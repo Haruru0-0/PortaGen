@@ -1,0 +1,276 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Pixel-art retro color palette with sky blue, pink, purple, and pastel tones */
+:root {
+  /* Sky blue and cyan tones */
+  --pixel-sky: oklch(0.85 0.08 230);
+  --pixel-cyan: oklch(0.75 0.12 220);
+
+  /* Pink and lavender tones */
+  --pixel-pink: oklch(0.78 0.15 340);
+  --pixel-lavender: oklch(0.72 0.12 300);
+
+  /* Purple tones */
+  --pixel-purple: oklch(0.55 0.18 290);
+  --pixel-purple-dark: oklch(0.45 0.2 285);
+
+  /* Yellow accent */
+  --pixel-yellow: oklch(0.88 0.15 95);
+
+  /* Neutrals */
+  --pixel-white: oklch(0.98 0.01 240);
+  --pixel-cream: oklch(0.95 0.02 85);
+  --pixel-gray: oklch(0.65 0.02 240);
+  --pixel-dark: oklch(0.25 0.03 270);
+
+  /* Semantic tokens for pixel theme */
+  --background: var(--pixel-sky);
+  --foreground: var(--pixel-dark);
+  --card: var(--pixel-white);
+  --card-foreground: var(--pixel-dark);
+  --popover: var(--pixel-white);
+  --popover-foreground: var(--pixel-dark);
+  --primary: var(--pixel-purple);
+  --primary-foreground: var(--pixel-white);
+  --secondary: var(--pixel-pink);
+  --secondary-foreground: var(--pixel-dark);
+  --muted: var(--pixel-cream);
+  --muted-foreground: var(--pixel-gray);
+  --accent: var(--pixel-yellow);
+  --accent-foreground: var(--pixel-dark);
+  --destructive: oklch(0.6 0.22 25);
+  --destructive-foreground: var(--pixel-white);
+  --border: var(--pixel-purple);
+  --input: var(--pixel-white);
+  --ring: var(--pixel-purple);
+  --radius: 0rem;
+
+  /* Sidebar tokens */
+  --sidebar: var(--pixel-white);
+  --sidebar-foreground: var(--pixel-dark);
+  --sidebar-primary: var(--pixel-purple);
+  --sidebar-primary-foreground: var(--pixel-white);
+  --sidebar-accent: var(--pixel-lavender);
+  --sidebar-accent-foreground: var(--pixel-dark);
+  --sidebar-border: var(--pixel-purple);
+  --sidebar-ring: var(--pixel-purple);
+}
+
+.dark {
+  --background: var(--pixel-dark);
+  --foreground: var(--pixel-white);
+  --card: var(--pixel-purple-dark);
+  --card-foreground: var(--pixel-white);
+  --popover: var(--pixel-purple-dark);
+  --popover-foreground: var(--pixel-white);
+  --primary: var(--pixel-cyan);
+  --primary-foreground: var(--pixel-dark);
+  --secondary: var(--pixel-pink);
+  --secondary-foreground: var(--pixel-dark);
+  --muted: oklch(0.35 0.03 270);
+  --muted-foreground: var(--pixel-gray);
+  --accent: var(--pixel-yellow);
+  --accent-foreground: var(--pixel-dark);
+  --border: var(--pixel-cyan);
+  --input: oklch(0.35 0.03 270);
+  --ring: var(--pixel-cyan);
+  --sidebar: var(--pixel-purple-dark);
+  --sidebar-foreground: var(--pixel-white);
+  --sidebar-primary: var(--pixel-cyan);
+  --sidebar-primary-foreground: var(--pixel-dark);
+  --sidebar-accent: var(--pixel-lavender);
+  --sidebar-accent-foreground: var(--pixel-white);
+  --sidebar-border: var(--pixel-cyan);
+  --sidebar-ring: var(--pixel-cyan);
+}
+
+@theme inline {
+  --font-sans: "Press Start 2P", "Courier New", monospace;
+  --font-mono: "Press Start 2P", "Courier New", monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: 0rem;
+  --radius-md: 0rem;
+  --radius-lg: 0rem;
+  --radius-xl: 0rem;
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+  }
+
+  /* Pixel-art specific styles */
+  .pixel-border {
+    border: 4px solid currentColor;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2), inset -2px -2px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  .pixel-button {
+    border: 3px solid currentColor;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+
+  .pixel-button:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  .pixel-card {
+    border: 4px solid var(--color-border);
+    background: var(--color-card);
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.15);
+  }
+
+  .pixel-text-shadow {
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  /* Pixel clouds animation */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .pixel-cloud {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Pixel character walk animation */
+  @keyframes walk {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(5px);
+    }
+  }
+
+  .pixel-walk {
+    animation: walk 0.5s steps(2) infinite;
+  }
+
+  /* Added portfolio desktop styles */
+  /* Desktop Icon Styles */
+  .desktop-icon-text {
+    @apply text-xs text-white text-center px-2 py-1 rounded;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4px);
+    max-width: 80px;
+    word-wrap: break-word;
+  }
+
+  /* Window Styles */
+  .window-container {
+    @apply rounded-lg shadow-2xl overflow-hidden;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .window-drag-handle {
+    @apply h-8 bg-gradient-to-r from-blue-400 to-purple-500 dark:from-blue-600 dark:to-purple-700 flex items-center justify-between px-3 cursor-move select-none;
+    color: white;
+  }
+
+  .window-button {
+    @apply w-5 h-5 rounded-full flex items-center justify-center transition-all;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .window-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+  }
+
+  .window-button-close {
+    background: rgba(255, 59, 48, 0.8);
+  }
+
+  .window-button-close:hover {
+    background: rgba(255, 59, 48, 1);
+  }
+
+  .window-content {
+    @apply overflow-auto;
+    height: calc(100% - 2rem);
+  }
+
+  .window-header-mobile {
+    @apply h-12 bg-gradient-to-r from-blue-400 to-purple-500 dark:from-blue-600 dark:to-purple-700 flex items-center justify-between px-4;
+    color: white;
+  }
+
+  .window-content-mobile {
+    @apply flex-1 overflow-auto;
+  }
+
+  .maximized-window {
+    @apply rounded-none;
+  }
+
+  /* Taskbar Styles */
+  .taskbar {
+    @apply fixed bottom-0 left-1/2 -translate-x-1/2 h-16 bg-white/10 dark:bg-gray-900/30 backdrop-blur-md rounded-t-2xl px-4 flex items-center gap-2 shadow-lg;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-bottom: none;
+    min-width: 300px;
+  }
+
+  .taskbar-indicator {
+    @apply absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white;
+  }
+
+  /* Floating animation for decorative elements */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 650px) {
+    .taskbar {
+      @apply w-full left-0 translate-x-0 rounded-none h-14;
+    }
+  }
+}
