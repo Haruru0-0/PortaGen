@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -68,7 +69,7 @@ export default function LoginPage() {
         redirectUrl: "/sso-callback",
         redirectUrlComplete: "/dashboard",
       })
-    } catch (err) {
+    } catch (err: any) {
       setError(err.errors?.[0]?.message || "OAUTH FAILED")
     }
   }

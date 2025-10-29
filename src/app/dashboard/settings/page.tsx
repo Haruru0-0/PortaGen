@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import { useState } from "react"
+import {useEffect, useState} from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -10,9 +11,11 @@ import { PixelCard } from "@/components/pixel-card"
 import { PixelInput } from "@/components/pixel-input"
 import { PixelCharacter } from "@/components/pixel-character"
 import { FileUpload } from "@/components/file-upload"
-import { Trash2, Eye } from "lucide-react"
+import {Trash2, Eye, Cloud, CheckCircle, XCircle} from "lucide-react"
 import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal"
 import Link from "next/link"
+import {useSearchParams} from "next/navigation";
+import {useGoogleDrive} from "@/hooks/use-google-drive";
 
 // Password validation schema
 const passwordSchema = z.object({
@@ -45,6 +48,22 @@ export default function SettingsPage() {
   const [passwordError, setPasswordError] = useState("")
   const [passwordSuccess, setPasswordSuccess] = useState(false)
   const [passwordLoading, setPasswordLoading] = useState(false)
+  const searchParams = useSearchParams()
+  const { connected, loading, connecting, connectDrive, disconnectDrive } = useGoogleDrive()
+  const [message, setMessage] = useState('')
+
+  useEffect(() => {
+    const success = searchParams.get('success')
+    const error = searchParams.get('error')
+
+    if (success === 'google_connected') {
+      setMessage('Google Drive connected successfully!')
+      setTimeout(() => setMessage(''), 5000)
+    } else if (error) {
+      setMessage(`Error: ${error}`)
+      setTimeout(() => setMessage(''), 5000)
+    }
+  }, [searchParams])
 
   const passwordForm = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordSchema),
@@ -120,7 +139,15 @@ export default function SettingsPage() {
               </PixelButton>
             </Link>
           </div>
-
+          {message && (
+              <div className={`p-3 border-2 text-[10px] text-center ${
+                  message.includes('Error')
+                      ? 'bg-red-500/20 border-red-500 text-red-500'
+                      : 'bg-green-500/20 border-green-500 text-green-500'
+              }`}>
+                {message}
+              </div>
+          )}
           {/* Profile Settings */}
           <PixelCard>
             <div className="space-y-6">
@@ -188,6 +215,77 @@ export default function SettingsPage() {
                   SAVE CHANGES
                 </PixelButton>
               </div>
+            </div>
+          </PixelCard>
+
+          <PixelCard>
+            <div className="space-y-6">
+              <h3 className="text-sm pixel-text-shadow">GOOGLE DRIVE INTEGRATION</h3>
+
+              <div className="flex items-center justify-between p-4 border-2 border-border bg-muted">
+                <div className="flex items-center gap-3">
+                  <Cloud className="w-6 h-6" />
+                  <div>
+                    <p className="text-[10px] font-bold">GOOGLE DRIVE STATUS</p>
+                    <p className="text-[8px] text-muted-foreground">
+                      {loading ? 'Checking...' : connected ? 'Connected' : 'Not connected'}
+                    </p>
+                  </div>
+                </div>
+
+                {!loading && (
+                    <div className="flex items-center gap-2">
+                      {connected ? (
+                          <>
+                            <CheckCircle className="w-5 h-5 text-green-500" />
+                            <PixelButton
+                                variant="secondary"
+                                className="text-[10px]"
+                                onClick={disconnectDrive}
+                            >
+                              DISCONNECT
+                            </PixelButton>
+                          </>
+                      ) : (
+                          <>
+                            <XCircle className="w-5 h-5 text-red-500" />
+                            <PixelButton
+                                variant="primary"
+                                className="text-[10px]"
+                                onClick={connectDrive}
+                                disabled={connecting}
+                            >
+                              {connecting ? 'CONNECTING...' : 'CONNECT DRIVE'}
+                            </PixelButton>
+                          </>
+                      )}
+                    </div>
+                )}
+              </div>
+
+              <div className="p-3 bg-accent/20 border-2 border-border">
+                <p className="text-[10px] leading-relaxed">
+                  <strong>WHY CONNECT GOOGLE DRIVE?</strong>
+                  <br />
+                  • Your files are stored in YOUR Google Drive
+                  <br />
+                  • You have full control over your assets
+                  <br />
+                  • No file storage limits from us
+                  <br />
+                  • Files are automatically backed up
+                  <br />
+                  • Easy to manage and organize
+                </p>
+              </div>
+
+              {connected && (
+                  <div className="p-3 bg-green-500/10 border-2 border-green-500">
+                    <p className="text-[10px] text-green-500">
+                      ✓ Your portfolio files will be saved to a &#34;Portfolio Assets&#34; folder in your Google Drive
+                    </p>
+                  </div>
+              )}
             </div>
           </PixelCard>
 
