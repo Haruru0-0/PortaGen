@@ -24,7 +24,7 @@ CREATE TABLE "icons" (
 	"name" varchar(255) NOT NULL,
 	"position" integer DEFAULT 0 NOT NULL,
 	"icon_file_id" varchar(255),
-	"icon_url" text NOT NULL,
+	"icon_url" text,
 	"icon_file_name" text,
 	"link_url" text,
 	"window_id" varchar(100),
@@ -107,7 +107,8 @@ CREATE TABLE "uploaded_assets" (
 	"asset_type" varchar(50) NOT NULL,
 	"file_id" varchar(255) NOT NULL,
 	"file_name" text NOT NULL,
-	"file_url" text NOT NULL,
+	"download_url" text,
+	"display_url" text,
 	"thumbnail_url" text,
 	"mime_type" varchar(100),
 	"file_size" integer,
@@ -153,8 +154,6 @@ ALTER TABLE "theme_settings" ADD CONSTRAINT "theme_settings_portfolio_id_portfol
 ALTER TABLE "uploaded_assets" ADD CONSTRAINT "uploaded_assets_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "uploaded_assets" ADD CONSTRAINT "uploaded_assets_portfolio_id_portfolios_id_fk" FOREIGN KEY ("portfolio_id") REFERENCES "public"."portfolios"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "window_contents" ADD CONSTRAINT "window_contents_portfolio_id_portfolios_id_fk" FOREIGN KEY ("portfolio_id") REFERENCES "public"."portfolios"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-CREATE INDEX "icons_portfolio_id_idx" ON "icons" USING btree ("portfolio_id");--> statement-breakpoint
-CREATE INDEX "music_portfolio_id_idx" ON "music_tracks" USING btree ("portfolio_id");--> statement-breakpoint
 CREATE INDEX "portfolio_user_id_idx" ON "portfolios" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "portfolio_slug_idx" ON "portfolios" USING btree ("slug");--> statement-breakpoint
 CREATE INDEX "assets_user_id_idx" ON "uploaded_assets" USING btree ("user_id");--> statement-breakpoint

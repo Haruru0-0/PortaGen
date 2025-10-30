@@ -10,7 +10,7 @@ import { PortfolioSelector } from "@/components/portfolio-selector"
 import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal"
 import { useGoogleDrive } from "@/hooks/use-google-drive"
 import { useFileUpload } from "@/hooks/use-file-upload"
-import { Cloud, CheckCircle, XCircle, Loader2 } from "lucide-react"
+import { Cloud, CheckCircle, XCircle, Loader2, FileImage, Music, Zap, Image, Edit, Save, X } from "lucide-react"
 
 type AssetType = "all" | "wallpaper" | "icon" | "music" | "sound"
 
@@ -34,6 +34,14 @@ interface Portfolio {
   isPublished: boolean
 }
 
+// Available asset types for user selection
+const ASSET_TYPES = [
+  { id: "wallpaper", label: "WALLPAPER", icon: FileImage, description: "Background images for your portfolio" },
+  { id: "icon", label: "ICON", icon: Zap, description: "Small images for desktop icons" },
+  { id: "music", label: "MUSIC", icon: Music, description: "Audio tracks for music player" },
+  { id: "sound", label: "SOUND", icon: Music, description: "Sound effects for interactions" },
+] as const
+
 export default function AssetsPage() {
   const [activeFilter, setActiveFilter] = useState<AssetType>("all")
   const [searchQuery, setSearchQuery] = useState("")
@@ -49,7 +57,10 @@ export default function AssetsPage() {
   // Modal states
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false)
   const [viewingAsset, setViewingAsset] = useState<Asset | null>(null)
+  const [renamingAsset, setRenamingAsset] = useState<Asset | null>(null)
+  const [newAssetName, setNewAssetName] = useState("")
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     isOpen: boolean
     assetId: number | null
@@ -57,6 +68,13 @@ export default function AssetsPage() {
     isOpen: false,
     assetId: null,
   })
+
+  // Upload state
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [selectedAssetType, setSelectedAssetType] = useState<"wallpaper" | "icon" | "music" | "sound">("wallpaper")
+  const [fileNames, setFileNames] = useState<{ [key: string]: string }>({})
+  const [editingAssetId, setEditingAssetId] = useState<number | null>(null)
+  const [editingAssetName, setEditingAssetName] = useState("")
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -95,7 +113,17 @@ export default function AssetsPage() {
       console.error('Failed to fetch portfolios:', error)
     }
   }
-
+  const getOptimizedDriveUrl = (fileId: string, type: 'display' | 'download' | 'thumbnail' = 'display') => {
+    switch (type) {
+      case 'thumbnail':
+        return `https://drive.google.com/thumbnail?id=${fileId}&sz=w300-h300`
+      case 'download':
+        return `https://drive.google.com/uc?export=download&id=${fileId}`
+      case 'display':
+      default:
+        return `https://drive.google.com/uc?id=${fileId}`
+    }
+  }
   const fetchAssets = async () => {
     if (!currentPortfolioId) return
 
@@ -104,7 +132,13 @@ export default function AssetsPage() {
       const response = await fetch(`/api/assets?portfolioId=${currentPortfolioId}`)
       if (response.ok) {
         const data = await response.json()
-        setAssets(data.assets || [])
+        // Ensure assets have proper URLs
+        const assetsWithFixedUrls = data.assets.map((asset: Asset) => ({
+          ...asset,
+          url: asset.url || getOptimizedDriveUrl(asset.fileId, 'display'),
+          thumbnailUrl: asset.thumbnailUrl || getOptimizedDriveUrl(asset.fileId, 'thumbnail')
+        }))
+        setAssets(assetsWithFixedUrls || [])
       }
     } catch (error) {
       console.error('Failed to fetch assets:', error)
@@ -120,7 +154,6 @@ export default function AssetsPage() {
   const handlePortfolioCreated = (newPortfolio: Portfolio) => {
     setPortfolios(prev => [...prev, newPortfolio])
     setCurrentPortfolioId(newPortfolio.id)
-    // Assets will be automatically fetched due to the useEffect dependency
   }
 
   const filteredAssets = assets.filter((asset) => {
@@ -137,8 +170,35 @@ export default function AssetsPage() {
     )
   }
 
+  // File selection handler
+  const handleFileSelect = (files: FileList | null) => {
+    if (!files) return
+
+    const fileArray = Array.from(files)
+    setSelectedFiles(fileArray)
+    setIsUploadModalOpen(true)
+
+    // Auto-detect asset type based on first file
+    if (fileArray.length > 0) {
+      const firstFile = fileArray[0]
+      if (firstFile.type.startsWith('audio/')) {
+        setSelectedAssetType(firstFile.size < 500000 ? 'sound' : 'music')
+      } else if (firstFile.type.startsWith('image/')) {
+        setSelectedAssetType(firstFile.size < 100000 ? 'icon' : 'wallpaper')
+      }
+    }
+  }
+
+  // File name change handler
+  const handleFileNameChange = (originalName: string, newName: string) => {
+    setFileNames(prev => ({
+      ...prev,
+      [originalName]: newName
+    }))
+  }
+
   // File upload handler
-  const handleFileUpload = async (files: File[]) => {
+  const handleFileUpload = async () => {
     if (!connected) {
       alert('Please connect your Google Drive first!')
       return
@@ -149,30 +209,135 @@ export default function AssetsPage() {
       return
     }
 
-    for (const file of files) {
-      const assetType = getFileType(file)
-      const result = await uploadFile(file, assetType, currentPortfolioId)
-
-      if (result.success) {
-        // Refresh assets list
-        await fetchAssets()
-      } else {
-        console.error('Failed to upload:', file.name, result.error)
-      }
+    if (selectedFiles.length === 0) {
+      alert('Please select files to upload')
+      return
     }
 
+    const uploadPromises = selectedFiles.map(async (file) => {
+      try {
+        // Get custom name or use original name without extension
+        const customName = fileNames[file.name] || file.name.replace(/\.[^/.]+$/, "")
+
+        const result = await uploadFile(file, selectedAssetType, currentPortfolioId, customName)
+
+        if (result.success) {
+          return { success: true, file: customName }
+        } else {
+          return { success: false, file: customName, error: result.error }
+        }
+      } catch (error) {
+        return { success: false, file: file.name, error: 'Upload failed' }
+      }
+    })
+
+    const results = await Promise.all(uploadPromises)
+
+    // Show upload summary
+    const successful = results.filter(r => r.success).length
+    const failed = results.filter(r => !r.success).length
+
+    if (failed > 0) {
+      const failedFiles = results.filter(r => !r.success).map(r => r.file).join(', ')
+      alert(`Upload completed: ${successful} successful, ${failed} failed\nFailed: ${failedFiles}`)
+    } else {
+      alert(`Successfully uploaded ${successful} files!`)
+    }
+
+    // Refresh assets list
+    await fetchAssets()
+
+    // Reset state
+    setSelectedFiles([])
     setIsUploadModalOpen(false)
+    setSelectedAssetType("wallpaper")
+    setFileNames({})
   }
 
-  const getFileType = (file: File): "wallpaper" | "icon" | "image" | "audio" => {
-    if (file.type.startsWith('image/')) {
-      // Simple heuristic: icons are usually smaller
-      return file.size < 100000 ? 'icon' : 'wallpaper'
-    } else if (file.type.startsWith('audio/')) {
-      // Simple heuristic: sounds are usually shorter
-      return 'audio'
+  // Rename asset handler
+  const handleRenameStart = (asset: Asset) => {
+    setRenamingAsset(asset)
+    setNewAssetName(asset.name)
+    setIsRenameModalOpen(true)
+  }
+
+  const handleRenameConfirm = async () => {
+    if (!renamingAsset || !newAssetName.trim()) return
+
+    try {
+      const response = await fetch(`/api/assets/${renamingAsset.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: newAssetName.trim()
+        }),
+      })
+
+      if (response.ok) {
+        // Update local state
+        setAssets(assets.map(asset =>
+            asset.id === renamingAsset.id
+                ? { ...asset, name: newAssetName.trim() }
+                : asset
+        ))
+        setIsRenameModalOpen(false)
+        setRenamingAsset(null)
+        setNewAssetName("")
+      } else {
+        alert('Failed to rename asset')
+      }
+    } catch (error) {
+      console.error('Rename error:', error)
+      alert('Failed to rename asset')
     }
-    return 'wallpaper'
+  }
+
+  // Inline rename handler
+  const handleInlineRenameStart = (asset: Asset) => {
+    setEditingAssetId(asset.id)
+    setEditingAssetName(asset.name)
+  }
+
+  const handleInlineRenameSave = async (assetId: number) => {
+    if (!editingAssetName.trim()) {
+      setEditingAssetId(null)
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/assets/${assetId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: editingAssetName.trim()
+        }),
+      })
+
+      if (response.ok) {
+        // Update local state
+        setAssets(assets.map(asset =>
+            asset.id === assetId
+                ? { ...asset, name: editingAssetName.trim() }
+                : asset
+        ))
+        setEditingAssetId(null)
+        setEditingAssetName("")
+      } else {
+        alert('Failed to rename asset')
+      }
+    } catch (error) {
+      console.error('Rename error:', error)
+      alert('Failed to rename asset')
+    }
+  }
+
+  const handleInlineRenameCancel = () => {
+    setEditingAssetId(null)
+    setEditingAssetName("")
   }
 
   const formatFileSize = (bytes: number): string => {
@@ -187,31 +352,9 @@ export default function AssetsPage() {
     setIsViewModalOpen(true)
   }
 
-  // Download handler
-  const handleDownload = (asset: Asset) => {
-    const link = document.createElement("a")
-    link.href = asset.url
-    link.download = asset.name
-    link.click()
-  }
-
   // Delete handler
   const handleDelete = (assetId: number) => {
     setDeleteConfirmation({ isOpen: true, assetId })
-  }
-
-  const confirmDelete = async () => {
-    if (deleteConfirmation.assetId) {
-      const asset = assets.find(a => a.id === deleteConfirmation.assetId)
-      if (asset) {
-        const result = await deleteFile(asset.fileId)
-        if (result.success) {
-          setAssets(assets.filter(a => a.id !== deleteConfirmation.assetId))
-          setSelectedAssets(selectedAssets.filter(id => id !== deleteConfirmation.assetId))
-        }
-      }
-    }
-    setDeleteConfirmation({ isOpen: false, assetId: null })
   }
 
   // Bulk delete handler
@@ -221,20 +364,28 @@ export default function AssetsPage() {
     }
   }
 
-  const confirmBulkDelete = async () => {
-    for (const assetId of selectedAssets) {
-      const asset = assets.find(a => a.id === assetId)
-      if (asset) {
-        await deleteFile(asset.fileId)
-      }
-    }
+  const handleDownload = (asset: Asset) => {
+    // Create a direct download link
+    const downloadUrl = asset.url.includes('export=download')
+        ? asset.url
+        : `https://drive.google.com/uc?export=download&id=${asset.fileId}`
 
-    setAssets(assets.filter(asset => !selectedAssets.includes(asset.id)))
-    setSelectedAssets([])
-    setDeleteConfirmation({ isOpen: false, assetId: null })
+    const link = document.createElement("a")
+    link.href = downloadUrl
+    link.target = "_blank" // Open in new tab for better user experience
+    link.rel = "noopener noreferrer"
+
+    // For direct download, you can try to trigger download
+    try {
+      link.download = asset.name
+      link.click()
+    } catch (error) {
+      console.log('Direct download failed, opening in new tab')
+      link.click()
+    }
   }
 
-  // Bulk download handler
+// Also update the bulk download handler
   const handleBulkDownload = () => {
     selectedAssets.forEach((id) => {
       const asset = assets.find((a) => a.id === id)
@@ -278,13 +429,23 @@ export default function AssetsPage() {
             <PixelButton
                 variant="primary"
                 className="text-[10px]"
-                onClick={() => setIsUploadModalOpen(true)}
+                onClick={() => fileInputRef.current?.click()}
                 disabled={!connected}
             >
               + UPLOAD ASSET
             </PixelButton>
           </div>
         </div>
+
+        {/* Hidden file input */}
+        <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/*,audio/*"
+            className="hidden"
+            onChange={(e) => handleFileSelect(e.target.files)}
+        />
 
         {/* Drive Status Banner */}
         {!connected && (
@@ -394,18 +555,6 @@ export default function AssetsPage() {
                 <p className="text-[10px] text-muted-foreground">
                   SUPPORTED: PNG, JPG, SVG, MP3, WAV
                 </p>
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    multiple
-                    accept="image/*,audio/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      if (e.target.files) {
-                        handleFileUpload(Array.from(e.target.files))
-                      }
-                    }}
-                />
               </div>
             </PixelCard>
         )}
@@ -449,12 +598,57 @@ export default function AssetsPage() {
                       </div>
 
                       <div className="space-y-1">
-                        <h4 className="text-[10px] pixel-text-shadow truncate">
-                          {asset.name}
-                        </h4>
+                        {/* Editable Asset Name */}
+                        {editingAssetId === asset.id ? (
+                            <div className="flex items-center gap-1">
+                              <input
+                                  type="text"
+                                  value={editingAssetName}
+                                  onChange={(e) => setEditingAssetName(e.target.value)}
+                                  className="flex-1 px-2 py-1 text-[10px] bg-input border border-border focus:outline-none focus:ring-1 focus:ring-primary"
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleInlineRenameSave(asset.id)
+                                    if (e.key === 'Escape') handleInlineRenameCancel()
+                                  }}
+                                  autoFocus
+                              />
+                              <button
+                                  onClick={() => handleInlineRenameSave(asset.id)}
+                                  className="w-6 h-6 bg-green-500 text-white flex items-center justify-center text-[8px]"
+                              >
+                                ✓
+                              </button>
+                              <button
+                                  onClick={handleInlineRenameCancel}
+                                  className="w-6 h-6 bg-red-500 text-white flex items-center justify-center text-[8px]"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-1 group">
+                              <h4
+                                  className="text-[10px] pixel-text-shadow truncate flex-1 cursor-text"
+                                  onDoubleClick={() => handleInlineRenameStart(asset)}
+                              >
+                                {asset.name}
+                              </h4>
+                              <button
+                                  onClick={() => handleInlineRenameStart(asset)}
+                                  className="w-5 h-5 border border-border bg-card hover:bg-primary hover:text-primary-foreground transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100"
+                                  title="Rename"
+                              >
+                                <Edit className="w-3 h-3" />
+                              </button>
+                            </div>
+                        )}
+
                         <div className="flex items-center justify-between text-[10px] text-muted-foreground">
                           <span>{formatFileSize(asset.fileSize)}</span>
                           <span>{new Date(asset.date).toLocaleDateString()}</span>
+                        </div>
+                        <div className="text-[8px] text-muted-foreground capitalize">
+                          {asset.type}
                         </div>
                       </div>
 
@@ -509,6 +703,261 @@ export default function AssetsPage() {
             </PixelCard>
         )}
 
+        {/* Upload Modal */}
+        <PixelModal
+            isOpen={isUploadModalOpen}
+            onClose={() => {
+              setIsUploadModalOpen(false)
+              setSelectedFiles([])
+              setFileNames({})
+            }}
+            title="UPLOAD ASSETS"
+        >
+          <div className="space-y-4">
+            {/* Selected Files with Editable Names */}
+            {selectedFiles.length > 0 && (
+                <div className="space-y-2">
+                  <label className="block text-xs uppercase tracking-wider">FILES TO UPLOAD</label>
+                  <div className="max-h-48 overflow-y-auto space-y-2">
+                    {selectedFiles.map((file, index) => {
+                      const originalName = file.name
+                      const originalNameWithoutExt = originalName.replace(/\.[^/.]+$/, "")
+                      const extension = originalName.split('.').pop()?.toLowerCase() || ''
+
+                      return (
+                          <div key={index} className="flex items-center gap-2 p-2 border border-border bg-muted">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                            <span className="text-[10px] text-muted-foreground flex-shrink-0">
+                              {file.type.startsWith('image/') ? '🖼️' : '🎵'}
+                            </span>
+                                <input
+                                    type="text"
+                                    value={fileNames[file.name] || originalNameWithoutExt}
+                                    onChange={(e) => handleFileNameChange(file.name, e.target.value)}
+                                    className="flex-1 px-2 py-1 text-[10px] bg-input border border-border focus:outline-none focus:ring-1 focus:ring-primary"
+                                    placeholder="Enter file name"
+                                />
+                                <span className="text-[8px] text-muted-foreground flex-shrink-0">
+                              .{extension}
+                            </span>
+                              </div>
+                              <div className="flex justify-between text-[8px] text-muted-foreground">
+                                <span>{formatFileSize(file.size)}</span>
+                                <span>Original: {file.name}</span>
+                              </div>
+                            </div>
+                          </div>
+                      )
+                    })}
+                  </div>
+                </div>
+            )}
+
+            {/* Asset Type Selection */}
+            <div className="space-y-2">
+              <label className="block text-xs uppercase tracking-wider">ASSET TYPE</label>
+              <div className="grid grid-cols-2 gap-2">
+                {ASSET_TYPES.map((type) => {
+                  const IconComponent = type.icon
+                  return (
+                      <button
+                          key={type.id}
+                          onClick={() => setSelectedAssetType(type.id)}
+                          className={`p-3 border-2 text-left transition-colors ${
+                              selectedAssetType === type.id
+                                  ? "border-primary bg-primary/10"
+                                  : "border-border bg-card hover:bg-muted"
+                          }`}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <IconComponent className="w-4 h-4" />
+                          <span className="text-[10px] font-bold">{type.label}</span>
+                        </div>
+                        <p className="text-[8px] text-muted-foreground">{type.description}</p>
+                      </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-4 border-t-2 border-border">
+              <PixelButton
+                  variant="secondary"
+                  className="flex-1 text-[10px]"
+                  onClick={() => {
+                    setIsUploadModalOpen(false)
+                    setSelectedFiles([])
+                    setFileNames({})
+                  }}
+              >
+                CANCEL
+              </PixelButton>
+              <PixelButton
+                  variant="primary"
+                  className="flex-1 text-[10px]"
+                  onClick={handleFileUpload}
+                  disabled={selectedFiles.length === 0 || uploading}
+              >
+                {uploading ? "UPLOADING..." : `UPLOAD ${selectedFiles.length} FILES`}
+              </PixelButton>
+            </div>
+          </div>
+        </PixelModal>
+
+        {/* Rename Modal */}
+        <PixelModal
+            isOpen={isRenameModalOpen}
+            onClose={() => {
+              setIsRenameModalOpen(false)
+              setRenamingAsset(null)
+              setNewAssetName("")
+            }}
+            title="RENAME ASSET"
+        >
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs uppercase tracking-wider mb-2">
+                NEW NAME
+              </label>
+              <PixelInput
+                  value={newAssetName}
+                  onChange={(e) => setNewAssetName(e.target.value)}
+                  placeholder="Enter new asset name"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleRenameConfirm()
+                  }}
+              />
+            </div>
+            <div className="flex gap-3 pt-2">
+              <PixelButton
+                  variant="secondary"
+                  className="flex-1 text-[10px]"
+                  onClick={() => {
+                    setIsRenameModalOpen(false)
+                    setRenamingAsset(null)
+                    setNewAssetName("")
+                  }}
+              >
+                CANCEL
+              </PixelButton>
+              <PixelButton
+                  variant="primary"
+                  className="flex-1 text-[10px]"
+                  onClick={handleRenameConfirm}
+                  disabled={!newAssetName.trim()}
+              >
+                RENAME
+              </PixelButton>
+            </div>
+          </div>
+        </PixelModal>
+
+        <PixelModal
+            isOpen={isViewModalOpen}
+            onClose={() => setIsViewModalOpen(false)}
+            title={viewingAsset?.name || ""}
+        >
+          {viewingAsset && (
+              <div className="space-y-4">
+                {(viewingAsset.type === "wallpaper" || viewingAsset.type === "icon") && viewingAsset.url ? (
+                    <div className="border-2 border-border bg-muted">
+                      <img
+                          src={viewingAsset.url.replace('/thumbnail', '/uc')} // Use full image for view modal
+                          alt={viewingAsset.name}
+                          className="w-full max-h-96 object-contain"
+                          onError={(e) => {
+                            // Fallback to thumbnail if full image fails
+                            const target = e.target as HTMLImageElement
+                            target.src = viewingAsset.thumbnailUrl || viewingAsset.url
+                          }}
+                      />
+                    </div>
+                ) : viewingAsset.type === "music" || viewingAsset.type === "sound" ? (
+                    <audio controls className="w-full">
+                      <source src={viewingAsset.url} type="audio/mpeg" />
+                      <source src={viewingAsset.url} type="audio/wav" />
+                      Your browser does not support the audio element.
+                    </audio>
+                ) : (
+                    <div className="aspect-video bg-muted border-2 border-border flex items-center justify-center text-4xl">
+                      {getAssetIcon(viewingAsset.type)}
+                    </div>
+                )}
+                <div className="space-y-2 text-[10px]">
+                  <p><strong>TYPE:</strong> {viewingAsset.type.toUpperCase()}</p>
+                  <p><strong>SIZE:</strong> {formatFileSize(viewingAsset.fileSize)}</p>
+                  <p><strong>DATE:</strong> {new Date(viewingAsset.date).toLocaleString()}</p>
+                  <p><strong>FILE ID:</strong> {viewingAsset.fileId}</p>
+                  <div className="pt-2">
+                    <PixelButton
+                        variant="primary"
+                        className="text-[10px] w-full"
+                        onClick={() => handleDownload(viewingAsset)}
+                    >
+                      DOWNLOAD FILE
+                    </PixelButton>
+                  </div>
+                </div>
+              </div>
+          )}
+        </PixelModal>
+
+        {/* Single Asset Delete */}
+        <DeleteConfirmationModal
+            isOpen={deleteConfirmation.isOpen && deleteConfirmation.assetId !== -1}
+            onClose={() => setDeleteConfirmation({ isOpen: false, assetId: null })}
+            onConfirm={async () => {
+              if (deleteConfirmation.assetId) {
+                const asset = assets.find(a => a.id === deleteConfirmation.assetId)
+                if (asset) {
+                  const result = await deleteFile(asset.fileId)
+                  if (result.success) {
+                    setAssets(assets.filter(a => a.id !== deleteConfirmation.assetId))
+                    setSelectedAssets(selectedAssets.filter(id => id !== deleteConfirmation.assetId))
+                  } else {
+                    throw new Error(result.error || 'Delete failed')
+                  }
+                }
+              }
+              setDeleteConfirmation({ isOpen: false, assetId: null })
+            }}
+            title="DELETE ASSET?"
+            message="ARE YOU SURE YOU WANT TO DELETE THIS ASSET? THIS WILL REMOVE IT FROM GOOGLE DRIVE."
+        />
+
+        {/* Bulk Delete */}
+        <DeleteConfirmationModal
+            isOpen={deleteConfirmation.isOpen && deleteConfirmation.assetId === -1}
+            onClose={() => setDeleteConfirmation({ isOpen: false, assetId: null })}
+            onConfirm={async () => {
+              const deletePromises = selectedAssets.map(async (assetId) => {
+                const asset = assets.find(a => a.id === assetId)
+                if (asset) {
+                  const result = await deleteFile(asset.fileId)
+                  if (!result.success) {
+                    throw new Error(`Failed to delete ${asset.name}`)
+                  }
+                  return assetId
+                }
+                return null
+              })
+
+              try {
+                await Promise.all(deletePromises)
+                setAssets(assets.filter(asset => !selectedAssets.includes(asset.id)))
+                setSelectedAssets([])
+                setDeleteConfirmation({ isOpen: false, assetId: null })
+              } catch (error) {
+                console.error('Bulk delete failed:', error)
+                throw error // This will trigger the error handling in the modal
+              }
+            }}
+            title="DELETE ASSETS?"
+            message={`ARE YOU SURE YOU WANT TO DELETE ${selectedAssets.length} SELECTED ASSETS? THIS WILL REMOVE THEM FROM GOOGLE DRIVE.`}
+        />
+
         {/* Upload Error */}
         {uploadError && (
             <div className="fixed bottom-4 right-4 p-4 bg-red-500 border-2 border-red-700 text-white text-[10px] max-w-sm">
@@ -523,52 +972,6 @@ export default function AssetsPage() {
               UPLOADING...
             </div>
         )}
-
-        {/* View Modal */}
-        <PixelModal
-            isOpen={isViewModalOpen}
-            onClose={() => setIsViewModalOpen(false)}
-            title={viewingAsset?.name || ""}
-        >
-          {viewingAsset && (
-              <div className="space-y-4">
-                {viewingAsset.type !== "music" && viewingAsset.type !== "sound" && viewingAsset.url ? (
-                    <img
-                        src={viewingAsset.url}
-                        alt={viewingAsset.name}
-                        className="w-full border-2 border-border"
-                    />
-                ) : viewingAsset.type === "music" || viewingAsset.type === "sound" ? (
-                    <audio controls className="w-full">
-                      <source src={viewingAsset.url} />
-                    </audio>
-                ) : (
-                    <div className="aspect-video bg-muted border-2 border-border flex items-center justify-center text-4xl">
-                      {getAssetIcon(viewingAsset.type)}
-                    </div>
-                )}
-                <div className="space-y-2 text-[10px]">
-                  <p><strong>TYPE:</strong> {viewingAsset.type.toUpperCase()}</p>
-                  <p><strong>SIZE:</strong> {formatFileSize(viewingAsset.fileSize)}</p>
-                  <p><strong>DATE:</strong> {new Date(viewingAsset.date).toLocaleString()}</p>
-                  <p><strong>FILE ID:</strong> {viewingAsset.fileId}</p>
-                </div>
-              </div>
-          )}
-        </PixelModal>
-
-        {/* Delete Confirmation */}
-        <DeleteConfirmationModal
-            isOpen={deleteConfirmation.isOpen}
-            onClose={() => setDeleteConfirmation({ isOpen: false, assetId: null })}
-            onConfirm={deleteConfirmation.assetId === -1 ? confirmBulkDelete : confirmDelete}
-            title="DELETE ASSET?"
-            message={
-              deleteConfirmation.assetId === -1
-                  ? `ARE YOU SURE YOU WANT TO DELETE ${selectedAssets.length} SELECTED ASSETS? THIS WILL REMOVE THEM FROM GOOGLE DRIVE.`
-                  : "ARE YOU SURE YOU WANT TO DELETE THIS ASSET? THIS WILL REMOVE IT FROM GOOGLE DRIVE."
-            }
-        />
       </div>
   )
 }

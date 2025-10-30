@@ -1,5 +1,5 @@
 {
-  "id": "55436f5f-6296-41ed-92a2-05d416154fbb",
+  "id": "7c845258-8add-4702-bd55-ad0031f10f98",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -176,7 +176,7 @@
           "name": "icon_url",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "icon_file_name": {
           "name": "icon_file_name",
@@ -218,23 +218,7 @@
           "default": "now()"
         }
       },
-      "indexes": {
-        "icons_portfolio_id_idx": {
-          "name": "icons_portfolio_id_idx",
-          "columns": [
-            {
-              "expression": "portfolio_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "icons_portfolio_id_portfolios_id_fk": {
           "name": "icons_portfolio_id_portfolios_id_fk",
@@ -436,23 +420,7 @@
           "default": "now()"
         }
       },
-      "indexes": {
-        "music_portfolio_id_idx": {
-          "name": "music_portfolio_id_idx",
-          "columns": [
-            {
-              "expression": "portfolio_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "music_tracks_portfolio_id_portfolios_id_fk": {
           "name": "music_tracks_portfolio_id_portfolios_id_fk",
@@ -819,11 +787,17 @@
           "primaryKey": false,
           "notNull": true
         },
-        "file_url": {
-          "name": "file_url",
+        "download_url": {
+          "name": "download_url",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
+        },
+        "display_url": {
+          "name": "display_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "thumbnail_url": {
           "name": "thumbnail_url",

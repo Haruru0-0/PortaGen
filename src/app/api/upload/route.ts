@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// app/api/upload/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { uploadToUserDrive, decryptToken, refreshAccessToken, encryptToken } from '@/lib/services/google-drive'
@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
         const file = formData.get('file') as File
         const assetType = formData.get('assetType') as string
         const portfolioId = formData.get('portfolioId') as string
+        const customFileName = formData.get('customFileName') as string
 
         if (!file) {
             return NextResponse.json({ error: 'No file provided' }, { status: 400 })
@@ -39,6 +40,22 @@ export async function POST(req: NextRequest) {
         const maxSize = assetType === 'audio' ? 50 * 1024 * 1024 : 10 * 1024 * 1024
         if (file.size > maxSize) {
             return NextResponse.json({ error: 'File too large' }, { status: 400 })
+        }
+
+        // Handle file naming
+        const originalExtension = file.name.split('.').pop() || ''
+
+        // Use custom file name if provided, otherwise use original name without extension
+        let finalFileName = customFileName || file.name.replace(/\.[^/.]+$/, "")
+
+        // Add extension if not already present
+        if (originalExtension && !finalFileName.endsWith(`.${originalExtension}`)) {
+            finalFileName = `${finalFileName}.${originalExtension}`
+        }
+
+        // Ensure the name is not empty
+        if (!finalFileName.trim()) {
+            finalFileName = `asset_${Date.now()}.${originalExtension}`
         }
 
         // Decrypt tokens
@@ -65,16 +82,12 @@ export async function POST(req: NextRequest) {
         const bytes = await file.arrayBuffer()
         const buffer = Buffer.from(bytes)
 
-        // Generate unique filename
-        const timestamp = Date.now()
-        const uniqueFileName = `${timestamp}_${file.name}`
-
         // Upload to user's Google Drive
         const uploadResult = await uploadToUserDrive(
             accessToken,
             refreshToken,
             buffer,
-            uniqueFileName,
+            finalFileName, // Use the final file name here
             file.type
         )
 
@@ -86,9 +99,9 @@ export async function POST(req: NextRequest) {
                 portfolioId: portfolioId ? parseInt(portfolioId) : null,
                 assetType,
                 fileId: uploadResult.fileId,
-                fileName: uploadResult.fileName,
+                fileName: finalFileName, // Store the final file name
                 fileUrl: uploadResult.fileUrl,
-                thumbnailUrl: uploadResult.thumbnailLink,
+                thumbnailUrl: uploadResult.thumbnailUrl,
                 mimeType: file.type,
                 fileSize: uploadResult.fileSize,
             })
@@ -99,9 +112,13 @@ export async function POST(req: NextRequest) {
             asset: {
                 id: asset.id,
                 fileId: uploadResult.fileId,
-                fileUrl: uploadResult.fileUrl,
-                fileName: uploadResult.fileName,
-                thumbnailUrl: uploadResult.thumbnailLink,
+                name: finalFileName,
+                type: assetType,
+                fileSize: uploadResult.fileSize,
+                date: asset.uploadedAt.toISOString(),
+                url: uploadResult.displayUrl,
+                thumbnailUrl: uploadResult.thumbnailUrl,
+                portfolioId: portfolioId ? parseInt(portfolioId) : null,
             },
         })
     } catch (error: any) {

@@ -55,7 +55,7 @@ export function PortfolioUrlShare({ username = "demo-user" }: PortfolioUrlShareP
       </p>
 
       <div className="flex gap-2 mb-4">
-        <div className="flex-1 bg-background border-2 border-foreground rounded px-4 py-2 font-mono text-sm truncate">
+        <div className="flex-1 bg-background border-2 border-foreground rounded px-4 py-2 font-mono text-sm truncate w-20">
           {portfolioUrl}
         </div>
         <PixelButton onClick={handleCopy} variant="secondary" className="shrink-0 flex items-center justify-center">

@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react'
 
+// Update the type to match your asset system
+type AssetType = 'wallpaper' | 'icon' | 'music' | 'sound'
+
 export function useFileUpload() {
     const [uploading, setUploading] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -8,8 +11,9 @@ export function useFileUpload() {
 
     const uploadFile = async (
         file: File,
-        assetType: 'image' | 'audio' | 'icon' | 'wallpaper',
-        portfolioId?: number
+        assetType: AssetType,
+        portfolioId?: number,
+        customFileName?: string // Add this parameter
     ) => {
         setUploading(true)
         setError(null)
@@ -21,6 +25,9 @@ export function useFileUpload() {
             formData.append('assetType', assetType)
             if (portfolioId) {
                 formData.append('portfolioId', portfolioId.toString())
+            }
+            if (customFileName) {
+                formData.append('customFileName', customFileName) // Send custom name to API
             }
 
             const response = await fetch('/api/upload', {

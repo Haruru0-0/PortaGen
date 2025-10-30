@@ -1,0 +1,54 @@
+// app/api/assets/[id]/route.ts
+import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@clerk/nextjs/server'
+import { db } from '@/lib/db'
+import { uploadedAssets } from '@/lib/db/schema'
+import { eq, and } from 'drizzle-orm'
+import { getUserByClerkId } from '@/lib/db/helpers'
+
+export async function PUT(
+    req: NextRequest,
+    { params }: { params: { id: string } }
+) {
+    try {
+        const { userId } = await auth()
+        if (!userId) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        const user = await getUserByClerkId(userId)
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 })
+        }
+
+        const { name } = await req.json()
+
+        if (!name || name.trim().length === 0) {
+            return NextResponse.json({ error: 'Name is required' }, { status: 400 })
+        }
+
+        // Update the asset name
+        const [updatedAsset] = await db
+            .update(uploadedAssets)
+            .set({
+                fileName: name.trim(),
+                uploadedAt: new Date()
+            })
+            .where(
+                and(
+                    eq(uploadedAssets.id, parseInt(params.id)),
+                    eq(uploadedAssets.userId, user.id)
+                )
+            )
+            .returning()
+
+        if (!updatedAsset) {
+            return NextResponse.json({ error: 'Asset not found' }, { status: 404 })
+        }
+
+        return NextResponse.json({ success: true, asset: updatedAsset })
+    } catch (error) {
+        console.error('Asset rename error:', error)
+        return NextResponse.json({ error: 'Failed to rename asset' }, { status: 500 })
+    }
+}

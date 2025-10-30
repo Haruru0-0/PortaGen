@@ -17,7 +17,7 @@ export async function DELETE(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const { fileId } = params
+        const { fileId } = await params
 
         // Get user
         const user = await db.query.users.findFirst({
@@ -30,7 +30,7 @@ export async function DELETE(
                 { status: 400 }
             )
         }
-
+        console.log(fileId)
         // Find asset in database
         const asset = await db.query.uploadedAssets.findFirst({
             where: and(

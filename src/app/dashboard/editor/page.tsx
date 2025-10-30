@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { PixelCard } from "@/components/pixel-card"
 import { PixelInput } from "@/components/pixel-input"
 import { PixelModal } from "@/components/pixel-modal"
@@ -10,6 +10,7 @@ import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal"
 import { AssetLibraryModal } from "@/components/asset-library-modal"
 import { PortfolioUrlShare } from "@/components/portfolio-url-share"
 import { ThemeEditor } from "@/components/theme-editor"
+import { PortfolioSelector } from "@/components/portfolio-selector"
 import { Library } from "lucide-react"
 import { LockScreenSettingsTab } from "@/components/editor/lock-screen-settings-tab"
 import { WallpaperTab } from "@/components/editor/wallpaper-tab"
@@ -35,6 +36,7 @@ interface Icon {
   name: string
   icon: string
   url?: string
+  iconFileId?: string
 }
 
 interface Music {
@@ -42,6 +44,7 @@ interface Music {
   name: string
   url: string
   type: "spotify" | "upload"
+  fileId?: string
 }
 
 interface Wallpaper {
@@ -49,6 +52,7 @@ interface Wallpaper {
   name: string
   url?: string
   color?: string
+  fileId?: string
 }
 
 interface WindowContent {
@@ -58,29 +62,47 @@ interface WindowContent {
   data: any
 }
 
+interface Portfolio {
+  id: number
+  name: string
+  slug: string
+  isPublished: boolean
+}
+
 export default function EditorPage() {
+  // Portfolio State
+  const [portfolios, setPortfolios] = useState<Portfolio[]>([])
+  const [currentPortfolioId, setCurrentPortfolioId] = useState<number | null>(null)
+
+  // UI State
   const [activeCategory, setActiveCategory] = useState<Category>("homeScreen")
   const [activeLockScreenTab, setActiveLockScreenTab] = useState<LockScreenTab>("settings")
   const [activeHomeScreenTab, setActiveHomeScreenTab] = useState<HomeScreenTab>("wallpaper")
   const [portfolioName, setPortfolioName] = useState("MY PORTFOLIO")
 
+  // Lock Screen State
   const [lockScreenPassword, setLockScreenPassword] = useState("1234")
   const [lockScreenHint, setLockScreenHint] = useState("It's 1234")
   const [lockScreenImage, setLockScreenImage] = useState("")
+  const [lockScreenImageFileId, setLockScreenImageFileId] = useState("")
   const [lockScreenEnabled, setLockScreenEnabled] = useState(true)
   const [isLocked, setIsLocked] = useState(true)
 
+  // Desktop State
   const [desktopGif, setDesktopGif] = useState("")
+  const [desktopGifFileId, setDesktopGifFileId] = useState("")
   const [mobileWidget1, setMobileWidget1] = useState("")
   const [mobileWidget2, setMobileWidget2] = useState("")
   const [musicPlayerIcon, setMusicPlayerIcon] = useState("")
 
+  // Modal States
   const [isIconModalOpen, setIsIconModalOpen] = useState(false)
   const [isMusicModalOpen, setIsMusicModalOpen] = useState(false)
   const [editingIcon, setEditingIcon] = useState<Icon | null>(null)
   const [editingMusic, setEditingMusic] = useState<Music | null>(null)
   const [editingWindow, setEditingWindow] = useState<WindowContent | null>(null)
 
+  // Content State
   const [icons, setIcons] = useState<Icon[]>([
     { id: 1, name: "ABOUT", icon: "/placeholder.svg" },
     { id: 2, name: "PROJECTS", icon: "/placeholder.svg" },
@@ -112,13 +134,16 @@ export default function EditorPage() {
 
   const [selectedWallpaper, setSelectedWallpaper] = useState<Wallpaper | null>(null)
   const [uploadedWallpaper, setUploadedWallpaper] = useState<string>("")
+  const [uploadedWallpaperFileId, setUploadedWallpaperFileId] = useState("")
   const [uploadedMusic, setUploadedMusic] = useState<string>("")
-  const [iconFormData, setIconFormData] = useState({ name: "", icon: "", url: "" })
-  const [musicFormData, setMusicFormData] = useState({ name: "", url: "", type: "upload" as "spotify" | "upload" })
+  const [uploadedMusicFileId, setUploadedMusicFileId] = useState("")
+  const [iconFormData, setIconFormData] = useState({ name: "", icon: "", url: "", fileId: "" })
+  const [musicFormData, setMusicFormData] = useState({ name: "", url: "", type: "upload" as "spotify" | "upload", fileId: "" })
   const [iconImagePreview, setIconImagePreview] = useState<string | StaticImageData>(Placeholder)
   const [deleteTarget, setDeleteTarget] = useState<{ type: "icon" | "music"; id: number } | null>(null)
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop")
 
+  // Theme & Sounds
   const [currentTheme, setCurrentTheme] = useState<PortfolioTheme>(THEME_PRESETS[0])
   const [soundEffects, setSoundEffects] = useState([
     { id: "click", name: "Click Sound", url: "", volume: 50 },
@@ -126,6 +151,10 @@ export default function EditorPage() {
     { id: "open", name: "Window Open", url: "", volume: 40 },
     { id: "close", name: "Window Close", url: "", volume: 40 },
   ])
+
+  // Asset Library
+  const [assetLibraryOpen, setAssetLibraryOpen] = useState(false)
+  const [assetLibraryType, setAssetLibraryType] = useState<"sound" | "wallpaper" | "icon" | "music">("wallpaper")
 
   const lockScreenTabs: { id: LockScreenTab; label: string }[] = [
     { id: "settings", label: "SETTINGS" },
@@ -143,33 +172,75 @@ export default function EditorPage() {
   const leftPanelRef = useRef<HTMLDivElement>(null)
   const rightPanelRef = useRef<HTMLDivElement>(null)
   const tabsRef = useRef<HTMLButtonElement[]>([])
+  const fetchPortfolios = async () => {
+    try {
+      const response = await fetch('/api/portfolio/list')
+      if (response.ok) {
+        const data = await response.json()
+        setPortfolios(data.portfolios || [])
 
-  const [assetLibraryOpen, setAssetLibraryOpen] = useState(false)
-  const [assetLibraryType, setAssetLibraryType] = useState<"sound" | "wallpaper" | "icon" | "music">("wallpaper")
+        if (data.portfolios.length > 0 && !currentPortfolioId) {
+          setCurrentPortfolioId(data.portfolios[0].id)
+          setPortfolioName(data.portfolios[0].name)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch portfolios:', error)
+    }
+  }
+  // Fetch portfolios on mount
+  useEffect(() => {
+    fetchPortfolios()
+  }, [])
+
+  const handlePortfolioCreated = (newPortfolio: Portfolio) => {
+    setPortfolios(prev => [...prev, newPortfolio])
+    setCurrentPortfolioId(newPortfolio.id)
+    setPortfolioName(newPortfolio.name)
+  }
 
   // Handlers
   const handleAddIcon = () => {
     if (iconFormData.name && iconFormData.icon) {
-      setIcons([...icons, { id: Date.now(), ...iconFormData }])
-      setIconFormData({ name: "", icon: "", url: "" })
-      setIconImagePreview("")
+      setIcons([...icons, {
+        id: Date.now(),
+        name: iconFormData.name,
+        icon: iconFormData.icon,
+        url: iconFormData.url,
+        iconFileId: iconFormData.fileId
+      }])
+      setIconFormData({ name: "", icon: "", url: "", fileId: "" })
+      setIconImagePreview(Placeholder)
       setIsIconModalOpen(false)
     }
   }
 
   const handleEditIcon = (icon: Icon) => {
     setEditingIcon(icon)
-    setIconFormData({ name: icon.name, icon: icon.icon, url: icon.url || "" })
+    setIconFormData({
+      name: icon.name,
+      icon: icon.icon,
+      url: icon.url || "",
+      fileId: icon.iconFileId || ""
+    })
     setIconImagePreview(icon.icon)
     setIsIconModalOpen(true)
   }
 
   const handleUpdateIcon = () => {
     if (editingIcon && iconFormData.name && iconFormData.icon) {
-      setIcons(icons.map((i) => (i.id === editingIcon.id ? { ...i, ...iconFormData } : i)))
+      setIcons(icons.map((i) =>
+          i.id === editingIcon.id ? {
+            ...i,
+            name: iconFormData.name,
+            icon: iconFormData.icon,
+            url: iconFormData.url,
+            iconFileId: iconFormData.fileId
+          } : i
+      ))
       setEditingIcon(null)
-      setIconFormData({ name: "", icon: "", url: "" })
-      setIconImagePreview("")
+      setIconFormData({ name: "", icon: "", url: "", fileId: "" })
+      setIconImagePreview(Placeholder)
       setIsIconModalOpen(false)
     }
   }
@@ -187,9 +258,16 @@ export default function EditorPage() {
 
   const handleAddMusic = () => {
     if (musicFormData.name && (musicFormData.url || uploadedMusic)) {
-      setMusicTracks([...musicTracks, { id: Date.now(), name: musicFormData.name, url: musicFormData.url || uploadedMusic, type: musicFormData.type }])
-      setMusicFormData({ name: "", url: "", type: "upload" })
+      setMusicTracks([...musicTracks, {
+        id: Date.now(),
+        name: musicFormData.name,
+        url: musicFormData.url || uploadedMusic,
+        type: musicFormData.type,
+        fileId: musicFormData.fileId || uploadedMusicFileId
+      }])
+      setMusicFormData({ name: "", url: "", type: "upload", fileId: "" })
       setUploadedMusic("")
+      setUploadedMusicFileId("")
       setIsMusicModalOpen(false)
     }
   }
@@ -197,7 +275,12 @@ export default function EditorPage() {
   const handleWallpaperUpload = (file: File) => {
     const url = URL.createObjectURL(file)
     setUploadedWallpaper(url)
-    const newWallpaper = { id: Date.now(), name: file.name, url }
+    const newWallpaper = {
+      id: Date.now(),
+      name: file.name,
+      url,
+      fileId: `local_${Date.now()}` // Temporary ID for local uploads
+    }
     setWallpapers([...wallpapers, newWallpaper])
     setSelectedWallpaper(newWallpaper)
   }
@@ -205,13 +288,57 @@ export default function EditorPage() {
   const handleMusicUpload = (file: File) => {
     const url = URL.createObjectURL(file)
     setUploadedMusic(url)
+    setUploadedMusicFileId(`local_${Date.now()}`)
     setMusicFormData({ ...musicFormData, name: file.name, url })
   }
 
   const handleIconImageUpload = (file: File) => {
     const url = URL.createObjectURL(file)
     setIconImagePreview(url)
-    setIconFormData({ ...iconFormData, icon: url })
+    setIconFormData({ ...iconFormData, icon: url, fileId: `local_${Date.now()}` })
+  }
+
+  const handleAssetSelect = (asset: any) => {
+    if (assetLibraryType === "wallpaper") {
+      const newWallpaper = {
+        id: Date.now(),
+        name: asset.name,
+        url: asset.url,
+        fileId: asset.fileId || asset.id
+      }
+      setWallpapers([...wallpapers, newWallpaper])
+      setSelectedWallpaper(newWallpaper)
+
+      // If selecting for lock screen
+      if (activeCategory === "lockScreen" && activeLockScreenTab === "wallpaper") {
+        setLockScreenImage(asset.url)
+        setLockScreenImageFileId(asset.fileId || asset.id)
+      }
+    } else if (assetLibraryType === "icon") {
+      setIconFormData({
+        ...iconFormData,
+        icon: asset.url,
+        fileId: asset.fileId || asset.id
+      })
+      setIconImagePreview(asset.url)
+    } else if (assetLibraryType === "music") {
+      setMusicFormData({
+        ...musicFormData,
+        name: asset.name,
+        url: asset.url,
+        fileId: asset.fileId || asset.id
+      })
+      setUploadedMusic(asset.url)
+      setUploadedMusicFileId(asset.fileId || asset.id)
+    } else if (assetLibraryType === "sound") {
+      // Handle sound effect selection
+      console.log("Selected sound:", asset)
+    }
+  }
+
+  const openAssetLibrary = (type: "sound" | "wallpaper" | "icon" | "music") => {
+    setAssetLibraryType(type)
+    setAssetLibraryOpen(true)
   }
 
   useGSAP(() => {
@@ -243,38 +370,47 @@ export default function EditorPage() {
     }
   }
 
-  const openAssetLibrary = (type: "sound" | "wallpaper" | "icon" | "music") => {
-    setAssetLibraryType(type)
-    setAssetLibraryOpen(true)
-  }
-
-  const handleAssetSelect = (asset: any) => {
-    if (assetLibraryType === "wallpaper") {
-      const newWallpaper = { id: Date.now(), name: asset.name, url: asset.url }
-      setWallpapers([...wallpapers, newWallpaper])
-      setSelectedWallpaper(newWallpaper)
-    } else if (assetLibraryType === "icon") {
-      setIconFormData({ ...iconFormData, icon: asset.url })
-      setIconImagePreview(asset.url)
-    } else if (assetLibraryType === "music") {
-      setMusicFormData({ ...musicFormData, name: asset.name, url: asset.url })
-    }
-  }
-
   return (
       <>
         <PortfolioUrlShare username="demo-user" />
+
+        {/* Portfolio Selection Header */}
+        <div className="mt-6 mb-4">
+          <PortfolioSelector
+              portfolios={portfolios}
+              currentPortfolioId={currentPortfolioId}
+              onPortfolioChange={(portfolioId) => {
+                setCurrentPortfolioId(portfolioId)
+                const portfolio = portfolios.find(p => p.id === portfolioId)
+                if (portfolio) {
+                  setPortfolioName(portfolio.name)
+                }
+              }}
+              onPortfolioCreated={handlePortfolioCreated}
+          />
+        </div>
+
         <div className="min-h-[calc(100vh-180px)] flex flex-col lg:flex-row gap-4 mt-8">
           <div ref={leftPanelRef} className="w-full lg:w-96 space-y-4 overflow-y-auto">
             <PixelCard>
               <div className="space-y-4">
-                <PixelInput label="PORTFOLIO NAME" value={portfolioName} onChange={(e) => setPortfolioName(e.target.value)} />
+                <PixelInput
+                    label="PORTFOLIO NAME"
+                    value={portfolioName}
+                    onChange={(e) => setPortfolioName(e.target.value)}
+                />
 
                 <div className="grid grid-cols-2 gap-2 border-b-2 border-border pb-4">
-                  <button onClick={() => setActiveCategory("lockScreen")} className={`flex flex-col items-center gap-2 px-2 py-3 text-xs border-2 border-border transition-colors font-bold ${activeCategory === "lockScreen" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
+                  <button
+                      onClick={() => setActiveCategory("lockScreen")}
+                      className={`flex flex-col items-center gap-2 px-2 py-3 text-xs border-2 border-border transition-colors font-bold ${activeCategory === "lockScreen" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}
+                  >
                     <Image src={Potion} alt={"potion"} className={"w-16 h-16"} /> LOCK SCREEN
                   </button>
-                  <button onClick={() => setActiveCategory("homeScreen")} className={`flex flex-col items-center gap-2 px-2 py-3 text-xs border-2 border-border transition-colors font-bold ${activeCategory === "homeScreen" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
+                  <button
+                      onClick={() => setActiveCategory("homeScreen")}
+                      className={`flex flex-col items-center gap-2 px-2 py-3 text-xs border-2 border-border transition-colors font-bold ${activeCategory === "homeScreen" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}
+                  >
                     <Image src={Jellyfish} alt={"jellyfish"} className={"w-16 h-16"} /> HOME SCREEN
                   </button>
                 </div>
@@ -320,7 +456,10 @@ export default function EditorPage() {
                             preview={lockScreenImage}
                             selectedWallpaper={null}
                             wallpapers={[]}
-                            onUpload={(file) => setLockScreenImage(URL.createObjectURL(file))}
+                            onUpload={(file) => {
+                              const url = URL.createObjectURL(file)
+                              setLockScreenImage(url)
+                            }}
                             onOpenLibrary={() => openAssetLibrary("wallpaper")}
                         />
                     )}
@@ -337,7 +476,10 @@ export default function EditorPage() {
                             wallpapers={wallpapers}
                             desktopGif={desktopGif}
                             onUpload={handleWallpaperUpload}
-                            onGifUpload={(file) => setDesktopGif(URL.createObjectURL(file))}
+                            onGifUpload={(file) => {
+                              const url = URL.createObjectURL(file)
+                              setDesktopGif(url)
+                            }}
                             onSelectWallpaper={setSelectedWallpaper}
                             onOpenLibrary={() => openAssetLibrary("wallpaper")}
                         />
@@ -349,8 +491,8 @@ export default function EditorPage() {
                             onDelete={(id) => setDeleteTarget({ type: "icon", id })}
                             onAdd={() => {
                               setEditingIcon(null)
-                              setIconFormData({ name: "", icon: "", url: "" })
-                              setIconImagePreview("")
+                              setIconFormData({ name: "", icon: "", url: "", fileId: "" })
+                              setIconImagePreview(Placeholder)
                               setIsIconModalOpen(true)
                             }}
                         />
@@ -405,7 +547,7 @@ export default function EditorPage() {
         </div>
 
         {/* Modals */}
-        <PixelModal isOpen={isIconModalOpen} onClose={() => { setIsIconModalOpen(false); setEditingIcon(null); setIconFormData({ name: "", icon: "", url: "" }); setIconImagePreview("") }} title={editingIcon ? "EDIT ICON" : "ADD ICON"}>
+        <PixelModal isOpen={isIconModalOpen} onClose={() => { setIsIconModalOpen(false); setEditingIcon(null); setIconFormData({ name: "", icon: "", url: "", fileId: "" }); setIconImagePreview(Placeholder) }} title={editingIcon ? "EDIT ICON" : "ADD ICON"}>
           <div className="space-y-4">
             <PixelInput label="ICON NAME" value={iconFormData.name} onChange={(e) => setIconFormData({ ...iconFormData, name: e.target.value })} placeholder="ABOUT ME" />
             <div className="space-y-2">
@@ -418,15 +560,27 @@ export default function EditorPage() {
             </div>
             <PixelInput label="LINK URL (OPTIONAL)" value={iconFormData.url} onChange={(e) => setIconFormData({ ...iconFormData, url: e.target.value })} placeholder="https://..." />
             <div className="flex gap-3 pt-2">
-              <PixelButton variant="secondary" className="flex-1 text-[10px]" onClick={() => { setIsIconModalOpen(false); setEditingIcon(null); setIconFormData({ name: "", icon: "", url: "" }); setIconImagePreview("") }}>CANCEL</PixelButton>
+              <PixelButton variant="secondary" className="flex-1 text-[10px]" onClick={() => { setIsIconModalOpen(false); setEditingIcon(null); setIconFormData({ name: "", icon: "", url: "", fileId: "" }); setIconImagePreview(Placeholder) }}>CANCEL</PixelButton>
               <PixelButton variant="primary" className="flex-1 text-[10px]" onClick={editingIcon ? handleUpdateIcon : handleAddIcon}>{editingIcon ? "UPDATE" : "ADD"}</PixelButton>
             </div>
           </div>
         </PixelModal>
 
-        <AssetLibraryModal isOpen={assetLibraryOpen} onClose={() => setAssetLibraryOpen(false)} assets={assetLibraryType === "wallpaper" ? DEFAULT_WALLPAPERS : assetLibraryType === "icon" ? DEFAULT_ICONS : assetLibraryType === "music" ? DEFAULT_MUSIC : DEFAULT_SOUNDS} type={assetLibraryType} onSelect={handleAssetSelect} />
+        <AssetLibraryModal
+            isOpen={assetLibraryOpen}
+            onClose={() => setAssetLibraryOpen(false)}
+            assets={
+              assetLibraryType === "wallpaper" ? DEFAULT_WALLPAPERS :
+                  assetLibraryType === "icon" ? DEFAULT_ICONS :
+                      assetLibraryType === "music" ? DEFAULT_MUSIC :
+                          DEFAULT_SOUNDS
+            }
+            type={assetLibraryType}
+            onSelect={handleAssetSelect}
+            currentPortfolioId={currentPortfolioId}
+        />
 
-        <PixelModal isOpen={isMusicModalOpen} onClose={() => { setIsMusicModalOpen(false); setEditingMusic(null); setMusicFormData({ name: "", url: "", type: "upload" }) }} title={editingMusic ? "EDIT MUSIC" : "ADD MUSIC"}>
+        <PixelModal isOpen={isMusicModalOpen} onClose={() => { setIsMusicModalOpen(false); setEditingMusic(null); setMusicFormData({ name: "", url: "", type: "upload", fileId: "" }) }} title={editingMusic ? "EDIT MUSIC" : "ADD MUSIC"}>
           <div className="space-y-4">
             <PixelInput label="MUSIC NAME" value={musicFormData.name} onChange={(e) => setMusicFormData({ ...musicFormData, name: e.target.value })} placeholder="CHIPTUNE_BEAT.MP3" />
             <div className="space-y-2">
@@ -434,9 +588,12 @@ export default function EditorPage() {
               {uploadedMusic && <div className="flex justify-center mb-3"><audio controls className="w-full"><source src={uploadedMusic} type="audio/mpeg" /></audio></div>}
               <FileUpload accept="audio/*" onFileSelect={handleMusicUpload} maxSize={10} label={uploadedMusic ? "REPLACE AUDIO" : "UPLOAD AUDIO"} />
             </div>
+            <PixelButton variant="secondary" className="w-full text-[10px] flex items-center justify-center gap-2" onClick={() => openAssetLibrary("music")}>
+              <Library className="w-4 h-4" /> CHOOSE FROM LIBRARY
+            </PixelButton>
             <div className="flex gap-3 pt-2">
-              <PixelButton variant="secondary" className="flex-1 text-[10px]" onClick={() => { setIsMusicModalOpen(false); setEditingMusic(null); setMusicFormData({ name: "", url: "", type: "upload" }) }}>CANCEL</PixelButton>
-              <PixelButton variant="primary" className="flex-1 text-[10px]" onClick={editingMusic ? () => { setMusicTracks(musicTracks.map((m) => (m.id === editingMusic.id ? { ...m, ...musicFormData } : m))); setEditingMusic(null); setMusicFormData({ name: "", url: "", type: "upload" }); setUploadedMusic(""); setIsMusicModalOpen(false) } : handleAddMusic}>{editingMusic ? "UPDATE" : "ADD"}</PixelButton>
+              <PixelButton variant="secondary" className="flex-1 text-[10px]" onClick={() => { setIsMusicModalOpen(false); setEditingMusic(null); setMusicFormData({ name: "", url: "", type: "upload", fileId: "" }) }}>CANCEL</PixelButton>
+              <PixelButton variant="primary" className="flex-1 text-[10px]" onClick={editingMusic ? () => { setMusicTracks(musicTracks.map((m) => (m.id === editingMusic.id ? { ...m, ...musicFormData } : m))); setEditingMusic(null); setMusicFormData({ name: "", url: "", type: "upload", fileId: "" }); setUploadedMusic(""); setIsMusicModalOpen(false) } : handleAddMusic}>{editingMusic ? "UPDATE" : "ADD"}</PixelButton>
             </div>
           </div>
         </PixelModal>
