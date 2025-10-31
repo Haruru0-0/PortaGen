@@ -1,3 +1,4 @@
+// app/api/assets/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
@@ -41,6 +42,7 @@ export async function GET(req: NextRequest) {
             url: asset.displayUrl,
             thumbnailUrl: asset.thumbnailUrl,
             portfolioId: asset.portfolioId,
+            mimeType: asset.mimeType
         }))
 
         return NextResponse.json({ assets: formattedAssets })

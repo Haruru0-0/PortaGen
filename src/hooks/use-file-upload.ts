@@ -27,7 +27,8 @@ export function useFileUpload() {
                 formData.append('portfolioId', portfolioId.toString())
             }
             if (customFileName) {
-                formData.append('customFileName', customFileName) // Send custom name to API
+                const nameWithoutExt = customFileName.replace(/\.[^/.]+$/, "")
+                formData.append('customFileName', nameWithoutExt)
             }
 
             const response = await fetch('/api/upload', {

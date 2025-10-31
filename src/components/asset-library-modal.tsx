@@ -15,6 +15,7 @@ interface Asset {
   type?: "default" | "uploaded"
   portfolioId?: number
   portfolioName?: string
+  fileId?: string // Add fileId for Google Drive optimization
 }
 
 interface AssetLibraryModalProps {
@@ -41,6 +42,41 @@ export function AssetLibraryModal({
   const [portfolioFilter, setPortfolioFilter] = useState<"all" | "current">("current")
   const [loading, setLoading] = useState(false)
 
+  // Function to optimize Google Drive URLs for display
+  const getOptimizedImageUrl = (asset: Asset): string => {
+    // If it's a default asset, use the provided URL
+    if (asset.type === "default") {
+      return asset.thumbnail || asset.url
+    }
+
+    // If it's a user uploaded asset with Google Drive fileId
+    if (asset.fileId) {
+      // For thumbnails in grid view
+      return `https://drive.google.com/thumbnail?id=${asset.fileId}&sz=w200-h200`
+    }
+
+    // If we have a thumbnail URL, use it
+    if (asset.thumbnail) {
+      return asset.thumbnail
+    }
+
+    // Fallback to the main URL
+    return asset.url
+  }
+
+  // Function to get full-size image URL for better quality when needed
+  const getFullImageUrl = (asset: Asset): string => {
+    if (asset.type === "default") {
+      return asset.url
+    }
+
+    if (asset.fileId) {
+      return `https://drive.google.com/uc?id=${asset.fileId}`
+    }
+
+    return asset.url
+  }
+
   // Fetch user's uploaded assets when modal opens
   useEffect(() => {
     if (isOpen && activeTab === "uploaded") {
@@ -60,11 +96,14 @@ export function AssetLibraryModal({
       const response = await fetch(url)
       if (response.ok) {
         const data = await response.json()
-        // Add type indicator for user assets
-        const userAssetsWithType = data.assets?.map((asset: any) => ({
-          ...asset,
-          type: "uploaded"
-        })) || []
+        const userAssetsWithType = data.assets
+            ?.filter((asset: any) => {
+              return asset.type === type || asset.assetType === type
+            })
+            .map((asset: any) => ({
+              ...asset,
+              type: "uploaded"
+            })) || []
         setUserAssets(userAssetsWithType)
       }
     } catch (error) {
@@ -97,7 +136,11 @@ export function AssetLibraryModal({
 
   const getDisplayAssets = () => {
     if (activeTab === "default") {
-      return assets.map(asset => ({ ...asset, type: "default" as const }))
+      return assets
+          .filter(asset => {
+            return asset.category === type
+          })
+          .map(asset => ({ ...asset, type: "default" as const }))
     } else {
       return userAssets
     }
@@ -118,7 +161,6 @@ export function AssetLibraryModal({
   return (
       <PixelModal isOpen={isOpen} onClose={onClose} title={`CHOOSE ${type.toUpperCase()}`}>
         <div className="space-y-4">
-          {/* Tabs for Default vs User Assets */}
           <div className="flex gap-2 border-b-2 border-border pb-2">
             <button
                 onClick={() => {
@@ -190,8 +232,8 @@ export function AssetLibraryModal({
                   </div>
                   <p className="text-[10px] text-muted-foreground mb-2">
                     {activeTab === "default"
-                        ? "NO DEFAULT ASSETS AVAILABLE"
-                        : "NO UPLOADED ASSETS FOUND"}
+                        ? `NO DEFAULT ${type.toUpperCase()}S AVAILABLE`
+                        : `NO UPLOADED ${type.toUpperCase()}S FOUND`}
                   </p>
                   {activeTab === "uploaded" && portfolioFilter === "current" && !currentPortfolioId && (
                       <p className="text-[8px] text-muted-foreground">
@@ -217,20 +259,47 @@ export function AssetLibraryModal({
                           </div>
                       )}
 
+                      {/* Wallpaper Display */}
                       {type === "wallpaper" && (
-                          <img
-                              src={asset.thumbnail || asset.url || "/placeholder.svg"}
-                              alt={asset.name}
-                              className="w-full aspect-video object-cover mb-2 border-2 border-border"
-                          />
+                          <div className="aspect-video mb-2 border-2 border-border overflow-hidden bg-muted">
+                            <img
+                                src={getOptimizedImageUrl(asset)}
+                                alt={asset.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  // Fallback to full image URL if thumbnail fails
+                                  const target = e.target as HTMLImageElement
+                                  if (target.src !== getFullImageUrl(asset)) {
+                                    target.src = getFullImageUrl(asset)
+                                  } else {
+                                    // Ultimate fallback
+                                    target.src = "/placeholder.svg?height=100&width=150"
+                                  }
+                                }}
+                            />
+                          </div>
                       )}
+
+                      {/* Icon Display */}
                       {type === "icon" && (
-                          <img
-                              src={asset.url || "/placeholder.svg"}
-                              alt={asset.name}
-                              className="w-16 h-16 mx-auto mb-2 border-2 border-border object-cover"
-                          />
+                          <div className="w-16 h-16 mx-auto mb-2 border-2 border-border overflow-hidden bg-muted">
+                            <img
+                                src={getOptimizedImageUrl(asset)}
+                                alt={asset.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement
+                                  if (target.src !== getFullImageUrl(asset)) {
+                                    target.src = getFullImageUrl(asset)
+                                  } else {
+                                    target.src = "/placeholder.svg?height=64&width=64"
+                                  }
+                                }}
+                            />
+                          </div>
                       )}
+
+                      {/* Audio Display */}
                       {(type === "sound" || type === "music") && (
                           <div className="flex items-center justify-center mb-2">
                             <button
@@ -248,6 +317,7 @@ export function AssetLibraryModal({
                             </button>
                           </div>
                       )}
+
                       <p className="text-[10px] text-center truncate">{asset.name}</p>
                       {asset.portfolioName && asset.type === "uploaded" && (
                           <p className="text-[8px] text-muted-foreground text-center truncate">
@@ -266,6 +336,16 @@ export function AssetLibraryModal({
                   SELECTED: <strong>{selectedAsset.name}</strong>
                   {selectedAsset.type === "uploaded" && " (Your Upload)"}
                 </p>
+                {/* Show preview for selected wallpaper */}
+                {type === "wallpaper" && selectedAsset && (
+                    <div className="mt-2 aspect-video border-2 border-border overflow-hidden">
+                      <img
+                          src={getOptimizedImageUrl(selectedAsset)}
+                          alt={selectedAsset.name}
+                          className="w-full h-full object-cover"
+                      />
+                    </div>
+                )}
               </div>
           )}
 

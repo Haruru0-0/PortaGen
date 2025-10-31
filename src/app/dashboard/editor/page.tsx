@@ -26,10 +26,11 @@ import Potion from "@/assets/Potion.png"
 import Jellyfish from "@/assets/Jellyfish.png"
 import Placeholder from "@/assets/Placeholder.png"
 import Image, {StaticImageData} from "next/image";
+import {SoundEffectsTab} from "@/components/editor/sound-effects-tab";
 
 type Category = "lockScreen" | "homeScreen"
 type LockScreenTab = "settings" | "wallpaper"
-type HomeScreenTab = "wallpaper" | "icons" | "music" | "windows" | "theme"
+type HomeScreenTab = "wallpaper" | "icons" | "music" | "windows" | "theme" | "sounds"
 
 interface Icon {
   id: number
@@ -59,7 +60,19 @@ interface WindowContent {
   id: string
   name: string
   enabled: boolean
-  data: any
+  data: {
+    type: "about" | "projects" | "contact" | "resume" | "blog" | "links" | "custom"
+    fields: Array<{
+      id: string
+      type: "text" | "textarea" | "image" | "link" | "list" | "badge"
+      label: string
+      value: any
+      placeholder?: string
+    }>
+    template?: string
+    description?: string
+  }
+  type: "about" | "projects" | "contact" | "resume" | "blog" | "links" | "custom"
 }
 
 interface Portfolio {
@@ -123,14 +136,7 @@ export default function EditorPage() {
     { id: 4, name: "GALAXY", color: "from-purple-600 to-indigo-500" },
   ])
 
-  const [windowContents, setWindowContents] = useState<WindowContent[]>([
-    { id: "about", name: "About Me", enabled: true, data: {} },
-    { id: "projects", name: "Projects", enabled: true, data: {} },
-    { id: "contact", name: "Contact", enabled: true, data: {} },
-    { id: "resume", name: "Resume", enabled: true, data: {} },
-    { id: "blog", name: "Blog", enabled: true, data: {} },
-    { id: "links", name: "Links", enabled: true, data: {} },
-  ])
+  const [windowContents, setWindowContents] = useState<WindowContent[]>([])
 
   const [selectedWallpaper, setSelectedWallpaper] = useState<Wallpaper | null>(null)
   const [uploadedWallpaper, setUploadedWallpaper] = useState<string>("")
@@ -166,6 +172,7 @@ export default function EditorPage() {
     { id: "icons", label: "ICONS" },
     { id: "music", label: "MUSIC" },
     { id: "windows", label: "WINDOWS" },
+    { id: "sounds", label: "SOUNDS" },
     { id: "theme", label: "THEME" },
   ]
 
@@ -390,142 +397,214 @@ export default function EditorPage() {
           />
         </div>
 
-        <div className="min-h-[calc(100vh-180px)] flex flex-col lg:flex-row gap-4 mt-8">
-          <div ref={leftPanelRef} className="w-full lg:w-96 space-y-4 overflow-y-auto">
+        <div className="min-h-[calc(100vh-180px)] flex flex-col mt-8">
+          {/* Portfolio Selection Header */}
+          <div className="mb-6">
+            <PortfolioSelector
+                portfolios={portfolios}
+                currentPortfolioId={currentPortfolioId}
+                onPortfolioChange={(portfolioId) => {
+                  setCurrentPortfolioId(portfolioId)
+                  const portfolio = portfolios.find(p => p.id === portfolioId)
+                  if (portfolio) {
+                    setPortfolioName(portfolio.name)
+                  }
+                }}
+                onPortfolioCreated={handlePortfolioCreated}
+            />
+          </div>
+
+          <PortfolioUrlShare username="demo-user" />
+
+          {/* Portfolio Name */}
+          <div className="mb-6">
             <PixelCard>
-              <div className="space-y-4">
-                <PixelInput
-                    label="PORTFOLIO NAME"
-                    value={portfolioName}
-                    onChange={(e) => setPortfolioName(e.target.value)}
-                />
+              <PixelInput
+                  label="PORTFOLIO NAME"
+                  value={portfolioName}
+                  onChange={(e) => setPortfolioName(e.target.value)}
+              />
+            </PixelCard>
+          </div>
 
-                <div className="grid grid-cols-2 gap-2 border-b-2 border-border pb-4">
-                  <button
-                      onClick={() => setActiveCategory("lockScreen")}
-                      className={`flex flex-col items-center gap-2 px-2 py-3 text-xs border-2 border-border transition-colors font-bold ${activeCategory === "lockScreen" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}
-                  >
-                    <Image src={Potion} alt={"potion"} className={"w-16 h-16"} /> LOCK SCREEN
-                  </button>
-                  <button
-                      onClick={() => setActiveCategory("homeScreen")}
-                      className={`flex flex-col items-center gap-2 px-2 py-3 text-xs border-2 border-border transition-colors font-bold ${activeCategory === "homeScreen" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}
-                  >
-                    <Image src={Jellyfish} alt={"jellyfish"} className={"w-16 h-16"} /> HOME SCREEN
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  {activeCategory === "lockScreen"
-                      ? lockScreenTabs.map((tab, index) => (
-                          <button key={tab.id} ref={(el) => { if (el) tabsRef.current[index] = el }} onClick={() => handleTabChange(tab.id)} className={`px-4 py-2 text-[10px] border-2 border-border transition-colors ${activeLockScreenTab === tab.id ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
-                            {tab.label}
-                          </button>
-                      ))
-                      : homeScreenTabs.map((tab, index) => (
-                          <button key={tab.id} ref={(el) => { if (el) tabsRef.current[index] = el }} onClick={() => handleTabChange(tab.id)} className={`px-4 py-2 text-[10px] border-2 border-border transition-colors ${activeHomeScreenTab === tab.id ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
-                            {tab.label}
-                          </button>
-                      ))}
-                </div>
+          {/* Category Selection */}
+          <div className="mb-6">
+            <PixelCard>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                    onClick={() => setActiveCategory("lockScreen")}
+                    className={`flex items-center justify-center gap-3 px-4 py-3 text-sm border-2 border-border transition-colors font-bold ${
+                        activeCategory === "lockScreen"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-card hover:bg-muted"
+                    }`}
+                >
+                  <Image src={Potion} alt={"potion"} className={"w-8 h-8"} />
+                  LOCK SCREEN
+                </button>
+                <button
+                    onClick={() => setActiveCategory("homeScreen")}
+                    className={`flex items-center justify-center gap-3 px-4 py-3 text-sm border-2 border-border transition-colors font-bold ${
+                        activeCategory === "homeScreen"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-card hover:bg-muted"
+                    }`}
+                >
+                  <Image src={Jellyfish} alt={"jellyfish"} className={"w-8 h-8"} />
+                  HOME SCREEN
+                </button>
               </div>
             </PixelCard>
+          </div>
 
-            <div className="tab-content">
-              {activeCategory === "lockScreen" && (
-                  <>
-                    {activeLockScreenTab === "settings" && (
-                        <LockScreenSettingsTab
-                            lockScreenEnabled={lockScreenEnabled}
-                            lockScreenPassword={lockScreenPassword}
-                            lockScreenHint={lockScreenHint}
-                            mobileWidget1={mobileWidget1}
-                            mobileWidget2={mobileWidget2}
-                            musicPlayerIcon={musicPlayerIcon}
-                            onToggleLockScreen={() => setLockScreenEnabled(!lockScreenEnabled)}
-                            onPasswordChange={setLockScreenPassword}
-                            onHintChange={setLockScreenHint}
-                            onWidget1Upload={(file) => setMobileWidget1(URL.createObjectURL(file))}
-                            onWidget2Upload={(file) => setMobileWidget2(URL.createObjectURL(file))}
-                            onMusicPlayerIconUpload={(file) => setMusicPlayerIcon(URL.createObjectURL(file))}
-                        />
-                    )}
-                    {activeLockScreenTab === "wallpaper" && (
-                        <WallpaperTab
-                            type="lockScreen"
-                            preview={lockScreenImage}
-                            selectedWallpaper={null}
-                            wallpapers={[]}
-                            onUpload={(file) => {
-                              const url = URL.createObjectURL(file)
-                              setLockScreenImage(url)
-                            }}
-                            onOpenLibrary={() => openAssetLibrary("wallpaper")}
-                        />
-                    )}
-                  </>
-              )}
+          {/* Main Content - Tabs and Content Side by Side */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            {/* Left Column - Tabs Navigation */}
+            <div className="lg:col-span-1">
+              <PixelCard>
+                <div className="space-y-4">
+                  <h3 className="text-sm pixel-text-shadow">
+                    {activeCategory === "lockScreen" ? "LOCK SCREEN" : "HOME SCREEN"}
+                  </h3>
 
-              {activeCategory === "homeScreen" && (
-                  <>
-                    {activeHomeScreenTab === "wallpaper" && (
-                        <WallpaperTab
-                            type="desktop"
-                            preview={uploadedWallpaper}
-                            selectedWallpaper={selectedWallpaper}
-                            wallpapers={wallpapers}
-                            desktopGif={desktopGif}
-                            onUpload={handleWallpaperUpload}
-                            onGifUpload={(file) => {
-                              const url = URL.createObjectURL(file)
-                              setDesktopGif(url)
-                            }}
-                            onSelectWallpaper={setSelectedWallpaper}
-                            onOpenLibrary={() => openAssetLibrary("wallpaper")}
-                        />
-                    )}
-                    {activeHomeScreenTab === "icons" && (
-                        <IconsTab
-                            icons={icons}
-                            onEdit={handleEditIcon}
-                            onDelete={(id) => setDeleteTarget({ type: "icon", id })}
-                            onAdd={() => {
-                              setEditingIcon(null)
-                              setIconFormData({ name: "", icon: "", url: "", fileId: "" })
-                              setIconImagePreview(Placeholder)
-                              setIsIconModalOpen(true)
-                            }}
-                        />
-                    )}
-                    {activeHomeScreenTab === "music" && (
-                        <MusicTab
-                            musicTracks={musicTracks}
-                            uploadedMusic={uploadedMusic}
-                            onUpload={handleMusicUpload}
-                            onDelete={(id) => setDeleteTarget({ type: "music", id })}
-                            onOpenLibrary={() => openAssetLibrary("music")}
-                        />
-                    )}
-                    {activeHomeScreenTab === "windows" && (
-                        <WindowsTab
-                            windowContents={windowContents}
-                            soundEffects={soundEffects}
-                            onToggleWindow={(id) => setWindowContents(windowContents.map((w) => (w.id === id ? { ...w, enabled: !w.enabled } : w)))}
-                            onEditWindow={setEditingWindow}
-                            onSoundsChange={setSoundEffects}
-                        />
-                    )}
-                    {activeHomeScreenTab === "theme" && (
-                        <PixelCard>
-                          <ThemeEditor currentTheme={currentTheme} onThemeChange={setCurrentTheme} />
-                        </PixelCard>
-                    )}
-                  </>
-              )}
+                  <div className="space-y-2">
+                    {activeCategory === "lockScreen"
+                        ? lockScreenTabs.map((tab, index) => (
+                            <button
+                                key={tab.id}
+                                ref={(el) => { if (el) tabsRef.current[index] = el }}
+                                onClick={() => handleTabChange(tab.id)}
+                                className={`w-full text-left px-4 py-3 text-[10px] border-2 border-border transition-colors ${
+                                    activeLockScreenTab === tab.id
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-card hover:bg-muted"
+                                }`}
+                            >
+                              {tab.label}
+                            </button>
+                        ))
+                        : homeScreenTabs.map((tab, index) => (
+                            <button
+                                key={tab.id}
+                                ref={(el) => { if (el) tabsRef.current[index] = el }}
+                                onClick={() => handleTabChange(tab.id)}
+                                className={`w-full text-left px-4 py-3 text-[10px] border-2 border-border transition-colors ${
+                                    activeHomeScreenTab === tab.id
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-card hover:bg-muted"
+                                }`}
+                            >
+                              {tab.label}
+                            </button>
+                        ))}
+                  </div>
+                </div>
+              </PixelCard>
+            </div>
+
+            {/* Right Column - Tab Content */}
+            <div className="lg:col-span-2">
+              <div className="tab-content">
+                {activeCategory === "lockScreen" && (
+                    <>
+                      {activeLockScreenTab === "settings" && (
+                          <LockScreenSettingsTab
+                              lockScreenEnabled={lockScreenEnabled}
+                              lockScreenPassword={lockScreenPassword}
+                              lockScreenHint={lockScreenHint}
+                              mobileWidget1={mobileWidget1}
+                              mobileWidget2={mobileWidget2}
+                              musicPlayerIcon={musicPlayerIcon}
+                              onToggleLockScreen={() => setLockScreenEnabled(!lockScreenEnabled)}
+                              onPasswordChange={setLockScreenPassword}
+                              onHintChange={setLockScreenHint}
+                              onWidget1Upload={(file) => setMobileWidget1(URL.createObjectURL(file))}
+                              onWidget2Upload={(file) => setMobileWidget2(URL.createObjectURL(file))}
+                              onMusicPlayerIconUpload={(file) => setMusicPlayerIcon(URL.createObjectURL(file))}
+                          />
+                      )}
+                      {activeLockScreenTab === "wallpaper" && (
+                          <WallpaperTab
+                              type="lockScreen"
+                              preview={lockScreenImage}
+                              selectedWallpaper={null}
+                              wallpapers={[]}
+                              onUpload={(file) => {
+                                const url = URL.createObjectURL(file)
+                                setLockScreenImage(url)
+                              }}
+                              onOpenLibrary={() => openAssetLibrary("wallpaper")}
+                          />
+                      )}
+                    </>
+                )}
+
+                {activeCategory === "homeScreen" && (
+                    <>
+                      {activeHomeScreenTab === "wallpaper" && (
+                          <WallpaperTab
+                              type="desktop"
+                              preview={uploadedWallpaper}
+                              selectedWallpaper={selectedWallpaper}
+                              wallpapers={wallpapers}
+                              desktopGif={desktopGif}
+                              onUpload={handleWallpaperUpload}
+                              onGifUpload={(file) => {
+                                const url = URL.createObjectURL(file)
+                                setDesktopGif(url)
+                              }}
+                              onSelectWallpaper={setSelectedWallpaper}
+                              onOpenLibrary={() => openAssetLibrary("wallpaper")}
+                          />
+                      )}
+                      {activeHomeScreenTab === "icons" && (
+                          <IconsTab
+                              icons={icons}
+                              onEdit={handleEditIcon}
+                              onDelete={(id) => setDeleteTarget({ type: "icon", id })}
+                              onAdd={() => {
+                                setEditingIcon(null)
+                                setIconFormData({ name: "", icon: "", url: "", fileId: "" })
+                                setIconImagePreview(Placeholder)
+                                setIsIconModalOpen(true)
+                              }}
+                          />
+                      )}
+                      {activeHomeScreenTab === "music" && (
+                          <MusicTab
+                              musicTracks={musicTracks}
+                              uploadedMusic={uploadedMusic}
+                              onUpload={handleMusicUpload}
+                              onDelete={(id) => setDeleteTarget({ type: "music", id })}
+                              onOpenLibrary={() => openAssetLibrary("music")}
+                          />
+                      )}
+                      {activeHomeScreenTab === "windows" && (
+                          <WindowsTab
+                              windowContents={windowContents}
+                              onToggleWindow={(id) => setWindowContents(windowContents.map((w) => (w.id === id ? { ...w, enabled: !w.enabled } : w)))}
+                              onWindowUpdate={setWindowContents}
+                          />
+                      )}
+                      {activeHomeScreenTab === "sounds" && (
+                          <SoundEffectsTab
+                              soundEffects={soundEffects}
+                              onSoundsChange={setSoundEffects}
+                          />
+                      )}
+                      {activeHomeScreenTab === "theme" && (
+                          <PixelCard>
+                            <ThemeEditor currentTheme={currentTheme} onThemeChange={setCurrentTheme} />
+                          </PixelCard>
+                      )}
+                    </>
+                )}
+              </div>
             </div>
           </div>
 
-          <div ref={rightPanelRef} className="flex-1 space-y-4">
+          {/* Preview Panel - Below Everything */}
+          <div className="flex-1">
             <PreviewPanel
                 previewMode={previewMode}
                 isLocked={isLocked}

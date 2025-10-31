@@ -1,4 +1,5 @@
 // app/api/upload/route.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { uploadToUserDrive, decryptToken, refreshAccessToken, encryptToken } from '@/lib/services/google-drive'
@@ -43,20 +44,18 @@ export async function POST(req: NextRequest) {
         }
 
         // Handle file naming
-        const originalExtension = file.name.split('.').pop() || ''
+        const originalName = file.name.replace(/\.[^/.]+$/, "")
 
         // Use custom file name if provided, otherwise use original name without extension
-        let finalFileName = customFileName || file.name.replace(/\.[^/.]+$/, "")
-
-        // Add extension if not already present
-        if (originalExtension && !finalFileName.endsWith(`.${originalExtension}`)) {
-            finalFileName = `${finalFileName}.${originalExtension}`
-        }
+        let finalFileName = customFileName || originalName
 
         // Ensure the name is not empty
         if (!finalFileName.trim()) {
-            finalFileName = `asset_${Date.now()}.${originalExtension}`
+            finalFileName = `asset_${Date.now()}`
         }
+
+        const originalExtension = file.name.split('.').pop() || ''
+        const driveFileName = originalExtension ? `${finalFileName}.${originalExtension}` : finalFileName
 
         // Decrypt tokens
         let accessToken = decryptToken(user.googleAccessToken)
@@ -87,7 +86,7 @@ export async function POST(req: NextRequest) {
             accessToken,
             refreshToken,
             buffer,
-            finalFileName, // Use the final file name here
+            driveFileName,
             file.type
         )
 
@@ -99,10 +98,11 @@ export async function POST(req: NextRequest) {
                 portfolioId: portfolioId ? parseInt(portfolioId) : null,
                 assetType,
                 fileId: uploadResult.fileId,
-                fileName: finalFileName, // Store the final file name
-                fileUrl: uploadResult.fileUrl,
+                fileName: finalFileName, // Save without extension
+                displayUrl: uploadResult.displayUrl,
                 thumbnailUrl: uploadResult.thumbnailUrl,
-                mimeType: file.type,
+                downloadUrl: uploadResult.downloadUrl,
+                mimeType: file.type, // MIME type tells us the file type
                 fileSize: uploadResult.fileSize,
             })
             .returning()
@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
             asset: {
                 id: asset.id,
                 fileId: uploadResult.fileId,
-                name: finalFileName,
+                name: finalFileName, // Return without extension
                 type: assetType,
                 fileSize: uploadResult.fileSize,
                 date: asset.uploadedAt.toISOString(),
