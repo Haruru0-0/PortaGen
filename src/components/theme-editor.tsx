@@ -8,9 +8,10 @@ import { Check } from "lucide-react"
 interface ThemeEditorProps {
   currentTheme: PortfolioTheme
   onThemeChange: (theme: PortfolioTheme) => void
+  onSave: () => void
 }
 
-export function ThemeEditor({ currentTheme, onThemeChange }: ThemeEditorProps) {
+export function ThemeEditor({ currentTheme, onThemeChange, onSave }: ThemeEditorProps) {
   const [customTheme, setCustomTheme] = useState<PortfolioTheme>(currentTheme)
 
   const handlePresetSelect = (preset: PortfolioTheme) => {
@@ -202,6 +203,11 @@ export function ThemeEditor({ currentTheme, onThemeChange }: ThemeEditorProps) {
             ))}
           </div>
         </div>
+      </div>
+      <div className="mt-6">
+        <PixelButton onClick={onSave} className="w-full text-[10px]">
+          SAVE
+        </PixelButton>
       </div>
     </div>
   )

@@ -8,6 +8,7 @@ import { gsap } from "gsap"
 import { useGSAP } from "@gsap/react"
 import { useRef } from "react"
 import { useAppSound } from "./sound-context"
+import Image from "next/image"
 
 export function MobileIcon({
   id,
@@ -144,9 +145,11 @@ export function MobileIcon({
       className="desktop-icon flex flex-col items-center justify-center w-14 sm:w-18 md:w-20 cursor-pointer select-none transition-transform hover:scale-105"
     >
       <div ref={iconRef} className="w-10 h-10 flex items-center justify-center">
-        <img
+        <Image
           src={icon || "/placeholder.svg"}
           alt={label}
+          width={40}
+          height={40}
           className="max-w-full max-h-full object-contain drop-shadow-md"
           style={{
             willChange: "transform",

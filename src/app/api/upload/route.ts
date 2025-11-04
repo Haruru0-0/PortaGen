@@ -95,7 +95,6 @@ export async function POST(req: NextRequest) {
             .insert(uploadedAssets)
             .values({
                 userId: user.id,
-                portfolioId: portfolioId ? parseInt(portfolioId) : null,
                 assetType,
                 fileId: uploadResult.fileId,
                 fileName: finalFileName, // Save without extension
@@ -118,7 +117,6 @@ export async function POST(req: NextRequest) {
                 date: asset.uploadedAt.toISOString(),
                 url: uploadResult.displayUrl,
                 thumbnailUrl: uploadResult.thumbnailUrl,
-                portfolioId: portfolioId ? parseInt(portfolioId) : null,
             },
         })
     } catch (error: any) {

@@ -1,6 +1,6 @@
 import { PixelCard } from "@/components/pixel-card"
 import { PixelInput } from "@/components/pixel-input"
-import { FileUpload } from "@/components/file-upload"
+import { PixelButton } from "@/components/pixel-button"
 
 interface LockScreenSettingsTabProps {
     lockScreenEnabled: boolean
@@ -15,21 +15,17 @@ interface LockScreenSettingsTabProps {
     onWidget1Upload: (file: File) => void
     onWidget2Upload: (file: File) => void
     onMusicPlayerIconUpload: (file: File) => void
+    onSave: () => void
 }
 
 export function LockScreenSettingsTab({
                                           lockScreenEnabled,
                                           lockScreenPassword,
                                           lockScreenHint,
-                                          mobileWidget1,
-                                          mobileWidget2,
-                                          musicPlayerIcon,
                                           onToggleLockScreen,
                                           onPasswordChange,
                                           onHintChange,
-                                          onWidget1Upload,
-                                          onWidget2Upload,
-                                          onMusicPlayerIconUpload,
+                                          onSave,
                                       }: LockScreenSettingsTabProps) {
     return (
         <PixelCard>
@@ -70,6 +66,11 @@ export function LockScreenSettingsTab({
                         />
                     </>
                 )}
+            </div>
+            <div className="mt-6">
+                <PixelButton onClick={onSave} className="w-full text-[10px]">
+                    SAVE
+                </PixelButton>
             </div>
         </PixelCard>
     )

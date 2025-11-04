@@ -2,11 +2,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
-import { lockScreenSettings, desktopSettings, themeSettings } from '@/lib/db/schema'
+import { portfolios } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { getUserByClerkId } from '@/lib/db/helpers'
 
-export async function PUT(req: NextRequest) {
+export async function POST(req: NextRequest) {
     try {
         const { userId } = await auth()
         if (!userId) {
@@ -18,37 +18,25 @@ export async function PUT(req: NextRequest) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 })
         }
 
-        const { type, portfolioId, data } = await req.json()
+        const data = await req.json()
+        const { portfolioId, ...settings } = data
 
-        switch (type) {
-            case 'lockScreen':
-                await db
-                    .update(lockScreenSettings)
-                    .set({ ...data, updatedAt: new Date() })
-                    .where(eq(lockScreenSettings.portfolioId, portfolioId))
-                break
-
-            case 'desktop':
-                await db
-                    .update(desktopSettings)
-                    .set({ ...data, updatedAt: new Date() })
-                    .where(eq(desktopSettings.portfolioId, portfolioId))
-                break
-
-            case 'theme':
-                await db
-                    .update(themeSettings)
-                    .set({ theme: data, updatedAt: new Date() })
-                    .where(eq(themeSettings.portfolioId, portfolioId))
-                break
-
-            default:
-                return NextResponse.json({ error: 'Invalid type' }, { status: 400 })
+        if (!portfolioId) {
+            return NextResponse.json({ error: 'Portfolio ID required' }, { status: 400 })
         }
 
-        return NextResponse.json({ success: true })
+        const [updated] = await db
+            .update(portfolios)
+            .set({
+                ...settings,
+                updatedAt: new Date(),
+            })
+            .where(eq(portfolios.id, portfolioId))
+            .returning()
+
+        return NextResponse.json(updated)
     } catch (error) {
-        console.error('Settings update error:', error)
-        return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 })
+        console.error('Portfolio settings update error:', error)
+        return NextResponse.json({ error: 'Failed to update portfolio settings' }, { status: 500 })
     }
 }

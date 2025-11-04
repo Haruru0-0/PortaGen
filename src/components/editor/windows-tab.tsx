@@ -26,6 +26,7 @@ interface WindowsTabProps {
     windowContents: WindowContent[]
     onToggleWindow: (id: string) => void
     onWindowUpdate: (windows: WindowContent[]) => void
+    onSave: () => void
 }
 
 // Template definitions with preview data
@@ -114,6 +115,7 @@ export function WindowsTab({
                                windowContents,
                                onToggleWindow,
                                onWindowUpdate,
+                               onSave,
                            }: WindowsTabProps) {
     const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
     const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop")
@@ -362,6 +364,11 @@ export function WindowsTab({
                     </div>
                 </div>
             </PixelCard>
+            <div className="mt-6">
+                <PixelButton onClick={onSave} className="w-full text-[10px]">
+                    SAVE
+                </PixelButton>
+            </div>
         </div>
     )
 }

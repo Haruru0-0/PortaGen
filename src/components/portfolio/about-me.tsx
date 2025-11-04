@@ -1,10 +1,14 @@
+import Image from "next/image"
+
 export default function AboutMe() {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-4">
-        <img
-          src="/placeholder.svg?height=100&width=100"
+        <Image
+          src="/placeholder.svg"
           alt="Profile"
+          width={100}
+          height={100}
           className="w-24 h-24 rounded-full border-4 border-primary"
         />
         <div>
@@ -17,7 +21,7 @@ export default function AboutMe() {
         <section>
           <h3 className="text-lg font-semibold mb-2">About Me</h3>
           <p className="text-sm leading-relaxed">
-            I'm a passionate developer with expertise in building modern web applications. I love creating beautiful,
+            I&apos;m a passionate developer with expertise in building modern web applications. I love creating beautiful,
             functional, and user-friendly experiences.
           </p>
         </section>

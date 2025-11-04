@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { getOAuth2Client } from '@/lib/services/google-drive'
 
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
         const { userId } = await auth()
 

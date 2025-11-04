@@ -3,6 +3,8 @@ import { PixelButton } from "@/components/pixel-button"
 import { Trash2, Edit2, Plus } from "lucide-react"
 import Placeholder from "@/assets/Placeholder.png"
 import Image from "next/image";
+import {MusicModal} from "@/components/editor/modals/MusicModal";
+import {uploadFile} from "@/lib/services/portfolioService";
 
 interface Icon {
     id: number
@@ -16,10 +18,21 @@ interface IconsTabProps {
     onEdit: (icon: Icon) => void
     onDelete: (id: number) => void
     onAdd: () => void
+    onSave: () => void
 }
 
-export function IconsTab({ icons, onEdit, onDelete, onAdd }: IconsTabProps) {
+export function IconsTab({ icons, onEdit, onDelete, onAdd, onSave }: IconsTabProps) {
+    const [isIconModalOpen, setIsIconModalOpen] = useState(false);
+
+    const handleIconImageUpload = async (file: File) => {
+        if (currentPortfolioId) {
+            const { asset } = await uploadFile(file, "icon", currentPortfolioId)
+            setIconImagePreview(asset.url)
+            setIconFormData({ ...iconFormData, icon: asset.url, fileId: asset.id })
+        }
+    }
     return (
+        <>
         <PixelCard>
             <div className="space-y-4">
                 <h3 className="text-sm pixel-text-shadow">DESKTOP ICONS</h3>
@@ -65,6 +78,30 @@ export function IconsTab({ icons, onEdit, onDelete, onAdd }: IconsTabProps) {
                     ADD ICON
                 </PixelButton>
             </div>
+            <div className="mt-6">
+                <PixelButton onClick={onSave} className="w-full text-[10px]">
+                    SAVE
+                </PixelButton>
+            </div>
         </PixelCard>
+
+            <IconModal
+                isOpen={isIconModalOpen}
+                onClose={() => {
+                    setIsIconModalOpen(false)
+                    setEditingIcon(null)
+                    setIconFormData({ name: "", icon: "", url: "", fileId: "" })
+                    setIconImagePreview(Placeholder)
+                }}
+                editingIcon={editingIcon}
+                iconFormData={iconFormData}
+                setIconFormData={setIconFormData}
+                iconImagePreview={iconImagePreview}
+                handleIconImageUpload={handleIconImageUpload}
+                openAssetLibrary={openAssetLibrary}
+                handleUpdateIcon={handleUpdateIcon}
+                handleAddIcon={handleAddIcon}
+            />
+        </>
     )
 }

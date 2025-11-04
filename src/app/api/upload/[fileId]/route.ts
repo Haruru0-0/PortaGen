@@ -31,7 +31,7 @@ export async function DELETE(
                 { status: 400 }
             )
         }
-        console.log(fileId)
+
         // Find asset in database
         const asset = await db.query.uploadedAssets.findFirst({
             where: and(

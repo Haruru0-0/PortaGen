@@ -20,6 +20,7 @@ interface WallpaperTabProps {
     onGifUpload?: (file: File) => void
     onSelectWallpaper?: (wallpaper: Wallpaper) => void
     onOpenLibrary: () => void
+    onSave: () => void
 }
 
 export function WallpaperTab({
@@ -32,6 +33,7 @@ export function WallpaperTab({
                                  onGifUpload,
                                  onSelectWallpaper,
                                  onOpenLibrary,
+                                 onSave,
                              }: WallpaperTabProps) {
     return (
         <PixelCard>
@@ -95,6 +97,11 @@ export function WallpaperTab({
                         </div>
                     </div>
                 )}
+            </div>
+            <div className="mt-6">
+                <PixelButton onClick={onSave} className="w-full text-[10px]">
+                    SAVE
+                </PixelButton>
             </div>
         </PixelCard>
     )

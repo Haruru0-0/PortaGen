@@ -16,6 +16,8 @@ import { PixelCharacter } from "@/components/pixel-character"
 
 // Validation schema
 const signupSchema = z.object({
+  firstName: z.string().min(1, { message: "FIRST NAME REQUIRED" }),
+  lastName: z.string().min(1, { message: "LAST NAME REQUIRED" }),
   email: z.string().email({ message: "INVALID EMAIL FORMAT" }),
   password: z
       .string()
@@ -43,6 +45,8 @@ export default function SignUpPage() {
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -85,6 +89,8 @@ export default function SignUpPage() {
 
     try {
       await signUp.create({
+        firstName: data.firstName,
+        lastName: data.lastName,
         emailAddress: data.email,
         password: data.password,
       })
@@ -255,6 +261,35 @@ export default function SignUpPage() {
               )}
 
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <div className="flex justify-between items-start gap-3">
+                  <div>
+                    <PixelInput
+                        label="FIRST NAME"
+                        type="text"
+                        placeholder="JOHN"
+                        {...form.register("firstName")}
+                    />
+                    {form.formState.errors.firstName && (
+                        <p className="text-red-500 text-[10px] mt-1">
+                          {form.formState.errors.firstName.message}
+                        </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <PixelInput
+                        label="LAST NAME"
+                        type="text"
+                        placeholder="DOE"
+                        {...form.register("lastName")}
+                    />
+                    {form.formState.errors.lastName && (
+                        <p className="text-red-500 text-[10px] mt-1">
+                          {form.formState.errors.lastName.message}
+                        </p>
+                    )}
+                  </div>
+                </div>
 
                 <div>
                   <PixelInput
@@ -271,52 +306,52 @@ export default function SignUpPage() {
                 </div>
 
                 <div className={"flex justify-between items-start gap-3"}>
-                <div>
-                  <PixelInput
-                      label="PASSWORD"
-                      type="password"
-                      placeholder="********"
-                      {...form.register("password")}
-                      onChange={handlePasswordChange}
-                  />
-                  {form.formState.errors.password && (
-                      <p className="text-red-500 text-[10px] mt-1">
-                        {form.formState.errors.password.message}
-                      </p>
-                  )}
-
-                  {form.watch("password") && (
-                      <div className="mt-2 space-y-1">
-                        <div className="flex gap-1">
-                          {[...Array(4)].map((_, i) => (
-                              <div
-                                  key={i}
-                                  className={`h-2 flex-1 border-2 border-border ${
-                                      i < passwordStrength / 25 ? getStrengthColor() : "bg-muted"
-                                  }`}
-                              />
-                          ))}
-                        </div>
-                        <p className="text-[10px] text-muted-foreground">
-                          STRENGTH: {getStrengthText()}
+                  <div>
+                    <PixelInput
+                        label="PASSWORD"
+                        type="password"
+                        placeholder="********"
+                        {...form.register("password")}
+                        onChange={handlePasswordChange}
+                    />
+                    {form.formState.errors.password && (
+                        <p className="text-red-500 text-[10px] mt-1">
+                          {form.formState.errors.password.message}
                         </p>
-                      </div>
-                  )}
-                </div>
+                    )}
 
-                <div>
-                  <PixelInput
-                      label="CONFIRM PASSWORD"
-                      type="password"
-                      placeholder="********"
-                      {...form.register("confirmPassword")}
-                  />
-                  {form.formState.errors.confirmPassword && (
-                      <p className="text-red-500 text-[10px] mt-1">
-                        {form.formState.errors.confirmPassword.message}
-                      </p>
-                  )}
-                </div>
+                    {form.watch("password") && (
+                        <div className="mt-2 space-y-1">
+                          <div className="flex gap-1">
+                            {[...Array(4)].map((_, i) => (
+                                <div
+                                    key={i}
+                                    className={`h-2 flex-1 border-2 border-border ${
+                                        i < passwordStrength / 25 ? getStrengthColor() : "bg-muted"
+                                    }`}
+                                />
+                            ))}
+                          </div>
+                          <p className="text-[10px] text-muted-foreground">
+                            STRENGTH: {getStrengthText()}
+                          </p>
+                        </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <PixelInput
+                        label="CONFIRM PASSWORD"
+                        type="password"
+                        placeholder="********"
+                        {...form.register("confirmPassword")}
+                    />
+                    {form.formState.errors.confirmPassword && (
+                        <p className="text-red-500 text-[10px] mt-1">
+                          {form.formState.errors.confirmPassword.message}
+                        </p>
+                    )}
+                  </div>
                 </div>
                 <PixelButton
                     type="submit"

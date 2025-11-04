@@ -1,87 +1,128 @@
-"use client"
+import { createContext, useEffect, useRef, useState } from "react";
+import { playlist, Track } from "@/lib/types";
 
-import type React from "react"
-
-import { createContext, useContext, useState, useRef, useCallback } from "react"
-
-type AudioContextType = {
-  isPlaying: boolean
-  currentTrack: number
-  tracks: { title: string; artist: string; url: string }[]
-  play: () => void
-  pause: () => void
-  next: () => void
-  previous: () => void
-  setVolume: (volume: number) => void
-  volume: number
-}
-
-const AudioContext = createContext<AudioContextType | undefined>(undefined)
+export const AudioContext = createContext({
+  audioRef: { current: null as HTMLAudioElement | null },
+  currentTrack: playlist[0],
+  isPlaying: false,
+  progress: 0,
+  volume: 70,
+  isLoading: false,
+  setCurrentTrack: (track: Track) => {},
+  setIsPlaying: (playing: boolean) => {},
+  setProgress: (progress: number) => {},
+  setVolume: (volume: number) => {},
+  setIsLoading: (loading: boolean) => {},
+});
 
 export function AudioProvider({ children }: { children: React.ReactNode }) {
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [currentTrack, setCurrentTrack] = useState(0)
-  const [volume, setVolumeState] = useState(0.5)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [currentTrack, setCurrentTrack] = useState<Track>(playlist[0]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [volume, setVolume] = useState(70);
+  const [isLoading, setIsLoading] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
-  const tracks = [
-    { title: "Track 1", artist: "Artist 1", url: "/music/track1.mp3" },
-    { title: "Track 2", artist: "Artist 2", url: "/music/track2.mp3" },
-  ]
+  // Resolve track source to a playable URL string
+  const resolveTrackSrc = (src: Track["src"]): string => {
+    if (typeof src === "string") return src;
+    // next-video Asset shape: prefer first source
+    const fromSources = src?.sources?.[0]?.src;
+    return fromSources ?? "";
+  };
 
-  const play = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.play()
-      setIsPlaying(true)
+  // Initialize audio element only once
+  useEffect(() => {
+    if (typeof document !== 'undefined' && !audioRef.current) {
+      const audio = document.createElement('audio');
+      audioRef.current = audio;
+      document.body.appendChild(audio);
+
+      // Save current time when switching views
+      const currentTime = audio.currentTime;
+      
+      const updateProgress = () => {
+        if (!audio.duration) return;
+        const newProgress = (audio.currentTime / audio.duration) * 100;
+        setProgress(isNaN(newProgress) ? 0 : newProgress);
+      };
+
+      const handleEnded = () => {
+        const currentIndex = playlist.findIndex(t => t.id === currentTrack.id);
+        const nextIndex = (currentIndex + 1) % playlist.length;
+        setCurrentTrack(playlist[nextIndex]);
+      };
+
+      audio.addEventListener('timeupdate', updateProgress);
+      audio.addEventListener('ended', handleEnded);
+
+      // Restore playback state if it was playing
+      if (isPlaying) {
+        audio.play().catch(e => console.log("Autoplay prevented:", e));
+      }
+
+      return () => {
+        audio.removeEventListener('timeupdate', updateProgress);
+        audio.removeEventListener('ended', handleEnded);
+        // Don't remove the audio element - we want it to persist
+      };
     }
-  }, [])
+  }, []);
 
-  const pause = useCallback(() => {
+  // Handle track changes
+  useEffect(() => {
+    const playAudio = async () => {
+      if (!audioRef.current) return;
+
+      try {
+        setIsLoading(true);
+        const wasPlaying = isPlaying;
+        audioRef.current.src = resolveTrackSrc(currentTrack.src);
+        audioRef.current.volume = volume / 100;
+
+        await audioRef.current.load();
+        
+        if (wasPlaying) {
+          await audioRef.current.play().catch(e => {
+            console.log("Autoplay prevented:", e);
+            setIsPlaying(false);
+          });
+        }
+      } catch (error) {
+        console.error("Playback error:", error);
+        setIsPlaying(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    playAudio();
+  }, [currentTrack]);
+
+  // Update volume when changed
+  useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.pause()
-      setIsPlaying(false)
+      audioRef.current.volume = volume / 100;
     }
-  }, [])
-
-  const next = useCallback(() => {
-    setCurrentTrack((prev) => (prev + 1) % tracks.length)
-  }, [tracks.length])
-
-  const previous = useCallback(() => {
-    setCurrentTrack((prev) => (prev - 1 + tracks.length) % tracks.length)
-  }, [tracks.length])
-
-  const setVolume = useCallback((vol: number) => {
-    setVolumeState(vol)
-    if (audioRef.current) {
-      audioRef.current.volume = vol
-    }
-  }, [])
+  }, [volume]);
 
   return (
     <AudioContext.Provider
       value={{
-        isPlaying,
+        audioRef,
         currentTrack,
-        tracks,
-        play,
-        pause,
-        next,
-        previous,
-        setVolume,
+        isPlaying,
+        progress,
         volume,
+        isLoading,
+        setCurrentTrack,
+        setIsPlaying,
+        setProgress,
+        setVolume,
+        setIsLoading,
       }}
     >
       {children}
-      <audio ref={audioRef} src={tracks[currentTrack]?.url} />
     </AudioContext.Provider>
-  )
-}
-
-export function useAudio() {
-  const context = useContext(AudioContext)
-  if (!context) {
-    throw new Error("useAudio must be used within AudioProvider")
-  }
-  return context
+  );
 }

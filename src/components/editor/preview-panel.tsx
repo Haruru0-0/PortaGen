@@ -131,6 +131,8 @@ export function PreviewPanel({
                                     ) : (
                                         <div className="w-full h-full relative" style={{ zIndex: 1 }}>
                                             <Desktop
+                                                previewMode={previewMode}
+                                                embedded={true}
                                                 mobileWidget1={mobileWidget1 || "/water-cd.jpg"}
                                                 mobileWidget2={mobileWidget2 || "/cute-puppy.png"}
                                                 musicPlayerIcon={musicPlayerIcon}

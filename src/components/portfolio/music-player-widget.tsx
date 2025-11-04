@@ -4,6 +4,7 @@ import { Play, Pause, SkipBack, SkipForward, Volume2 } from "lucide-react"
 import { useState } from "react"
 import { useAudio } from "./audio-context"
 import { useAppSound } from "./sound-context"
+import Image from "next/image"
 
 interface MusicPlayerWidgetProps {
   isDesktop: boolean
@@ -48,7 +49,7 @@ export default function MusicPlayerWidget({ isDesktop, icon }: MusicPlayerWidget
       >
         <div className="flex items-center gap-3">
           {icon ? (
-            <img src={icon || "/placeholder.svg"} alt="Music" className="w-12 h-12 rounded object-cover" />
+            <Image src={icon || "/placeholder.svg"} alt="Music" width={48} height={48} className="w-12 h-12 rounded object-cover" />
           ) : (
             <div
               className="w-12 h-12 rounded flex items-center justify-center font-bold"
@@ -149,7 +150,7 @@ export default function MusicPlayerWidget({ isDesktop, icon }: MusicPlayerWidget
     >
       <div className="flex items-center gap-2 mb-2">
         {icon ? (
-          <img src={icon || "/placeholder.svg"} alt="Music" className="w-10 h-10 rounded object-cover" />
+          <Image src={icon || "/placeholder.svg"} alt="Music" width={40} height={40} className="w-10 h-10 rounded object-cover" />
         ) : (
           <div
             className="w-10 h-10 rounded flex items-center justify-center font-bold text-sm"

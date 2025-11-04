@@ -1,8 +1,17 @@
+import { withNextVideo } from "next-video/process";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "drive.google.com",
+        pathname: "/**",
+      },
+    ],
+  },
 };
 
-export default nextConfig;
+export default withNextVideo(nextConfig, { folder: 'src/assets' });

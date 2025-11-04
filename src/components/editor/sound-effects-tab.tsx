@@ -12,9 +12,10 @@ interface SoundEffect {
 interface SoundEffectsTabProps {
     soundEffects: SoundEffect[]
     onSoundsChange: (sounds: SoundEffect[]) => void
+    onSave: () => void
 }
 
-export function SoundEffectsTab({ soundEffects, onSoundsChange }: SoundEffectsTabProps) {
+export function SoundEffectsTab({ soundEffects, onSoundsChange, onSave }: SoundEffectsTabProps) {
     return (
         <PixelCard>
             <div className="space-y-4">
@@ -40,6 +41,11 @@ export function SoundEffectsTab({ soundEffects, onSoundsChange }: SoundEffectsTa
                         </ul>
                     </div>
                 </div>
+            </div>
+            <div className="mt-6">
+                <PixelButton onClick={onSave} className="w-full text-[10px]">
+                    SAVE
+                </PixelButton>
             </div>
         </PixelCard>
     )

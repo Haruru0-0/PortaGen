@@ -1,5 +1,5 @@
 {
-  "id": "7c845258-8add-4702-bd55-ad0031f10f98",
+  "id": "e52cd2b0-af86-4642-a55d-8af396cd4595",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -20,75 +20,33 @@
           "primaryKey": false,
           "notNull": true
         },
-        "wallpaper_file_id": {
-          "name": "wallpaper_file_id",
-          "type": "varchar(255)",
+        "wallpaper_asset_id": {
+          "name": "wallpaper_asset_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
-        "wallpaper_url": {
-          "name": "wallpaper_url",
-          "type": "text",
+        "desktop_gif_asset_id": {
+          "name": "desktop_gif_asset_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
-        "wallpaper_file_name": {
-          "name": "wallpaper_file_name",
-          "type": "text",
+        "widget1_asset_id": {
+          "name": "widget1_asset_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
-        "desktop_gif_file_id": {
-          "name": "desktop_gif_file_id",
-          "type": "varchar(255)",
+        "widget2_asset_id": {
+          "name": "widget2_asset_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
-        "desktop_gif_url": {
-          "name": "desktop_gif_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "desktop_gif_file_name": {
-          "name": "desktop_gif_file_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "widget1_file_id": {
-          "name": "widget1_file_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "widget1_url": {
-          "name": "widget1_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "widget2_file_id": {
-          "name": "widget2_file_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "widget2_url": {
-          "name": "widget2_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "music_player_icon_file_id": {
-          "name": "music_player_icon_file_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "music_player_icon_url": {
-          "name": "music_player_icon_url",
-          "type": "text",
+        "music_player_icon_asset_id": {
+          "name": "music_player_icon_asset_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -120,6 +78,71 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "desktop_settings_wallpaper_asset_id_uploaded_assets_id_fk": {
+          "name": "desktop_settings_wallpaper_asset_id_uploaded_assets_id_fk",
+          "tableFrom": "desktop_settings",
+          "tableTo": "uploaded_assets",
+          "columnsFrom": [
+            "wallpaper_asset_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "desktop_settings_desktop_gif_asset_id_uploaded_assets_id_fk": {
+          "name": "desktop_settings_desktop_gif_asset_id_uploaded_assets_id_fk",
+          "tableFrom": "desktop_settings",
+          "tableTo": "uploaded_assets",
+          "columnsFrom": [
+            "desktop_gif_asset_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "desktop_settings_widget1_asset_id_uploaded_assets_id_fk": {
+          "name": "desktop_settings_widget1_asset_id_uploaded_assets_id_fk",
+          "tableFrom": "desktop_settings",
+          "tableTo": "uploaded_assets",
+          "columnsFrom": [
+            "widget1_asset_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "desktop_settings_widget2_asset_id_uploaded_assets_id_fk": {
+          "name": "desktop_settings_widget2_asset_id_uploaded_assets_id_fk",
+          "tableFrom": "desktop_settings",
+          "tableTo": "uploaded_assets",
+          "columnsFrom": [
+            "widget2_asset_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "desktop_settings_music_player_icon_asset_id_uploaded_assets_id_fk": {
+          "name": "desktop_settings_music_player_icon_asset_id_uploaded_assets_id_fk",
+          "tableFrom": "desktop_settings",
+          "tableTo": "uploaded_assets",
+          "columnsFrom": [
+            "music_player_icon_asset_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -166,21 +189,9 @@
           "notNull": true,
           "default": 0
         },
-        "icon_file_id": {
-          "name": "icon_file_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "icon_url": {
-          "name": "icon_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "icon_file_name": {
-          "name": "icon_file_name",
-          "type": "text",
+        "icon_asset_id": {
+          "name": "icon_asset_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -232,6 +243,19 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
+        },
+        "icons_icon_asset_id_uploaded_assets_id_fk": {
+          "name": "icons_icon_asset_id_uploaded_assets_id_fk",
+          "tableFrom": "icons",
+          "tableTo": "uploaded_assets",
+          "columnsFrom": [
+            "icon_asset_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -275,21 +299,9 @@
           "primaryKey": false,
           "notNull": false
         },
-        "wallpaper_file_id": {
-          "name": "wallpaper_file_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "wallpaper_url": {
-          "name": "wallpaper_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "wallpaper_file_name": {
-          "name": "wallpaper_file_name",
-          "type": "text",
+        "wallpaper_asset_id": {
+          "name": "wallpaper_asset_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -321,6 +333,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "lock_screen_settings_wallpaper_asset_id_uploaded_assets_id_fk": {
+          "name": "lock_screen_settings_wallpaper_asset_id_uploaded_assets_id_fk",
+          "tableFrom": "lock_screen_settings",
+          "tableTo": "uploaded_assets",
+          "columnsFrom": [
+            "wallpaper_asset_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -367,21 +392,9 @@
           "notNull": true,
           "default": 0
         },
-        "audio_file_id": {
-          "name": "audio_file_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "audio_url": {
-          "name": "audio_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "audio_file_name": {
-          "name": "audio_file_name",
-          "type": "text",
+        "audio_asset_id": {
+          "name": "audio_asset_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -434,10 +447,121 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
+        },
+        "music_tracks_audio_asset_id_uploaded_assets_id_fk": {
+          "name": "music_tracks_audio_asset_id_uploaded_assets_id_fk",
+          "tableFrom": "music_tracks",
+          "tableTo": "uploaded_assets",
+          "columnsFrom": [
+            "audio_asset_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.portfolio_assets": {
+      "name": "portfolio_assets",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "portfolio_id": {
+          "name": "portfolio_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "asset_id": {
+          "name": "asset_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "portfolio_assets_portfolio_id_idx": {
+          "name": "portfolio_assets_portfolio_id_idx",
+          "columns": [
+            {
+              "expression": "portfolio_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "portfolio_assets_asset_id_idx": {
+          "name": "portfolio_assets_asset_id_idx",
+          "columns": [
+            {
+              "expression": "asset_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "portfolio_assets_portfolio_id_portfolios_id_fk": {
+          "name": "portfolio_assets_portfolio_id_portfolios_id_fk",
+          "tableFrom": "portfolio_assets",
+          "tableTo": "portfolios",
+          "columnsFrom": [
+            "portfolio_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "portfolio_assets_asset_id_uploaded_assets_id_fk": {
+          "name": "portfolio_assets_asset_id_uploaded_assets_id_fk",
+          "tableFrom": "portfolio_assets",
+          "tableTo": "uploaded_assets",
+          "columnsFrom": [
+            "asset_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "unique_portfolio_asset": {
+          "name": "unique_portfolio_asset",
+          "nullsNotDistinct": false,
+          "columns": [
+            "portfolio_id",
+            "asset_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -608,15 +732,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "audio_file_id": {
-          "name": "audio_file_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "audio_url": {
-          "name": "audio_url",
-          "type": "text",
+        "audio_asset_id": {
+          "name": "audio_asset_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
@@ -662,6 +780,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "sound_effects_audio_asset_id_uploaded_assets_id_fk": {
+          "name": "sound_effects_audio_asset_id_uploaded_assets_id_fk",
+          "tableFrom": "sound_effects",
+          "tableTo": "uploaded_assets",
+          "columnsFrom": [
+            "audio_asset_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -763,12 +894,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "portfolio_id": {
-          "name": "portfolio_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
         "asset_type": {
           "name": "asset_type",
           "type": "varchar(50)",
@@ -841,21 +966,6 @@
           "method": "btree",
           "with": {}
         },
-        "assets_portfolio_id_idx": {
-          "name": "assets_portfolio_id_idx",
-          "columns": [
-            {
-              "expression": "portfolio_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "assets_file_id_idx": {
           "name": "assets_file_id_idx",
           "columns": [
@@ -879,19 +989,6 @@
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "uploaded_assets_portfolio_id_portfolios_id_fk": {
-          "name": "uploaded_assets_portfolio_id_portfolios_id_fk",
-          "tableFrom": "uploaded_assets",
-          "tableTo": "portfolios",
-          "columnsFrom": [
-            "portfolio_id"
           ],
           "columnsTo": [
             "id"

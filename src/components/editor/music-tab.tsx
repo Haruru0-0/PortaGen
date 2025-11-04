@@ -16,6 +16,7 @@ interface MusicTabProps {
     onUpload: (file: File) => void
     onDelete: (id: number) => void
     onOpenLibrary: () => void
+    onSave: () => void
 }
 
 export function MusicTab({
@@ -24,6 +25,7 @@ export function MusicTab({
                              onUpload,
                              onDelete,
                              onOpenLibrary,
+                             onSave,
                          }: MusicTabProps) {
     return (
         <PixelCard>
@@ -73,6 +75,11 @@ export function MusicTab({
                         </div>
                     ))}
                 </div>
+            </div>
+            <div className="mt-6">
+                <PixelButton onClick={onSave} className="w-full text-[10px]">
+                    SAVE
+                </PixelButton>
             </div>
         </PixelCard>
     )

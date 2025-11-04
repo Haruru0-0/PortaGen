@@ -12,7 +12,6 @@ export function useFileUpload() {
     const uploadFile = async (
         file: File,
         assetType: AssetType,
-        portfolioId?: number,
         customFileName?: string // Add this parameter
     ) => {
         setUploading(true)
@@ -23,9 +22,6 @@ export function useFileUpload() {
             const formData = new FormData()
             formData.append('file', file)
             formData.append('assetType', assetType)
-            if (portfolioId) {
-                formData.append('portfolioId', portfolioId.toString())
-            }
             if (customFileName) {
                 const nameWithoutExt = customFileName.replace(/\.[^/.]+$/, "")
                 formData.append('customFileName', nameWithoutExt)

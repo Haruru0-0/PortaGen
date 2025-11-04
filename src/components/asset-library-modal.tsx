@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"
 import { PixelModal } from "./pixel-modal"
 import { PixelButton } from "./pixel-button"
 import { Play, Pause, Cloud, Image, Music, Zap } from "lucide-react"
+import NextImage from "next/image"
 
 interface Asset {
   id: string
@@ -261,18 +262,18 @@ export function AssetLibraryModal({
 
                       {/* Wallpaper Display */}
                       {type === "wallpaper" && (
-                          <div className="aspect-video mb-2 border-2 border-border overflow-hidden bg-muted">
-                            <img
+                          <div className="aspect-video mb-2 border-2 border-border overflow-hidden bg-muted relative">
+                            <Image
                                 src={getOptimizedImageUrl(asset)}
                                 alt={asset.name}
-                                className="w-full h-full object-cover"
+                                fill
+                                sizes="300px"
+                                className="object-cover"
                                 onError={(e) => {
-                                  // Fallback to full image URL if thumbnail fails
                                   const target = e.target as HTMLImageElement
                                   if (target.src !== getFullImageUrl(asset)) {
                                     target.src = getFullImageUrl(asset)
                                   } else {
-                                    // Ultimate fallback
                                     target.src = "/placeholder.svg?height=100&width=150"
                                   }
                                 }}
@@ -282,11 +283,13 @@ export function AssetLibraryModal({
 
                       {/* Icon Display */}
                       {type === "icon" && (
-                          <div className="w-16 h-16 mx-auto mb-2 border-2 border-border overflow-hidden bg-muted">
-                            <img
+                          <div className="w-16 h-16 mx-auto mb-2 border-2 border-border overflow-hidden bg-muted relative">
+                            <Image
                                 src={getOptimizedImageUrl(asset)}
                                 alt={asset.name}
-                                className="w-full h-full object-cover"
+                                fill
+                                sizes="64px"
+                                className="object-cover"
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement
                                   if (target.src !== getFullImageUrl(asset)) {
@@ -338,11 +341,13 @@ export function AssetLibraryModal({
                 </p>
                 {/* Show preview for selected wallpaper */}
                 {type === "wallpaper" && selectedAsset && (
-                    <div className="mt-2 aspect-video border-2 border-border overflow-hidden">
-                      <img
+                    <div className="mt-2 aspect-video border-2 border-border overflow-hidden relative">
+                      <Image
                           src={getOptimizedImageUrl(selectedAsset)}
                           alt={selectedAsset.name}
-                          className="w-full h-full object-cover"
+                          fill
+                          sizes="300px"
+                          className="object-cover"
                       />
                     </div>
                 )}

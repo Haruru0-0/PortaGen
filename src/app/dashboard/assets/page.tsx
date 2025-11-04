@@ -6,39 +6,13 @@ import {PixelCard} from "@/components/pixel-card"
 import {PixelInput} from "@/components/pixel-input"
 import {PixelButton} from "@/components/pixel-button"
 import {PixelModal} from "@/components/pixel-modal"
-import {PortfolioSelector} from "@/components/portfolio-selector"
 import {DeleteConfirmationModal} from "@/components/delete-confirmation-modal"
 import {useGoogleDrive} from "@/hooks/use-google-drive"
 import {useFileUpload} from "@/hooks/use-file-upload"
 import {Cloud, FileImage, Loader2, Music, XCircle, Zap} from "lucide-react"
 import Image from "next/image";
-import Edit from "@/assets/Edit.png";
-import Delete from "@/assets/Delete.png";
-import Download from "@/assets/Download.png";
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
-
-type AssetType = "all" | "wallpaper" | "icon" | "music" | "sound"
-
-interface Asset {
-    id: number
-    fileId: string
-    name: string
-    type: AssetType
-    size: string
-    fileSize: number
-    date: string
-    url: string
-    thumbnailUrl?: string
-    portfolioId: number
-    mimeType?: string
-}
-
-interface Portfolio {
-    id: number
-    name: string
-    slug: string
-    isPublished: boolean
-}
+import {Asset, AssetType} from "@/lib/types"
+import AssetCard from "@/components/asset-card";
 
 // Available asset types for user selection
 const ASSET_TYPES = [
@@ -53,8 +27,6 @@ export default function AssetsPage() {
     const [searchQuery, setSearchQuery] = useState("")
     const [selectedAssets, setSelectedAssets] = useState<number[]>([])
     const [assets, setAssets] = useState<Asset[]>([])
-    const [portfolios, setPortfolios] = useState<Portfolio[]>([])
-    const [currentPortfolioId, setCurrentPortfolioId] = useState<number | null>(null)
     const [loading, setLoading] = useState(false)
 
     const {connected, loading: driveLoading, connectDrive} = useGoogleDrive()
@@ -90,33 +62,11 @@ export default function AssetsPage() {
         {id: "sound", label: "SOUNDS"},
     ]
 
-    // Fetch portfolios on mount
-    useEffect(() => {
-        fetchPortfolios()
-    }, [])
-
     // Fetch assets when portfolio changes
     useEffect(() => {
-        if (currentPortfolioId) {
-            fetchAssets()
-        }
-    }, [currentPortfolioId])
+        fetchAssets()
+    }, [])
 
-    const fetchPortfolios = async () => {
-        try {
-            const response = await fetch('/api/portfolio/list')
-            if (response.ok) {
-                const data = await response.json()
-                setPortfolios(data.portfolios || [])
-
-                if (data.portfolios.length > 0 && !currentPortfolioId) {
-                    setCurrentPortfolioId(data.portfolios[0].id)
-                }
-            }
-        } catch (error) {
-            console.error('Failed to fetch portfolios:', error)
-        }
-    }
     const getOptimizedDriveUrl = (fileId: string, type: 'display' | 'download' | 'thumbnail' = 'display') => {
         switch (type) {
             case 'thumbnail':
@@ -129,11 +79,9 @@ export default function AssetsPage() {
         }
     }
     const fetchAssets = async () => {
-        if (!currentPortfolioId) return
-
         setLoading(true)
         try {
-            const response = await fetch(`/api/assets?portfolioId=${currentPortfolioId}`)
+            const response = await fetch(`/api/assets`)
             if (response.ok) {
                 const data = await response.json()
                 const assetsWithFixedUrls = data.assets.map((asset: any) => ({
@@ -149,15 +97,6 @@ export default function AssetsPage() {
         } finally {
             setLoading(false)
         }
-    }
-
-    const handlePortfolioChange = (portfolioId: number) => {
-        setCurrentPortfolioId(portfolioId)
-    }
-
-    const handlePortfolioCreated = (newPortfolio: Portfolio) => {
-        setPortfolios(prev => [...prev, newPortfolio])
-        setCurrentPortfolioId(newPortfolio.id)
     }
 
     const filteredAssets = assets.filter((asset) => {
@@ -208,11 +147,6 @@ export default function AssetsPage() {
             return
         }
 
-        if (!currentPortfolioId) {
-            alert('Please select a portfolio first')
-            return
-        }
-
         if (selectedFiles.length === 0) {
             alert('Please select files to upload')
             return
@@ -223,7 +157,7 @@ export default function AssetsPage() {
                 // Get custom name or use original name without extension
                 const customName = fileNames[file.name] || file.name.replace(/\.[^/.]+$/, "")
 
-                const result = await uploadFile(file, selectedAssetType, currentPortfolioId, customName)
+                const result = await uploadFile(file, selectedAssetType, customName)
 
                 if (result.success) {
                     return {success: true, file: customName}
@@ -397,25 +331,15 @@ export default function AssetsPage() {
                 </div>
 
                 <div className="flex gap-3">
-                    {!connected && (
+                    {connected && (
                         <PixelButton
-                            variant="secondary"
-                            className="text-[10px] flex items-center gap-2"
-                            onClick={connectDrive}
-                            disabled={driveLoading}
+                            variant="primary"
+                            className="text-[10px]"
+                            onClick={() => fileInputRef.current?.click()}
                         >
-                            <Cloud className="w-4 h-4"/>
-                            {driveLoading ? 'CONNECTING...' : 'CONNECT DRIVE'}
+                            + UPLOAD ASSET
                         </PixelButton>
                     )}
-                    <PixelButton
-                        variant="primary"
-                        className="text-[10px]"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={!connected}
-                    >
-                        + UPLOAD ASSET
-                    </PixelButton>
                 </div>
             </div>
 
@@ -444,22 +368,16 @@ export default function AssetsPage() {
                         </div>
                         <PixelButton
                             variant="primary"
-                            className="text-[10px]"
+                            className="text-[10px] flex items-center gap-2"
                             onClick={connectDrive}
+                            disabled={driveLoading}
                         >
-                            CONNECT NOW
+                            <Cloud className="w-4 h-4"/>
+                            {driveLoading ? 'CONNECTING...' : 'CONNECT NOW'}
                         </PixelButton>
                     </div>
                 </PixelCard>
             )}
-
-            {/* Portfolio Selector Component */}
-            <PortfolioSelector
-                portfolios={portfolios}
-                currentPortfolioId={currentPortfolioId}
-                onPortfolioChange={handlePortfolioChange}
-                onPortfolioCreated={handlePortfolioCreated}
-            />
 
             {/* Filters and Search */}
             <PixelCard>
@@ -522,25 +440,6 @@ export default function AssetsPage() {
                 </div>
             </PixelCard>
 
-            {/* Upload Area */}
-            {connected && currentPortfolioId && (
-                <PixelCard>
-                    <div
-                        className="border-4 border-dashed border-border p-12 text-center space-y-4 hover:bg-muted cursor-pointer"
-                        onClick={() => fileInputRef.current?.click()}
-                    >
-                        <div className="text-4xl">⬆️</div>
-                        <div>
-                            <p className="text-sm pixel-text-shadow mb-2">DRAG & DROP FILES HERE</p>
-                            <p className="text-[10px] text-muted-foreground">OR CLICK TO BROWSE</p>
-                        </div>
-                        <p className="text-[10px] text-muted-foreground">
-                            SUPPORTED: PNG, JPG, SVG, MP3, WAV
-                        </p>
-                    </div>
-                </PixelCard>
-            )}
-
             {/* Loading State */}
             {loading && (
                 <div className="flex justify-center items-center py-12">
@@ -549,124 +448,39 @@ export default function AssetsPage() {
             )}
 
             {/* Asset Grid */}
-            {!loading && currentPortfolioId && (
+            {!loading && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {filteredAssets.map((asset) => (
-                        <PixelCard key={asset.id} className="relative">
-                            <div className="space-y-3">
-                                <div className="absolute top-4 left-4 z-10">
-                                    <button
-                                        onClick={() => toggleAssetSelection(asset.id)}
-                                        className={`w-6 h-6 border-2 border-border ${
-                                            selectedAssets.includes(asset.id) ? "bg-primary" : "bg-card"
-                                        } flex items-center justify-center`}
-                                    >
-                                        {selectedAssets.includes(asset.id) && (
-                                            <span className="text-[10px]">✓</span>
-                                        )}
-                                    </button>
-                                </div>
-
-                                <div
-                                    className="aspect-square bg-muted border-2 border-border flex items-center justify-center text-4xl overflow-hidden">
-                                    {asset.url && asset.type !== "music" && asset.type !== "sound" ? (
-                                        <img
-                                            src={asset.thumbnailUrl || asset.url}
-                                            alt={asset.name}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    ) : (
-                                        getAssetIcon(asset.type)
-                                    )}
-                                </div>
-
-                                <div className="space-y-1">
-                                    {/* Asset Name with Rename Button */}
-                                    <div className="flex items-center justify-between gap-1 group">
-                                        <div className="text-xs">
-                                            {asset.name}.{asset.mimeType ? asset.mimeType.split('/')[1] : 'file'}
-                                        </div>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <button
-                                                    onClick={() => handleRenameStart(asset)}
-                                                    className="w-8 h-8 border border-2 bg-card hover:bg-primary hover:text-primary-foreground transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100"
-                                                >
-                                                    <Image alt={"Edit button"} src={Edit}/>
-                                                </button>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>Rename</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </div>
-
-                                    <div className="flex flex-col text-[10px] text-muted-foreground">
-                                        <p>{formatFileSize(asset.fileSize)}</p>
-                                        <p>{new Date(asset.date).toLocaleDateString()}</p>
-                                        <p>{asset.type}</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-2">
-                                    <PixelButton
-                                        variant="secondary"
-                                        className="flex-1 text-[10px] px-2 py-1"
-                                        onClick={() => handleView(asset)}
-                                    >
-                                        VIEW
-                                    </PixelButton>
-
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                    <button
-                                        className="w-8 h-8 border-2 border-border bg-card hover:bg-muted text-[10px]"
-                                        onClick={() => handleDownload(asset)}
-                                    >
-                                      <Image alt={"Download button"} src={Download}/>
-                                    </button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>Download</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <button
-                                                className="w-8 h-8 border border-2 bg-card hover:bg-destructive text-[10px]"
-                                                onClick={() => handleDelete(asset.id)}
-                                            >
-                                                <Image alt={"Delete button"} src={Delete}/>
-                                            </button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>Delete</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </div>
-                            </div>
-                        </PixelCard>
+                        <AssetCard
+                            key={asset.id}
+                            onToggle={() => toggleAssetSelection(asset.id)}
+                            selectedAssets={selectedAssets}
+                            asset={asset}
+                            assetIcon={getAssetIcon(asset.type)}
+                            onRename={() => handleRenameStart(asset)}
+                            fileSize={formatFileSize(asset.fileSize)}
+                            onView={() => handleView(asset)}
+                            onDownload={() => handleDownload(asset)}
+                            onDelete={() => handleDelete(asset.id)}
+                        />
                     ))}
                 </div>
             )}
 
             {/* Empty State */}
-            {!loading && (!currentPortfolioId || filteredAssets.length === 0) && (
+            {!loading && (filteredAssets.length === 0) && (
                 <PixelCard>
                     <div className="text-center py-12 space-y-4">
                         <div className="text-4xl">
-                            {!currentPortfolioId ? "📁" : "🖼️"}
+                            🖼️
                         </div>
                         <h4 className="text-sm pixel-text-shadow">
-                            {!currentPortfolioId ? "NO PORTFOLIO SELECTED" : "NO ASSETS FOUND"}
+                            NO ASSETS FOUND
                         </h4>
                         <p className="text-[10px] text-muted-foreground leading-relaxed">
-                            {!currentPortfolioId
-                                ? "SELECT A PORTFOLIO OR CREATE A NEW ONE TO MANAGE ASSETS"
-                                : searchQuery
-                                    ? "TRY A DIFFERENT SEARCH TERM"
-                                    : "UPLOAD YOUR FIRST ASSET TO GET STARTED"
+                            {searchQuery
+                                ? "TRY A DIFFERENT SEARCH TERM"
+                                : "UPLOAD YOUR FIRST ASSET TO GET STARTED"
                             }
                         </p>
                     </div>
@@ -833,13 +647,14 @@ export default function AssetsPage() {
                 {viewingAsset && (
                     <div className="space-y-4">
                         {(viewingAsset.type === "wallpaper" || viewingAsset.type === "icon") && viewingAsset.url ? (
-                            <div className="border-2 border-border bg-muted">
-                                <img
-                                    src={viewingAsset.url.replace('/thumbnail', '/uc')} // Use full image for view modal
+                            <div className="border-2 border-border bg-muted relative w-full h-96">
+                                <Image
+                                    src={viewingAsset.url.replace('/thumbnail', '/uc')}
                                     alt={viewingAsset.name}
-                                    className="w-full max-h-96 object-contain"
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, 800px"
+                                    className="object-contain"
                                     onError={(e) => {
-                                        // Fallback to thumbnail if full image fails
                                         const target = e.target as HTMLImageElement
                                         target.src = viewingAsset.thumbnailUrl || viewingAsset.url
                                     }}

@@ -24,8 +24,7 @@ export async function GET(req: NextRequest) {
         const assets = await db.query.uploadedAssets.findMany({
             where: portfolioId
                 ? and(
-                    eq(uploadedAssets.userId, user.id),
-                    eq(uploadedAssets.portfolioId, parseInt(portfolioId))
+                    eq(uploadedAssets.userId, user.id)
                 )
                 : eq(uploadedAssets.userId, user.id),
             orderBy: (uploadedAssets, { desc }) => [desc(uploadedAssets.uploadedAt)],
@@ -41,7 +40,6 @@ export async function GET(req: NextRequest) {
             date: asset.uploadedAt.toISOString(),
             url: asset.displayUrl,
             thumbnailUrl: asset.thumbnailUrl,
-            portfolioId: asset.portfolioId,
             mimeType: asset.mimeType
         }))
 
