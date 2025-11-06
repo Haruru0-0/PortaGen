@@ -21,11 +21,13 @@ import {playlist, Track} from "@/lib/types";
 interface MusicPlayerProps {
   isDesktop?: boolean;
   embedded?: boolean;
+  spotifyPlaylistUrl?: string;
 }
 
 export default function MusicPlayerWidget({
   isDesktop = false,
   embedded = false,
+  spotifyPlaylistUrl,
 }: MusicPlayerProps) {
   const {
     audioRef,
@@ -51,6 +53,121 @@ export default function MusicPlayerWidget({
 
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const spotifyEmbedUrl = (() => {
+    if (!spotifyPlaylistUrl) return "";
+    try {
+      return spotifyPlaylistUrl.replace('open.spotify.com/playlist', 'open.spotify.com/embed/playlist');
+    } catch {
+      return "";
+    }
+  })();
+
+  // Spotify Web Playback SDK integration (Premium required)
+  const useSpotify = !!spotifyPlaylistUrl
+  const spotifyPlayerRef = useRef<any>(null)
+  const spotifyAccessTokenRef = useRef<string>("")
+  const spotifyDeviceIdRef = useRef<string>("")
+  const [spotifyReady, setSpotifyReady] = useState(false)
+  const [spIsPlaying, setSpIsPlaying] = useState(false)
+  const [spPositionMs, setSpPositionMs] = useState(0)
+  const [spDurationMs, setSpDurationMs] = useState(0)
+
+  const parsePlaylistId = (url?: string) => {
+    if (!url) return ""
+    try {
+      const u = new URL(url)
+      const parts = u.pathname.split('/')
+      const idx = parts.findIndex(p => p === 'playlist')
+      if (idx >= 0 && parts[idx + 1]) return parts[idx + 1]
+      return ""
+    } catch {
+      return ""
+    }
+  }
+
+  useEffect(() => {
+    if (!useSpotify) return
+
+    let cancelled = false
+    const init = async () => {
+      try {
+        // Get access token
+        const res = await fetch('/api/auth/spotify/token')
+        if (!res.ok) return
+        const { accessToken } = await res.json()
+        if (cancelled) return
+        spotifyAccessTokenRef.current = accessToken
+
+        // Load SDK if not present
+        if (!(window as any).Spotify) {
+          await new Promise<void>((resolve) => {
+            const script = document.createElement('script')
+            script.src = 'https://sdk.scdn.co/spotify-player.js'
+            script.async = true
+            script.onload = () => resolve()
+            document.body.appendChild(script)
+          })
+        }
+
+        ;(window as any).onSpotifyWebPlaybackSDKReady = () => {
+          if (cancelled) return
+          const player = new (window as any).Spotify.Player({
+            name: 'PortaGen Player',
+            getOAuthToken: (cb: (t: string) => void) => cb(spotifyAccessTokenRef.current),
+            volume: 0.5,
+          })
+
+          player.addListener('ready', async ({ device_id }: any) => {
+            if (cancelled) return
+            spotifyDeviceIdRef.current = device_id
+            setSpotifyReady(true)
+            const playlistId = parsePlaylistId(spotifyPlaylistUrl)
+            if (!playlistId) return
+            try {
+              // Transfer playback to SDK device and start playlist
+              await fetch('https://api.spotify.com/v1/me/player', {
+                method: 'PUT',
+                headers: { Authorization: `Bearer ${spotifyAccessTokenRef.current}` },
+                body: JSON.stringify({ device_ids: [device_id], play: true }),
+              })
+              await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
+                method: 'PUT',
+                headers: {
+                  Authorization: `Bearer ${spotifyAccessTokenRef.current}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ context_uri: `spotify:playlist:${playlistId}` }),
+              })
+            } catch (e) {
+              // ignore
+            }
+          })
+
+          player.addListener('player_state_changed', (state: any) => {
+            if (!state) return
+            setSpIsPlaying(!state.paused)
+            setSpPositionMs(state.position || 0)
+            setSpDurationMs(state.duration || 0)
+            const pct = state.duration ? (state.position / state.duration) * 100 : 0
+            setProgress(isNaN(pct) ? 0 : pct)
+            setIsPlaying(!state.paused)
+          })
+
+          player.addListener('not_ready', () => {
+            setSpotifyReady(false)
+          })
+
+          player.connect()
+          spotifyPlayerRef.current = player
+        }
+      } catch {}
+    }
+
+    init()
+    return () => {
+      cancelled = true
+    }
+  }, [useSpotify, spotifyPlaylistUrl])
 
     const playerRef = useRef<HTMLDivElement>(null);
   const playlistRef = useRef<HTMLDivElement>(null);
@@ -252,8 +369,13 @@ export default function MusicPlayerWidget({
   }, [volume]);
 
   const handlePlayPause = async () => {
+    if (useSpotify && spotifyPlayerRef.current) {
+      try {
+        await spotifyPlayerRef.current.togglePlay()
+      } catch {}
+      return
+    }
     if (!audioRef.current) return;
-
     try {
       if (isPlaying) {
         audioRef.current.pause();
@@ -276,6 +398,10 @@ export default function MusicPlayerWidget({
   };
 
   const handleNext = () => {
+    if (useSpotify && spotifyPlayerRef.current) {
+      spotifyPlayerRef.current.nextTrack()
+      return
+    }
     const currentIndex = playlist.findIndex(
       (track) => track.id === currentTrack.id
     );
@@ -284,6 +410,10 @@ export default function MusicPlayerWidget({
   };
 
   const handlePrevious = () => {
+    if (useSpotify && spotifyPlayerRef.current) {
+      spotifyPlayerRef.current.previousTrack()
+      return
+    }
     const currentIndex = playlist.findIndex(
       (track) => track.id === currentTrack.id
     );
@@ -292,19 +422,40 @@ export default function MusicPlayerWidget({
   };
 
   const formatTime = (progress: number) => {
+    if (useSpotify) {
+      const totalSeconds = Math.floor(((spDurationMs || 0) * progress) / 100 / 1000)
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+    }
     if (!audioRef.current || isNaN(audioRef.current.duration)) return "0:00";
-    const totalSeconds = Math.floor(
-      (audioRef.current.duration * progress) / 100
-    );
+    const totalSeconds = Math.floor((audioRef.current.duration * progress) / 100);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const handleSeek = (value: number[]) => {
+  const handleSeek = async (value: number[]) => {
+    const pct = value[0]
+    if (useSpotify && spotifyPlayerRef.current) {
+      try {
+        const targetMs = Math.floor(((spDurationMs || 0) * pct) / 100)
+        if (typeof spotifyPlayerRef.current.seek === 'function') {
+          await spotifyPlayerRef.current.seek(targetMs)
+        } else if (spotifyDeviceIdRef.current) {
+          await fetch(`https://api.spotify.com/v1/me/player/seek?position_ms=${targetMs}&device_id=${spotifyDeviceIdRef.current}`, {
+            method: 'PUT',
+            headers: { Authorization: `Bearer ${spotifyAccessTokenRef.current}` },
+          })
+        }
+        setProgress(pct)
+      } catch {}
+      playClickSound();
+      return
+    }
     if (!audioRef.current) return;
-    audioRef.current.currentTime = (audioRef.current.duration * value[0]) / 100;
-    setProgress(value[0]);
+    audioRef.current.currentTime = (audioRef.current.duration * pct) / 100;
+    setProgress(pct);
     playClickSound();
   };
 
@@ -384,6 +535,34 @@ export default function MusicPlayerWidget({
             />
           </div>
         </button>
+      </div>
+    );
+  }
+
+  // Desktop expanded panel - Spotify embed fallback (before SDK becomes ready)
+  if (isDesktop && isExpanded && spotifyEmbedUrl && useSpotify && !spotifyReady) {
+    return (
+      <div
+        ref={playerRef}
+        className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 ${embedded ? "z-10" : "z-50"} backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 overflow-hidden bg-cover bg-center`}
+        style={{
+          width: "380px",
+          height: "300px",
+          backgroundImage: `url(${MusicWallpaper})`,
+        }}
+      >
+        <div className="flex h-full w-full">
+          <div className="flex-1 p-4">
+            <iframe
+              src={spotifyEmbedUrl}
+              width="100%"
+              height="100%"
+              frameBorder={0}
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+            />
+          </div>
+        </div>
       </div>
     );
   }
@@ -472,32 +651,32 @@ export default function MusicPlayerWidget({
                   {currentTrack.artist}
                 </p>
                 <div className="mt-2">
-                  <Slider
-                    value={[progress]}
-                    max={100}
-                    step={0.1}
-                    className="cursor-pointer w-full"
-                    onValueChange={handleSeek}
-                    disabled={isLoading}
-                    trackClassName="bg-[#ccf2fc]"
-                    rangeClassName="bg-[#74defc]"
-                    thumbClassName="h-8 w-8 flex items-center justify-center rounded-full"
-                    thumb={
-                      <Image
-                        src={SliderIcon}
-                        className="w-full h-full object-cover rounded-full"
-                        alt={"sliderIcon"}
-                        width={32}
-                        height={32}
-                      />
-                    }
+              <Slider
+                value={[progress]}
+                max={100}
+                step={0.1}
+                className="cursor-pointer w-full"
+                onValueChange={handleSeek}
+                disabled={isLoading}
+                trackClassName="bg-[#ccf2fc]"
+                rangeClassName="bg-[#74defc]"
+                thumbClassName="h-8 w-8 flex items-center justify-center rounded-full"
+                thumb={
+                  <Image
+                    src={SliderIcon}
+                    className="w-full h-full object-cover rounded-full"
+                    alt={"sliderIcon"}
+                    width={32}
+                    height={32}
                   />
-                  <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    <span>{formatTime(progress)}</span>
-                    <span>{currentTrack.duration}</span>
-                  </div>
-                </div>
+                }
+              />
+              <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <span>{formatTime(progress)}</span>
+                <span>{useSpotify ? new Date(spDurationMs).toISOString().substr(14,5) : currentTrack.duration}</span>
               </div>
+              </div>
+            </div>
             </div>
 
             <div className="flex items-center justify-center gap-4 mb-4">
@@ -575,7 +754,12 @@ export default function MusicPlayerWidget({
                 step={1}
                 className="cursor-pointer w-full flex-1"
                 onValueChange={(value) => {
-                  setVolume(value[0]);
+                  const v = value[0]
+                  setVolume(v);
+                  if (useSpotify && spotifyPlayerRef.current) {
+                    const vol = Math.min(1, Math.max(0, v / 100))
+                    spotifyPlayerRef.current.setVolume(vol)
+                  }
                   playClickSound();
                 }}
                 disabled={isLoading}

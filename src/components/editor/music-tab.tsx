@@ -1,86 +1,66 @@
+import { useEffect, useState } from "react"
 import { PixelCard } from "@/components/pixel-card"
 import { PixelButton } from "@/components/pixel-button"
-import { FileUpload } from "@/components/file-upload"
-import { Trash2, Library } from "lucide-react"
+import { PixelInput } from "@/components/pixel-input"
 
-interface Music {
-    id: number
-    name: string
-    url: string
-    type: "spotify" | "upload"
+export function MusicTab() {
+  const [connected, setConnected] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
+
+  useEffect(() => {
+    const check = async () => {
+      try {
+        const res = await fetch('/api/auth/spotify/status')
+        if (res.ok) {
+          const data = await res.json()
+          setConnected(!!data.connected)
+        }
+      } catch {}
+    }
+    check()
+  }, [])
+
+  const connectSpotify = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch('/api/auth/spotify/connect')
+      const data = await res.json()
+      if (data.authUrl) window.location.href = data.authUrl
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <PixelCard>
+      <div className="space-y-4">
+        <h3 className="text-sm pixel-text-shadow">MUSIC (SPOTIFY)</h3>
+
+        <div className="space-y-2">
+          <label className="block text-[10px]">SPOTIFY PLAYLIST URL</label>
+          <PixelInput
+            placeholder="https://open.spotify.com/playlist/..."
+          />
+          <p className="text-[10px] text-muted-foreground">Private playlists require Spotify connect. Full playback requires Premium.</p>
+        </div>
+
+        {!connected && (
+          <PixelButton
+            variant="secondary"
+            className="w-full text-[10px]"
+            onClick={connectSpotify}
+            disabled={loading}
+          >
+            {loading ? 'CONNECTING…' : 'CONNECT SPOTIFY'}
+          </PixelButton>
+        )}
+      </div>
+      <div className="mt-6">
+        <PixelButton className="w-full text-[10px]">
+          SAVE
+        </PixelButton>
+      </div>
+    </PixelCard>
+  )
 }
 
-interface MusicTabProps {
-    musicTracks: Music[]
-    uploadedMusic: string
-    onUpload: (file: File) => void
-    onDelete: (id: number) => void
-    onOpenLibrary: () => void
-    onSave: () => void
-}
-
-export function MusicTab({
-                             musicTracks,
-                             uploadedMusic,
-                             onUpload,
-                             onDelete,
-                             onOpenLibrary,
-                             onSave,
-                         }: MusicTabProps) {
-    return (
-        <PixelCard>
-            <div className="space-y-4">
-                <h3 className="text-sm pixel-text-shadow">MUSIC</h3>
-
-                <FileUpload
-                    accept="audio/*"
-                    onFileSelect={onUpload}
-                    preview={uploadedMusic}
-                    label="UPLOAD AUDIO"
-                    maxSize={10}
-                />
-
-                <PixelButton
-                    variant="secondary"
-                    className="w-full text-[10px] flex items-center justify-center gap-2"
-                    onClick={onOpenLibrary}
-                >
-                    <Library className="w-4 h-4" />
-                    CHOOSE FROM LIBRARY
-                </PixelButton>
-
-                <div className="space-y-3">
-                    <p className="text-[10px]">TRACKS ({musicTracks.length})</p>
-                    {musicTracks.map((track) => (
-                        <div key={track.id} className="border-2 border-border p-3 bg-muted">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2 flex-1">
-                                    <div className="w-8 h-8 bg-primary flex items-center justify-center text-xs">
-                                        ♪
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-[10px] truncate">{track.name}</p>
-                                        <p className="text-[8px] text-muted-foreground">
-                                            {track.type.toUpperCase()}
-                                        </p>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => onDelete(track.id)}
-                                    className="w-8 h-8 border-2 border-border bg-card hover:bg-destructive hover:text-destructive-foreground transition-colors flex items-center justify-center ml-2"
-                                >
-                                    <Trash2 className="w-3 h-3" />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-            <div className="mt-6">
-                <PixelButton onClick={onSave} className="w-full text-[10px]">
-                    SAVE
-                </PixelButton>
-            </div>
-        </PixelCard>
-    )
-}

@@ -111,14 +111,10 @@ const WINDOW_TEMPLATES = [
     }
 ]
 
-export function WindowsTab({
-                               windowContents,
-                               onToggleWindow,
-                               onWindowUpdate,
-                               onSave,
-                           }: WindowsTabProps) {
+export function WindowsTab() {
     const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
     const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop")
+    const windowContents: WindowContent[] = []
 
     const handleCreateWindow = (templateId: string) => {
         const template = WINDOW_TEMPLATES.find(t => t.id === templateId)
@@ -140,18 +136,20 @@ export function WindowsTab({
             }
         }
 
-        onWindowUpdate([...windowContents, newWindow])
         setSelectedTemplate(null)
     }
 
     const handleDeleteWindow = (id: string) => {
-        const updatedWindows = windowContents.filter(w => w.id !== id)
-        onWindowUpdate(updatedWindows)
+
     }
 
     const getTemplatePreview = (templateId: string) => {
         const template = WINDOW_TEMPLATES.find(t => t.id === templateId)
         return template?.preview || null
+    }
+
+    function onToggleWindow(id: string) {
+
     }
 
     return (
@@ -365,7 +363,7 @@ export function WindowsTab({
                 </div>
             </PixelCard>
             <div className="mt-6">
-                <PixelButton onClick={onSave} className="w-full text-[10px]">
+                <PixelButton className="w-full text-[10px]">
                     SAVE
                 </PixelButton>
             </div>

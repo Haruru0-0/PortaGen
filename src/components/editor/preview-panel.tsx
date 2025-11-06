@@ -1,13 +1,14 @@
-import { Suspense } from "react"
+import { Suspense, useMemo, useRef } from "react"
 import { PixelCard } from "@/components/pixel-card"
 import { PixelButton } from "@/components/pixel-button"
 import { Monitor, Smartphone, Lock, Unlock } from "lucide-react"
 import { LockScreen } from "@/components/portfolio/lock-screen"
-import Desktop from "@/components/portfolio/desktop"
+import Desktop from "@/components/portfolio-preview/desktop"
 import { CuteSuspenseFallback } from "@/components/portfolio/suspense-fallback"
 import { SoundProvider } from "@/components/portfolio/sound-context"
 import { AudioProvider } from "@/components/portfolio/audio-context"
 import { PortfolioTheme } from "@/lib/portfolio-theme"
+import { useResizeObserver } from "@/hooks/use-resize-observer"
 
 interface Icon {
     id: number
@@ -28,6 +29,7 @@ interface PreviewPanelProps {
     mobileWidget1: string
     mobileWidget2: string
     musicPlayerIcon: string
+    spotifyPlaylistUrl?: string
     icons: Icon[]
     theme: PortfolioTheme
     onPreviewModeChange: (mode: "desktop" | "mobile") => void
@@ -46,11 +48,15 @@ export function PreviewPanel({
                                  mobileWidget1,
                                  mobileWidget2,
                                  musicPlayerIcon,
+                                 spotifyPlaylistUrl,
                                  icons,
                                  theme,
                                  onPreviewModeChange,
                                  onLockChange,
                              }: PreviewPanelProps) {
+    const stageContainerRef = useRef<HTMLDivElement>(null)
+    const { width: containerWidth } = useResizeObserver(stageContainerRef)
+    const isNarrow = (containerWidth || 0) < 738
     return (
         <PixelCard className="">
             <div className="space-y-4 h-full flex flex-col">
@@ -63,7 +69,9 @@ export function PreviewPanel({
                                 previewMode === "desktop"
                                     ? "bg-primary text-primary-foreground"
                                     : "bg-card hover:bg-muted"
-                            }`}
+                            } ${isNarrow ? "opacity-60 cursor-not-allowed" : ""}`}
+                            disabled={isNarrow}
+                            title={isNarrow ? "Desktop preview is available on larger screens" : undefined}
                         >
                             <Monitor className="w-3 h-3" />
                             DESKTOP
@@ -109,43 +117,81 @@ export function PreviewPanel({
                     </div>
                 </div>
 
-                <div className="flex-1 border-4 border-border relative bg-muted" style={{ zIndex: 1 }}>
-                    <div
-                        className={`mx-auto h-full transition-all duration-300 overflow-hidden ${
-                            previewMode === "mobile" ? "max-w-[375px]" : "w-full"
-                        }`}
-                        style={{
-                            aspectRatio: previewMode === "mobile" ? "9/16" : "auto",
-                        }}
-                    >
-                        <SoundProvider>
-                            <AudioProvider>
-                                <Suspense fallback={<CuteSuspenseFallback />}>
-                                    {lockScreenEnabled && isLocked ? (
-                                        <LockScreen
-                                            password={lockScreenPassword}
-                                            hint={lockScreenHint}
-                                            wallpaper={lockScreenImage || "/beautiful-pastel-gradient-wallpaper.jpg"}
-                                            onUnlock={() => onLockChange(false)}
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full relative" style={{ zIndex: 1 }}>
-                                            <Desktop
-                                                previewMode={previewMode}
-                                                embedded={true}
-                                                mobileWidget1={mobileWidget1 || "/water-cd.jpg"}
-                                                mobileWidget2={mobileWidget2 || "/cute-puppy.png"}
-                                                musicPlayerIcon={musicPlayerIcon}
-                                                desktopGif={desktopGif || "/cute-greeting-gif.jpg"}
-                                                wallpaper={wallpaper || "/beautiful-pastel-gradient-wallpaper.jpg"}
-                                                icons={icons}
-                                                theme={theme}
-                                            />
-                                        </div>
-                                    )}
-                                </Suspense>
-                            </AudioProvider>
-                        </SoundProvider>
+                <div className="flex-1 border-4 border-border relative bg-muted overflow-hidden" style={{ zIndex: 1 }}>
+                    <div ref={stageContainerRef} className="w-full h-full">
+                        {previewMode === "mobile" ? (
+                            <div className="mx-auto max-w-[375px] h-[800px]">
+                                <SoundProvider>
+                                    <AudioProvider>
+                                        <Suspense fallback={<CuteSuspenseFallback />}>
+                                            {lockScreenEnabled && isLocked ? (
+                                                <LockScreen
+                                                    password={lockScreenPassword}
+                                                    hint={lockScreenHint}
+                                                    wallpaper={lockScreenImage || "/beautiful-pastel-gradient-wallpaper.jpg"}
+                                                    onUnlock={() => onLockChange(false)}
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full relative" style={{ zIndex: 1 }}>
+                                                    <Desktop
+                                                        previewMode={previewMode}
+                                                        embedded={true}
+                                                        mobileWidget1={mobileWidget1 || "/water-cd.jpg"}
+                                                        mobileWidget2={mobileWidget2 || "/cute-puppy.png"}
+                                                        musicPlayerIcon={musicPlayerIcon}
+                                                        spotifyPlaylistUrl={spotifyPlaylistUrl}
+                                                        desktopGif={desktopGif || "/cute-greeting-gif.jpg"}
+                                                        wallpaper={wallpaper}
+                                                        icons={icons}
+                                                        theme={theme}
+                                                    />
+                                                </div>
+                                            )}
+                                        </Suspense>
+                                    </AudioProvider>
+                                </SoundProvider>
+                            </div>
+                        ) : (
+                            <div className="mx-auto w-full" style={{ aspectRatio: "16/9" }}>
+                                {isNarrow ? (
+                                    <div className="w-full h-full flex items-center justify-center p-4 text-center text-[10px] sm:text-xs">
+                                        Desktop preview is available on larger screens. Switch to Mobile view or widen your window.
+                                    </div>
+                                ) : (
+                                    <div className="w-full h-full">
+                                        <SoundProvider>
+                                            <AudioProvider>
+                                                <Suspense fallback={<CuteSuspenseFallback />}>
+                                                    {lockScreenEnabled && isLocked ? (
+                                                        <LockScreen
+                                                            password={lockScreenPassword}
+                                                            hint={lockScreenHint}
+                                                            wallpaper={lockScreenImage || "/beautiful-pastel-gradient-wallpaper.jpg"}
+                                                            onUnlock={() => onLockChange(false)}
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full relative" style={{ zIndex: 1 }}>
+                                                            <Desktop
+                                                                previewMode={previewMode}
+                                                                embedded={true}
+                                                                mobileWidget1={mobileWidget1 || "/water-cd.jpg"}
+                                                                mobileWidget2={mobileWidget2 || "/cute-puppy.png"}
+                                                                musicPlayerIcon={musicPlayerIcon}
+                                                                spotifyPlaylistUrl={spotifyPlaylistUrl}
+                                                                desktopGif={desktopGif || "/cute-greeting-gif.jpg"}
+                                                                wallpaper={wallpaper}
+                                                                icons={icons}
+                                                                theme={theme}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </Suspense>
+                                            </AudioProvider>
+                                        </SoundProvider>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
 

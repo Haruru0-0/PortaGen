@@ -37,25 +37,30 @@ export const fetchPortfolios = async () => {
   }
 };
 
-export const deleteIcon = async (id: number) => {
+export const createPortfolio = async (portfolioName?: string) => {
   try {
-    const response = await fetch(`/api/icons?id=${id}`, { method: "DELETE" });
+    const response = await fetch("/api/portfolio/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ portfolioName }),
+    });
+    if (!response.ok) throw new Error("Failed to create portfolio");
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to create portfolio:", error);
+  }
+};
+
+export const deletePortfolio = async (id: number) => {
+  try {
+    const response = await fetch(`/api/portfolio/delete?id=${id}`, { method: "DELETE" });
     return response.ok;
   } catch (error) {
-    console.error("Failed to delete icon:", error);
+    console.error("Failed to delete portfolio:", error);
     return false;
   }
 };
 
-export const deleteMusic = async (id: number) => {
-  try {
-    const response = await fetch(`/api/music?id=${id}`, { method: "DELETE" });
-    return response.ok;
-  } catch (error) {
-    console.error("Failed to delete music:", error);
-    return false;
-  }
-};
 
 export const uploadFile = async (
   file: File,

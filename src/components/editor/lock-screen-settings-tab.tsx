@@ -1,77 +1,99 @@
 import { PixelCard } from "@/components/pixel-card"
 import { PixelInput } from "@/components/pixel-input"
 import { PixelButton } from "@/components/pixel-button"
+import { Switch } from "@/components/ui/switch";
+import { useLockScreenContext } from "@/contexts/lockScreenContext";
+import { useEditorContext } from "@/contexts/editorContext";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
-interface LockScreenSettingsTabProps {
-    lockScreenEnabled: boolean
-    lockScreenPassword: string
-    lockScreenHint: string
-    mobileWidget1: string
-    mobileWidget2: string
-    musicPlayerIcon: string
-    onToggleLockScreen: () => void
-    onPasswordChange: (value: string) => void
-    onHintChange: (value: string) => void
-    onWidget1Upload: (file: File) => void
-    onWidget2Upload: (file: File) => void
-    onMusicPlayerIconUpload: (file: File) => void
-    onSave: () => void
-}
+const schema = z.object({
+    enabled: z.boolean().default(true),
+    password: z.string().optional().transform(v => v ?? ""),
+    hint: z.string().optional().transform(v => v ?? ""),
+}).refine((val) => !val.enabled || (val.password ?? "").length > 0, {
+    message: "Password is required when lock screen is enabled",
+    path: ["password"],
+})
 
-export function LockScreenSettingsTab({
-                                          lockScreenEnabled,
-                                          lockScreenPassword,
-                                          lockScreenHint,
-                                          onToggleLockScreen,
-                                          onPasswordChange,
-                                          onHintChange,
-                                          onSave,
-                                      }: LockScreenSettingsTabProps) {
+export function LockScreenSettingsTab() {
+    const { data, updatePass, getLockScreenData } = useLockScreenContext()
+    const { currentPortfolioId } = useEditorContext()
+
+    const form = useForm<z.infer<typeof schema>>({
+        resolver: zodResolver(schema),
+        defaultValues: { enabled: true, password: "", hint: "" },
+    })
+
+    useEffect(() => {
+        if (currentPortfolioId) void getLockScreenData(currentPortfolioId)
+        if (data) {
+            form.reset({ enabled: !!data.enabled, password: data.password || "", hint: data.hint || "" })
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentPortfolioId, data])
+
+    const onSubmit = async (values: z.infer<typeof schema>) => {
+        await updatePass(currentPortfolioId, )
+    }
+
     return (
         <PixelCard>
-            <div className="space-y-4">
-                <h3 className="text-sm pixel-text-shadow">LOCK SCREEN SETTINGS</h3>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <h3 className="text-sm pixel-text-shadow">LOCK SCREEN SETTINGS</h3>
 
-                <div className="flex items-center justify-between p-3 border-2 border-border bg-muted">
-                    <span className="text-[10px]">ENABLE LOCK SCREEN</span>
-                    <button
-                        onClick={onToggleLockScreen}
-                        className={`w-12 h-6 rounded-full border-2 border-border transition-colors ${
-                            lockScreenEnabled ? "bg-primary" : "bg-muted-foreground"
-                        }`}
-                    >
-                        <div
-                            className={`w-4 h-4 bg-white rounded-full transition-transform ${
-                                lockScreenEnabled ? "translate-x-6" : "translate-x-1"
-                            }`}
-                        />
-                    </button>
-                </div>
+                    <FormField
+                        control={form.control}
+                        name="enabled"
+                        render={({ field }) => (
+                            <FormItem>
+                                <div className="flex items-center justify-between p-3 border-2 border-border bg-muted">
+                                    <span className="text-[10px]">ENABLE LOCK SCREEN</span>
+                                    <FormControl>
+                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                    </FormControl>
+                                </div>
+                            </FormItem>
+                        )}
+                    />
 
-                {lockScreenEnabled && (
-                    <>
-                        <PixelInput
-                            label="PASSWORD"
-                            type="password"
-                            value={lockScreenPassword}
-                            onChange={(e) => onPasswordChange(e.target.value)}
-                            placeholder="Enter password"
-                        />
+                    <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>PASSWORD</FormLabel>
+                                <FormControl>
+                                    <PixelInput type="password" placeholder="Enter password" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
-                        <PixelInput
-                            label="PASSWORD HINT"
-                            value={lockScreenHint}
-                            onChange={(e) => onHintChange(e.target.value)}
-                            placeholder="Enter hint"
-                        />
-                    </>
-                )}
-            </div>
-            <div className="mt-6">
-                <PixelButton onClick={onSave} className="w-full text-[10px]">
-                    SAVE
-                </PixelButton>
-            </div>
+                    <FormField
+                        control={form.control}
+                        name="hint"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>PASSWORD HINT</FormLabel>
+                                <FormControl>
+                                    <PixelInput placeholder="Enter hint" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <div className="pt-2">
+                        <PixelButton type="submit" className="w-full text-[10px]">SAVE</PixelButton>
+                    </div>
+                </form>
+            </Form>
         </PixelCard>
     )
 }

@@ -16,7 +16,7 @@ import Image from "next/image";
 
 const navItems = [
   { href: "/dashboard", label: "HOME", icon: Bow },
-  { href: "/dashboard/editor", label: "EDITOR", icon: Retro },
+  { href: "/dashboard/portfolios", label: "PORTFOLIOS", icon: Retro },
   { href: "/dashboard/assets", label: "ASSETS", icon: Cd },
   { href: "/dashboard/settings", label: "SETTINGS", icon: Miku },
 ]

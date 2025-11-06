@@ -6,6 +6,7 @@ CREATE TABLE "desktop_settings" (
 	"widget1_asset_id" integer,
 	"widget2_asset_id" integer,
 	"music_player_icon_asset_id" integer,
+	"spotify_playlist_url" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "desktop_settings_portfolio_id_unique" UNIQUE("portfolio_id")
@@ -117,6 +118,10 @@ CREATE TABLE "users" (
 	"google_refresh_token" text,
 	"google_token_expiry" timestamp,
 	"google_drive_connected" boolean DEFAULT false,
+	"spotify_access_token" text,
+	"spotify_refresh_token" text,
+	"spotify_token_expiry" timestamp,
+	"spotify_connected" boolean DEFAULT false,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "users_clerk_user_id_unique" UNIQUE("clerk_user_id"),

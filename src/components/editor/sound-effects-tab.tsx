@@ -1,6 +1,7 @@
 import { PixelCard } from "@/components/pixel-card"
 import { SoundEditor } from "@/components/sound-editor"
 import { Volume2 } from "lucide-react"
+import {PixelButton} from "@/components/pixel-button";
 
 interface SoundEffect {
     id: string
@@ -8,14 +9,13 @@ interface SoundEffect {
     url: string
     volume: number
 }
+export function SoundEffectsTab() {
+    const soundEffects: SoundEffect[] = []
 
-interface SoundEffectsTabProps {
-    soundEffects: SoundEffect[]
-    onSoundsChange: (sounds: SoundEffect[]) => void
-    onSave: () => void
-}
+    function onSoundsChange() {
 
-export function SoundEffectsTab({ soundEffects, onSoundsChange, onSave }: SoundEffectsTabProps) {
+    }
+
     return (
         <PixelCard>
             <div className="space-y-4">
@@ -35,7 +35,7 @@ export function SoundEffectsTab({ soundEffects, onSoundsChange, onSave }: SoundE
                         <p><strong>Tips:</strong></p>
                         <ul className="list-disc list-inside space-y-1">
                             <li>Use short sound effects for better performance</li>
-                            <li>Test volume levels to ensure they're not too loud</li>
+                            <li>Test volume levels to ensure they&#39;re not too loud</li>
                             <li>Consider users who may have sound sensitivity</li>
                             <li>Supported formats: MP3, WAV, OGG</li>
                         </ul>
@@ -43,7 +43,7 @@ export function SoundEffectsTab({ soundEffects, onSoundsChange, onSave }: SoundE
                 </div>
             </div>
             <div className="mt-6">
-                <PixelButton onClick={onSave} className="w-full text-[10px]">
+                <PixelButton className="w-full text-[10px]">
                     SAVE
                 </PixelButton>
             </div>

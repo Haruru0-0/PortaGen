@@ -23,8 +23,7 @@ export async function GET(req: NextRequest) {
             with: {
                 lockScreenSettings: true,
                 desktopSettings: true,
-                icons: { orderBy: (icons, { asc }) => [asc(icons.position)] },
-                musicTracks: { orderBy: (musicTracks, { asc }) => [asc(musicTracks.position)] },
+                icons: { orderBy: (icons, { asc }) => [asc(icons.position)], with: { asset: true } },
                 windowContents: { orderBy: (windowContents, { asc }) => [asc(windowContents.position)] },
                 themeSettings: true,
                 soundEffects: true,

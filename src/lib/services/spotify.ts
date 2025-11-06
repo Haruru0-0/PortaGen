@@ -19,6 +19,10 @@ export function getSpotifyAuthUrl(redirectUri: string, state: string) {
         'user-read-private',
         'playlist-read-private',
         'user-library-read',
+        // Required for Web Playback SDK and controlling playback
+        'streaming',
+        'user-modify-playback-state',
+        'user-read-playback-state',
     ]
 
     const params = new URLSearchParams({

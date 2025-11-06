@@ -4,19 +4,14 @@ import { useState } from "react"
 import { PixelInput } from "./pixel-input"
 import { THEME_PRESETS, type PortfolioTheme } from "@/lib/portfolio-theme"
 import { Check } from "lucide-react"
+import {PixelButton} from "@/components/pixel-button";
 
-interface ThemeEditorProps {
-  currentTheme: PortfolioTheme
-  onThemeChange: (theme: PortfolioTheme) => void
-  onSave: () => void
-}
-
-export function ThemeEditor({ currentTheme, onThemeChange, onSave }: ThemeEditorProps) {
+export function ThemeEditor() {
+  let currentTheme;
   const [customTheme, setCustomTheme] = useState<PortfolioTheme>(currentTheme)
 
   const handlePresetSelect = (preset: PortfolioTheme) => {
     setCustomTheme(preset)
-    onThemeChange(preset)
   }
 
   const handleColorChange = (key: keyof PortfolioTheme["colors"], value: string) => {
@@ -28,7 +23,6 @@ export function ThemeEditor({ currentTheme, onThemeChange, onSave }: ThemeEditor
       },
     }
     setCustomTheme(updated)
-    onThemeChange(updated)
   }
 
   const handleFontChange = (key: keyof PortfolioTheme["fonts"], value: string) => {
@@ -40,7 +34,6 @@ export function ThemeEditor({ currentTheme, onThemeChange, onSave }: ThemeEditor
       },
     }
     setCustomTheme(updated)
-    onThemeChange(updated)
   }
 
   const handleLayoutChange = (key: keyof PortfolioTheme["layout"], value: any) => {
@@ -52,7 +45,6 @@ export function ThemeEditor({ currentTheme, onThemeChange, onSave }: ThemeEditor
       },
     }
     setCustomTheme(updated)
-    onThemeChange(updated)
   }
 
   return (
@@ -205,7 +197,7 @@ export function ThemeEditor({ currentTheme, onThemeChange, onSave }: ThemeEditor
         </div>
       </div>
       <div className="mt-6">
-        <PixelButton onClick={onSave} className="w-full text-[10px]">
+        <PixelButton className="w-full text-[10px]">
           SAVE
         </PixelButton>
       </div>

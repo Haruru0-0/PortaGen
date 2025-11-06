@@ -18,6 +18,12 @@ export const users = pgTable('users', {
     googleTokenExpiry: timestamp('google_token_expiry'),
     googleDriveConnected: boolean('google_drive_connected').default(false),
 
+    // Spotify OAuth tokens (encrypted)
+    spotifyAccessToken: text('spotify_access_token'),
+    spotifyRefreshToken: text('spotify_refresh_token'),
+    spotifyTokenExpiry: timestamp('spotify_token_expiry'),
+    spotifyConnected: boolean('spotify_connected').default(false),
+
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => ({
@@ -137,23 +143,6 @@ export const portfolioAssets = pgTable('portfolio_assets', {
 }))
 
 // Music tracks table
-export const musicTracks = pgTable('music_tracks', {
-    id: serial('id').primaryKey(),
-    portfolioId: integer('portfolio_id').notNull().references(() => portfolios.id, { onDelete: 'cascade' }),
-
-    name: varchar('name', { length: 255 }).notNull(),
-    position: integer('position').notNull().default(0),
-
-    audioAssetId: integer('audio_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
-
-    type: varchar('type', { length: 50 }).notNull().default('upload'), // 'upload' or 'spotify'
-    duration: integer('duration'), // in seconds
-
-    isVisible: boolean('is_visible').default(true),
-
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    updatedAt: timestamp('updated_at').defaultNow().notNull(),
-})
 
 // Sound effects table
 export const soundEffects = pgTable('sound_effects', {
@@ -229,6 +218,9 @@ export const desktopSettings = pgTable('desktop_settings', {
     widget2AssetId: integer('widget2_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
     musicPlayerIconAssetId: integer('music_player_icon_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
 
+    // Spotify playlist URL to drive the music player via Web Playback SDK
+    spotifyPlaylistUrl: text('spotify_playlist_url'),
+
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
@@ -249,7 +241,6 @@ export const portfoliosRelations = relations(portfolios, ({ one, many }) => ({
     }),
     portfolioAssets: many(portfolioAssets),
     icons: many(icons),
-    musicTracks: many(musicTracks),
     windowContents: many(windowContents),
     themeSettings: one(themeSettings),
     soundEffects: many(soundEffects),
@@ -266,7 +257,6 @@ export const uploadedAssetsRelations = relations(uploadedAssets, ({ one, many })
     icons: many(icons),
     lockScreenSettings: many(lockScreenSettings),
     desktopSettings: many(desktopSettings),
-    musicTracks: many(musicTracks),
     soundEffects: many(soundEffects),
 }))
 
@@ -292,16 +282,7 @@ export const iconsRelations = relations(icons, ({ one }) => ({
     }),
 }))
 
-export const musicTracksRelations = relations(musicTracks, ({ one }) => ({
-    portfolio: one(portfolios, {
-        fields: [musicTracks.portfolioId],
-        references: [portfolios.id],
-    }),
-    asset: one(uploadedAssets, {
-        fields: [musicTracks.audioAssetId],
-        references: [uploadedAssets.id],
-    }),
-}))
+// musicTracks removed – Spotify-only flow
 
 export const soundEffectsRelations = relations(soundEffects, ({ one }) => ({
     portfolio: one(portfolios, {

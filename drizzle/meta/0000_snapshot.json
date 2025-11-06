@@ -1,5 +1,5 @@
 {
-  "id": "e52cd2b0-af86-4642-a55d-8af396cd4595",
+  "id": "b876c96e-8349-4ec6-bf9c-0a9cb6bd397d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -47,6 +47,12 @@
         "music_player_icon_asset_id": {
           "name": "music_player_icon_asset_id",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "spotify_playlist_url": {
+          "name": "spotify_playlist_url",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -1059,6 +1065,31 @@
         },
         "google_drive_connected": {
           "name": "google_drive_connected",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "spotify_access_token": {
+          "name": "spotify_access_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "spotify_refresh_token": {
+          "name": "spotify_refresh_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "spotify_token_expiry": {
+          "name": "spotify_token_expiry",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "spotify_connected": {
+          "name": "spotify_connected",
           "type": "boolean",
           "primaryKey": false,
           "notNull": false,

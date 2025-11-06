@@ -44,9 +44,10 @@ interface DesktopProps {
   desktopGif?: string;
   icons?: Array<{ id: string; label: string; icon: any }>;
   theme?: any;
+  spotifyPlaylistUrl?: string;
 }
 
-export default function Desktop({ previewMode, embedded = false, wallpaper: wallpaperProp }: DesktopProps) {
+export default function Desktop({ previewMode, embedded = false, wallpaper: wallpaperProp, spotifyPlaylistUrl }: DesktopProps) {
   type WindowData = {
     name: string;
     minimized: boolean;
@@ -307,7 +308,7 @@ export default function Desktop({ previewMode, embedded = false, wallpaper: wall
                     </div>
                   ))}
                 </div>
-                <MusicPlayerWidget isDesktop={true} embedded={embedded} />
+                <MusicPlayerWidget isDesktop={true} embedded={embedded} spotifyPlaylistUrl={spotifyPlaylistUrl} />
                 <Taskbar
                   apps={desktopApps}
                   openWindows={openWindows}
@@ -382,7 +383,7 @@ export default function Desktop({ previewMode, embedded = false, wallpaper: wall
                       ))}
                     </div>
                   </div>
-                  <MusicPlayerWidget isDesktop={false} />
+                  <MusicPlayerWidget isDesktop={false} spotifyPlaylistUrl={spotifyPlaylistUrl} />
                 </div>
                 <Taskbar
                   apps={desktopApps}
