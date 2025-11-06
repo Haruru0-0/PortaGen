@@ -53,3 +53,4 @@ src/assets/*
 !src/assets/*.js
 !src/assets/*.ts
 public/_next-video
+.env
