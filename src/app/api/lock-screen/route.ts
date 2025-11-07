@@ -33,9 +33,8 @@ export async function GET(req: NextRequest) {
       portfolioId: row.portfolioId,
       enabled: row.enabled,
       password: row.password,
-      hint: row.hint,
       wallpaperAssetId: row.wallpaperAssetId ?? undefined,
-      wallpaperUrl: row.wallpaperAsset?.displayUrl || '',
+      wallpaperUrl: row.wallpaperAsset?.thumbnailUrl || '',
     })
   } catch (e) {
     console.error('Lock screen fetch error:', e)

@@ -9,14 +9,16 @@ import {useEditorContext} from "@/contexts/editorContext";
 import {DeleteConfirmationModal} from "@/components/delete-confirmation-modal";
 import {AddIconModal} from "@/components/editor/modals/AddIconModal";
 import {EditIconModal} from "@/components/editor/modals/EditIconModal";
+import {useParams} from "next/navigation";
 
 export function IconsTab() {
-    const {icons = [], deleteIcon, setIcons, getAllIcons} = useIconContext()
-    const {currentPortfolioId} = useEditorContext()
+    const {icons, deleteIcon, setIcons, getAllIcons} = useIconContext()
+    const params = useParams<{ id: string }>()
+    const currentPortfolioId = Number(params?.id)
 
     useEffect(() => {
         if (currentPortfolioId) {
-            void getAllIcons()
+            void getAllIcons(currentPortfolioId)
         }
     }, [currentPortfolioId])
 
@@ -112,7 +114,7 @@ export function IconsTab() {
                 message="ARE YOU SURE YOU WANT TO DELETE THIS ICON?"
                 onConfirm={async () => {
                     if (deleteTarget) {
-                        const ok = await deleteIcon(deleteTarget)
+                        const ok = await deleteIcon(currentPortfolioId,deleteTarget)
                         if (ok) setIcons((icons as Icon[]).filter((i: Icon) => i.id !== deleteTarget))
                         setDeleteTarget(null)
                     }

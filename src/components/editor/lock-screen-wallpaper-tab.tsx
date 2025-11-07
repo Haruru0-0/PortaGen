@@ -1,25 +1,50 @@
 import { PixelCard } from "@/components/pixel-card"
 import { PixelButton } from "@/components/pixel-button"
 import { FileUpload } from "@/components/file-upload"
+import { PixelModal } from "@/components/pixel-modal"
+import { PixelInput } from "@/components/pixel-input"
 import { Library } from "lucide-react"
 import { useLockScreenContext } from "@/contexts/lockScreenContext"
-import { useEditorContext } from "@/contexts/editorContext"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import {useParams} from "next/navigation";
+import { useFileUpload } from "@/hooks/use-file-upload"
 
 export function LockScreenWallpaperTab() {
-  const { data, updateWallpaper, load } = useLockScreenContext()
-  const { uploadAsset, currentPortfolioId } = useEditorContext()
+  const { data, updateWallpaper, getLockScreenData, loading } = useLockScreenContext()
+  const params = useParams<{ id: string }>()
+  const currentPortfolioId = Number(params?.id)
+  const { uploadFile, uploading } = useFileUpload()
+
+  const [renameOpen, setRenameOpen] = useState(false)
+  const [pendingFile, setPendingFile] = useState<File | null>(null)
+  const [customName, setCustomName] = useState("")
 
   useEffect(() => {
     if (currentPortfolioId) {
-      void load(currentPortfolioId)
+      void getLockScreenData(currentPortfolioId)
     }
-  }, [currentPortfolioId])
+  }, [currentPortfolioId, getLockScreenData])
 
-  const onUpload = async (file: File) => {
+  const onUpload = (file: File) => {
     if (!currentPortfolioId) return
-    const { asset } = await uploadAsset(file, 'wallpaper', currentPortfolioId)
-    await updateWallpaper(currentPortfolioId, asset.id)
+    const base = file.name.replace(/\.[^/.]+$/, "")
+    setPendingFile(file)
+    setCustomName(base)
+    setRenameOpen(true)
+  }
+
+  const confirmUpload = async () => {
+    if (!pendingFile || !currentPortfolioId) return
+    const name = customName.trim() || pendingFile.name.replace(/\.[^/.]+$/, "")
+    const result = await uploadFile(pendingFile, 'wallpaper', name)
+    if (result?.success && result.data?.id) {
+      await updateWallpaper(currentPortfolioId, result.data.id)
+      setRenameOpen(false)
+      setPendingFile(null)
+      setCustomName("")
+    } else if (!result?.success) {
+      alert(result?.error || 'Upload failed')
+    }
   }
 
   return (
@@ -44,11 +69,33 @@ export function LockScreenWallpaperTab() {
           CHOOSE FROM LIBRARY
         </PixelButton>
       </div>
-      <div className="mt-6">
-        <PixelButton className="w-full text-[10px]" onClick={() => undefined}>
-          SAVE
-        </PixelButton>
-      </div>
+      <PixelModal isOpen={renameOpen} onClose={() => !uploading && setRenameOpen(false)} title="RENAME WALLPAPER">
+        <div className="space-y-4">
+          <p className="text-[10px] text-muted-foreground">SET A NAME FOR YOUR WALLPAPER</p>
+          <PixelInput
+            value={customName}
+            onChange={(e) => setCustomName(e.target.value)}
+            placeholder="Enter name"
+          />
+          <div className="flex gap-3 pt-2">
+            <PixelButton
+              variant="secondary"
+              className="flex-1 text-[10px]"
+              onClick={() => setRenameOpen(false)}
+              disabled={uploading}
+            >
+              CANCEL
+            </PixelButton>
+            <PixelButton
+              className="flex-1 text-[10px]"
+              onClick={confirmUpload}
+              disabled={uploading || !pendingFile}
+            >
+              {uploading ? 'UPLOADING…' : 'UPLOAD'}
+            </PixelButton>
+          </div>
+        </div>
+      </PixelModal>
     </PixelCard>
   )
 }

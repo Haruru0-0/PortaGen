@@ -24,8 +24,8 @@ export interface EditorContextType {
   setActiveCategory: (v: 'lockScreen' | 'homeScreen') => void
   activeLockScreenTab: 'settings' | 'wallpaper'
   setActiveLockScreenTab: (v: 'settings' | 'wallpaper') => void
-  activeHomeScreenTab: 'wallpaper' | 'icons' | 'music' | 'windows' | 'theme' | 'sounds' | 'widgets'
-  setActiveHomeScreenTab: (v: 'wallpaper' | 'icons' | 'music' | 'windows' | 'theme' | 'sounds' | 'widgets') => void
+  activeHomeScreenTab: 'wallpaper' | 'icons' | 'music' | 'windows' | 'theme' | 'sounds' | "mobile widgets" | "desktop widget"
+  setActiveHomeScreenTab: (v: 'wallpaper' | 'icons' | 'music' | 'windows' | 'theme' | 'sounds' | "mobile widgets" | "desktop widget") => void
   portfolioName: string
   setPortfolioName: (v: string) => void
 
@@ -93,9 +93,6 @@ export interface EditorContextType {
   setAssetLibraryType: (v: 'sound' | 'wallpaper' | 'icon' | 'music') => void
 
 
-  isLoading: boolean
-  setIsLoading: (b: boolean) => void
-
   // Load & Persist
   loadPortfolio: (portfolioId: number) => Promise<void>
   updatePortfolioName: () => Promise<void>
@@ -108,7 +105,6 @@ export interface EditorContextType {
   // Assets & CRUD helpers
   uploadAsset: (file: File, type: string, portfolioId: number) => Promise<any>
   deleteIconById: (id: number) => Promise<boolean>
-  deleteMusicById: (id: number) => Promise<boolean>
 
   // Icons
   addIcon: (payload: { name: string; url?: string; fileId?: number | string; position?: number; windowId?: string; isVisible?: boolean }) => Promise<any>
@@ -137,7 +133,7 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
 
   const [activeCategory, setActiveCategory] = useState<'lockScreen' | 'homeScreen'>('homeScreen')
   const [activeLockScreenTab, setActiveLockScreenTab] = useState<'settings' | 'wallpaper'>('settings')
-  const [activeHomeScreenTab, setActiveHomeScreenTab] = useState<'wallpaper' | 'icons' | 'music' | 'windows' | 'theme' | 'sounds'>('wallpaper')
+  const [activeHomeScreenTab, setActiveHomeScreenTab] = useState<'wallpaper' | 'icons' | 'music' | 'windows' | 'theme' | 'sounds' | "mobile widgets" | "desktop widget">('wallpaper')
   const [portfolioName, setPortfolioName] = useState('MY PORTFOLIO')
 
   const [lockScreenPassword, setLockScreenPassword] = useState('1234')
@@ -179,10 +175,6 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const [assetLibraryOpen, setAssetLibraryOpen] = useState(false)
   const [assetLibraryType, setAssetLibraryType] = useState<'sound' | 'wallpaper' | 'icon' | 'music'>('wallpaper')
 
-  let isLoading = false
-  const setIsLoading = (_: boolean) => {
-    isLoading = _
-  }
 
   const loadPortfolio = async (portfolioId: number) => {
     const data = await fetchPortfolioData(portfolioId)
@@ -368,8 +360,6 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
             setAssetLibraryOpen,
             assetLibraryType,
             setAssetLibraryType,
-            isLoading,
-            setIsLoading,
             loadPortfolio,
             updatePortfolioName,
             updateLockscreenSettings,

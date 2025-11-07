@@ -30,7 +30,6 @@ export async function POST(req: NextRequest) {
         const formData = await req.formData()
         const file = formData.get('file') as File
         const assetType = formData.get('assetType') as string
-        const portfolioId = formData.get('portfolioId') as string
         const customFileName = formData.get('customFileName') as string
 
         if (!file) {

@@ -30,7 +30,8 @@ type HomeScreenTab =
     | "windows"
     | "theme"
     | "sounds"
-    | "widgets"
+    | "mobile widgets"
+    | "desktop widget"
 
 function EditorContent() {
     const params = useParams<{ id: string }>()
@@ -97,7 +98,8 @@ function EditorContent() {
 
     const homeScreenTabs: { id: HomeScreenTab; label: string }[] = [
         {id: "wallpaper", label: "WALLPAPER"},
-        {id: "widgets", label: "WIDGETS"},
+        {id: "mobile widgets", label: "MOBILE WIDGETS"},
+        {id: "desktop widget", label: "DESKTOP WIDGET"},
         {id: "icons", label: "ICONS"},
         {id: "music", label: "MUSIC"},
         {id: "windows", label: "WINDOWS"},

@@ -15,7 +15,7 @@ function format(row: any) {
     windowId: row.windowId || undefined,
     isVisible: row.isVisible,
     iconAssetId: row.iconAssetId || undefined,
-    icon: row.asset?.displayUrl || '',
+    icon: row.asset?.thumbnailUrl || '',
   }
 }
 

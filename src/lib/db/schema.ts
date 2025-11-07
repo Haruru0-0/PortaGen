@@ -142,8 +142,6 @@ export const portfolioAssets = pgTable('portfolio_assets', {
     assetIdIdx: index('portfolio_assets_asset_id_idx').on(table.assetId),
 }))
 
-// Music tracks table
-
 // Sound effects table
 export const soundEffects = pgTable('sound_effects', {
     id: serial('id').primaryKey(),
@@ -199,7 +197,6 @@ export const lockScreenSettings = pgTable('lock_screen_settings', {
 
     enabled: boolean('enabled').default(true),
     password: varchar('password', { length: 255 }),
-    hint: text('hint'),
 
     wallpaperAssetId: integer('wallpaper_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
 

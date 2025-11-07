@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
-import { desktopSettings, portfolios } from '@/lib/db/schema'
+import { desktopSettings, portfolios, portfolioAssets } from '@/lib/db/schema'
 import { and, eq } from 'drizzle-orm'
 import { getUserByClerkId } from '@/lib/db/helpers'
 
@@ -28,10 +28,16 @@ export async function POST(req: NextRequest) {
       .where(eq(desktopSettings.portfolioId, portfolioId))
       .returning()
 
+    if (desktopGifAssetId) {
+      await db
+        .insert(portfolioAssets)
+        .values({ portfolioId, assetId: desktopGifAssetId })
+        .onConflictDoNothing()
+    }
+
     return NextResponse.json(updated)
   } catch (e) {
     console.error('Desktop gif update error:', e)
     return NextResponse.json({ error: 'Failed to update desktop gif' }, { status: 500 })
   }
 }
-

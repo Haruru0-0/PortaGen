@@ -27,7 +27,7 @@ export async function updateLockScreenWallpaper(portfolioId: number, wallpaperAs
   return res.json()
 }
 
-export async function updateLockScreenPass(portfolioId: number, data: { enabled?: boolean; password?: string; hint?: string }) {
+export async function updateLockScreenPass(portfolioId: number, data: { enabled?: boolean; password?: string; }) {
   const res = await fetch('/api/lock-screen/pass', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

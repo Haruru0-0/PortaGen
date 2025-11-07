@@ -8,7 +8,6 @@ import {
   listIcons,
   updateIcon as updateIconAPI
 } from '@/lib/services/iconService'
-import {useParams} from "next/navigation";
 
 export type Icon = {
     id: number;
@@ -24,44 +23,60 @@ export type Icon = {
 interface IconContextType {
     icons: Icon[]
     setIcons: (icons: Icon[]) => void
-    getAllIcons: () => Promise<void>
-    addIcon: (payload: Partial<Icon> & { fileId?: number | string; portfolioId?: number }) => Promise<Icon | undefined>
-    updateIcon: (payload: Partial<Icon> & {
-        id: number;
-        fileId?: number | string;
-        portfolioId?: number
-    }) => Promise<Icon | undefined>
-    deleteIcon: (id: number) => Promise<boolean>
+    loading: boolean
+    getAllIcons: (portfolioId: number) => Promise<void>
+    addIcon: (portfolioId: number, payload: Partial<Icon> & { fileId?: number | string }) => Promise<Icon | undefined>
+    updateIcon: (portfolioId: number, payload: Partial<Icon> & { id: number; fileId?: number | string }) => Promise<Icon | undefined>
+    deleteIcon: (portfolioId: number, id: number) => Promise<boolean>
     getIconById: (id: number) => Promise<Icon | undefined>
 }
 
 const IconContext = createContext<IconContextType | undefined>(undefined)
 
 export function IconProvider({children}: { children: React.ReactNode }) {
-    const params = useParams<{ id: string }>()
-    const currentPortfolioId = Number(params?.id)
     const [icons, setIcons] = useState<Icon[]>([])
+    const [loading, setLoading] = useState(false)
 
-    const getAllIcons = async () => {
-        if (!currentPortfolioId) return
-        const res = await listIcons(Number(currentPortfolioId))
-        if (res?.icons) setIcons(res.icons as Icon[])
+    const getAllIcons = async (portfolioId: number) => {
+        if (!portfolioId) return
+        setLoading(true)
+        try {
+            const res = await listIcons(portfolioId)
+            if (res?.icons) setIcons(res.icons as Icon[])
+        } finally {
+            setLoading(false)
+        }
     }
 
-    const addIcon = async (payload: any) => {
-        const created = await addIconAPI({...payload, portfolioId: payload.portfolioId || currentPortfolioId})
-        if (created) setIcons((prev) => [...prev, created])
-        return created
+    const addIcon = async (portfolioId: number, payload: any) => {
+        setLoading(true)
+        try {
+            const created = await addIconAPI({...payload, portfolioId})
+            if (created) setIcons((prev) => [...prev, created])
+            return created
+        } finally {
+            setLoading(false)
+        }
     }
-    const updateIcon = async (payload: any) => {
-        const updated = await updateIconAPI({...payload, portfolioId: payload.portfolioId || currentPortfolioId})
-        if (updated) setIcons((prev) => prev.map((i) => (i.id === updated.id ? updated : i)))
-        return updated
+    const updateIcon = async (portfolioId: number, payload: any) => {
+        setLoading(true)
+        try {
+            const updated = await updateIconAPI({...payload, portfolioId})
+            if (updated) setIcons((prev) => prev.map((i) => (i.id === updated.id ? updated : i)))
+            return updated
+        } finally {
+            setLoading(false)
+        }
     }
-    const deleteIcon = async (id: number) => {
-        const ok = await deleteIconAPI(id)
-        if (ok) setIcons((prev) => prev.filter((i) => i.id !== id))
-        return ok
+    const deleteIcon = async (_portfolioId: number, id: number) => {
+        setLoading(true)
+        try {
+            const ok = await deleteIconAPI(id)
+            if (ok) setIcons((prev) => prev.filter((i) => i.id !== id))
+            return ok
+        } finally {
+            setLoading(false)
+        }
     }
     const getIconById = async (id: number) => {
         try {
@@ -77,6 +92,7 @@ export function IconProvider({children}: { children: React.ReactNode }) {
             value={{
                 icons,
                 setIcons,
+                loading,
                 getAllIcons,
                 addIcon,
                 updateIcon,

@@ -1,4 +1,4 @@
- import { PixelModal } from "@/components/pixel-modal";
+﻿import { PixelModal } from "@/components/pixel-modal";
 import { PixelInput } from "@/components/pixel-input";
 import { FileUpload } from "@/components/file-upload";
 import { PixelButton } from "@/components/pixel-button";
@@ -8,8 +8,9 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useEditorContext } from "@/contexts/editorContext";
 import { Icon, useIconContext } from "@/contexts/iconContext";
+import { useParams } from "next/navigation";
+import { useFileUpload } from "@/hooks/use-file-upload";
 
 interface EditIconModalProps {
   isOpen: boolean;
@@ -19,8 +20,7 @@ interface EditIconModalProps {
 }
 
 export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModalProps) {
-  const { currentPortfolioId, uploadAsset } = useEditorContext()
-  const { updateIcon } = useIconContext()
+  const { updateIcon, loading } = useIconContext()
   const schema = z.object({
     name: z.string().min(1, 'Name is required'),
     url: z.string().url('Invalid URL').optional().or(z.literal('')),
@@ -28,33 +28,43 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
   })
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema), defaultValues: { name: '', url: '', fileId: undefined } })
   const [preview, setPreview] = useState<string>("")
-  const [isSaving, setIsSaving] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const params = useParams<{ id: string }>()
+  const currentPortfolioId = Number(params?.id)
+  const { uploadFile, uploading } = useFileUpload()
 
   useEffect(() => {
     if (icon) {
       form.reset({ name: icon.name || "", url: icon.url || "", fileId: icon.iconAssetId })
       setPreview(icon.icon || "")
+      setSelectedFile(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [icon])
 
-  const handleUpload = async (file: File) => {
-    if (!currentPortfolioId) return
-    const { asset } = await uploadAsset(file, "icon", currentPortfolioId)
-    form.setValue('fileId', asset.id, { shouldValidate: true })
-    setPreview(asset.url)
+  const handleUpload = (file: File) => {
+    setSelectedFile(file)
+    try {
+      const objectUrl = URL.createObjectURL(file)
+      setPreview(objectUrl)
+    } catch {}
   }
 
   const handleUpdate = async () => {
     if (!currentPortfolioId || !icon) return
-    setIsSaving(true)
-    try {
-      const values = form.getValues()
-      const updated = await updateIcon({ id: icon.id, ...values, portfolioId: currentPortfolioId })
-      onUpdated(updated)
-    } finally {
-      setIsSaving(false)
+    let values = form.getValues()
+    if (selectedFile) {
+      const nameForUpload = (values.name || selectedFile.name.replace(/\.[^/.]+$/, "")).trim()
+      const res = await uploadFile(selectedFile, 'icon', nameForUpload)
+      if (!res?.success || !res.data?.id) {
+        alert(res?.error || 'Upload failed')
+        return
+      }
+      values = { ...values, fileId: res.data.id }
+      if (res.data.url) setPreview(res.data.url)
     }
+    const updated = await updateIcon(currentPortfolioId, { id: icon.id, ...values })
+    onUpdated(updated)
   }
 
   return (
@@ -92,11 +102,11 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
           </FormItem>
         )} />
         <div className="flex gap-3 pt-2">
-          <PixelButton type="button" variant="secondary" className="flex-1 text-[10px]" onClick={onClose} disabled={isSaving}>
+          <PixelButton type="button" variant="secondary" className="flex-1 text-[10px]" onClick={onClose} disabled={loading || uploading}>
             CANCEL
           </PixelButton>
-          <PixelButton type="submit" variant="primary" className="flex-1 text-[10px]" disabled={isSaving}>
-            UPDATE
+          <PixelButton type="submit" variant="primary" className="flex-1 text-[10px]" disabled={loading || uploading}>
+            {loading || uploading ? 'UPDATING…' : 'UPDATE'}
           </PixelButton>
         </div>
         </form>

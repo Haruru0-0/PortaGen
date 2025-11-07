@@ -1,29 +1,47 @@
 import { PixelCard } from "@/components/pixel-card"
 import { PixelButton } from "@/components/pixel-button"
 import { FileUpload } from "@/components/file-upload"
+import { PixelModal } from "@/components/pixel-modal"
+import { PixelInput } from "@/components/pixel-input"
 import { Library } from "lucide-react"
-import { useEditorContext } from "@/contexts/editorContext"
 import { useDesktopContext } from "@/contexts/desktopContext"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import { useFileUpload } from "@/hooks/use-file-upload"
+import {useParams} from "next/navigation";
 
 export function DesktopWallpaperTab() {
-  const { uploadAsset, currentPortfolioId } = useEditorContext() as any
-  const { data, load, updateGif, updateWallpaper } = useDesktopContext()
+  const params = useParams<{ id: string }>()
+  const currentPortfolioId = Number(params?.id)
+  const { data, getDesktopData, updateWallpaper } = useDesktopContext()
+  const { uploadFile, uploading } = useFileUpload()
+  const [renameOpen, setRenameOpen] = useState(false)
+  const [pendingFile, setPendingFile] = useState<File | null>(null)
+  const [customName, setCustomName] = useState("")
 
   useEffect(() => {
-    if (currentPortfolioId) void load(currentPortfolioId)
+    if (currentPortfolioId) void getDesktopData(currentPortfolioId)
   }, [currentPortfolioId])
 
-  const onUploadWallpaper = async (file: File) => {
+  const onUploadWallpaper = (file: File) => {
     if (!currentPortfolioId) return
-    const { asset } = await uploadAsset(file, 'wallpaper', currentPortfolioId)
-    await updateWallpaper(currentPortfolioId, asset.id)
+    const base = file.name.replace(/\.[^/.]+$/, "")
+    setPendingFile(file)
+    setCustomName(base)
+    setRenameOpen(true)
   }
 
-  const onUploadGif = async (file: File) => {
-    if (!currentPortfolioId) return
-    const { asset } = await uploadAsset(file, 'gif', currentPortfolioId)
-    await updateGif(currentPortfolioId, asset.id)
+  const confirmUpload = async () => {
+    if (!pendingFile || !currentPortfolioId) return
+    const name = customName.trim() || pendingFile.name.replace(/\.[^/.]+$/, "")
+    const result = await uploadFile(pendingFile, 'wallpaper', name)
+    if (result?.success && result.data?.id) {
+      await updateWallpaper(currentPortfolioId, result.data.id)
+      setRenameOpen(false)
+      setPendingFile(null)
+      setCustomName("")
+    } else if (!result?.success) {
+      alert(result?.error || 'Upload failed')
+    }
   }
 
   return (
@@ -32,18 +50,10 @@ export function DesktopWallpaperTab() {
         <h3 className="text-sm pixel-text-shadow">DESKTOP WALLPAPER</h3>
 
         <FileUpload
-          accept="image/gif,image/*"
-          onFileSelect={onUploadGif}
-          preview={data?.desktopGifUrl || ''}
-          label="DESKTOP GIF/IMAGE"
-          maxSize={10}
-        />
-
-        <FileUpload
           accept="image/*"
           onFileSelect={onUploadWallpaper}
           preview={data?.wallpaperUrl || ''}
-          label="WALLPAPER IMAGE"
+          label=""
           maxSize={10}
         />
 
@@ -51,11 +61,16 @@ export function DesktopWallpaperTab() {
           <Library className="w-4 h-4" /> CHOOSE FROM LIBRARY
         </PixelButton>
       </div>
-      <div className="mt-6">
-        <PixelButton className="w-full text-[10px]" onClick={() => undefined}>
-          SAVE
-        </PixelButton>
-      </div>
+      <PixelModal isOpen={renameOpen} onClose={() => !uploading && setRenameOpen(false)} title="RENAME WALLPAPER">
+        <div className="space-y-4">
+          <p className="text-[10px] text-muted-foreground">SET A NAME FOR YOUR WALLPAPER</p>
+          <PixelInput value={customName} onChange={(e) => setCustomName(e.target.value)} placeholder="Enter name" />
+          <div className="flex gap-3 pt-2">
+            <PixelButton variant="secondary" className="flex-1 text-[10px]" onClick={() => setRenameOpen(false)} disabled={uploading}>CANCEL</PixelButton>
+            <PixelButton className="flex-1 text-[10px]" onClick={confirmUpload} disabled={uploading || !pendingFile}>{uploading ? 'UPLOADING…' : 'UPLOAD'}</PixelButton>
+          </div>
+        </div>
+      </PixelModal>
     </PixelCard>
   )
 }
