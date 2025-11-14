@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-PortaGen is a Next.js application that allows users to create and customize their own pixel-art-themed digital portfolios. The application provides a desktop-like experience where users can customize their wallpaper, arrange icons, and embed music. It uses Clerk for user authentication, Drizzle ORM for interacting with a PostgreSQL database, and Tailwind CSS for styling. The frontend is built with React and utilizes various libraries, including GSAP for animations and Radix UI for accessible components.
+PortaGen is a Next.js application that allows users to create and customize their own pixel-art-themed digital portfolios. The application provides a desktop-like experience where users can customize their wallpaper, arrange icons, and embed music. It uses Clerk for user authentication, Drizzle ORM for interacting with a PostgreSQL database, and Tailwind CSS for styling. The frontend is built with React and utilizes various libraries, including GSAP for animations, Radix UI for accessible components, and shadcn/ui for UI components.
 
 ## Building and Running
 
