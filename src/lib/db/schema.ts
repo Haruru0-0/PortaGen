@@ -72,8 +72,16 @@ export const windows = pgTable('windows', {
 
     // Content stored as JSON
     content: jsonb('content').$type<{
-        type: 'text' | 'markdown' | 'html' | 'projects' | 'links'
-        data: string
+        type: string;
+        template: string;
+        description: string;
+        fields: {
+            id: string;
+            type: string;
+            label: string;
+            value: any;
+            placeholder?: string;
+        }[];
     }>(),
 
     createdAt: timestamp('created_at').defaultNow().notNull(),

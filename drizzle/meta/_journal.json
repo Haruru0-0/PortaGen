@@ -22,6 +22,27 @@
       "when": 1762694345309,
       "tag": "0002_lush_wild_child",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1763215301831,
+      "tag": "0003_military_christian_walker",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1763215376520,
+      "tag": "0004_perfect_hedge_knight",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1763215420247,
+      "tag": "0005_woozy_starjammers",
+      "breakpoints": true
     }
   ]
 }

@@ -101,29 +101,23 @@ interface WindowContentEditorProps {
 }
 
 export function WindowContentEditor({ windowContent, onSave, onCancel, onDelete }: WindowContentEditorProps) {
-    const [selectedType, setSelectedType] = useState<WindowContentType>("about")
+    const [selectedType, setSelectedType] = useState<WindowContentType>(windowContent?.type || "about")
     const [contentFields, setContentFields] = useState<ContentField[]>([])
-    const [windowName, setWindowName] = useState("")
-    const [isEditing, setIsEditing] = useState(false)
+    const [windowName, setWindowName] = useState(windowContent?.name || "")
+    const isEditing = !!windowContent
 
     // Initialize form when windowContent changes
     useEffect(() => {
         if (windowContent) {
             setWindowName(windowContent.name)
             setSelectedType(windowContent.type)
-            setIsEditing(true)
-
+            
             // Load existing fields or use template
             if (windowContent.data && windowContent.data.fields) {
                 setContentFields(windowContent.data.fields)
             } else {
                 setContentFields([...CONTENT_TEMPLATES[windowContent.type].fields])
             }
-        } else {
-            setWindowName("")
-            setSelectedType("about")
-            setContentFields([...CONTENT_TEMPLATES.about.fields])
-            setIsEditing(false)
         }
     }, [windowContent])
 
@@ -292,19 +286,7 @@ export function WindowContentEditor({ windowContent, onSave, onCancel, onDelete 
         }
     }
 
-    if (!windowContent && !isEditing) {
-        return (
-            <PixelCard>
-                <div className="text-center p-8">
-                    <Layout className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-sm font-bold mb-2">NO WINDOW SELECTED</h3>
-                    <p className="text-[10px] text-muted-foreground mb-4">
-                        Select a window to edit or create a new one
-                    </p>
-                </div>
-            </PixelCard>
-        )
-    }
+
 
     return (
         <PixelCard>

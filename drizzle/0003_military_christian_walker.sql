@@ -1,0 +1,1 @@
+ALTER TABLE "icons" DROP COLUMN "window_id";
