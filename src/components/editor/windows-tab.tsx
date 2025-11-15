@@ -76,8 +76,8 @@ export function WindowsTab() {
                     <button
                       onClick={() => {
                         const pid = params?.id
-                        const wid = (w as any).windowId ?? (w as any).id
-                        if (pid && wid) router.push(`/dashboard/editor/${pid}/windows/${wid}`)
+                        const windowId = (w as any).windowId ?? (w as any).id
+                        if (pid && windowId) router.push(`/dashboard/editor/${pid}/windows/${windowId}`)
                       }}
                       className="w-8 h-8 border-2 border-border bg-card hover:bg-primary hover:text-primary-foreground transition-colors flex items-center justify-center"
                     >
