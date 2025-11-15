@@ -8,9 +8,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Icon, useIconContext } from "@/contexts/iconContext";
 import { useParams } from "next/navigation";
 import { useFileUpload } from "@/hooks/use-file-upload";
+import Image from "next/image";
 
 interface EditIconModalProps {
   isOpen: boolean;
@@ -21,12 +23,19 @@ interface EditIconModalProps {
 
 export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModalProps) {
   const { updateIcon, loading } = useIconContext()
-  const schema = z.object({
-    name: z.string().min(1, 'Name is required'),
-    url: z.string().url('Invalid URL').optional().or(z.literal('')),
-    fileId: z.union([z.string(), z.number()]).optional(),
-  })
-  const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema), defaultValues: { name: '', url: '', fileId: undefined } })
+  const schema = z
+    .object({
+      name: z.string().min(1, 'Name is required'),
+      linkType: z.enum(['window','url']).default('window'),
+      url: z.string().url('Invalid URL').optional().or(z.literal('')),
+      fileId: z.union([z.string(), z.number()]).optional(),
+    })
+    .superRefine((val, ctx) => {
+      if (val.linkType === 'url' && !val.url) {
+        ctx.addIssue({ path: ['url'], code: z.ZodIssueCode.custom, message: 'Enter a URL' })
+      }
+    })
+  const form = useForm<z.input<typeof schema>>({ resolver: zodResolver(schema), defaultValues: { name: '', linkType: 'window', url: '', fileId: undefined } })
   const [preview, setPreview] = useState<string>("")
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const params = useParams<{ id: string }>()
@@ -35,8 +44,8 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
 
   useEffect(() => {
     if (icon) {
-      form.reset({ name: icon.name || "", url: icon.url || "", fileId: icon.iconAssetId })
-      setPreview(icon.icon || "")
+      form.reset({ name: icon.name || '', linkType: (icon as any).linkType || 'window', url: icon.url || '', fileId: icon.iconAssetId })
+      setPreview(icon.icon || '')
       setSelectedFile(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -80,11 +89,34 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
               <FormMessage />
             </FormItem>
           )} />
+        <FormField name="linkType" control={form.control} render={({ field }) => (
+          <FormItem>
+            <FormLabel>LINK TYPE</FormLabel>
+            <FormControl>
+              <RadioGroup
+                value={field.value}
+                onValueChange={field.onChange}
+                className="grid grid-cols-2 gap-2 p-2 border-2 border-border bg-card"
+              >
+                <label className="flex items-center gap-2 px-2 py-1 text-[10px] border-2 border-border bg-muted cursor-pointer">
+                  <RadioGroupItem value="window" className="border-2 border-border" />
+                  Link to Window
+                </label>
+                <label className="flex items-center gap-2 px-2 py-1 text-[10px] border-2 border-border bg-muted cursor-pointer">
+                  <RadioGroupItem value="url" className="border-2 border-border" />
+                  Link to URL
+                </label>
+              </RadioGroup>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )} />
+
         <div className="space-y-2">
           <label className="block text-xs uppercase tracking-wider">ICON IMAGE</label>
           {preview && (
             <div className="flex justify-center mb-3">
-              <img src={preview} alt="Icon preview" className="w-16 h-16 border-4 border-border object-cover" />
+              <Image src={preview} width={64} height={64} alt="Icon preview" className="border-4 border-border object-cover" />
             </div>
           )}
           <FileUpload accept="image/*" onFileSelect={handleUpload} maxSize={1} label={preview ? "REPLACE IMAGE" : "UPLOAD IMAGE"} />
@@ -92,15 +124,17 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
             <Library className="w-4 h-4" /> CHOOSE FROM LIBRARY
           </PixelButton>
         </div>
-        <FormField name="url" control={form.control} render={({ field }) => (
-          <FormItem>
-            <FormLabel>LINK URL (OPTIONAL)</FormLabel>
-            <FormControl>
-              <PixelInput placeholder="https://..." {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )} />
+        {form.watch('linkType') === 'url' && (
+          <FormField name="url" control={form.control} render={({ field }) => (
+            <FormItem>
+              <FormLabel>LINK URL</FormLabel>
+              <FormControl>
+                <PixelInput placeholder="https://..." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+        )}
         <div className="flex gap-3 pt-2">
           <PixelButton type="button" variant="secondary" className="flex-1 text-[10px]" onClick={onClose} disabled={loading || uploading}>
             CANCEL

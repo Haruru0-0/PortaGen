@@ -14,9 +14,9 @@ export type Icon = {
     name: string;
     icon: string;
     url?: string;
+    linkType?: 'window' | 'url';
     iconAssetId?: number;
     position?: number;
-    windowId?: string;
     isVisible?: boolean
 }
 

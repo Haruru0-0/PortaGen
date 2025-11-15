@@ -107,8 +107,8 @@ export interface EditorContextType {
   deleteIconById: (id: number) => Promise<boolean>
 
   // Icons
-  addIcon: (payload: { name: string; url?: string; fileId?: number | string; position?: number; windowId?: string; isVisible?: boolean }) => Promise<any>
-  updateIcon: (payload: { id: number; name?: string; url?: string; fileId?: number | string; position?: number; windowId?: string; isVisible?: boolean }) => Promise<any>
+  addIcon: (payload: { name: string; url?: string; fileId?: number | string; position?: number; isVisible?: boolean; linkType?: 'window' | 'url' }) => Promise<any>
+  updateIcon: (payload: { id: number; name?: string; url?: string; fileId?: number | string; position?: number; isVisible?: boolean; linkType?: 'window' | 'url' }) => Promise<any>
 
   // Music
   addMusic: () => Promise<any>
@@ -248,12 +248,12 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const deleteIconById = async (id: number) => deleteIconAPI(id)
   
   // Icons CRUD
-  const addIcon = async (payload: { name: string; url?: string; fileId?: number | string; position?: number; windowId?: string; isVisible?: boolean }) => {
+  const addIcon = async (payload: { name: string; url?: string; fileId?: number | string; position?: number; isVisible?: boolean; linkType?: 'window' | 'url' }) => {
     const created = await addIconAPI({ portfolioId: currentPortfolioId, ...payload })
     if (created) setIcons([...(icons as any[]), created])
     return created
   }
-  const updateIcon = async (payload: { id: number; name?: string; url?: string; fileId?: number | string; position?: number; windowId?: string; isVisible?: boolean }) => {
+  const updateIcon = async (payload: { id: number; name?: string; url?: string; fileId?: number | string; position?: number; isVisible?: boolean; linkType?: 'window' | 'url' }) => {
     const updated = await updateIconAPI({ portfolioId: currentPortfolioId, ...payload })
     if (updated) setIcons((icons as any[]).map((i: any) => (i.id === updated.id ? updated : i)))
     return updated
@@ -392,4 +392,3 @@ export const useEditorContext = () => {
   }
   return context
 }
-

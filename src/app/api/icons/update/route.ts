@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
-import { icons, portfolios, portfolioAssets } from '@/lib/db/schema'
+import { icons, portfolios, portfolioAssets, windows } from '@/lib/db/schema'
 import { and, eq } from 'drizzle-orm'
 import { getUserByClerkId } from '@/lib/db/helpers'
 
@@ -16,8 +16,8 @@ async function formatIconResponse(id: number) {
     id: row.id,
     name: row.name,
     position: row.position,
+    linkType: row.linkType || 'window',
     url: row.linkUrl || undefined,
-    windowId: row.windowId || undefined,
     isVisible: row.isVisible,
     iconAssetId: row.iconAssetId || undefined,
     icon: row.asset?.displayUrl || '',
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
     const body = await req.json().catch(() => ({}))
-    const { id, portfolioId, name, url, fileId, position, windowId, isVisible } = body || {}
+    const { id, portfolioId, name, url, fileId, position, linkType, isVisible } = body || {}
 
     if (!id) return NextResponse.json({ error: 'Icon ID required' }, { status: 400 })
     if (!portfolioId) return NextResponse.json({ error: 'Portfolio ID required' }, { status: 400 })
@@ -46,8 +46,8 @@ export async function POST(req: NextRequest) {
 
     const payload: Partial<typeof icons.$inferInsert> = {
       name,
-      linkUrl: url,
-      windowId,
+      linkType: (linkType === 'url' || linkType === 'window') ? linkType : undefined,
+      linkUrl: linkType === 'url' ? url : (linkType === 'window' ? '' : undefined),
       isVisible: typeof isVisible === 'boolean' ? isVisible : undefined,
       iconAssetId: fileId != null && fileId !== '' ? Number(fileId) : undefined,
       position: typeof position === 'number' ? position : undefined,
@@ -89,6 +89,27 @@ export async function POST(req: NextRequest) {
           .where(and(eq(portfolioAssets.portfolioId, portfolioId), eq(portfolioAssets.assetId, oldAssetId)))
       }
     }
+
+    // If changed to window type, ensure a windows row exists bound to this icon
+    try {
+      if (linkType === 'window' && updated) {
+        const existingWin = await db.query.windows.findFirst({ where: eq(windows.iconId, updated.id) })
+        if (!existingWin) {
+          const base = (name || 'window').toString().toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'window'
+          let candidate = base
+          let i = 1
+          // ensure unique windowId per portfolio
+          // eslint-disable-next-line no-constant-condition
+          while (true) {
+            const exists = await db.query.windows.findFirst({ where: and(eq(windows.portfolioId, portfolioId), eq(windows.windowId, candidate)) })
+            if (!exists) break
+            i += 1
+            candidate = `${base}-${i}`
+          }
+          await db.insert(windows).values({ portfolioId, windowId: candidate, name: name || candidate, iconId: updated.id })
+        }
+      }
+    } catch {}
 
     const formatted = await formatIconResponse(updated.id)
     return NextResponse.json(formatted)

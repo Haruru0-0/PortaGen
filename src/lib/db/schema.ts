@@ -56,13 +56,16 @@ export const portfolios = pgTable('portfolios', {
 // CONTENT TABLES
 // ============================================
 
-// Window contents table - about, projects, contact, etc.
-export const windowContents = pgTable('window_contents', {
+// Windows table (renamed from window_contents) - about, projects, contact, etc.
+export const windows = pgTable('windows', {
     id: serial('id').primaryKey(),
     portfolioId: integer('portfolio_id').notNull().references(() => portfolios.id, { onDelete: 'cascade' }),
 
     windowId: varchar('window_id', { length: 100 }).notNull(), // 'about', 'projects', 'contact', etc.
     name: varchar('name', { length: 255 }).notNull(),
+
+    // Optional link to an icon entry that opens this window
+    iconId: integer('icon_id').references(() => icons.id, { onDelete: 'set null' }),
 
     enabled: boolean('enabled').default(true),
     position: integer('position').notNull().default(0),
@@ -76,8 +79,9 @@ export const windowContents = pgTable('window_contents', {
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => ({
-    portfolioWindowIdx: unique('portfolio_window_unique').on(table.portfolioId, table.windowId),
-    portfolioIdIdx: index('window_portfolio_id_idx').on(table.portfolioId),
+    portfolioWindowIdx: unique('windows_portfolio_window_unique').on(table.portfolioId, table.windowId),
+    portfolioIdIdx: index('windows_portfolio_id_idx').on(table.portfolioId),
+    iconIdIdx: index('windows_icon_id_idx').on(table.iconId),
 }))
 
 // Icons table
@@ -91,8 +95,8 @@ export const icons = pgTable('icons', {
     iconAssetId: integer('icon_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
 
     // Link/Window
+    linkType: varchar('link_type', { length: 20 }).default('window'),
     linkUrl: text('link_url'),
-    windowId: varchar('window_id', { length: 100 }), // Links to window content
 
     isVisible: boolean('is_visible').default(true),
 
@@ -238,7 +242,8 @@ export const portfoliosRelations = relations(portfolios, ({ one, many }) => ({
     }),
     portfolioAssets: many(portfolioAssets),
     icons: many(icons),
-    windowContents: many(windowContents),
+    // Keep relation key name for API compatibility, but point to windows table
+    windowContents: many(windows),
     themeSettings: one(themeSettings),
     soundEffects: many(soundEffects),
     lockScreenSettings: one(lockScreenSettings),

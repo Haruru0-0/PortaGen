@@ -1,32 +1,45 @@
-﻿import { PixelModal } from "@/components/pixel-modal";
+import { PixelModal } from "@/components/pixel-modal";
 import { PixelInput } from "@/components/pixel-input";
 import { FileUpload } from "@/components/file-upload";
 import { PixelButton } from "@/components/pixel-button";
 import { Library } from "lucide-react";
 import { useState } from "react";
 import { useIconContext } from "@/contexts/iconContext";
+import { useEditorContext } from "@/contexts/editorContext";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useParams } from "next/navigation";
 import { useFileUpload } from "@/hooks/use-file-upload";
+import Image from "next/image";
 
 interface AddIconModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreated: (icon?: { id: number; name: string; icon: string; url?: string }) => void;
+  onCreated: (icon?: { id: number; name: string; icon: string; url?: string; linkType?: 'window' | 'url' }) => void;
 }
 
-const schema = z.object({
-  name: z.string().min(1, "Name is required"),
-  url: z.string().url("Invalid URL").optional().or(z.literal("")),
-  fileId: z.union([z.string(), z.number()]).optional(),
-})
+const schema = z
+  .object({
+    name: z.string().min(1, "Name is required"),
+    linkType: z.enum(["window", "url"]).default("window"),
+    url: z.string().url("Invalid URL").optional().or(z.literal("")),
+    fileId: z.union([z.string(), z.number()]).optional(),
+  })
+  .superRefine((val, ctx) => {
+    if (val.linkType === "url" && !val.url) {
+      ctx.addIssue({ path: ["url"], code: z.ZodIssueCode.custom, message: "Enter a URL" })
+    }
+  })
 
 export function AddIconModal({ isOpen, onClose, onCreated }: AddIconModalProps) {
   const { addIcon, loading } = useIconContext()
-  const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema), defaultValues: { name: "", url: "", fileId: undefined } })
+  const form = useForm<z.input<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: { name: "", linkType: "window", url: "", fileId: undefined },
+  })
   const [preview, setPreview] = useState<string>("")
   const params = useParams<{ id: string }>()
   const currentPortfolioId = Number(params?.id)
@@ -40,14 +53,13 @@ export function AddIconModal({ isOpen, onClose, onCreated }: AddIconModalProps) 
       const objectUrl = URL.createObjectURL(file)
       setPreview(objectUrl)
     } catch {
-      // fallback: keep previous preview
+      // ignore preview error
     }
   }
 
-  const onSubmit = async (values: z.infer<typeof schema>) => {
+  const onSubmit = async (values: z.input<typeof schema>) => {
     if (!currentPortfolioId) return
-    let payload: z.infer<typeof schema> = { ...values }
-    // If a local file is selected and no fileId yet, upload it using the icon name
+    let payload: z.input<typeof schema> = { ...values }
     if (selectedFile && !payload.fileId) {
       const customName = (values.name || selectedFile.name.replace(/\.[^/.]+$/, "")).trim()
       const res = await uploadFile(selectedFile, "icon", customName)
@@ -56,12 +68,16 @@ export function AddIconModal({ isOpen, onClose, onCreated }: AddIconModalProps) 
         return
       }
       payload = { ...payload, fileId: res.data.id }
-      // Use uploaded URL as preview (keeps in sync after creation)
       if (res.data.url) setPreview(res.data.url)
     }
-    const created = await addIcon(currentPortfolioId, payload)
+    const created = await addIcon(currentPortfolioId, {
+      name: payload.name,
+      fileId: payload.fileId,
+      linkType: payload.linkType ?? 'window',
+      url: payload.linkType === "url" ? payload.url : "",
+    })
     onCreated(created)
-    form.reset({ name: "", url: "", fileId: undefined })
+    form.reset({ name: "", linkType: "window", url: "", fileId: undefined })
     setPreview("")
     setSelectedFile(null)
   }
@@ -83,23 +99,48 @@ export function AddIconModal({ isOpen, onClose, onCreated }: AddIconModalProps) 
             <label className="block text-xs uppercase tracking-wider">ICON IMAGE</label>
             {preview && (
               <div className="flex justify-center mb-3">
-                <img src={preview} alt="Icon preview" className="w-16 h-16 border-4 border-border object-cover" />
+                <Image src={preview} width={64} height={64} alt="Icon preview" className="border-4 border-border object-cover" />
               </div>
             )}
-            <FileUpload accept="image/*" onFileSelect={handleUpload} maxSize={1} label={preview ? "REPLACE IMAGE" : "UPLOAD IMAGE"} />
+            <FileUpload accept="image/*" onFileSelect={handleUpload} maxSize={1} label={preview && "REPLACE IMAGE"} />
             <PixelButton variant="secondary" className="w-full text-[10px] flex items-center justify-center gap-2" disabled>
               <Library className="w-4 h-4" /> CHOOSE FROM LIBRARY
             </PixelButton>
           </div>
-          <FormField name="url" control={form.control} render={({ field }) => (
-            <FormItem>
-              <FormLabel>LINK URL (OPTIONAL)</FormLabel>
-              <FormControl>
-                <PixelInput placeholder="https://..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+          <FormField name="linkType" control={form.control} render={({ field }) => (
+              <FormItem>
+                <FormLabel>LINK TYPE</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      className="grid grid-cols-2 gap-2 p-2 border-2 border-border bg-card"
+                  >
+                    <label className="flex items-center gap-2 px-2 py-1 text-[10px] border-2 border-border bg-muted cursor-pointer">
+                      <RadioGroupItem value="window" className="border-2 border-border" />
+                      Link to Window
+                    </label>
+                    <label className="flex items-center gap-2 px-2 py-1 text-[10px] border-2 border-border bg-muted cursor-pointer">
+                      <RadioGroupItem value="url" className="border-2 border-border" />
+                      Link to URL
+                    </label>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
           )} />
+          {form.watch('linkType') === 'url' && (
+            <FormField name="url" control={form.control} render={({ field }) => (
+              <FormItem>
+                <FormLabel>LINK URL</FormLabel>
+                <FormControl>
+                  <PixelInput placeholder="https://..." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+          )}
+
           <div className="flex gap-3 pt-2">
             <PixelButton type="button" variant="secondary" className="flex-1 text-[10px]" onClick={onClose} disabled={loading || uploading}>
               CANCEL

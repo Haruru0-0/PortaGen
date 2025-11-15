@@ -14,6 +14,7 @@ import {EditorProvider, useEditorContext} from "@/contexts/editorContext"
 import {LockScreenProvider} from "@/contexts/lockScreenContext"
 import {DesktopProvider} from "@/contexts/desktopContext"
 import {IconProvider, useIconContext} from "@/contexts/iconContext"
+import {WindowsProvider} from "@/contexts/windowsContext"
 import {saveData,} from "@/lib/services/portfolioService"
 import {CategorySelection} from "@/components/editor/CategorySelection"
 import {TabsNavigation} from "@/components/editor/TabsNavigation"
@@ -292,7 +293,9 @@ export default function EditorPage() {
             <DesktopProvider>
                 <LockScreenProvider>
                     <IconProvider>
+                      <WindowsProvider>
                         <EditorContent/>
+                      </WindowsProvider>
                     </IconProvider>
                 </LockScreenProvider>
             </DesktopProvider>

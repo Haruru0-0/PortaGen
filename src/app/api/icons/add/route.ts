@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
-import { icons, portfolios, portfolioAssets } from '@/lib/db/schema'
+import { icons, portfolios, portfolioAssets, windows } from '@/lib/db/schema'
 import { and, eq } from 'drizzle-orm'
 import { getUserByClerkId } from '@/lib/db/helpers'
 
@@ -16,8 +16,8 @@ async function formatIconResponse(id: number) {
     id: row.id,
     name: row.name,
     position: row.position,
+    linkType: (row as any).linkType || 'window',
     url: row.linkUrl || undefined,
-    windowId: row.windowId || undefined,
     isVisible: row.isVisible,
     iconAssetId: row.iconAssetId || undefined,
     icon: row.asset?.displayUrl || '',
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
     const body = await req.json().catch(() => ({}))
-    const { portfolioId, name, url, fileId, position, windowId, isVisible } = body || {}
+    const { portfolioId, name, url, fileId, position, linkType, isVisible } = body || {}
 
     if (!portfolioId) {
       return NextResponse.json({ error: 'Portfolio ID required' }, { status: 400 })
@@ -58,8 +58,8 @@ export async function POST(req: NextRequest) {
         portfolioId,
         name: name || 'NEW ICON',
         position: nextPosition || 0,
-        linkUrl: url,
-        windowId,
+        linkType: (linkType === 'url' || linkType === 'window') ? linkType : 'window',
+        linkUrl: linkType === 'url' ? url : undefined,
         isVisible: typeof isVisible === 'boolean' ? isVisible : true,
         iconAssetId: fileId != null && fileId !== '' ? Number(fileId) : undefined,
       })
@@ -77,6 +77,25 @@ export async function POST(req: NextRequest) {
       } catch (e) {
         // noop if unique conflict or unsupported op in driver
       }
+    }
+
+    // If linking to a window, create a windows row bound to this icon
+    if ((linkType === 'window' || !linkType) && created) {
+      // Basic slug from name
+      const base = (name || 'window').toString().toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'window'
+      let candidate = base
+      let i = 1
+      // ensure uniqueness per portfolio
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const existing = await db.query.windows.findFirst({ where: and(eq(windows.portfolioId, portfolioId), eq(windows.windowId, candidate)) })
+        if (!existing) break
+        i += 1
+        candidate = `${base}-${i}`
+      }
+      try {
+        await db.insert(windows).values({ portfolioId, windowId: candidate, name: name || candidate, iconId: created.id })
+      } catch {}
     }
 
     const formatted = await formatIconResponse(created.id)
