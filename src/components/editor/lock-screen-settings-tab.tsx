@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import {useParams} from "next/navigation";
+import { useParams } from "next/navigation";
 
 const schema = z.object({
     enabled: z.boolean().default(true),
@@ -48,7 +48,7 @@ export function LockScreenSettingsTab() {
         <PixelCard>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <h3 className="text-sm pixel-text-shadow">LOCK SCREEN SETTINGS</h3>
+                    <h3 className="text-sm dashboard-pixel-text-shadow">LOCK SCREEN SETTINGS</h3>
 
                     <FormField
                         control={form.control}

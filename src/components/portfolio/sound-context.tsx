@@ -24,7 +24,7 @@ let audioContext: AudioContext | null = null
 
 const getAudioContext = () => {
   if (!audioContext) {
-    audioContext = new (window.AudioContext || (window as Window & typeof globalThis).webkitAudioContext)()
+    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
   }
   return audioContext
 }
@@ -327,7 +327,10 @@ const generateRetroMenuSound = (volume: number) => {
 }
 
 export function SoundProvider({ children }: { children: React.ReactNode }) {
-  const [isSoundEnabled, setSoundEnabled] = useState(true)
+  const [isSoundEnabled, setSoundEnabled] = useState(() => {
+    const saved = localStorage.getItem('portfolio-sound-enabled')
+    return saved !== null ? JSON.parse(saved) : true
+  })
   
   const [volume, setVolume] = useState(() => {
     const saved = localStorage.getItem('portfolio-sound-volume')

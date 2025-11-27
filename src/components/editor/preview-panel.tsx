@@ -3,7 +3,7 @@ import { PixelCard } from "@/components/pixel-card"
 import { PixelButton } from "@/components/pixel-button"
 import { Monitor, Smartphone, Lock, Unlock } from "lucide-react"
 import { LockScreen } from "@/components/portfolio/lock-screen"
-import Desktop from "@/components/portfolio-preview/desktop"
+import Desktop from "@/components/portfolio/desktop"
 import { CuteSuspenseFallback } from "@/components/portfolio/suspense-fallback"
 import { SoundProvider } from "@/components/portfolio/sound-context"
 import { AudioProvider } from "@/components/portfolio/audio-context"
@@ -37,23 +37,23 @@ interface PreviewPanelProps {
 }
 
 export function PreviewPanel({
-                                 previewMode,
-                                 isLocked,
-                                 lockScreenEnabled,
-                                 lockScreenPassword,
-                                 lockScreenHint,
-                                 lockScreenImage,
-                                 desktopGif,
-                                 wallpaper,
-                                 mobileWidget1,
-                                 mobileWidget2,
-                                 musicPlayerIcon,
-                                 spotifyPlaylistUrl,
-                                 icons,
-                                 theme,
-                                 onPreviewModeChange,
-                                 onLockChange,
-                             }: PreviewPanelProps) {
+    previewMode,
+    isLocked,
+    lockScreenEnabled,
+    lockScreenPassword,
+    lockScreenHint,
+    lockScreenImage,
+    desktopGif,
+    wallpaper,
+    mobileWidget1,
+    mobileWidget2,
+    musicPlayerIcon,
+    spotifyPlaylistUrl,
+    icons,
+    theme,
+    onPreviewModeChange,
+    onLockChange,
+}: PreviewPanelProps) {
     const stageContainerRef = useRef<HTMLDivElement>(null)
     const { width: containerWidth } = useResizeObserver(stageContainerRef)
     const isNarrow = (containerWidth || 0) < 738
@@ -61,15 +61,14 @@ export function PreviewPanel({
         <PixelCard className="">
             <div className="space-y-4 h-full flex flex-col">
                 <div className="flex items-center justify-between flex-wrap gap-2">
-                    <h3 className="text-sm pixel-text-shadow">LIVE PREVIEW</h3>
+                    <h3 className="text-sm dashboard-pixel-text-shadow">LIVE PREVIEW</h3>
                     <div className="flex gap-2 flex-wrap">
                         <button
                             onClick={() => onPreviewModeChange("desktop")}
-                            className={`px-3 py-2 text-[10px] border-2 border-border flex items-center gap-1 ${
-                                previewMode === "desktop"
+                            className={`px-3 py-2 text-[10px] border-2 border-border flex items-center gap-1 ${previewMode === "desktop"
                                     ? "bg-primary text-primary-foreground"
                                     : "bg-card hover:bg-muted"
-                            } ${isNarrow ? "opacity-60 cursor-not-allowed" : ""}`}
+                                } ${isNarrow ? "opacity-60 cursor-not-allowed" : ""}`}
                             disabled={isNarrow}
                             title={isNarrow ? "Desktop preview is available on larger screens" : undefined}
                         >
@@ -78,11 +77,10 @@ export function PreviewPanel({
                         </button>
                         <button
                             onClick={() => onPreviewModeChange("mobile")}
-                            className={`px-3 py-2 text-[10px] border-2 border-border flex items-center gap-1 ${
-                                previewMode === "mobile"
+                            className={`px-3 py-2 text-[10px] border-2 border-border flex items-center gap-1 ${previewMode === "mobile"
                                     ? "bg-primary text-primary-foreground"
                                     : "bg-card hover:bg-muted"
-                            }`}
+                                }`}
                         >
                             <Smartphone className="w-3 h-3" />
                             MOBILE
@@ -92,22 +90,20 @@ export function PreviewPanel({
                             <>
                                 <button
                                     onClick={() => onLockChange(true)}
-                                    className={`px-3 py-2 text-[10px] border-2 border-border flex items-center gap-1 ${
-                                        isLocked
+                                    className={`px-3 py-2 text-[10px] border-2 border-border flex items-center gap-1 ${isLocked
                                             ? "bg-primary text-primary-foreground"
                                             : "bg-card hover:bg-muted"
-                                    }`}
+                                        }`}
                                 >
                                     <Lock className="w-3 h-3" />
                                     LOCK
                                 </button>
                                 <button
                                     onClick={() => onLockChange(false)}
-                                    className={`px-3 py-2 text-[10px] border-2 border-border flex items-center gap-1 ${
-                                        !isLocked
+                                    className={`px-3 py-2 text-[10px] border-2 border-border flex items-center gap-1 ${!isLocked
                                             ? "bg-primary text-primary-foreground"
                                             : "bg-card hover:bg-muted"
-                                    }`}
+                                        }`}
                                 >
                                     <Unlock className="w-3 h-3" />
                                     DESKTOP
@@ -133,18 +129,7 @@ export function PreviewPanel({
                                                 />
                                             ) : (
                                                 <div className="w-full h-full relative" style={{ zIndex: 1 }}>
-                                                    <Desktop
-                                                        previewMode={previewMode}
-                                                        embedded={true}
-                                                        mobileWidget1={mobileWidget1 || "/water-cd.jpg"}
-                                                        mobileWidget2={mobileWidget2 || "/cute-puppy.png"}
-                                                        musicPlayerIcon={musicPlayerIcon}
-                                                        spotifyPlaylistUrl={spotifyPlaylistUrl}
-                                                        desktopGif={desktopGif || "/cute-greeting-gif.jpg"}
-                                                        wallpaper={wallpaper}
-                                                        icons={icons}
-                                                        theme={theme}
-                                                    />
+                                                    <Desktop preview={true} previewMode={previewMode} />
                                                 </div>
                                             )}
                                         </Suspense>
@@ -171,18 +156,7 @@ export function PreviewPanel({
                                                         />
                                                     ) : (
                                                         <div className="w-full h-full relative" style={{ zIndex: 1 }}>
-                                                            <Desktop
-                                                                previewMode={previewMode}
-                                                                embedded={true}
-                                                                mobileWidget1={mobileWidget1 || "/water-cd.jpg"}
-                                                                mobileWidget2={mobileWidget2 || "/cute-puppy.png"}
-                                                                musicPlayerIcon={musicPlayerIcon}
-                                                                spotifyPlaylistUrl={spotifyPlaylistUrl}
-                                                                desktopGif={desktopGif || "/cute-greeting-gif.jpg"}
-                                                                wallpaper={wallpaper}
-                                                                icons={icons}
-                                                                theme={theme}
-                                                            />
+                                                            <Desktop preview={true} previewMode={previewMode} />
                                                         </div>
                                                     )}
                                                 </Suspense>

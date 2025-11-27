@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type RefObject } from "react"
 
-export function useResizeObserver(ref: RefObject<HTMLElement>) {
+export function useResizeObserver<T extends HTMLElement>(ref: RefObject<T> | RefObject<T | null>) {
   const [width, setWidth] = useState(0)
   const [height, setHeight] = useState(0)
 

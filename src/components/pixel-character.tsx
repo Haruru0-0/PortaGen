@@ -6,7 +6,7 @@ interface PixelCharacterProps {
 
 export function PixelCharacter({ color = "#FF69B4", size = 40, animate = false }: PixelCharacterProps) {
   return (
-    <div className={animate ? "pixel-walk" : ""}>
+    <div className={animate ? "dashboard-pixel-walk" : ""}>
       <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
         {/* Head */}
         <rect x="5" y="2" width="6" height="6" fill={color} />

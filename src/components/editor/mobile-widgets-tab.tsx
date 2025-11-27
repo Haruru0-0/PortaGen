@@ -1,18 +1,18 @@
-import {PixelCard} from "@/components/pixel-card"
-import {PixelButton} from "@/components/pixel-button"
-import {FileUpload} from "@/components/file-upload"
-import {useDesktopContext} from "@/contexts/desktopContext"
-import {useEffect, useState} from "react"
-import {PixelModal} from "@/components/pixel-modal"
-import {PixelInput} from "@/components/pixel-input"
-import {useFileUpload} from "@/hooks/use-file-upload"
-import {useParams} from "next/navigation";
+import { PixelCard } from "@/components/pixel-card"
+import { PixelButton } from "@/components/pixel-button"
+import { FileUpload } from "@/components/file-upload"
+import { useDesktopContext } from "@/contexts/desktopContext"
+import { useEffect, useState } from "react"
+import { PixelModal } from "@/components/pixel-modal"
+import { PixelInput } from "@/components/pixel-input"
+import { useFileUpload } from "@/hooks/use-file-upload"
+import { useParams } from "next/navigation";
 
 export function MobileWidgetsTab() {
     const params = useParams<{ id: string }>()
     const currentPortfolioId = Number(params?.id)
-    const {data, getDesktopData, updateWidget} = useDesktopContext()
-    const {uploadFile, uploading} = useFileUpload()
+    const { data, getDesktopData, updateWidget } = useDesktopContext()
+    const { uploadFile, uploading } = useFileUpload()
 
     const [renameOpen, setRenameOpen] = useState(false)
     const [pendingFile, setPendingFile] = useState<File | null>(null)
@@ -55,27 +55,27 @@ export function MobileWidgetsTab() {
     return (
         <PixelCard>
             <div className="space-y-4">
-                <h3 className="text-sm pixel-text-shadow">MOBILE WIDGETS</h3>
+                <h3 className="text-sm dashboard-pixel-text-shadow">MOBILE WIDGETS</h3>
                 <FileUpload accept="image/*" onFileSelect={onUploadWidget1} label="WIDGET 1"
-                            preview={data?.widget1Url || ''} maxSize={5}/>
+                    preview={data?.widget1Url || ''} maxSize={5} />
                 <FileUpload accept="image/*" onFileSelect={onUploadWidget2} label="WIDGET 2"
-                            preview={data?.widget2Url || ''} maxSize={5}/>
+                    preview={data?.widget2Url || ''} maxSize={5} />
             </div>
             <div className="mt-6">
                 <PixelButton onClick={onSave} className="w-full text-[10px]"
-                             disabled={uploading}>{uploading ? 'UPLOADING…' : 'SAVE'}</PixelButton>
+                    disabled={uploading}>{uploading ? 'UPLOADING…' : 'SAVE'}</PixelButton>
             </div>
 
             <PixelModal isOpen={renameOpen} onClose={() => !uploading && setRenameOpen(false)} title="RENAME WIDGET">
                 <div className="space-y-4">
                     <p className="text-[10px] text-muted-foreground">SET A NAME FOR YOUR WIDGET IMAGE</p>
                     <PixelInput value={customName} onChange={(e) => setCustomName(e.target.value)}
-                                placeholder="Enter name"/>
+                        placeholder="Enter name" />
                     <div className="flex gap-3 pt-2">
                         <PixelButton variant="secondary" className="flex-1 text-[10px]"
-                                     onClick={() => setRenameOpen(false)} disabled={uploading}>CANCEL</PixelButton>
+                            onClick={() => setRenameOpen(false)} disabled={uploading}>CANCEL</PixelButton>
                         <PixelButton className="flex-1 text-[10px]" onClick={confirmUpload}
-                                     disabled={uploading || !pendingFile}>{uploading ? 'UPLOADING…' : 'UPLOAD'}</PixelButton>
+                            disabled={uploading || !pendingFile}>{uploading ? 'UPLOADING…' : 'UPLOAD'}</PixelButton>
                     </div>
                 </div>
             </PixelModal>

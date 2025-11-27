@@ -1,18 +1,18 @@
-import React, {useEffect} from "react"
-import {PixelCard} from "@/components/pixel-card"
-import {PixelButton} from "@/components/pixel-button"
-import {Edit2, Plus, Trash2} from "lucide-react"
+import React, { useEffect } from "react"
+import { PixelCard } from "@/components/pixel-card"
+import { PixelButton } from "@/components/pixel-button"
+import { Edit2, Plus, Trash2 } from "lucide-react"
 import Placeholder from "@/assets/Placeholder.png"
 import Image from "next/image";
-import {Icon, useIconContext} from "@/contexts/iconContext";
-import {useEditorContext} from "@/contexts/editorContext";
-import {DeleteConfirmationModal} from "@/components/delete-confirmation-modal";
-import {AddIconModal} from "@/components/editor/modals/AddIconModal";
-import {EditIconModal} from "@/components/editor/modals/EditIconModal";
-import {useParams} from "next/navigation";
+import { Icon, useIconContext } from "@/contexts/iconContext";
+import { useEditorContext } from "@/contexts/editorContext";
+import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal";
+import { AddIconModal } from "@/components/editor/modals/AddIconModal";
+import { EditIconModal } from "@/components/editor/modals/EditIconModal";
+import { useParams } from "next/navigation";
 
 export function IconsTab() {
-    const {icons, deleteIcon, setIcons, getAllIcons} = useIconContext()
+    const { icons, deleteIcon, setIcons, getAllIcons } = useIconContext()
     const params = useParams<{ id: string }>()
     const currentPortfolioId = Number(params?.id)
 
@@ -39,7 +39,7 @@ export function IconsTab() {
     return (
         <PixelCard>
             <div className="space-y-4">
-                <h3 className="text-sm pixel-text-shadow">DESKTOP ICONS</h3>
+                <h3 className="text-sm dashboard-pixel-text-shadow">DESKTOP ICONS</h3>
 
                 <div className="space-y-3 max-h-96 overflow-y-auto">
                     {(icons || []).map((icon: Icon) => (
@@ -62,13 +62,13 @@ export function IconsTab() {
                                     onClick={() => handleEdit(icon)}
                                     className="w-8 h-8 border-2 border-border bg-card hover:bg-primary hover:text-primary-foreground transition-colors flex items-center justify-center"
                                 >
-                                    <Edit2 className="w-3 h-3"/>
+                                    <Edit2 className="w-3 h-3" />
                                 </button>
                                 <button
                                     onClick={() => handleDelete(icon.id)}
                                     className="w-8 h-8 border-2 border-border bg-card hover:bg-destructive hover:text-destructive-foreground transition-colors flex items-center justify-center"
                                 >
-                                    <Trash2 className="w-3 h-3"/>
+                                    <Trash2 className="w-3 h-3" />
                                 </button>
                             </div>
                         </div>
@@ -80,7 +80,7 @@ export function IconsTab() {
                     className="w-full text-[10px] flex items-center justify-center gap-2"
                     onClick={handleAdd}
                 >
-                    <Plus className="w-4 h-4"/>
+                    <Plus className="w-4 h-4" />
                     ADD ICON
                 </PixelButton>
             </div>
@@ -114,7 +114,7 @@ export function IconsTab() {
                 message="ARE YOU SURE YOU WANT TO DELETE THIS ICON?"
                 onConfirm={async () => {
                     if (deleteTarget) {
-                        const ok = await deleteIcon(currentPortfolioId,deleteTarget)
+                        const ok = await deleteIcon(currentPortfolioId, deleteTarget)
                         if (ok) setIcons((icons as Icon[]).filter((i: Icon) => i.id !== deleteTarget))
                         setDeleteTarget(null)
                     }

@@ -1,5 +1,5 @@
+import { playlist, type Track } from "@/lib/types";
 import { createContext, useEffect, useRef, useState } from "react";
-import { playlist, Track } from "@/lib/types";
 
 export const AudioContext = createContext({
   audioRef: { current: null as HTMLAudioElement | null },
@@ -22,14 +22,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const [volume, setVolume] = useState(70);
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
-
-  // Resolve track source to a playable URL string
-  const resolveTrackSrc = (src: Track["src"]): string => {
-    if (typeof src === "string") return src;
-    // next-video Asset shape: prefer first source
-    const fromSources = src?.sources?.[0]?.src;
-    return fromSources ?? "";
-  };
 
   // Initialize audio element only once
   useEffect(() => {
@@ -77,7 +69,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       try {
         setIsLoading(true);
         const wasPlaying = isPlaying;
-        audioRef.current.src = resolveTrackSrc(currentTrack.src);
+        audioRef.current.src = currentTrack.src;
         audioRef.current.volume = volume / 100;
 
         await audioRef.current.load();

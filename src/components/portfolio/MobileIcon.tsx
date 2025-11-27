@@ -1,10 +1,9 @@
-"use client"
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useDraggable } from "@dnd-kit/core";
+import Image, { StaticImageData } from "next/image";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useRef } from "react";
-import Image, { StaticImageData } from "next/image";
 import { useAppSound } from "./sound-context";
 
 export function MobileIcon({
@@ -24,7 +23,7 @@ export function MobileIcon({
     id,
     disabled: isMobile,
   });
-  
+
   const iconRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
 
@@ -36,7 +35,7 @@ export function MobileIcon({
 
   const handleMouseEnter = () => {
     playHoverSound();
-    
+
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReducedMotion) return;
 
@@ -106,22 +105,22 @@ export function MobileIcon({
 
   useGSAP(() => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    
+
     if (iconRef.current) {
       if (prefersReducedMotion) {
-        gsap.fromTo(iconRef.current, 
-          { opacity: 0 }, 
+        gsap.fromTo(iconRef.current,
+          { opacity: 0 },
           { opacity: 1, duration: 0.3 }
         );
       } else {
-        gsap.fromTo(iconRef.current, 
-          { scale: 0.8, opacity: 0 }, 
-          { 
-            scale: 1, 
-            opacity: 1, 
-            duration: 0.3, 
+        gsap.fromTo(iconRef.current,
+          { scale: 0.8, opacity: 0 },
+          {
+            scale: 1,
+            opacity: 1,
+            duration: 0.3,
             delay: Math.random() * 0.2,
-            ease: "back.out(1.7)" 
+            ease: "back.out(1.7)"
           }
         );
       }

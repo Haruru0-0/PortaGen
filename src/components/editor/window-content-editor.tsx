@@ -111,7 +111,7 @@ export function WindowContentEditor({ windowContent, onSave, onCancel, onDelete 
         if (windowContent) {
             setWindowName(windowContent.name)
             setSelectedType(windowContent.type)
-            
+
             // Load existing fields or use template
             if (windowContent.data && windowContent.data.fields) {
                 setContentFields(windowContent.data.fields)
@@ -260,7 +260,7 @@ export function WindowContentEditor({ windowContent, onSave, onCancel, onDelete 
                                 onKeyPress={(e) => {
                                     if (e.key === 'Enter') {
                                         addListItem(field.id, (e.target as HTMLInputElement).value)
-                                        ;(e.target as HTMLInputElement).value = ''
+                                            ; (e.target as HTMLInputElement).value = ''
                                     }
                                 }}
                                 className="flex-1 p-2 text-xs border-2 border-border bg-card focus:outline-none focus:border-primary"
@@ -301,7 +301,7 @@ export function WindowContentEditor({ windowContent, onSave, onCancel, onDelete 
                             <ArrowLeft className="w-3 h-3" />
                         </button>
                         <div>
-                            <h3 className="text-sm pixel-text-shadow">
+                            <h3 className="text-sm dashboard-pixel-text-shadow">
                                 {isEditing ? "EDIT WINDOW" : "CREATE WINDOW"}
                             </h3>
                             <p className="text-[10px] text-muted-foreground">
@@ -348,11 +348,10 @@ export function WindowContentEditor({ windowContent, onSave, onCancel, onDelete 
                             <button
                                 key={key}
                                 onClick={() => handleTemplateChange(key)}
-                                className={`p-3 border-2 text-left transition-all ${
-                                    selectedType === key
+                                className={`p-3 border-2 text-left transition-all ${selectedType === key
                                         ? "border-primary bg-primary text-primary-foreground"
                                         : "border-border bg-card hover:bg-muted hover:border-muted-foreground"
-                                }`}
+                                    }`}
                             >
                                 <div className="flex items-center gap-2 mb-2">
                                     {template.icon}

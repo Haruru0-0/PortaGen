@@ -7,7 +7,7 @@ import { Library } from "lucide-react"
 import { useDesktopContext } from "@/contexts/desktopContext"
 import { useEffect, useState } from "react"
 import { useFileUpload } from "@/hooks/use-file-upload"
-import {useParams} from "next/navigation";
+import { useParams } from "next/navigation";
 
 export function DesktopWallpaperTab() {
   const params = useParams<{ id: string }>()
@@ -47,7 +47,7 @@ export function DesktopWallpaperTab() {
   return (
     <PixelCard>
       <div className="space-y-4">
-        <h3 className="text-sm pixel-text-shadow">DESKTOP WALLPAPER</h3>
+        <h3 className="text-sm dashboard-pixel-text-shadow">DESKTOP WALLPAPER</h3>
 
         <FileUpload
           accept="image/*"

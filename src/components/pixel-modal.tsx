@@ -51,7 +51,7 @@ export function PixelModal({ isOpen, onClose, title, children }: PixelModalProps
         className="relative bg-card border-4 border-border shadow-pixel max-w-lg w-full max-h-[90vh] overflow-y-auto"
       >
         <div className="sticky top-0 bg-primary text-primary-foreground px-4 py-3 flex items-center justify-between border-b-4 border-border z-50">
-          <h3 className="text-sm pixel-text-shadow">{title}</h3>
+          <h3 className="text-sm dashboard-pixel-text-shadow">{title}</h3>
           <button
             onClick={handleClose}
             className="w-6 h-6 border-2 border-primary-foreground hover:bg-primary-foreground hover:text-primary transition-colors flex items-center justify-center"

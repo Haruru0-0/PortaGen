@@ -1,7 +1,7 @@
 import { PixelCard } from "@/components/pixel-card"
 import { SoundEditor } from "@/components/sound-editor"
 import { Volume2 } from "lucide-react"
-import {PixelButton} from "@/components/pixel-button";
+import { PixelButton } from "@/components/pixel-button";
 
 interface SoundEffect {
     id: string
@@ -21,7 +21,7 @@ export function SoundEffectsTab() {
             <div className="space-y-4">
                 <div className="flex items-center gap-2">
                     <Volume2 className="w-4 h-4" />
-                    <h3 className="text-sm pixel-text-shadow">SOUND EFFECTS</h3>
+                    <h3 className="text-sm dashboard-pixel-text-shadow">SOUND EFFECTS</h3>
                 </div>
 
                 <p className="text-[10px] text-muted-foreground">

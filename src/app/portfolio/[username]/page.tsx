@@ -14,7 +14,7 @@ export default function PortfolioPreviewPage() {
     { id: 3, name: "CONTACT.EXE", icon: "📧", x: 20, y: 220 },
     { id: 4, name: "RESUME.PDF", icon: "📋", x: 140, y: 20 },
     { id: 5, name: "GITHUB", icon: "🔗", x: 140, y: 120 },
-  ]
+  ] 
 
   return (
     <div className="min-h-screen bg-background">

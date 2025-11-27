@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useWindowsContext } from "@/contexts/windowsContext"
 import { WindowContentEditor } from "@/components/editor/window-content-editor"
-import type { WindowContent } from "@/types/window-content"
+import {WindowContent} from "@/lib/types";
 
 export default function EditWindowPage() {
   const router = useRouter()

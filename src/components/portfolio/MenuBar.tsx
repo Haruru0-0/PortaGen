@@ -1,9 +1,13 @@
+"use client"
+
 import { useState, useEffect } from "react"
 import { format } from "date-fns"
 import { ModeToggle } from "./mode-toggle"
 import { SoundSettings } from "./sound-settings"
+import HalloGif from "@/assets/hallo.gif";
+import Image from "next/image";
 
-export default function MenuBar({ embedded = false }: { embedded?: boolean }) {
+export default function MenuBar({ embedded = false, previewMode }: { embedded?: boolean; previewMode?: "desktop" | "mobile" }) {
   const [currentTime, setCurrentTime] = useState(new Date())
 
   useEffect(() => {
@@ -15,18 +19,24 @@ export default function MenuBar({ embedded = false }: { embedded?: boolean }) {
   }, [])
 
   return (
-    <div
-      className={`${embedded ? "absolute" : "fixed"} top-0 left-0 right-0 h-7 bg-white/20 dark:bg-gray-900/40 backdrop-blur-xs flex items-center justify-between px-4 text-white ${embedded ? "z-10" : "z-50"} text-sm`}
-    >
-      <div className="flex items-center gap-4">
-        <div className="font-bold flex items-center">
-          <span className="mr-1">🌸</span> Portfolio
+    <div className={embedded ? "absolute top-0 left-0 right-0 z-50" : "fixed top-0 left-0 right-0 z-50"}>
+      <div className="liquidGlass-wrapper menubar h-12 flex items-center justify-between px-4 text-lg font-medium transition-none">
+        <div className="liquidGlass-effect"></div>
+        <div className="liquidGlass-tint"></div>
+        <div className="liquidGlass-shine"></div>
+        <div className="liquidGlass-content w-full flex items-center justify-between" style={{ color: "var(--cute-text)" }}>
+          <div className="flex items-center gap-4">
+            <div className="font-bold flex items-center">
+              <Image src={HalloGif} alt="Logo" className="h-7 w-8 mr-2" />
+              <p>Ahmad kanaan</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <SoundSettings previewMode={previewMode} embedded={embedded} />
+            <ModeToggle previewMode={previewMode} embedded={embedded} />
+            <span>{format(currentTime, "EEE d MMM h:mm a")}</span>
+          </div>
         </div>
-      </div>
-      <div className="flex items-center gap-3">
-        <SoundSettings />
-        <ModeToggle />
-        <span>{format(currentTime, "EEE d MMM h:mm a")}</span>
       </div>
     </div>
   )

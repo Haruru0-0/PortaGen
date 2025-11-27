@@ -20,7 +20,7 @@ export function WindowsTab() {
       <PixelCard>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm pixel-text-shadow">YOUR WINDOWS</h3>
+            <h3 className="text-sm dashboard-pixel-text-shadow">YOUR WINDOWS</h3>
             <div className="text-[10px] text-muted-foreground">
               {windows.length} window{windows.length !== 1 ? 's' : ''}
             </div>
@@ -48,9 +48,8 @@ export function WindowsTab() {
                         if (!currentPortfolioId) return
                         await updateWindow(currentPortfolioId, (w as any).windowId, { enabled: !(w as any).enabled })
                       }}
-                      className={`w-6 h-6 border-2 border-border flex items-center justify-center transition-colors ${
-                        (w as any).enabled ? 'bg-primary text-primary-foreground' : 'bg-card hover:bg-muted'
-                      }`}
+                      className={`w-6 h-6 border-2 border-border flex items-center justify-center transition-colors ${(w as any).enabled ? 'bg-primary text-primary-foreground' : 'bg-card hover:bg-muted'
+                        }`}
                     >
                       {(w as any).enabled ? (
                         <Eye className="w-3 h-3" />

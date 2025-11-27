@@ -28,7 +28,11 @@ export default function PortfolioPreviewPage() {
             onUnlock={() => setIsUnlocked(true)}
           />
         ) : (
-          <Desktop />
+          <div className="w-full h-screen flex items-center justify-center bg-gray-100 p-4">
+            <div className="w-full max-w-6xl h-[80vh] border-4 border-gray-800 rounded-lg overflow-hidden shadow-2xl">
+              <Desktop preview={true} />
+            </div>
+          </div>
         )}
       </SoundProvider>
     </ThemeProvider>
