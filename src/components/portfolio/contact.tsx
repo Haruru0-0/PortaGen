@@ -255,7 +255,7 @@ export default function Contact({ windowWidth }: { windowWidth?: number }) {
         </AnimatedSection>
       </div>
 
-      <AnimatedSection variant="fadeIn" delay={0.4} threshold={0.2}>
+      <AnimatedSection variant="fadeIn" delay={0.4} threshold={.2}>
         <div className="mt-8 rounded-none overflow-hidden h-64 border-2 border-[var(--cute-text)]">
           <iframe
             title="Map"

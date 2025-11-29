@@ -11,6 +11,7 @@ import { FileUpload } from "@/components/file-upload"
 import { Plus, Trash2, Settings2, X } from "lucide-react"
 import { AnimatedSection, AnimatedItem } from "@/components/portfolio/animated-section"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import type { AboutMeData, Testimonial, Hobby } from "@/lib/types"
 
 interface AboutMeFormProps {
@@ -92,21 +93,27 @@ export function AboutMeForm({ initialData, onChange }: AboutMeFormProps) {
                     <Settings2 className="w-4 h-4 text-muted-foreground" />
                 </div>
 
-                <div className="relative inline-block group/avatar">
-                    <Avatar className="w-24 h-24 mx-auto mb-4 border-2 border-[var(--cute-text)] rounded-none cursor-pointer">
+                <div className="relative inline-block group/avatar mb-4">
+                    <Avatar className="w-24 h-24 mx-auto border-2 border-[var(--cute-text)] rounded-none cursor-pointer">
                         <AvatarImage src={data.profileImage || "/profile-photo.jpg"} alt="Profile" />
                         <AvatarFallback className="rounded-none bg-[var(--cute-highlight)] text-[var(--cute-text)]">AK</AvatarFallback>
                     </Avatar>
                     <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity rounded-none">
-                        <FileUpload
+                        <input
+                            type="file"
                             accept="image/*"
-                            onFileSelect={(file) => {
-                                const url = URL.createObjectURL(file)
-                                updateData({ ...data, profileImage: url })
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0]
+                                if (file) {
+                                    if (file.size > 5 * 1024 * 1024) {
+                                        alert("File too large (max 5MB)")
+                                        return
+                                    }
+                                    const url = URL.createObjectURL(file)
+                                    updateData({ ...data, profileImage: url })
+                                }
                             }}
-                            label=""
-                            maxSize={5}
-                            className="w-full h-full opacity-0 absolute inset-0 cursor-pointer"
                         />
                         <span className="text-white text-xs font-bold pointer-events-none">CHANGE</span>
                     </div>
@@ -125,25 +132,71 @@ export function AboutMeForm({ initialData, onChange }: AboutMeFormProps) {
 
                 <div className="flex flex-wrap justify-center gap-2 items-center">
                     {(data.skills || []).map((skill, index) => (
-                        <Badge key={index} variant="secondary" className="pixel-badge hover:bg-[var(--cute-highlight)] pr-1 gap-1">
+                        <Badge key={index} variant="secondary" className="pixel-badge hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors pr-1 gap-1">
                             {skill}
                             <button onClick={() => removeSkill(index)} className="hover:text-red-500">
                                 <X className="w-3 h-3" />
                             </button>
                         </Badge>
                     ))}
-                    <div className="flex items-center gap-1">
-                        <Input
-                            placeholder="Add skill..."
-                            className="w-24 h-6 text-xs border-dashed border-2"
-                            onKeyPress={(e) => {
-                                if (e.key === 'Enter') {
-                                    addSkill((e.target as HTMLInputElement).value)
-                                        ; (e.target as HTMLInputElement).value = ''
-                                }
-                            }}
-                        />
-                    </div>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Badge
+                                variant="outline"
+                                className="pixel-badge border-dashed border-2 cursor-pointer hover:border-solid hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors gap-1"
+                            >
+                                <Plus className="w-3 h-3" />
+                                Add Skill
+                            </Badge>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Add New Skill</DialogTitle>
+                                <DialogDescription>
+                                    Enter a skill to add to your profile.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="skill" className="text-right">
+                                        Skill
+                                    </Label>
+                                    <Input
+                                        id="skill"
+                                        placeholder="e.g. React, TypeScript"
+                                        className="col-span-3"
+                                        onKeyPress={(e) => {
+                                            if (e.key === 'Enter') {
+                                                const value = (e.target as HTMLInputElement).value
+                                                if (value.trim()) {
+                                                    addSkill(value)
+                                                        ; (e.target as HTMLInputElement).value = ''
+                                                    const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                    closeButton?.click()
+                                                }
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <Button
+                                    type="button"
+                                    onClick={() => {
+                                        const input = document.getElementById('skill') as HTMLInputElement
+                                        if (input?.value.trim()) {
+                                            addSkill(input.value)
+                                            input.value = ''
+                                            const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                            closeButton?.click()
+                                        }
+                                    }}
+                                >
+                                    Add Skill
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 </div>
             </AnimatedSection>
 
@@ -164,8 +217,9 @@ export function AboutMeForm({ initialData, onChange }: AboutMeFormProps) {
                     <h2 className="text-2xl font-bold pixel-title border-b-2 border-[var(--cute-text)] inline-block">
                         Testimonials
                     </h2>
-                    <Button variant="ghost" size="sm" onClick={addTestimonial} className="h-6 w-6 p-0 opacity-0 group-hover/section:opacity-100 transition-opacity">
-                        <Plus className="w-4 h-4" />
+                    <Button variant="outline" size="sm" onClick={addTestimonial} className="pixel-badge cursor-pointer">
+                        <Plus className="w-4 h-4 mr-1" />
+                        Add
                     </Button>
                 </div>
 
@@ -181,56 +235,77 @@ export function AboutMeForm({ initialData, onChange }: AboutMeFormProps) {
                             <CarouselItem key={index} className="basis-1/2 lg:basis-1/3">
                                 <div className="p-1 h-full relative group">
                                     <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex gap-1">
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 bg-background/80 backdrop-blur-sm border border-border">
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 bg-background/80 backdrop-blur-sm border border-border hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors">
                                                     <Settings2 className="w-3 h-3" />
                                                 </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-80">
-                                                <div className="grid gap-4">
-                                                    <div className="space-y-2">
-                                                        <h4 className="font-medium leading-none">Edit Testimonial</h4>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-[425px]">
+                                                <DialogHeader>
+                                                    <DialogTitle>Edit Testimonial</DialogTitle>
+                                                    <DialogDescription>
+                                                        Update the testimonial details below.
+                                                    </DialogDescription>
+                                                </DialogHeader>
+                                                <div className="grid gap-4 py-4">
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label className="text-right">Name</Label>
+                                                        <Input
+                                                            value={testimonial.name}
+                                                            onChange={(e) => updateTestimonial(index, "name", e.target.value)}
+                                                            className="col-span-3"
+                                                        />
                                                     </div>
-                                                    <div className="grid gap-2">
-                                                        <div className="grid grid-cols-3 items-center gap-4">
-                                                            <Label>Name</Label>
-                                                            <Input
-                                                                value={testimonial.name}
-                                                                onChange={(e) => updateTestimonial(index, "name", e.target.value)}
-                                                                className="col-span-2 h-8"
-                                                            />
-                                                        </div>
-                                                        <div className="grid grid-cols-3 items-center gap-4">
-                                                            <Label>Role</Label>
-                                                            <Input
-                                                                value={testimonial.role}
-                                                                onChange={(e) => updateTestimonial(index, "role", e.target.value)}
-                                                                className="col-span-2 h-8"
-                                                            />
-                                                        </div>
-                                                        <div className="grid grid-cols-3 items-center gap-4">
-                                                            <Label>Avatar</Label>
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label className="text-right">Role</Label>
+                                                        <Input
+                                                            value={testimonial.role}
+                                                            onChange={(e) => updateTestimonial(index, "role", e.target.value)}
+                                                            className="col-span-3"
+                                                        />
+                                                    </div>
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label className="text-right">Content</Label>
+                                                        <Textarea
+                                                            value={testimonial.content}
+                                                            onChange={(e) => updateTestimonial(index, "content", e.target.value)}
+                                                            className="col-span-3 min-h-[100px]"
+                                                        />
+                                                    </div>
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label className="text-right">Avatar</Label>
+                                                        <div className="col-span-3">
                                                             <FileUpload
                                                                 accept="image/*"
                                                                 onFileSelect={(file) => {
                                                                     const url = URL.createObjectURL(file)
                                                                     updateTestimonial(index, "avatar", url)
                                                                 }}
-                                                                label="Upload"
+                                                                label="Upload Avatar"
                                                                 maxSize={5}
-                                                                className="col-span-2"
+                                                                className="w-full"
                                                             />
                                                         </div>
                                                     </div>
-                                                    <div className="flex justify-end">
-                                                        <Button variant="destructive" size="sm" onClick={() => removeTestimonial(index)}>
-                                                            <Trash2 className="w-4 h-4 mr-2" /> Remove
-                                                        </Button>
-                                                    </div>
                                                 </div>
-                                            </PopoverContent>
-                                        </Popover>
+                                                <DialogFooter className="sm:justify-between">
+                                                    <Button variant="destructive" size="sm" onClick={() => {
+                                                        removeTestimonial(index)
+                                                        const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                        closeButton?.click()
+                                                    }}>
+                                                        <Trash2 className="w-4 h-4 mr-2" /> Remove
+                                                    </Button>
+                                                    <Button type="button" onClick={() => {
+                                                        const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                        closeButton?.click()
+                                                    }}>
+                                                        Done
+                                                    </Button>
+                                                </DialogFooter>
+                                            </DialogContent>
+                                        </Dialog>
                                     </div>
 
                                     <Card className="h-full pixel-card">
@@ -257,9 +332,21 @@ export function AboutMeForm({ initialData, onChange }: AboutMeFormProps) {
                                 </div>
                             </CarouselItem>
                         ))}
+                        <CarouselItem className="basis-1/2 lg:basis-1/3">
+                            <div className="p-1 h-full">
+                                <Button
+                                    variant="ghost"
+                                    className="w-full h-full cursor-pointer min-h-[200px] border-4 border-dashed border-[var(--cute-text)]/50 hover:border-solid hover:border-[var(--cute-text)] hover:bg-transparent hover:shadow-[4px_4px_0px_0px_var(--cute-text)] transition-all rounded-none flex flex-col gap-2 pixel-text"
+                                    onClick={addTestimonial}
+                                >
+                                    <Plus className="w-8 h-8" />
+                                    <span className="font-medium">Add Testimonial</span>
+                                </Button>
+                            </div>
+                        </CarouselItem>
                     </CarouselContent>
-                    <CarouselPrevious className="border-2 border-[var(--cute-text)] rounded-none text-[var(--cute-text)] hover:bg-[var(--cute-highlight)]" />
-                    <CarouselNext className="border-2 border-[var(--cute-text)] rounded-none text-[var(--cute-text)] hover:bg-[var(--cute-highlight)]" />
+                    <CarouselPrevious className="border-2 border-[var(--cute-text)] rounded-none text-[var(--cute-text)] hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors" />
+                    <CarouselNext className="border-2 border-[var(--cute-text)] rounded-none text-[var(--cute-text)] hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors" />
                 </Carousel>
             </AnimatedSection>
 
@@ -269,8 +356,9 @@ export function AboutMeForm({ initialData, onChange }: AboutMeFormProps) {
                     <h2 className="text-2xl font-bold pixel-title border-b-2 border-[var(--cute-text)] inline-block">
                         Hobbies & Interests
                     </h2>
-                    <Button variant="ghost" size="sm" onClick={addHobby} className="h-6 w-6 p-0 opacity-0 group-hover/section:opacity-100 transition-opacity">
-                        <Plus className="w-4 h-4" />
+                    <Button variant="outline" size="sm" onClick={addHobby} className="pixel-badge cursor-pointer">
+                        <Plus className="w-4 h-4 mr-1" />
+                        Add
                     </Button>
                 </div>
 
@@ -279,7 +367,12 @@ export function AboutMeForm({ initialData, onChange }: AboutMeFormProps) {
                         <AnimatedItem key={index}>
                             <Card className="h-full pixel-card hover:shadow-md transition-shadow relative group">
                                 <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                                    <Button variant="ghost" size="sm" onClick={() => removeHobby(index)} className="h-6 w-6 p-0 text-red-500 hover:text-red-700">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => removeHobby(index)}
+                                        className="h-6 w-6 p-0 bg-white/50 hover:bg-red-500 hover:text-white border-2 border-transparent hover:border-[var(--cute-text)] transition-all rounded-none"
+                                    >
                                         <Trash2 className="w-3 h-3" />
                                     </Button>
                                 </div>
@@ -304,7 +397,11 @@ export function AboutMeForm({ initialData, onChange }: AboutMeFormProps) {
                         </AnimatedItem>
                     ))}
                     <AnimatedItem>
-                        <Button variant="outline" className="w-full h-full min-h-[150px] border-dashed border-2 flex flex-col gap-2" onClick={addHobby}>
+                        <Button
+                            variant="ghost"
+                            className="w-full h-full cursor-pointer min-h-[150px] border-4 border-dashed border-[var(--cute-text)]/50 hover:border-solid hover:border-[var(--cute-text)] hover:bg-transparent hover:shadow-[4px_4px_0px_0px_var(--cute-text)] transition-all rounded-none flex flex-col gap-2 pixel-text"
+                            onClick={addHobby}
+                        >
                             <Plus className="w-6 h-6" />
                             <span>Add Hobby</span>
                         </Button>

@@ -306,6 +306,21 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                     </div>
                 </AnimatedSection>
             </div>
+
+            {/* Map URL Section */}
+            <AnimatedSection variant="fadeIn" delay={0.4} className="group relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
+                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Settings2 className="w-4 h-4 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-bold mb-2 pixel-title">Map Embed URL</h3>
+                <p className="text-sm opacity-70 mb-3">Paste your Google Maps embed URL here (get it from Google Maps → Share → Embed a map)</p>
+                <Input
+                    value={data.mapUrl || ""}
+                    onChange={(e) => updateData({ ...data, mapUrl: e.target.value })}
+                    placeholder="https://www.google.com/maps/embed?pb=..."
+                    className="border-2 border-[var(--cute-text)] bg-[var(--card-bg)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                />
+            </AnimatedSection>
         </div>
     )
 }

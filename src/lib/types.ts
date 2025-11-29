@@ -140,6 +140,7 @@ export interface ContactData {
     contactInfo?: ContactInfoItem[]
     socialLinks?: SocialLink[]
     showForm?: boolean
+    mapUrl?: string
     formConfig?: {
         serviceId: string
         templateId: string
