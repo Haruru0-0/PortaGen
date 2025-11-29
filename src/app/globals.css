@@ -3,7 +3,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Updated to use LUNA color palette from reference image */
 :root {
   /* LUNA Color Palette - Blue/Teal theme */
   --luna-cyan-light: #a7ebf2;
@@ -55,6 +54,20 @@
   --sidebar-accent-foreground: var(--luna-blue-darkest);
   --sidebar-border: var(--luna-blue-darkest);
   --sidebar-ring: var(--luna-blue);
+
+  --window-header: #f8fafc;
+  --card-bg: #ffffff;
+  --music-slider-bg: #e2e8f0;
+  --music-slider-active: #74cef7;
+  --music-slider-thumb: #60a5fa;
+
+  /* Cute Blue Theme Variables (Retro Version) */
+  --cute-bg: #f0f9ff;
+  --cute-border: #7dd3fc;
+  --cute-header: #bae6fd;
+  --cute-shadow: rgba(14, 165, 233, 0.2);
+  --cute-text: #0c4a6e;
+  --cute-highlight: #e0f2fe;
 }
 
 .dark {
@@ -83,6 +96,20 @@
   --sidebar-accent-foreground: var(--luna-cyan-light);
   --sidebar-border: var(--luna-cyan);
   --sidebar-ring: var(--luna-cyan);
+
+  --window-header: #0f172a;
+  --card-bg: #0f172a;
+  --music-slider-bg: #334155;
+  --music-slider-active: #38bdf8;
+  --music-slider-thumb: #7dd3fc;
+
+  /* Dark Mode Cute Theme Variables - High Contrast */
+  --cute-bg: #020617;
+  --cute-border: #38bdf8;
+  --cute-header: #0f172a;
+  --cute-shadow: rgba(56, 189, 248, 0.15);
+  --cute-text: #bae6fd;
+  --cute-highlight: #1e293b;
 }
 
 @theme inline {
@@ -214,13 +241,33 @@
     padding: 20px;
     height: calc(100% - 49px);
     overflow: auto;
-    background: var(--bg-window);
+    background: var(--bg-window) !important;
     color: var(--cute-text);
     transition: none;
     overscroll-behavior: contain;
+    overflow-x: hidden;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
   }
 
-  /* Mobile Window Styles - Pixel Retro */
+  .window-content img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .window-content h1,
+  .window-content h2,
+  .window-content h3 {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+
+  .window-content [data-width] {
+    --content-width: attr(data-width);
+  }
+
+  /* Mobile Window Styles */
   .window-mobile {
     background: var(--cute-bg);
     border: none;
@@ -250,7 +297,7 @@
     overscroll-behavior: contain;
   }
 
-  /* Window Control Buttons - Pixel Style */
+  /* Window Control Buttons */
   .window-button {
     width: 24px;
     height: 24px;
@@ -291,31 +338,7 @@
     box-shadow: 1px 1px 0px var(--cute-text);
   }
 
-  /* Responsive window content */
-  .window-content {
-    overflow-x: hidden;
-    will-change: transform, opacity;
-    backface-visibility: hidden;
-  }
-
-  .window-content img {
-    max-width: 100%;
-    height: auto;
-  }
-
-  .window-content h1,
-  .window-content h2,
-  .window-content h3 {
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    hyphens: auto;
-  }
-
-  .window-content [data-width] {
-    --content-width: attr(data-width);
-  }
-
-  /* Maximized window styles - Fix for fullscreen */
+  /* Maximized window styles */
   .maximized-window {
     border-radius: 0 !important;
     position: fixed !important;
@@ -335,7 +358,7 @@
     max-height: calc(100vh - 49px) !important;
   }
 
-  /* Mobile window styles */
+  /* Mobile responsive styles */
   @media (max-width: 650px) {
     .window-content {
       padding: 1rem;
@@ -351,13 +374,16 @@
       backdrop-filter: none;
       box-shadow: none;
     }
+
+    .fixed {
+      position: fixed !important;
+    }
   }
 
   /* Desktop icon styles */
   .desktop-icon-text {
     color: white;
     text-shadow: 2px 2px 0px #000000;
-    /* Retro shadow */
     font-size: 1rem;
     text-align: center;
     margin-top: 0.25rem;
@@ -366,7 +392,7 @@
     backdrop-filter: none;
   }
 
-  /* Taskbar styles - Pixel Retro Blue Theme */
+  /* Taskbar styles */
   .taskbar {
     margin: 0 auto;
     padding: 8px 12px;
@@ -397,11 +423,9 @@
     height: 6px;
     background: #3b82f6;
     border-radius: 0;
-    /* Square dots */
     margin-top: 4px;
     box-shadow: none;
     animation: none;
-    /* No pulse for retro */
   }
 
   /* Animations */
@@ -419,7 +443,6 @@
 
   .window-open-animation {
     animation: windowOpen 0.2s steps(5) forwards;
-    /* Stepped animation for retro feel */
     will-change: transform, opacity;
   }
 
@@ -439,7 +462,6 @@
 
   .animate-float {
     animation: float 6s steps(10) infinite;
-    /* Stepped float */
     will-change: transform;
   }
 
@@ -454,14 +476,10 @@
     will-change: transform, opacity;
   }
 
-  /* Improve animation performance */
-  .window-container,
-  .window-content {
+  /* Window container */
+  .window-container {
     will-change: transform, opacity;
     backface-visibility: hidden;
-  }
-
-  .window-container {
     border: 2px solid var(--cute-text);
     box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.2);
   }
@@ -498,13 +516,6 @@
 
     .window-content .grid {
       grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
-    }
-  }
-
-  /* Ensure mobile windows are visible */
-  @media (max-width: 650px) {
-    .fixed {
-      position: fixed !important;
     }
   }
 
@@ -604,7 +615,6 @@
     position: absolute;
     inset: 0;
     background: rgba(56, 189, 248, 0.50);
-    /* Sky blue tint */
     border-radius: 2rem;
   }
 
@@ -663,11 +673,11 @@
 
   /* Pixel Retro Utility Classes */
   .pixel-card {
-    background: var(--card-bg);
-    border: 2px solid var(--cute-text);
+    background: var(--card-bg) !important;
+    border: 2px solid var(--cute-text) !important;
     border-radius: 0 !important;
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2) !important;
+    transition: transform 0.2s, box-shadow 0.2s !important;
   }
 
   .pixel-card:hover {
@@ -685,402 +695,12 @@
 
   .pixel-badge {
     border-radius: 0 !important;
-    border: 2px solid var(--cute-text);
-    background: var(--cute-highlight);
-    color: var(--cute-text);
-    box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
-    font-family: "Pixelify Sans", monospace;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  /* Menubar Liquid Glass Overrides */
-  .liquidGlass-wrapper.menubar {
-    border-radius: 0 0 1.5rem 1.5rem;
-    width: 100%;
-    max-width: 100%;
-    padding: 0 1rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-
-  .liquidGlass-wrapper.menubar .liquidGlass-effect,
-  .responsive-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1rem;
-  }
-
-  .responsive-grid-small {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 1rem;
-  }
-
-  /* Text truncation */
-  .line-clamp-1 {
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  /* Animation utilities */
-  .animate-on-scroll {
-    opacity: 0;
-    transform: translateY(20px);
-    transition:
-      opacity 0.6s ease-out,
-      transform 0.6s ease-out;
-    will-change: transform, opacity;
-  }
-
-  .animate-on-scroll.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* Reduced motion preferences */
-  @media (prefers-reduced-motion: reduce) {
-
-    *,
-    ::before,
-    ::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-
-    .animate-float,
-    .animate-pulse-slow,
-    .animate-bounce-slow,
-    .animate-spin-slow {
-      animation: none !important;
-    }
-  }
-
-  /* Liquid Glass Taskbar Styles */
-  .liquidGlass-wrapper {
-    position: relative;
-    display: flex;
-    font-weight: 600;
-    overflow: hidden;
-    box-shadow: 0 6px 6px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
-    border-radius: 2rem;
-  }
-
-  .liquidGlass-effect {
-    position: absolute;
-    z-index: 0;
-    inset: 0;
-    backdrop-filter: blur(3px);
-    filter: url(#glass-distortion);
-    overflow: hidden;
-    border-radius: 2rem;
-  }
-
-  .liquidGlass-tint {
-    z-index: 1;
-    position: absolute;
-    inset: 0;
-    background: rgba(56, 189, 248, 0.50);
-    /* Sky blue tint */
-    border-radius: 2rem;
-  }
-
-  .liquidGlass-shine {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    overflow: hidden;
-    box-shadow: inset 2px 2px 1px 0 rgba(224, 242, 254, 0.6),
-      inset -1px -1px 1px 1px rgba(224, 242, 254, 0.6);
-    border-radius: 2rem;
-  }
-
-  .liquidGlass-content {
-    z-index: 3;
-    position: relative;
-  }
-
-  .dock {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 0.6rem;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
-  }
-
-  .liquidGlass-wrapper:hover .dock {
-    padding: 0.8rem;
-  }
-
-  .dock-icon {
-    width: 50px;
-    height: 50px;
-    padding: 0;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: none;
-  }
-
-  .dock-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
-  }
-
-  .dock-icon:hover {
-    transform: scale(0.95);
-    transform-origin: center center;
-  }
-
-  /* Pixel Retro Utility Classes */
-  .pixel-card {
-    background: var(--card-bg);
-    border: 2px solid var(--cute-text);
-    border-radius: 0 !important;
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-
-  .pixel-card:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.2);
-  }
-
-  .dark .pixel-card {
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.5);
-  }
-
-  .dark .pixel-card:hover {
-    box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.5);
-  }
-
-  .pixel-badge {
-    border-radius: 0 !important;
-    border: 2px solid var(--cute-text);
-    background: var(--cute-highlight);
-    color: var(--cute-text);
-    box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
-    font-family: "VT323", monospace;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  /* Menubar Liquid Glass Overrides */
-  .liquidGlass-wrapper.menubar {
-    border-radius: 0 0 1.5rem 1.5rem;
-    width: 100%;
-    max-width: 100%;
-    padding: 0 1rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-
-  .liquidGlass-wrapper.menubar .liquidGlass-effect,
-  .liquidGlass-wrapper.menubar .liquidGlass-tint,
-  .liquidGlass-wrapper.menubar .liquidGlass-shine {
-    border-radius: 0 0 1.5rem 1.5rem;
-  }
-
-
-  .responsive-grid-small {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 1rem;
-  }
-
-  /* Text truncation */
-  .line-clamp-1 {
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  /* Animation utilities */
-  .animate-on-scroll {
-    opacity: 0;
-    transform: translateY(20px);
-    transition:
-      opacity 0.6s ease-out,
-      transform 0.6s ease-out;
-    will-change: transform, opacity;
-  }
-
-  .animate-on-scroll.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* Reduced motion preferences */
-  @media (prefers-reduced-motion: reduce) {
-
-    *,
-    ::before,
-    ::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-
-    .animate-float,
-    .animate-pulse-slow,
-    .animate-bounce-slow,
-    .animate-spin-slow {
-      animation: none !important;
-    }
-  }
-
-  /* Liquid Glass Taskbar Styles */
-  .liquidGlass-wrapper {
-    position: relative;
-    display: flex;
-    font-weight: 600;
-    overflow: hidden;
-    box-shadow: 0 6px 6px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
-    border-radius: 2rem;
-  }
-
-  .liquidGlass-effect {
-    position: absolute;
-    z-index: 0;
-    inset: 0;
-    backdrop-filter: blur(3px);
-    filter: url(#glass-distortion);
-    overflow: hidden;
-    border-radius: 2rem;
-  }
-
-  .liquidGlass-tint {
-    z-index: 1;
-    position: absolute;
-    inset: 0;
-    background: rgba(56, 189, 248, 0.50);
-    /* Sky blue tint */
-    border-radius: 2rem;
-  }
-
-  .liquidGlass-shine {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    overflow: hidden;
-    box-shadow: inset 2px 2px 1px 0 rgba(224, 242, 254, 0.6),
-      inset -1px -1px 1px 1px rgba(224, 242, 254, 0.6);
-    border-radius: 2rem;
-  }
-
-  .liquidGlass-content {
-    z-index: 3;
-    position: relative;
-  }
-
-  .dock {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 0.6rem;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
-  }
-
-  .liquidGlass-wrapper:hover .dock {
-    padding: 0.8rem;
-  }
-
-  .dock-icon {
-    width: 50px;
-    height: 50px;
-    padding: 0;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: none;
-  }
-
-  .dock-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
-  }
-
-  .dock-icon:hover {
-    transform: scale(0.95);
-    transform-origin: center center;
-  }
-
-  /* Pixel Retro Utility Classes */
-  .pixel-card {
-    background: var(--card-bg);
-    border: 2px solid var(--cute-text);
-    border-radius: 0 !important;
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-
-  .pixel-card:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.2);
-  }
-
-  .dark .pixel-card {
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.5);
-  }
-
-  .dark .pixel-card:hover {
-    box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.5);
-  }
-
-  .pixel-badge {
-    border-radius: 0 !important;
-    border: 2px solid var(--cute-text);
-    background: var(--cute-highlight);
-    color: var(--cute-text);
-    box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
-    font-family: "VT323", monospace;
-    text-transform: uppercase;
+    border: 2px solid var(--cute-text) !important;
+    background: var(--cute-highlight) !important;
+    color: var(--cute-text) !important;
+    box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2) !important;
+    font-family: "Pixelify Sans", monospace !important;
+    text-transform: uppercase !important;
     letter-spacing: 1px;
   }
 
@@ -1101,7 +721,6 @@
 
   .liquidGlass-wrapper.menubar:hover .dock {
     padding: 0.6rem;
-    /* Prevent padding change on hover for menubar */
   }
 
   /* Liquid Glass Icon Styles */
@@ -1121,203 +740,6 @@
     transition: opacity 0.3s ease;
     border-radius: 1rem;
     pointer-events: none;
-    /* Let clicks pass through to content */
-  }
-
-  .liquidGlass-icon:hover .liquidGlass-effect,
-  .liquidGlass-icon:hover .liquidGlass-tint,
-  .liquidGlass-icon:hover .liquidGlass-shine {
-    opacity: 1;
-  }
-
-  .animate-on-scroll {
-    opacity: 0;
-    transform: translateY(20px);
-    transition:
-      opacity 0.6s ease-out,
-      transform 0.6s ease-out;
-    will-change: transform, opacity;
-  }
-
-  .animate-on-scroll.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* Reduced motion preferences */
-  @media (prefers-reduced-motion: reduce) {
-
-    *,
-    ::before,
-    ::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-
-    .animate-float,
-    .animate-pulse-slow,
-    .animate-bounce-slow,
-    .animate-spin-slow {
-      animation: none !important;
-    }
-  }
-
-  /* Liquid Glass Taskbar Styles */
-  .liquidGlass-wrapper {
-    position: relative;
-    display: flex;
-    font-weight: 600;
-    overflow: hidden;
-    box-shadow: 0 6px 6px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
-    border-radius: 2rem;
-  }
-
-  .liquidGlass-effect {
-    position: absolute;
-    z-index: 0;
-    inset: 0;
-    backdrop-filter: blur(3px);
-    filter: url(#glass-distortion);
-    overflow: hidden;
-    border-radius: 2rem;
-  }
-
-  .liquidGlass-tint {
-    z-index: 1;
-    position: absolute;
-    inset: 0;
-    background: rgba(56, 189, 248, 0.50);
-    /* Sky blue tint */
-    border-radius: 2rem;
-  }
-
-  .liquidGlass-shine {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    overflow: hidden;
-    box-shadow: inset 2px 2px 1px 0 rgba(224, 242, 254, 0.6),
-      inset -1px -1px 1px 1px rgba(224, 242, 254, 0.6);
-    border-radius: 2rem;
-  }
-
-  .liquidGlass-content {
-    z-index: 3;
-    position: relative;
-  }
-
-  .dock {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 0.6rem;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
-  }
-
-  .liquidGlass-wrapper:hover .dock {
-    padding: 0.8rem;
-  }
-
-  .dock-icon {
-    width: 50px;
-    height: 50px;
-    padding: 0;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: none;
-  }
-
-  .dock-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
-  }
-
-  .dock-icon:hover {
-    transform: scale(0.95);
-    transform-origin: center center;
-  }
-
-  /* Pixel Retro Utility Classes */
-  .pixel-card {
-    background: var(--card-bg);
-    border: 2px solid var(--cute-text);
-    border-radius: 0 !important;
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-
-  .pixel-card:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.2);
-  }
-
-  .dark .pixel-card {
-    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.5);
-  }
-
-  .dark .pixel-card:hover {
-    box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.5);
-  }
-
-  .pixel-badge {
-    border-radius: 0 !important;
-    border: 2px solid var(--cute-text);
-    background: var(--cute-highlight);
-    color: var(--cute-text);
-    box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
-    font-family: "VT323", monospace;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  /* Menubar Liquid Glass Overrides */
-  .liquidGlass-wrapper.menubar {
-    border-radius: 0 0 1.5rem 1.5rem;
-    width: 100%;
-    max-width: 100%;
-    padding: 0 1rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-
-  .liquidGlass-wrapper.menubar .liquidGlass-effect,
-  .liquidGlass-wrapper.menubar .liquidGlass-tint,
-  .liquidGlass-wrapper.menubar .liquidGlass-shine {
-    border-radius: 0 0 1.5rem 1.5rem;
-  }
-
-  .liquidGlass-wrapper.menubar:hover .dock {
-    padding: 0.6rem;
-    /* Prevent padding change on hover for menubar */
-  }
-
-  /* Liquid Glass Icon Styles */
-  .liquidGlass-icon {
-    position: relative;
-    border-radius: 1rem;
-    transition: all 0.3s ease;
-    overflow: hidden;
-    background-color: transparent;
-    box-shadow: none;
-  }
-
-  .liquidGlass-icon .liquidGlass-effect,
-  .liquidGlass-icon .liquidGlass-tint,
-  .liquidGlass-icon .liquidGlass-shine {
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    border-radius: 1rem;
-    pointer-events: none;
-    /* Let clicks pass through to content */
   }
 
   .liquidGlass-icon:hover .liquidGlass-effect,
@@ -1344,12 +766,10 @@
   /* Dropdown Liquid Glass Overrides */
   .liquidGlass-wrapper.dropdown {
     border-radius: 0.75rem;
-    /* rounded-xl */
     width: 100%;
     height: 100%;
     padding: 0;
     box-shadow: none;
-    /* Dropdown content usually handles shadow or we let the wrapper do it if we remove it from content */
   }
 
   .liquidGlass-wrapper.dropdown .liquidGlass-effect,

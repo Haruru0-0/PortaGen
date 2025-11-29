@@ -12,9 +12,10 @@ interface FileUploadProps {
   preview?: string
   label?: string
   maxSize?: number // in MB
+  className?: string
 }
 
-export function FileUpload({ accept, onFileSelect, preview, label, maxSize = 5 }: FileUploadProps) {
+export function FileUpload({ accept, onFileSelect, preview, label, maxSize = 5, className }: FileUploadProps) {
   const [dragActive, setDragActive] = useState(false)
   const [error, setError] = useState<string>("")
   const inputRef = useRef<HTMLInputElement>(null)
@@ -88,17 +89,16 @@ export function FileUpload({ accept, onFileSelect, preview, label, maxSize = 5 }
   }
 
   return (
-    <div className="space-y-3">
+    <div className={`space-y-3 ${className || ""}`}>
       {label && <p className="text-[10px]">{label}</p>}
 
       <div
-        className={`border-4 border-dashed p-8 text-center space-y-3 cursor-pointer transition-colors ${
-          dragActive
-            ? "border-primary bg-primary/10"
-            : error
-              ? "border-destructive bg-destructive/10"
-              : "border-border hover:bg-muted"
-        }`}
+        className={`border-4 border-dashed p-8 text-center space-y-3 cursor-pointer transition-colors ${dragActive
+          ? "border-primary bg-primary/10"
+          : error
+            ? "border-destructive bg-destructive/10"
+            : "border-border hover:bg-muted"
+          }`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}

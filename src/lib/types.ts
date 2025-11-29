@@ -63,7 +63,125 @@ export interface ContentField {
     placeholder?: string
 }
 
-export type WindowContentType = "about" | "projects" | "contact" | "resume" | "blog" | "links" | "custom"
+export type WindowContentType = "about" | "projects" | "contact" | "resume" | "blog" | "links" | "blank"
+
+export interface SocialLink {
+    platform: string
+    url: string
+    icon?: string // Lucide icon name or custom
+}
+
+export interface ProjectLink {
+    title: string
+    url: string
+    description: string
+    icon?: string
+}
+
+export interface LinksData {
+    socials: SocialLink[]
+    projects: ProjectLink[]
+}
+
+export interface Testimonial {
+    name: string
+    role: string
+    content: string
+    avatar?: string
+}
+
+export interface Hobby {
+    name: string
+    icon: string
+    description: string
+}
+
+export interface AboutMeData {
+    title: string
+    subtitle: string
+    description: string
+    profileImage?: string
+    skills: string[]
+    testimonials: Testimonial[]
+    hobbies: Hobby[]
+}
+
+// Union type for all template data
+export interface ProjectItem {
+    id: string
+    title: string
+    description: string
+    image?: string
+    tags: string[]
+    demoUrl?: string
+    githubUrl?: string | { frontend: string; backend: string }
+}
+
+export interface ProjectsData {
+    title?: string
+    description?: string
+    projects?: ProjectItem[]
+    layout?: 'grid' | 'carousel'
+}
+
+export interface ContactInfoItem {
+    type: 'email' | 'phone' | 'location' | 'custom'
+    value: string
+    link?: string
+    label?: string
+}
+
+export interface ContactData {
+    title?: string
+    description?: string
+    email?: string
+    phone?: string
+    location?: string
+    contactInfo?: ContactInfoItem[]
+    socialLinks?: SocialLink[]
+    showForm?: boolean
+    formConfig?: {
+        serviceId: string
+        templateId: string
+        publicKey: string
+    }
+}
+
+export interface EducationItem {
+    degree: string
+    institution: string
+    year: string
+    description: string
+}
+
+export interface ExperienceItem {
+    role: string
+    company: string
+    period: string
+    achievements: string[]
+}
+
+export interface SkillCategory {
+    name: string
+    skills: string[]
+    icon: string
+}
+
+export interface ResumeData {
+    education?: EducationItem[]
+    experience?: ExperienceItem[]
+    leadership?: ExperienceItem[]
+    skills?: SkillCategory[]
+    interests?: string[]
+}
+
+export interface BlogData {
+    source?: 'hashnode' | 'devto' | 'medium' | 'custom'
+    username?: string
+    rssUrl?: string
+}
+
+export type TemplateData = LinksData | AboutMeData | ProjectsData | ContactData | ResumeData | BlogData | { fields: ContentField[] } | any
 
 export interface WindowContent {
     id: string
@@ -74,6 +192,7 @@ export interface WindowContent {
         fields: ContentField[]
         template?: string
         description?: string
+        content?: TemplateData // Added for structured data
     }
     type: WindowContentType
 }

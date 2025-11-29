@@ -1,27 +1,25 @@
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import {useRef} from "react"
-import {PixelCard} from "@/components/pixel-card"
-import {PixelInput} from "@/components/pixel-input"
-import {AssetLibraryModal} from "@/components/asset-library-modal"
-import {PortfolioUrlShare} from "@/components/portfolio-url-share"
-import {PreviewPanel} from "@/components/editor/preview-panel"
-import {DEFAULT_ICONS, DEFAULT_MUSIC, DEFAULT_SOUNDS, DEFAULT_WALLPAPERS,} from "@/lib/default-assets"
+import { useRef } from "react"
+import { PixelCard } from "@/components/pixel-card"
+import { PixelInput } from "@/components/pixel-input"
+import { AssetLibraryModal } from "@/components/asset-library-modal"
+import { PortfolioUrlShare } from "@/components/portfolio-url-share"
+import { PreviewPanel } from "@/components/editor/preview-panel"
+import { DEFAULT_ICONS, DEFAULT_MUSIC, DEFAULT_SOUNDS, DEFAULT_WALLPAPERS, } from "@/lib/default-assets"
 import gsap from "gsap"
-import {useGSAP} from "@gsap/react"
-import {EditorProvider, useEditorContext} from "@/contexts/editorContext"
-import {LockScreenProvider} from "@/contexts/lockScreenContext"
-import {DesktopProvider} from "@/contexts/desktopContext"
-import {IconProvider, useIconContext} from "@/contexts/iconContext"
-import {WindowsProvider} from "@/contexts/windowsContext"
-import {saveData,} from "@/lib/services/portfolioService"
-import {CategorySelection} from "@/components/editor/CategorySelection"
-import {TabsNavigation} from "@/components/editor/TabsNavigation"
-import {TabContent} from "@/components/editor/TabContent"
+import { useGSAP } from "@gsap/react"
+import { useEditorContext } from "@/contexts/editorContext"
+import { useIconContext } from "@/contexts/iconContext"
+import { saveData, } from "@/lib/services/portfolioService"
+import { CategorySelection } from "@/components/editor/CategorySelection"
+import { TabsNavigation } from "@/components/editor/TabsNavigation"
+import { TabContent } from "@/components/editor/TabContent"
 // Icon modals now live inside IconsTab
-import {DeleteModal} from "@/components/editor/modals/DeleteModal"
-import {useParams} from "next/navigation";
+import { DeleteModal } from "@/components/editor/modals/DeleteModal"
+import { useParams } from "next/navigation";
 
 type LockScreenTab = "settings" | "wallpaper"
 type HomeScreenTab =
@@ -73,7 +71,7 @@ function EditorContent() {
         setAssetLibraryOpen,
         assetLibraryType,
     } = useEditorContext()
-    const {icons} = useIconContext()
+    const { icons } = useIconContext()
 
     const handleUpdatePortfolioName = async () => {
         await saveData("portfolio/settings", {
@@ -93,19 +91,19 @@ function EditorContent() {
     }
 
     const lockScreenTabs: { id: LockScreenTab; label: string }[] = [
-        {id: "settings", label: "SETTINGS"},
-        {id: "wallpaper", label: "WALLPAPER"},
+        { id: "settings", label: "SETTINGS" },
+        { id: "wallpaper", label: "WALLPAPER" },
     ]
 
     const homeScreenTabs: { id: HomeScreenTab; label: string }[] = [
-        {id: "wallpaper", label: "WALLPAPER"},
-        {id: "mobile widgets", label: "MOBILE WIDGETS"},
-        {id: "desktop widget", label: "DESKTOP WIDGET"},
-        {id: "icons", label: "ICONS"},
-        {id: "music", label: "MUSIC"},
-        {id: "windows", label: "WINDOWS"},
-        {id: "sounds", label: "SOUNDS"},
-        {id: "theme", label: "THEME"},
+        { id: "wallpaper", label: "WALLPAPER" },
+        { id: "mobile widgets", label: "MOBILE WIDGETS" },
+        { id: "desktop widget", label: "DESKTOP WIDGET" },
+        { id: "icons", label: "ICONS" },
+        { id: "music", label: "MUSIC" },
+        { id: "windows", label: "WINDOWS" },
+        { id: "sounds", label: "SOUNDS" },
+        { id: "theme", label: "THEME" },
     ]
 
     const leftPanelRef = useRef<HTMLDivElement>(null)
@@ -120,13 +118,13 @@ function EditorContent() {
         if (leftPanelRef.current && rightPanelRef.current) {
             gsap.fromTo(
                 leftPanelRef.current,
-                {x: -50, opacity: 0},
-                {x: 0, opacity: 1, duration: 0.6, ease: "power3.out"}
+                { x: -50, opacity: 0 },
+                { x: 0, opacity: 1, duration: 0.6, ease: "power3.out" }
             )
             gsap.fromTo(
                 rightPanelRef.current,
-                {x: 50, opacity: 0},
-                {x: 0, opacity: 1, duration: 0.6, ease: "power3.out", delay: 0.1}
+                { x: 50, opacity: 0 },
+                { x: 0, opacity: 1, duration: 0.6, ease: "power3.out", delay: 0.1 }
             )
         }
 
@@ -134,7 +132,7 @@ function EditorContent() {
             if (tab) {
                 gsap.fromTo(
                     tab,
-                    {y: -20, opacity: 0},
+                    { y: -20, opacity: 0 },
                     {
                         y: 0,
                         opacity: 1,
@@ -153,8 +151,8 @@ function EditorContent() {
         if (!prefersReducedMotion && leftPanelRef.current) {
             gsap.fromTo(
                 leftPanelRef.current.querySelector(".tab-content"),
-                {opacity: 0, y: 10},
-                {opacity: 1, y: 0, duration: 0.3, ease: "power2.out"}
+                { opacity: 0, y: 10 },
+                { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }
             )
         }
 
@@ -167,7 +165,7 @@ function EditorContent() {
 
     return (
         <>
-            <PortfolioUrlShare username={portfolioName}/>
+            <PortfolioUrlShare username={portfolioName} />
 
             <div className="min-h-[calc(100vh-180px)] flex flex-col mt-8">
                 {/* Portfolio Name */}
@@ -278,7 +276,7 @@ function EditorContent() {
                         setUploadedWallpaperFileId(asset.id)
                         await handleUpdateDesktopSettings()
                     } else if (assetLibraryType === "icon") {
-                        setIconFormData({...iconFormData, icon: asset.url, fileId: asset.id})
+                        setIconFormData({ ...iconFormData, icon: asset.url, fileId: asset.id })
                     }
                 }}
                 currentPortfolioId={currentPortfolioId as any}
@@ -288,17 +286,5 @@ function EditorContent() {
 }
 
 export default function EditorPage() {
-    return (
-        <EditorProvider>
-            <DesktopProvider>
-                <LockScreenProvider>
-                    <IconProvider>
-                      <WindowsProvider>
-                        <EditorContent/>
-                      </WindowsProvider>
-                    </IconProvider>
-                </LockScreenProvider>
-            </DesktopProvider>
-        </EditorProvider>
-    )
+    return <EditorContent />
 }
