@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
           .insert(portfolioAssets)
           .values({ portfolioId, assetId: newAssetId })
           .onConflictDoNothing({ target: [portfolioAssets.portfolioId, portfolioAssets.assetId] })
-      } catch {}
+      } catch { }
     }
     if (oldAssetId && oldAssetId !== newAssetId) {
       const others = await db.query.icons.findMany({
@@ -95,21 +95,10 @@ export async function POST(req: NextRequest) {
       if (linkType === 'window' && updated) {
         const existingWin = await db.query.windows.findFirst({ where: eq(windows.iconId, updated.id) })
         if (!existingWin) {
-          const base = (name || 'window').toString().toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'window'
-          let candidate = base
-          let i = 1
-          // ensure unique windowId per portfolio
-          // eslint-disable-next-line no-constant-condition
-          while (true) {
-            const exists = await db.query.windows.findFirst({ where: and(eq(windows.portfolioId, portfolioId), eq(windows.windowId, candidate)) })
-            if (!exists) break
-            i += 1
-            candidate = `${base}-${i}`
-          }
-          await db.insert(windows).values({ portfolioId, windowId: candidate, name: name || candidate, iconId: updated.id })
+          await db.insert(windows).values({ portfolioId, name: name || 'New Window', iconId: updated.id })
         }
       }
-    } catch {}
+    } catch { }
 
     const formatted = await formatIconResponse(updated.id)
     return NextResponse.json(formatted)

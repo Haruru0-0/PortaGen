@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react"
+import React, { useState, useEffect, JSX } from "react"
 import { PixelCard } from "@/components/pixel-card"
 import { PixelButton } from "@/components/pixel-button"
-import { PixelInput } from "@/components/pixel-input"
-import { Trash2, Save, Layout, User, Briefcase, Mail, FileText, Link, BookOpen, ArrowLeft, Eye, EyeOff } from "lucide-react"
-import type { WindowContent, WindowContentType, TemplateData } from "@/lib/types"
+import { Save, Layout, User, Briefcase, Mail, FileText, Link, BookOpen, ArrowLeft } from "lucide-react"
+import type { WindowContent, WindowContentType, TemplateData, AboutMeData, ProjectsData, ContactData, ResumeData, BlogData, LinksData } from "@/lib/types"
 import { LinksForm } from "./forms/links-form"
 import { AboutMeForm } from "./forms/about-me-form"
 import { ProjectsForm } from "./forms/projects-form"
 import { ContactForm } from "./forms/contact-form"
 import { ResumeForm } from "./forms/resume-form"
 import { BlogForm } from "./forms/blog-form"
+import { uploadFile } from "@/lib/services/uploadService"
 
 // Template definitions metadata
 const CONTENT_TEMPLATES: Record<WindowContentType, {
@@ -56,69 +56,148 @@ const CONTENT_TEMPLATES: Record<WindowContentType, {
 
 interface WindowContentEditorProps {
     windowContent: WindowContent | null
+    portfolioId: number
     onSave: (content: WindowContent) => void
     onCancel: () => void
-    onDelete?: (id: string) => void
 }
 
-export function WindowContentEditor({ windowContent, onSave, onCancel, onDelete }: WindowContentEditorProps) {
-    const [selectedType, setSelectedType] = useState<WindowContentType>(windowContent?.type || "about")
-    const [contentData, setContentData] = useState<TemplateData>({})
-    const [windowName, setWindowName] = useState(windowContent?.name || "")
+export function WindowContentEditor({ windowContent, portfolioId, onSave, onCancel }: WindowContentEditorProps) {
+    const [name, setName] = useState(windowContent?.name || "")
+    const [selectedType, setSelectedType] = useState<WindowContentType>(windowContent?.data?.type || "about")
+    const [contentData, setContentData] = useState<TemplateData>(windowContent?.data?.content || {})
+    const [filesToUpload, setFilesToUpload] = useState<Map<string, File>>(new Map())
+    const [isUploading, setIsUploading] = useState(false)
     const isEditing = !!windowContent
 
-    // Initialize form when windowContent changes
     useEffect(() => {
         if (windowContent) {
-            setWindowName(windowContent.name)
-            setSelectedType(windowContent.type)
-
-            if (windowContent.data && windowContent.data.content) {
-                setContentData(windowContent.data.content)
-            } else {
-                setContentData({})
-            }
+            setName(windowContent.name)
+            setSelectedType(windowContent.data.type)
+            setContentData(windowContent.data.content || {})
         }
     }, [windowContent])
 
-    const handleTemplateChange = (templateType: WindowContentType) => {
-        setSelectedType(templateType)
+    const handleTypeChange = (type: WindowContentType) => {
+        setSelectedType(type)
+        // Reset content data when type changes, or set default structure
         setContentData({})
+        setFilesToUpload(new Map())
 
         // Update window name to match template if it's a new window or using default name
-        if (!windowContent || windowName === CONTENT_TEMPLATES[selectedType].name) {
-            setWindowName(CONTENT_TEMPLATES[templateType].name)
+        if (!windowContent || name === CONTENT_TEMPLATES[selectedType].name) {
+            setName(CONTENT_TEMPLATES[type].name)
         }
     }
 
-    const handleSave = () => {
-        if (!windowName.trim()) return
+    const handleFileSelect = (path: string, file: File) => {
+        setFilesToUpload(prev => new Map(prev).set(path, file))
 
-        const content = {
-            type: selectedType,
-            template: CONTENT_TEMPLATES[selectedType].name,
-            description: CONTENT_TEMPLATES[selectedType].description,
-            content: contentData
+        // Create temporary blob URL for preview
+        const blobUrl = URL.createObjectURL(file)
+
+        // Helper to set deep value
+        const setDataDeep = (obj: any, path: string, value: any): any => {
+            const parts = path.replace(/\[(\d+)\]/g, '.$1').split('.')
+            const newObj = { ...obj }
+            let current = newObj
+            for (let i = 0; i < parts.length - 1; i++) {
+                const part = parts[i]
+                if (!current[part]) current[part] = {}
+                current[part] = Array.isArray(current[part]) ? [...current[part]] : { ...current[part] }
+                current = current[part]
+            }
+            current[parts[parts.length - 1]] = value
+            return newObj
         }
 
-        onSave({
-            id: windowContent?.id || `window-${Date.now()}`,
-            name: windowName,
-            enabled: windowContent?.enabled ?? true,
-            type: selectedType,
-            data: content
-        })
+        setContentData((prev: TemplateData) => setDataDeep(prev, path, blobUrl))
+    }
+
+    const handleSave = async () => {
+        if (!name.trim()) return
+
+        setIsUploading(true)
+        try {
+            // Upload files
+            const uploadedUrls = new Map<string, string>()
+
+            for (const [path, file] of filesToUpload.entries()) {
+                const asset = await uploadFile(file, portfolioId)
+                if (asset) {
+                    uploadedUrls.set(path, asset.url)
+                }
+            }
+
+            // Replace blob URLs with real URLs in contentData
+            let finalContentData = { ...contentData }
+
+            const setDataDeep = (obj: any, path: string, value: any): any => {
+                const parts = path.replace(/\[(\d+)\]/g, '.$1').split('.')
+                const newObj = Array.isArray(obj) ? [...obj] : { ...obj }
+                let current = newObj
+                for (let i = 0; i < parts.length - 1; i++) {
+                    const part = parts[i]
+                    if (!current[part]) current[part] = {}
+                    current[part] = Array.isArray(current[part]) ? [...current[part]] : { ...current[part] }
+                    current = current[part]
+                }
+                current[parts[parts.length - 1]] = value
+                return newObj
+            }
+
+            for (const [path, url] of uploadedUrls.entries()) {
+                finalContentData = setDataDeep(finalContentData, path, url)
+            }
+
+            const content: WindowContent = {
+                id: windowContent?.id || 0,
+                name,
+                enabled: windowContent?.enabled ?? true,
+                type: selectedType,
+                data: {
+                    type: selectedType,
+                    template: CONTENT_TEMPLATES[selectedType].name,
+                    description: CONTENT_TEMPLATES[selectedType].description,
+                    content: finalContentData
+                }
+            }
+            onSave(content)
+        } catch (error) {
+            console.error("Failed to save window:", error)
+            // TODO: Show error toast
+        } finally {
+            setIsUploading(false)
+        }
+    }
+
+    const renderForm = () => {
+        switch (selectedType) {
+            case "about":
+                return <AboutMeForm initialData={contentData as AboutMeData} onChange={setContentData} onFileSelect={handleFileSelect} />
+            case "projects":
+                return <ProjectsForm initialData={contentData as ProjectsData} onChange={setContentData} />
+            case "contact":
+                return <ContactForm initialData={contentData as ContactData} onChange={setContentData} />
+            case "resume":
+                return <ResumeForm initialData={contentData as ResumeData} onChange={setContentData} />
+            case "blog":
+                return <BlogForm initialData={contentData as BlogData} onChange={setContentData} />
+            case "links":
+                return <LinksForm initialData={contentData as LinksData} onChange={setContentData} />
+            default:
+                return <div className="p-4 text-center text-muted-foreground">Select a content type to start editing</div>
+        }
     }
 
     return (
-        <PixelCard>
+        <PixelCard className="w-full max-w-4xl mx-auto">
             <div className="space-y-6">
-                {/* Header */}
                 <div className="flex items-center justify-between border-b-2 border-border pb-4">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={onCancel}
                             className="w-8 h-8 border-2 border-border bg-card hover:bg-muted transition-colors flex items-center justify-center"
+                            disabled={isUploading}
                         >
                             <ArrowLeft className="w-3 h-3" />
                         </button>
@@ -132,26 +211,15 @@ export function WindowContentEditor({ windowContent, onSave, onCancel, onDelete 
                         </div>
                     </div>
 
-                    <div className="flex gap-2">
-                        {isEditing && onDelete && (
-                            <PixelButton
-                                variant="secondary"
-                                className="text-[10px] flex items-center gap-2"
-                                onClick={() => onDelete(windowContent!.id)}
-                            >
-                                <Trash2 className="w-3 h-3" />
-                                DELETE
-                            </PixelButton>
-                        )}
-                        <PixelButton
-                            variant="primary"
-                            className="text-[10px] flex items-center gap-2"
-                            onClick={handleSave}
-                        >
-                            <Save className="w-3 h-3" />
-                            {isEditing ? "UPDATE" : "CREATE"}
-                        </PixelButton>
-                    </div>
+                    <PixelButton
+                        variant="primary"
+                        className="text-[10px] flex items-center gap-2"
+                        onClick={handleSave}
+                        disabled={isUploading}
+                    >
+                        <Save className="w-3 h-3" />
+                        {isUploading ? "SAVING..." : (isEditing ? "UPDATE" : "CREATE")}
+                    </PixelButton>
                 </div>
 
                 {/* Template Selection */}
@@ -161,11 +229,12 @@ export function WindowContentEditor({ windowContent, onSave, onCancel, onDelete 
                         {(Object.entries(CONTENT_TEMPLATES) as [WindowContentType, typeof CONTENT_TEMPLATES[WindowContentType]][]).map(([key, template]) => (
                             <button
                                 key={key}
-                                onClick={() => handleTemplateChange(key)}
+                                onClick={() => handleTypeChange(key)}
                                 className={`p-3 border-2 text-left transition-all ${selectedType === key
                                     ? "border-primary bg-primary text-primary-foreground"
                                     : "border-border bg-card hover:bg-muted hover:border-muted-foreground"
                                     }`}
+                                disabled={isUploading}
                             >
                                 <div className="flex items-center gap-2 mb-2">
                                     {template.icon}
@@ -181,48 +250,7 @@ export function WindowContentEditor({ windowContent, onSave, onCancel, onDelete 
 
                 {/* Specific Form Rendering */}
                 <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 border-2 border-border p-4 bg-muted/20">
-                    {selectedType === 'links' && (
-                        <LinksForm
-                            initialData={contentData}
-                            onChange={setContentData}
-                        />
-                    )}
-                    {selectedType === 'about' && (
-                        <AboutMeForm
-                            initialData={contentData}
-                            onChange={setContentData}
-                        />
-                    )}
-                    {selectedType === 'projects' && (
-                        <ProjectsForm
-                            initialData={contentData}
-                            onChange={setContentData}
-                        />
-                    )}
-                    {selectedType === 'contact' && (
-                        <ContactForm
-                            initialData={contentData}
-                            onChange={setContentData}
-                        />
-                    )}
-                    {selectedType === 'resume' && (
-                        <ResumeForm
-                            initialData={contentData}
-                            onChange={setContentData}
-                        />
-                    )}
-                    {selectedType === 'blog' && (
-                        <BlogForm
-                            initialData={contentData}
-                            onChange={setContentData}
-                        />
-                    )}
-                    {(selectedType === 'blank') && (
-                        <div className="text-center py-8 text-muted-foreground">
-                            <p>Custom content editing is coming soon.</p>
-                            <p className="text-xs mt-2">For now, please use one of the structured templates.</p>
-                        </div>
-                    )}
+                    {renderForm()}
                 </div>
             </div>
         </PixelCard>

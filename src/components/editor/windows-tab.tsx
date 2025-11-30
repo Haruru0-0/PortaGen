@@ -39,19 +39,19 @@ export function WindowsTab() {
             ) : (
               windows.map((w) => (
                 <div
-                  key={(w as any).windowId || (w as any).id}
+                  key={w.id}
                   className="flex items-center justify-between p-3 border-2 border-border bg-muted hover:bg-accent transition-colors"
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <button
                       onClick={async () => {
                         if (!currentPortfolioId) return
-                        await updateWindow(currentPortfolioId, (w as any).windowId, { enabled: !(w as any).enabled })
+                        await updateWindow(currentPortfolioId, w.id, { enabled: !w.enabled })
                       }}
-                      className={`w-6 h-6 border-2 border-border flex items-center justify-center transition-colors ${(w as any).enabled ? 'bg-primary text-primary-foreground' : 'bg-card hover:bg-muted'
+                      className={`w-6 h-6 border-2 border-border flex items-center justify-center transition-colors ${w.enabled ? 'bg-primary text-primary-foreground' : 'bg-card hover:bg-muted'
                         }`}
                     >
-                      {(w as any).enabled ? (
+                      {w.enabled ? (
                         <Eye className="w-3 h-3" />
                       ) : (
                         <EyeOff className="w-3 h-3" />
@@ -60,13 +60,13 @@ export function WindowsTab() {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[10px] font-bold truncate">{(w as any).name}</span>
+                        <span className="text-[10px] font-bold truncate">{w.name}</span>
                         <span className="text-[8px] px-1 py-0.5 border border-border bg-card capitalize">
-                          {((w as any).content?.type) || 'text'}
+                          {w.data.type || 'text'}
                         </span>
                       </div>
                       <p className="text-[8px] text-muted-foreground truncate">
-                        {typeof (w as any).content?.data === 'string' ? (w as any).content?.data : 'Custom content'}
+                        {w.data.description || 'Custom content'}
                       </p>
                     </div>
                   </div>
@@ -75,8 +75,7 @@ export function WindowsTab() {
                     <button
                       onClick={() => {
                         const pid = params?.id
-                        const windowId = (w as any).windowId ?? (w as any).id
-                        if (pid && windowId) router.push(`/dashboard/editor/${pid}/windows/${windowId}`)
+                        if (pid && w.id) router.push(`/dashboard/editor/${pid}/windows/${w.id}`)
                       }}
                       className="w-8 h-8 border-2 border-border bg-card hover:bg-primary hover:text-primary-foreground transition-colors flex items-center justify-center"
                     >
@@ -85,7 +84,7 @@ export function WindowsTab() {
                     {currentPortfolioId && (
                       <button
                         onClick={async () => {
-                          await deleteWindow(currentPortfolioId, (w as any).windowId)
+                          await deleteWindow(currentPortfolioId, w.id)
                         }}
                         className="w-8 h-8 border-2 border-border bg-card hover:bg-destructive hover:text-destructive-foreground transition-colors flex items-center justify-center"
                       >

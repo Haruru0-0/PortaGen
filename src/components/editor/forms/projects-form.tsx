@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { FileUpload } from "@/components/file-upload"
-import { Plus, Trash2, Settings2, X, ExternalLink, Github } from "lucide-react"
-import { AnimatedSection, AnimatedItem } from "@/components/portfolio/animated-section"
+import { Plus, Trash2, Settings2, X } from "lucide-react"
+import { AnimatedSection } from "@/components/portfolio/animated-section"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel"
 import type { ProjectsData, ProjectItem } from "@/lib/types"
 
@@ -110,44 +110,55 @@ export function ProjectsForm({ initialData, onChange }: ProjectsFormProps) {
                             <CarouselItem key={project.id}>
                                 <Card className="pixel-card border-0 shadow-lg overflow-hidden relative group">
                                     <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex gap-1 bg-background/80 backdrop-blur-sm p-1 rounded-md border border-border">
-                                        <Popover>
-                                            <PopoverTrigger asChild>
+                                        <Dialog>
+                                            <DialogTrigger asChild>
                                                 <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
                                                     <Settings2 className="w-3 h-3" />
                                                 </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-80">
-                                                <div className="grid gap-4">
-                                                    <div className="space-y-2">
-                                                        <h4 className="font-medium leading-none">Project Links</h4>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)]">
+                                                <DialogHeader>
+                                                    <DialogTitle>Project Links</DialogTitle>
+                                                    <DialogDescription>
+                                                        Manage your project URLs.
+                                                    </DialogDescription>
+                                                </DialogHeader>
+                                                <div className="grid gap-4 py-4">
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label className="text-right">Demo URL</Label>
+                                                        <Input
+                                                            value={project.demoUrl || ""}
+                                                            onChange={(e) => updateProject(index, "demoUrl", e.target.value)}
+                                                            className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                        />
                                                     </div>
-                                                    <div className="grid gap-2">
-                                                        <div className="grid grid-cols-3 items-center gap-4">
-                                                            <Label>Demo URL</Label>
-                                                            <Input
-                                                                value={project.demoUrl || ""}
-                                                                onChange={(e) => updateProject(index, "demoUrl", e.target.value)}
-                                                                className="col-span-2 h-8"
-                                                            />
-                                                        </div>
-                                                        <div className="grid grid-cols-3 items-center gap-4">
-                                                            <Label>GitHub URL</Label>
-                                                            <Input
-                                                                value={typeof project.githubUrl === 'string' ? project.githubUrl : ''}
-                                                                onChange={(e) => updateProject(index, "githubUrl", e.target.value)}
-                                                                className="col-span-2 h-8"
-                                                                placeholder="https://github.com/..."
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex justify-end">
-                                                        <Button variant="destructive" size="sm" onClick={() => removeProject(index)}>
-                                                            <Trash2 className="w-4 h-4 mr-2" /> Remove Project
-                                                        </Button>
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label className="text-right">GitHub URL</Label>
+                                                        <Input
+                                                            value={typeof project.githubUrl === 'string' ? project.githubUrl : ''}
+                                                            onChange={(e) => updateProject(index, "githubUrl", e.target.value)}
+                                                            className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                            placeholder="https://github.com/..."
+                                                        />
                                                     </div>
                                                 </div>
-                                            </PopoverContent>
-                                        </Popover>
+                                                <DialogFooter className="sm:justify-between">
+                                                    <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
+                                                        removeProject(index)
+                                                        const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                        closeButton?.click()
+                                                    }}>
+                                                        <Trash2 className="w-4 h-4 mr-2" /> Remove Project
+                                                    </Button>
+                                                    <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
+                                                        const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                        closeButton?.click()
+                                                    }}>
+                                                        Done
+                                                    </Button>
+                                                </DialogFooter>
+                                            </DialogContent>
+                                        </Dialog>
                                     </div>
 
                                     <div className="grid gap-2 px-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 400px), 1fr))" }}>
@@ -193,7 +204,7 @@ export function ProjectsForm({ initialData, onChange }: ProjectsFormProps) {
                                                 ))}
                                                 <Input
                                                     placeholder="Add tag..."
-                                                    className="w-20 h-6 text-xs border-dashed border-2 px-1"
+                                                    className="w-20 h-6 text-xs border-dashed border-2 px-1 rounded-none border-[var(--cute-text)]"
                                                     onKeyPress={(e) => {
                                                         if (e.key === 'Enter') {
                                                             addTag(index, (e.target as HTMLInputElement).value)
@@ -207,9 +218,21 @@ export function ProjectsForm({ initialData, onChange }: ProjectsFormProps) {
                                 </Card>
                             </CarouselItem>
                         ))}
+                        <CarouselItem>
+                            <div className="p-1 h-full">
+                                <Button
+                                    variant="ghost"
+                                    className="w-full h-full cursor-pointer min-h-[300px] border-4 border-dashed border-[var(--cute-text)]/50 hover:border-solid hover:border-[var(--cute-text)] hover:bg-transparent hover:shadow-[4px_4px_0px_0px_var(--cute-text)] transition-all rounded-none flex flex-col gap-2 pixel-text"
+                                    onClick={addProject}
+                                >
+                                    <Plus className="w-8 h-8" />
+                                    <span className="font-medium">Add Project</span>
+                                </Button>
+                            </div>
+                        </CarouselItem>
                     </CarouselContent>
-                    <CarouselPrevious className="static translate-y-0 mr-2 inline-flex" />
-                    <CarouselNext className="static translate-y-0 inline-flex" />
+                    <CarouselPrevious className="static translate-y-0 mr-2 inline-flex border-2 border-[var(--cute-text)] rounded-none text-[var(--cute-text)] hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors" />
+                    <CarouselNext className="static translate-y-0 inline-flex border-2 border-[var(--cute-text)] rounded-none text-[var(--cute-text)] hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors" />
                 </Carousel>
             </AnimatedSection>
 

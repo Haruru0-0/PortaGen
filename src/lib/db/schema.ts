@@ -61,7 +61,6 @@ export const windows = pgTable('windows', {
     id: serial('id').primaryKey(),
     portfolioId: integer('portfolio_id').notNull().references(() => portfolios.id, { onDelete: 'cascade' }),
 
-    windowId: varchar('window_id', { length: 100 }).notNull(), // 'about', 'projects', 'contact', etc.
     name: varchar('name', { length: 255 }).notNull(),
 
     // Optional link to an icon entry that opens this window
@@ -75,19 +74,12 @@ export const windows = pgTable('windows', {
         type: string;
         template: string;
         description: string;
-        fields: {
-            id: string;
-            type: string;
-            label: string;
-            value: any;
-            placeholder?: string;
-        }[];
+        content?: any;
     }>(),
 
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => ({
-    portfolioWindowIdx: unique('windows_portfolio_window_unique').on(table.portfolioId, table.windowId),
     portfolioIdIdx: index('windows_portfolio_id_idx').on(table.portfolioId),
     iconIdIdx: index('windows_icon_id_idx').on(table.iconId),
 }))

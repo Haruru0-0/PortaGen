@@ -18,12 +18,12 @@ export async function GET(req: NextRequest) {
     const windowIdParam = searchParams.get('windowId')
     if (!portfolioIdParam || !windowIdParam) return NextResponse.json({ error: 'portfolioId and windowId required' }, { status: 400 })
     const portfolioId = Number(portfolioIdParam)
-    const windowId = windowIdParam
+    const windowId = Number(windowIdParam)
 
     const owned = await db.query.portfolios.findFirst({ where: and(eq(portfolios.id, portfolioId), eq(portfolios.userId, user.id)) })
     if (!owned) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-    const row = await db.query.windows.findFirst({ where: and(eq(windows.portfolioId, portfolioId), eq(windows.windowId, windowId)) })
+    const row = await db.query.windows.findFirst({ where: and(eq(windows.portfolioId, portfolioId), eq(windows.id, windowId)) })
     if (!row) return NextResponse.json({ error: 'Not found' }, { status: 404 })
     return NextResponse.json(row)
   } catch (error) {

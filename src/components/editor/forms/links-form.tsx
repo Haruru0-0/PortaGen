@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Github, Linkedin, Twitter, Instagram, Youtube, Globe, Mail, FileText, Bookmark, Plus, Trash2, Settings2 } from "lucide-react"
 import { AnimatedSection, AnimatedItem } from "@/components/portfolio/animated-section"
@@ -40,6 +40,7 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
     // Socials Management
     const addSocial = () => {
         const newSocial: SocialLink = {
+            platform: "custom",
             name: "New Link",
             url: "https://",
             icon: "Globe",
@@ -102,18 +103,19 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
 
             {/* Social Media Section */}
             <AnimatedSection variant="stagger" delay={0.1} staggerChildren={0.1} className="relative group/section border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
-                <div className="flex items-center justify-between mb-4 border-b-2 border-[var(--cute-text)]">
+                <div className="flex items-center justify-between mb-4 border-b-2 border-[var(--cute-text)] pb-2">
                     <h2 className="text-xl font-bold pixel-title">Social Media</h2>
-                    <Button variant="ghost" size="sm" onClick={addSocial} className="h-6 w-6 p-0 opacity-0 group-hover/section:opacity-100 transition-opacity">
-                        <Plus className="w-4 h-4" />
+                    <Button variant="outline" size="sm" onClick={addSocial} className="pixel-badge cursor-pointer">
+                        <Plus className="w-4 h-4 mr-1" />
+                        Add
                     </Button>
                 </div>
 
                 <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))" }}>
                     {(data.socials || []).map((link, index) => (
                         <AnimatedItem key={index}>
-                            <Popover>
-                                <PopoverTrigger asChild>
+                            <Dialog>
+                                <DialogTrigger asChild>
                                     <div className="relative group cursor-pointer">
                                         <Button variant="default" className={`w-full ${link.color || 'bg-primary'} text-white rounded-none border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_rgba(0,0,0,0.2)] transition-all`}>
                                             {getIcon(link.icon)}
@@ -125,68 +127,78 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
                                             </div>
                                         </div>
                                     </div>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-80">
-                                    <div className="grid gap-4">
-                                        <div className="space-y-2">
-                                            <h4 className="font-medium leading-none">Edit Link</h4>
-                                            <p className="text-sm text-muted-foreground">Update social link details.</p>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)]">
+                                    <DialogHeader>
+                                        <DialogTitle>Edit Link</DialogTitle>
+                                        <DialogDescription>
+                                            Update social link details.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="grid gap-4 py-4">
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor={`name-${index}`} className="text-right">Name</Label>
+                                            <Input
+                                                id={`name-${index}`}
+                                                value={link.name || ""}
+                                                onChange={(e) => updateSocial(index, "name", e.target.value)}
+                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                            />
                                         </div>
-                                        <div className="grid gap-2">
-                                            <div className="grid grid-cols-3 items-center gap-4">
-                                                <Label htmlFor={`name-${index}`}>Name</Label>
-                                                <Input
-                                                    id={`name-${index}`}
-                                                    value={link.name || ""}
-                                                    onChange={(e) => updateSocial(index, "name", e.target.value)}
-                                                    className="col-span-2 h-8"
-                                                />
-                                            </div>
-                                            <div className="grid grid-cols-3 items-center gap-4">
-                                                <Label htmlFor={`url-${index}`}>URL</Label>
-                                                <Input
-                                                    id={`url-${index}`}
-                                                    value={link.url || ""}
-                                                    onChange={(e) => updateSocial(index, "url", e.target.value)}
-                                                    className="col-span-2 h-8"
-                                                />
-                                            </div>
-                                            <div className="grid grid-cols-3 items-center gap-4">
-                                                <Label htmlFor={`icon-${index}`}>Icon</Label>
-                                                <select
-                                                    id={`icon-${index}`}
-                                                    value={link.icon || "Globe"}
-                                                    onChange={(e) => updateSocial(index, "icon", e.target.value)}
-                                                    className="col-span-2 h-8 w-full border rounded-md px-2 text-sm"
-                                                >
-                                                    {AVAILABLE_ICONS.map(icon => (
-                                                        <option key={icon} value={icon}>{icon}</option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                            <div className="grid grid-cols-3 items-center gap-4">
-                                                <Label htmlFor={`color-${index}`}>Color</Label>
-                                                <Input
-                                                    id={`color-${index}`}
-                                                    value={link.color || ""}
-                                                    onChange={(e) => updateSocial(index, "color", e.target.value)}
-                                                    className="col-span-2 h-8"
-                                                    placeholder="bg-primary"
-                                                />
-                                            </div>
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor={`url-${index}`} className="text-right">URL</Label>
+                                            <Input
+                                                id={`url-${index}`}
+                                                value={link.url || ""}
+                                                onChange={(e) => updateSocial(index, "url", e.target.value)}
+                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                            />
                                         </div>
-                                        <div className="flex justify-end">
-                                            <Button variant="destructive" size="sm" onClick={() => removeSocial(index)}>
-                                                <Trash2 className="w-4 h-4 mr-2" /> Remove
-                                            </Button>
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor={`icon-${index}`} className="text-right">Icon</Label>
+                                            <select
+                                                id={`icon-${index}`}
+                                                value={link.icon || "Globe"}
+                                                onChange={(e) => updateSocial(index, "icon", e.target.value)}
+                                                className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
+                                            >
+                                                {AVAILABLE_ICONS.map(icon => (
+                                                    <option key={icon} value={icon}>{icon}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor={`color-${index}`} className="text-right">Color</Label>
+                                            <Input
+                                                id={`color-${index}`}
+                                                value={link.color || ""}
+                                                onChange={(e) => updateSocial(index, "color", e.target.value)}
+                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                placeholder="bg-primary"
+                                            />
                                         </div>
                                     </div>
-                                </PopoverContent>
-                            </Popover>
+                                    <DialogFooter className="sm:justify-between">
+                                        <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
+                                            removeSocial(index)
+                                            const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                            closeButton?.click()
+                                        }}>
+                                            <Trash2 className="w-4 h-4 mr-2" /> Remove
+                                        </Button>
+                                        <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
+                                            const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                            closeButton?.click()
+                                        }}>
+                                            Done
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
                         </AnimatedItem>
                     ))}
                     <AnimatedItem>
-                        <Button variant="outline" className="w-full h-full min-h-[40px] border-dashed border-2" onClick={addSocial}>
+                        <Button variant="ghost" className="w-full h-full min-h-[40px] cursor-pointer border-4 border-dashed border-[var(--cute-text)]/50 hover:border-solid hover:border-[var(--cute-text)] hover:bg-transparent hover:shadow-[4px_4px_0px_0px_var(--cute-text)] transition-all rounded-none flex flex-col gap-2 pixel-text" onClick={addSocial}>
                             <Plus className="w-4 h-4 mr-2" /> Add Link
                         </Button>
                     </AnimatedItem>
@@ -195,10 +207,11 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
 
             {/* Projects Section */}
             <AnimatedSection variant="stagger" delay={0.2} staggerChildren={0.1} className="relative group/section border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
-                <div className="flex items-center justify-between mb-4 border-b-2 border-[var(--cute-text)]">
+                <div className="flex items-center justify-between mb-4 border-b-2 border-[var(--cute-text)] pb-2">
                     <h2 className="text-xl font-bold pixel-title">Projects & Resources</h2>
-                    <Button variant="ghost" size="sm" onClick={addProject} className="h-6 w-6 p-0 opacity-0 group-hover/section:opacity-100 transition-opacity">
-                        <Plus className="w-4 h-4" />
+                    <Button variant="outline" size="sm" onClick={addProject} className="pixel-badge cursor-pointer">
+                        <Plus className="w-4 h-4 mr-1" />
+                        Add
                     </Button>
                 </div>
 
@@ -208,47 +221,58 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
                             <Card className="h-full hover:shadow-md transition-shadow pixel-card border-0 relative group">
                                 <CardContent className="p-4">
                                     <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex gap-1">
-                                        <Popover>
-                                            <PopoverTrigger asChild>
+                                        <Dialog>
+                                            <DialogTrigger asChild>
                                                 <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
                                                     <Settings2 className="w-3 h-3" />
                                                 </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-80">
-                                                <div className="grid gap-4">
-                                                    <div className="space-y-2">
-                                                        <h4 className="font-medium leading-none">Edit Project</h4>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)]">
+                                                <DialogHeader>
+                                                    <DialogTitle>Edit Project</DialogTitle>
+                                                    <DialogDescription>
+                                                        Update project details.
+                                                    </DialogDescription>
+                                                </DialogHeader>
+                                                <div className="grid gap-4 py-4">
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label className="text-right">URL</Label>
+                                                        <Input
+                                                            value={link.url || ""}
+                                                            onChange={(e) => updateProject(index, "url", e.target.value)}
+                                                            className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                        />
                                                     </div>
-                                                    <div className="grid gap-2">
-                                                        <div className="grid grid-cols-3 items-center gap-4">
-                                                            <Label>URL</Label>
-                                                            <Input
-                                                                value={link.url || ""}
-                                                                onChange={(e) => updateProject(index, "url", e.target.value)}
-                                                                className="col-span-2 h-8"
-                                                            />
-                                                        </div>
-                                                        <div className="grid grid-cols-3 items-center gap-4">
-                                                            <Label>Icon</Label>
-                                                            <select
-                                                                value={link.icon || "Globe"}
-                                                                onChange={(e) => updateProject(index, "icon", e.target.value)}
-                                                                className="col-span-2 h-8 w-full border rounded-md px-2 text-sm"
-                                                            >
-                                                                {AVAILABLE_ICONS.map(icon => (
-                                                                    <option key={icon} value={icon}>{icon}</option>
-                                                                ))}
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex justify-end">
-                                                        <Button variant="destructive" size="sm" onClick={() => removeProject(index)}>
-                                                            <Trash2 className="w-4 h-4 mr-2" /> Remove
-                                                        </Button>
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label className="text-right">Icon</Label>
+                                                        <select
+                                                            value={link.icon || "Globe"}
+                                                            onChange={(e) => updateProject(index, "icon", e.target.value)}
+                                                            className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
+                                                        >
+                                                            {AVAILABLE_ICONS.map(icon => (
+                                                                <option key={icon} value={icon}>{icon}</option>
+                                                            ))}
+                                                        </select>
                                                     </div>
                                                 </div>
-                                            </PopoverContent>
-                                        </Popover>
+                                                <DialogFooter className="sm:justify-between">
+                                                    <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
+                                                        removeProject(index)
+                                                        const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                        closeButton?.click()
+                                                    }}>
+                                                        <Trash2 className="w-4 h-4 mr-2" /> Remove
+                                                    </Button>
+                                                    <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
+                                                        const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                        closeButton?.click()
+                                                    }}>
+                                                        Done
+                                                    </Button>
+                                                </DialogFooter>
+                                            </DialogContent>
+                                        </Dialog>
                                     </div>
 
                                     <div className="flex items-start gap-3">
@@ -257,7 +281,7 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <Input
-                                                value={link.name || link.title || ""}
+                                                value={link.title || ""}
                                                 onChange={(e) => updateProject(index, "title", e.target.value)}
                                                 className="font-medium pixel-text h-6 p-0 border-none shadow-none focus-visible:ring-0 bg-transparent"
                                                 placeholder="Project Title"
@@ -275,7 +299,7 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
                         </AnimatedItem>
                     ))}
                     <AnimatedItem>
-                        <Button variant="outline" className="w-full h-full min-h-[100px] border-dashed border-2 flex flex-col gap-2" onClick={addProject}>
+                        <Button variant="ghost" className="w-full h-full min-h-[100px] cursor-pointer border-4 border-dashed border-[var(--cute-text)]/50 hover:border-solid hover:border-[var(--cute-text)] hover:bg-transparent hover:shadow-[4px_4px_0px_0px_var(--cute-text)] transition-all rounded-none flex flex-col gap-2 pixel-text" onClick={addProject}>
                             <Plus className="w-6 h-6" />
                             <span>Add Project</span>
                         </Button>

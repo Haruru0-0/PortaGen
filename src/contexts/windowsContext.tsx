@@ -1,7 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState } from 'react'
-import type { WindowContent } from '@/lib/services/windowsService'
+import type { WindowContent } from '@/lib/types'
 import { listWindows, getWindow as getWindowAPI, createWindow as createWindowAPI, updateWindow as updateWindowAPI, deleteWindow as deleteWindowAPI } from '@/lib/services/windowsService'
 
 interface WindowsContextType {
@@ -9,10 +9,10 @@ interface WindowsContextType {
   loading: boolean
   setWindows: (rows: WindowContent[]) => void
   fetchWindows: (portfolioId: number) => Promise<void>
-  getWindow: (portfolioId: number, windowId: string) => Promise<WindowContent | undefined>
-  createWindow: (portfolioId: number, name: string, baseWindowId?: string, content?: WindowContent['content']) => Promise<WindowContent | undefined>
-  updateWindow: (portfolioId: number, windowId: string, payload: Partial<Omit<WindowContent, 'id' | 'portfolioId' | 'windowId'>>) => Promise<WindowContent | undefined>
-  deleteWindow: (portfolioId: number, windowId: string) => Promise<boolean>
+  getWindow: (portfolioId: number, windowId: number) => Promise<WindowContent | undefined>
+  createWindow: (portfolioId: number, name: string, content?: WindowContent['data']['content']) => Promise<WindowContent | undefined>
+  updateWindow: (portfolioId: number, windowId: number, payload: Partial<Omit<WindowContent, 'id' | 'portfolioId'>>) => Promise<WindowContent | undefined>
+  deleteWindow: (portfolioId: number, windowId: number) => Promise<boolean>
 }
 
 const WindowsContext = createContext<WindowsContextType | undefined>(undefined)
@@ -32,7 +32,7 @@ export function WindowsProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const getWindow = async (portfolioId: number, windowId: string) => {
+  const getWindow = async (portfolioId: number, windowId: number) => {
     try {
       return await getWindowAPI(portfolioId, windowId)
     } catch {
@@ -40,10 +40,10 @@ export function WindowsProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const createWindow = async (portfolioId: number, name: string, baseWindowId?: string, content?: WindowContent['content']) => {
+  const createWindow = async (portfolioId: number, name: string, content?: WindowContent['data']['content']) => {
     setLoading(true)
     try {
-      const created = await createWindowAPI(portfolioId, name, baseWindowId, content)
+      const created = await createWindowAPI(portfolioId, name, content)
       if (created) setWindows((prev) => [...prev, created])
       return created
     } finally {
@@ -51,22 +51,22 @@ export function WindowsProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const updateWindow = async (portfolioId: number, windowId: string, payload: Partial<Omit<WindowContent, 'id' | 'portfolioId' | 'windowId'>>) => {
+  const updateWindow = async (portfolioId: number, windowId: number, payload: Partial<Omit<WindowContent, 'id' | 'portfolioId'>>) => {
     setLoading(true)
     try {
       const updated = await updateWindowAPI(portfolioId, windowId, payload)
-      if (updated) setWindows((prev) => prev.map((w) => (w.windowId === windowId ? updated : w)))
+      if (updated) setWindows((prev) => prev.map((w) => (w.id === windowId ? updated : w)))
       return updated
     } finally {
       setLoading(false)
     }
   }
 
-  const deleteWindow = async (portfolioId: number, windowId: string) => {
+  const deleteWindow = async (portfolioId: number, windowId: number) => {
     setLoading(true)
     try {
       const ok = await deleteWindowAPI(portfolioId, windowId)
-      if (ok) setWindows((prev) => prev.filter((w) => w.windowId !== windowId))
+      if (ok) setWindows((prev) => prev.filter((w) => w.id !== windowId))
       return ok
     } finally {
       setLoading(false)

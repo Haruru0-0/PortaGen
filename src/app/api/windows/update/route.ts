@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     const [updated] = await db
       .update(windows)
       .set(payload)
-      .where(and(eq(windows.portfolioId, Number(portfolioId)), eq(windows.windowId, windowId)))
+      .where(and(eq(windows.portfolioId, Number(portfolioId)), eq(windows.id, Number(windowId))))
       .returning()
 
     if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 })

@@ -53,15 +53,6 @@ export const playlist: Track[] = [
     },
 ];
 
-export type ContentFieldType = "text" | "textarea" | "image" | "link" | "list" | "badge"
-
-export interface ContentField {
-    id: string
-    type: ContentFieldType
-    label: string
-    value: any
-    placeholder?: string
-}
 
 export type WindowContentType = "about" | "projects" | "contact" | "resume" | "blog" | "links" | "blank"
 
@@ -69,6 +60,8 @@ export interface SocialLink {
     platform: string
     url: string
     icon?: string // Lucide icon name or custom
+    name?: string
+    color?: string
 }
 
 export interface ProjectLink {
@@ -79,6 +72,8 @@ export interface ProjectLink {
 }
 
 export interface LinksData {
+    title?: string
+    description?: string
     socials: SocialLink[]
     projects: ProjectLink[]
 }
@@ -182,18 +177,17 @@ export interface BlogData {
     rssUrl?: string
 }
 
-export type TemplateData = LinksData | AboutMeData | ProjectsData | ContactData | ResumeData | BlogData | { fields: ContentField[] } | any
+export type TemplateData = LinksData | AboutMeData | ProjectsData | ContactData | ResumeData | BlogData | any
 
 export interface WindowContent {
-    id: string
+    id: number
     name: string
     enabled: boolean
     data: {
         type: WindowContentType
-        fields: ContentField[]
         template?: string
         description?: string
-        content?: TemplateData // Added for structured data
+        content?: TemplateData
     }
     type: WindowContentType
 }

@@ -1,13 +1,4 @@
-export type WindowContent = {
-  id: number
-  portfolioId: number
-  windowId: string
-  name: string
-  enabled: boolean
-  position: number
-  iconId?: number | null
-  content?: { type: 'text' | 'markdown' | 'html' | 'projects' | 'links'; data: any }
-}
+import type { WindowContent } from '@/lib/types'
 
 export const listWindows = async (portfolioId: number) => {
   try {
@@ -20,9 +11,9 @@ export const listWindows = async (portfolioId: number) => {
   }
 }
 
-export const getWindow = async (portfolioId: number, windowId: string) => {
+export const getWindow = async (portfolioId: number, windowId: number) => {
   try {
-    const res = await fetch(`/api/windows/get?portfolioId=${portfolioId}&windowId=${encodeURIComponent(windowId)}`)
+    const res = await fetch(`/api/windows/get?portfolioId=${portfolioId}&windowId=${windowId}`)
     if (!res.ok) return undefined
     return (await res.json()) as WindowContent
   } catch (e) {
@@ -30,12 +21,16 @@ export const getWindow = async (portfolioId: number, windowId: string) => {
   }
 }
 
-export const createWindow = async (portfolioId: number, name: string, baseWindowId?: string, content?: WindowContent['content']) => {
+export const createWindow = async (portfolioId: number, name: string, content?: WindowContent['data']['content']) => {
   try {
     const res = await fetch('/api/windows/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ portfolioId, name, baseWindowId, content }),
+      body: JSON.stringify({
+        portfolioId,
+        name,
+        content: (content as any)?.data || content // Handle both structures if needed
+      }),
     })
     if (!res.ok) throw new Error('Failed to create window')
     return (await res.json()) as WindowContent
@@ -44,12 +39,17 @@ export const createWindow = async (portfolioId: number, name: string, baseWindow
   }
 }
 
-export const updateWindow = async (portfolioId: number, windowId: string, payload: Partial<Omit<WindowContent, 'id' | 'portfolioId' | 'windowId'>>) => {
+export const updateWindow = async (portfolioId: number, windowId: number, payload: Partial<Omit<WindowContent, 'id' | 'portfolioId'>>) => {
   try {
     const res = await fetch('/api/windows/update', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ portfolioId, windowId, ...payload }),
+      body: JSON.stringify({
+        portfolioId,
+        windowId,
+        ...payload,
+        content: (payload as any).data // Map 'data' to 'content' for the API
+      }),
     })
     if (!res.ok) throw new Error('Failed to update window')
     return (await res.json()) as WindowContent
@@ -58,9 +58,9 @@ export const updateWindow = async (portfolioId: number, windowId: string, payloa
   }
 }
 
-export const deleteWindow = async (portfolioId: number, windowId: string) => {
+export const deleteWindow = async (portfolioId: number, windowId: number) => {
   try {
-    const res = await fetch(`/api/windows/delete?portfolioId=${portfolioId}&windowId=${encodeURIComponent(windowId)}`, { method: 'DELETE' })
+    const res = await fetch(`/api/windows/delete?portfolioId=${portfolioId}&windowId=${windowId}`, { method: 'DELETE' })
     return res.ok
   } catch (e) {
     console.error('deleteWindow error:', e)

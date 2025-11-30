@@ -4,16 +4,16 @@ import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useWindowsContext } from "@/contexts/windowsContext"
 import { WindowContentEditor } from "@/components/editor/window-content-editor"
-import {WindowContent} from "@/lib/types";
+import { WindowContent } from "@/lib/types";
 
 export default function EditWindowPage() {
   const router = useRouter()
   const params = useParams<{ id: string; windowId: string }>() // Use windowId here
-  const { getWindow, updateWindow, deleteWindow } = useWindowsContext()
+  const { getWindow, updateWindow } = useWindowsContext()
   const [windowContent, setWindowContent] = useState<WindowContent | null>(null)
 
   const portfolioId = Number(params.id)
-  const windowId = params.windowId // Use windowId here
+  const windowId = Number(params.windowId) // Use windowId here
 
   useEffect(() => {
     if (portfolioId && windowId) {
@@ -34,20 +34,13 @@ export default function EditWindowPage() {
     router.push(`/dashboard/editor/${portfolioId}`)
   }
 
-  const handleDelete = async (id: string) => {
-    if (portfolioId && id) {
-      await deleteWindow(portfolioId, id)
-      router.push(`/dashboard/editor/${portfolioId}`)
-    }
-  }
-
   return (
     <div className="container mx-auto p-4">
       <WindowContentEditor
         windowContent={windowContent}
+        portfolioId={portfolioId}
         onSave={handleSave}
         onCancel={handleCancel}
-        onDelete={handleDelete}
       />
     </div>
   )

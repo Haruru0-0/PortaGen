@@ -81,21 +81,9 @@ export async function POST(req: NextRequest) {
 
     // If linking to a window, create a windows row bound to this icon
     if ((linkType === 'window' || !linkType) && created) {
-      // Basic slug from name
-      const base = (name || 'window').toString().toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'window'
-      let candidate = base
-      let i = 1
-      // ensure uniqueness per portfolio
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        const existing = await db.query.windows.findFirst({ where: and(eq(windows.portfolioId, portfolioId), eq(windows.windowId, candidate)) })
-        if (!existing) break
-        i += 1
-        candidate = `${base}-${i}`
-      }
       try {
-        await db.insert(windows).values({ portfolioId, windowId: candidate, name: name || candidate, iconId: created.id })
-      } catch {}
+        await db.insert(windows).values({ portfolioId, name: name || 'New Window', iconId: created.id })
+      } catch { }
     }
 
     const formatted = await formatIconResponse(created.id)
