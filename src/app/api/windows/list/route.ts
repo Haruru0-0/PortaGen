@@ -22,7 +22,8 @@ export async function GET(req: NextRequest) {
     if (!owned) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const rows = await db.query.windows.findMany({ where: eq(windows.portfolioId, portfolioId), orderBy: (t, { asc }) => [asc(t.position)] })
-    return NextResponse.json({ windows: rows })
+    const a = rows.map(r => ({...r, data: r.content}))
+    return NextResponse.json({ windows: a })
   } catch (error) {
     console.error('Windows LIST error:', error)
     return NextResponse.json({ error: 'Failed to list windows' }, { status: 500 })

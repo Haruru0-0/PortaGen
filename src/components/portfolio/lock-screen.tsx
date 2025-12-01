@@ -11,11 +11,14 @@ import { cn } from "@/lib/utils"
 import { useAppSound } from "./sound-context"
 import { gsap } from "gsap"
 import { useGSAP } from "@gsap/react"
+import { useLockScreenContext } from "@/contexts/lockScreenContext"
+import { useEditorContext } from "@/contexts/editorContext"
+import { useParams } from "next/navigation"
 
 interface LockScreenProps {
-  password: string
-  hint: string
-  wallpaper: string
+  password?: string
+  hint?: string
+  wallpaper?: string
   onUnlock: () => void
 }
 
@@ -25,6 +28,19 @@ export function LockScreen({ password, hint, wallpaper, onUnlock }: LockScreenPr
   const [inputPassword, setInputPassword] = useState("")
   const [isWrongPassword, setIsWrongPassword] = useState(false)
   const { playClickSound, playErrorSound, playSuccessSound } = useAppSound()
+
+  const { data, getLockScreenData } = useLockScreenContext()
+  const params = useParams<{ id: string }>()
+  const currentPortfolioId = Number(params?.id)
+
+  useEffect(() => {
+    if (currentPortfolioId && !data) {
+      getLockScreenData(currentPortfolioId)
+    }
+  }, [currentPortfolioId, data, getLockScreenData])
+
+  const effectivePassword = data?.password || password || "1234"
+  const effectiveWallpaper = data?.wallpaperUrl || wallpaper || "/placeholder.svg?height=1080&width=1920"
 
   const timeRef = useRef<HTMLHeadingElement>(null)
   const dateRef = useRef<HTMLParagraphElement>(null)
@@ -68,7 +84,7 @@ export function LockScreen({ password, hint, wallpaper, onUnlock }: LockScreenPr
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (inputPassword === password) {
+    if (inputPassword === effectivePassword) {
       playSuccessSound()
       onUnlock()
     } else {
@@ -181,7 +197,7 @@ export function LockScreen({ password, hint, wallpaper, onUnlock }: LockScreenPr
   return (
     <div
       className="relative flex flex-col items-center justify-center w-full min-h-screen overflow-hidden bg-cover bg-center"
-      style={{ backgroundImage: `url(${wallpaper || "/placeholder.svg?height=1080&width=1920"})` }}
+      style={{ backgroundImage: `url(${effectiveWallpaper})` }}
       onClick={handleScreenClick}
     >
       <div className="flex flex-col items-center">
@@ -234,7 +250,7 @@ export function LockScreen({ password, hint, wallpaper, onUnlock }: LockScreenPr
                   <span className="sr-only">Unlock</span>
                 </Button>
               </div>
-              {hint && <p className="text-xs text-blue-600/80 text-center">Hint: {hint}</p>}
+              {effectivePassword && <p className="text-xs text-blue-600/80 text-center">Hint: The password is '{effectivePassword}'</p>}
             </form>
           </div>
 

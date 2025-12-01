@@ -71,7 +71,6 @@ export async function POST(req: NextRequest) {
     const newAssetId = updated.iconAssetId ?? null
     if (newAssetId && newAssetId !== oldAssetId) {
       try {
-        // @ts-ignore onConflictDoNothing typing variance
         await db
           .insert(portfolioAssets)
           .values({ portfolioId, assetId: newAssetId })

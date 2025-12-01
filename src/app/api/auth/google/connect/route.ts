@@ -16,7 +16,7 @@ export async function GET() {
         const authUrl = oauth2Client.generateAuthUrl({
             access_type: 'offline',
             scope: [
-                'https://www.googleapis.com/auth/drive.file',
+                'https://www.googleapis.com/auth/drive',
                 'https://www.googleapis.com/auth/userinfo.email',
                 'https://www.googleapis.com/auth/userinfo.profile',
             ],

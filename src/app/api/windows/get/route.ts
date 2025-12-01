@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
 
     const row = await db.query.windows.findFirst({ where: and(eq(windows.portfolioId, portfolioId), eq(windows.id, windowId)) })
     if (!row) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-    return NextResponse.json(row)
+    return NextResponse.json({ ...row, data: row.content })
   } catch (error) {
     console.error('Windows GET error:', error)
     return NextResponse.json({ error: 'Failed to get window' }, { status: 500 })

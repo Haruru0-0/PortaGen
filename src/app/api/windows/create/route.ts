@@ -22,10 +22,20 @@ export async function POST(req: NextRequest) {
 
     const [created] = await db
       .insert(windows)
-      .values({ portfolioId: Number(portfolioId), name, enabled: true, content })
+      .values({
+        portfolioId: Number(portfolioId),
+        name,
+        enabled: true,
+        content: {
+          type: 'blank',
+          template: 'blank',
+          description: '',
+          content: content
+        }
+      })
       .returning()
 
-    return NextResponse.json(created)
+    return NextResponse.json({ ...created, data: created.content })
   } catch (error) {
     console.error('Windows CREATE error:', error)
     return NextResponse.json({ error: 'Failed to create window' }, { status: 500 })

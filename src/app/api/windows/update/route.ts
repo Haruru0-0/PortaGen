@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       .returning()
 
     if (!updated) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-    return NextResponse.json(updated)
+    return NextResponse.json({ ...updated, data: updated.content })
   } catch (error) {
     console.error('Windows UPDATE error:', error)
     return NextResponse.json({ error: 'Failed to update window' }, { status: 500 })

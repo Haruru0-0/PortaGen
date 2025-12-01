@@ -9,12 +9,6 @@ import { Taskbar } from "./taskbar";
 import MenuBar from "./MenuBar";
 import MusicPlayerWidget from "./MusicPlayerWidget";
 import Wallpaper from "@/assets/wallpaper.jpg";
-import Project from "@/assets/project.png";
-import LinkIcon from "@/assets/Links.png";
-import Phone from "@/assets/phone.png";
-import BlogIcon from "@/assets/Blog.png";
-import About from "@/assets/about.png";
-import ResumeIcon from "@/assets/resume.png";
 import GreetingGif from "@/assets/greeting.gif";
 import WaterCd from "@/assets/water-cd.jpg";
 import CutePuppy from "@/assets/cute-puppy.jpg";
@@ -24,6 +18,11 @@ import { useGSAP } from "@gsap/react";
 import { AudioProvider } from "./audio-context";
 import { SoundProvider } from "./sound-context";
 import { MobileSettingsBar } from "./MobileSettingsBar";
+import { useEditorContext } from "@/contexts/editorContext";
+import { useIconContext, type Icon } from "@/contexts/iconContext";
+import { useDesktopContext } from "@/contexts/desktopContext";
+import type { WindowContent } from "@/lib/types";
+import { useParams } from "next/navigation";
 
 const AboutMe = React.lazy(() => import("./about-me"));
 const Resume = React.lazy(() => import("./resume"));
@@ -39,6 +38,31 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
     component: React.ReactNode;
   };
 
+  const { uploadedWallpaper, selectedWallpaper, windowContents } = useEditorContext();
+  const params = useParams<{ id: string }>()
+  const currentPortfolioId = Number(params?.id)
+  const { data, getDesktopData } = useDesktopContext();
+  const { icons, getAllIcons } = useIconContext();
+
+  useEffect(() => {
+    if (currentPortfolioId && !data) {
+      getDesktopData(currentPortfolioId);
+    }
+  }, [currentPortfolioId, data, getDesktopData]);
+
+  useEffect(() => {
+    if (currentPortfolioId) {
+      void getAllIcons(currentPortfolioId)
+    }
+  }, [currentPortfolioId])
+
+  const effectiveWallpaper = data?.wallpaperUrl || uploadedWallpaper || selectedWallpaper?.url || Wallpaper.src;
+  const effectiveGif = data?.desktopGifUrl || GreetingGif;
+  const effectiveWidget1 = data?.widget1Url || WaterCd;
+  const effectiveWidget2 = data?.widget2Url || CutePuppy;
+
+
+
   const mqDesktop = useMediaQuery("(min-width: 650px)");
   const isDesktop = previewMode ? previewMode === "desktop" : mqDesktop;
   const hour = new Date().getHours();
@@ -50,15 +74,6 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
   const desktopIconsRef = useRef<HTMLDivElement[]>([]);
   const mobileIconsRef = useRef<HTMLDivElement[]>([]);
   const floatingAnims = useRef<gsap.core.Tween[]>([]);
-
-  const desktopApps = [
-    { id: "about", label: "About me", icon: About },
-    { id: "resume", label: "Resume", icon: ResumeIcon },
-    { id: "projects", label: "Projects", icon: Project },
-    { id: "blog", label: "Blog", icon: BlogIcon },
-    { id: "links", label: "Links", icon: LinkIcon },
-    { id: "contact", label: "Contact me", icon: Phone },
-  ];
 
   const [openWindows, setOpenWindows] = useState<WindowData[]>([]);
 
@@ -74,6 +89,10 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
   }, [openWindows, isDesktop]);
 
   const getComponentForWindow = (name: string) => {
+    const windowContent = windowContents.find((w: WindowContent) => w.name === name);
+    if (windowContent) {
+      return <div>{windowContent.data.content}</div>;
+    }
     switch (name) {
       case "About me":
         return <AboutMe />;
@@ -269,7 +288,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
         <DndContext>
           <div
             className={`${preview ? 'w-full h-full' : 'w-screen h-screen'} relative overflow-hidden bg-cover bg-center`}
-            style={{ backgroundImage: `url(${Wallpaper.src})` }}
+            style={{ backgroundImage: `url(${effectiveWallpaper})` }}
           >
             {isDesktop && <MenuBar embedded={preview} previewMode={previewMode} />}
 
@@ -281,7 +300,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
                     backfaceVisibility: "hidden",
                   }}>
                     <Image
-                      src={GreetingGif}
+                      src={effectiveGif}
                       alt="Cute greeting"
                       width={96}
                       height={96}
@@ -301,7 +320,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
             {isDesktop ? (
               <div className="absolute inset-0 flex flex-col gap-4 p-4 pt-12">
                 <div className="flex flex-col flex-wrap gap-4 content-start flex-1 overflow-auto pointer-events-none">
-                  {desktopApps.map((app, index) => (
+                  {icons.map((app, index) => (
                     <div
                       key={app.id}
                       ref={(el) => {
@@ -309,17 +328,17 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
                       }}
                     >
                       <DesktopIcon
-                        id={app.id}
-                        label={app.label}
+                        id={String(app.id)}
+                        label={app.name}
                         icon={app.icon}
-                        onDoubleClick={() => openWindow(app.label)}
+                        onDoubleClick={() => openWindow(app.name)}
                       />
                     </div>
                   ))}
                 </div>
-                <MusicPlayerWidget isDesktop={true} embedded={preview} />
+                <MusicPlayerWidget isDesktop={true} embedded={preview} spotifyPlaylistUrl={data?.spotifyPlaylistUrl} />
                 <Taskbar
-                  apps={desktopApps}
+                  apps={icons.map(icon => ({ id: String(icon.id), label: icon.name, icon: icon.icon }))}
                   openWindows={openWindows}
                   onAppClick={handleAppClick}
                   className="mt-auto"
@@ -331,7 +350,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
                 <div className="flex flex-col gap-4 justify-between h-full">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="grid grid-cols-2 gap-4 auto-rows-min justify-items-center">
-                      {desktopApps.slice(0, 4).map((app, index) => (
+                      {icons.slice(0, 4).map((app, index) => (
                         <div
                           key={app.id}
                           ref={(el) => {
@@ -339,17 +358,17 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
                           }}
                         >
                           <MobileIcon
-                            id={app.id}
-                            label={app.label}
+                            id={String(app.id)}
+                            label={app.name}
                             icon={app.icon}
-                            onClick={() => openWindow(app.label)}
+                            onClick={() => openWindow(app.name)}
                           />
                         </div>
                       ))}
                     </div>
                     <div className="flex justify-center">
                       <Image
-                        src={WaterCd}
+                        src={effectiveWidget1}
                         alt="Water CD"
                         width={160}
                         height={160}
@@ -364,7 +383,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex justify-center">
                       <Image
-                        src={CutePuppy}
+                        src={effectiveWidget2}
                         alt="Cute Puppy"
                         width={160}
                         height={160}
@@ -377,7 +396,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
                     </div>
                     <div className="flex flex-col justify-center">
                       <div className="grid grid-cols-2 gap-4 auto-rows-min justify-items-center">
-                        {desktopApps.slice(4, 6).map((app, index) => (
+                        {icons.slice(4, 6).map((app, index) => (
                           <div
                             key={app.id}
                             ref={(el) => {
@@ -385,10 +404,10 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
                             }}
                           >
                             <MobileIcon
-                              id={app.id}
-                              label={app.label}
+                              id={String(app.id)}
+                              label={app.name}
                               icon={app.icon}
-                              onClick={() => openWindow(app.label)}
+                              onClick={() => openWindow(app.name)}
                             />
                           </div>
                         ))}
@@ -399,7 +418,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
                   <MusicPlayerWidget isDesktop={false} embedded={preview} />
                 </div>
                 <Taskbar
-                  apps={desktopApps}
+                  apps={icons.map(icon => ({ id: String(icon.id), label: icon.name, icon: icon.icon }))}
                   openWindows={openWindows}
                   onAppClick={handleAppClick}
                   className="mt-auto"
