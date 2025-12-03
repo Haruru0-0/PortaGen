@@ -62,11 +62,11 @@ export function WindowsTab() {
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-[10px] font-bold truncate">{w.name}</span>
                         <span className="text-[8px] px-1 py-0.5 border border-border bg-card capitalize">
-                          {w.data.type || 'text'}
+                          {w.data?.type || 'text'}
                         </span>
                       </div>
                       <p className="text-[8px] text-muted-foreground truncate">
-                        {w.data.description || 'Custom content'}
+                        {w.data?.description || 'Custom content'}
                       </p>
                     </div>
                   </div>

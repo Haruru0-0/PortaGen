@@ -15,11 +15,10 @@ import CutePuppy from "@/assets/cute-puppy.jpg";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
-import { AudioProvider } from "./audio-context";
-import { SoundProvider } from "./sound-context";
+import { AudioProvider } from "../../contexts/audio-context";
+import { SoundProvider } from "../../contexts/sound-context";
 import { MobileSettingsBar } from "./MobileSettingsBar";
-import { useEditorContext } from "@/contexts/editorContext";
-import { useIconContext, type Icon } from "@/contexts/iconContext";
+import { useIconContext } from "@/contexts/iconContext";
 import { useDesktopContext } from "@/contexts/desktopContext";
 import type { WindowContent } from "@/lib/types";
 import { useParams } from "next/navigation";
@@ -31,6 +30,8 @@ const Blog = React.lazy(() => import("./blog"));
 const Links = React.lazy(() => import("./links"));
 const Contact = React.lazy(() => import("./contact"));
 
+import { useWindowsContext } from "@/contexts/windowsContext";
+
 export default function Desktop({ preview = false, previewMode }: { preview?: boolean; previewMode?: "desktop" | "mobile" }) {
   type WindowData = {
     name: string;
@@ -38,30 +39,42 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
     component: React.ReactNode;
   };
 
-  const { uploadedWallpaper, selectedWallpaper, windowContents } = useEditorContext();
-  const params = useParams<{ id: string }>()
+  const params = useParams<{ username: string, id: string }>()
   const currentPortfolioId = Number(params?.id)
-  const { data, getDesktopData } = useDesktopContext();
-  const { icons, getAllIcons } = useIconContext();
+  const { data, getDesktopData, displayDesktopData } = useDesktopContext();
+  const { icons, getAllIcons, displayIcons } = useIconContext();
+  const { windows: fetchedWindows, fetchWindows, displayWindows } = useWindowsContext();
 
   useEffect(() => {
     if (currentPortfolioId && !data) {
-      getDesktopData(currentPortfolioId);
+      if (preview) {
+        void getDesktopData(currentPortfolioId)
+      } else {
+        void displayDesktopData(params.username, currentPortfolioId)
+      }
     }
-  }, [currentPortfolioId, data, getDesktopData]);
+  }, []);
 
   useEffect(() => {
     if (currentPortfolioId) {
-      void getAllIcons(currentPortfolioId)
+      if (preview) {
+        void getAllIcons(currentPortfolioId)
+        void fetchWindows(currentPortfolioId)
+      } else {
+        console.log("we're here")
+        void displayIcons(params.username, currentPortfolioId)
+        void displayWindows(params.username, currentPortfolioId)
+      }
     }
-  }, [currentPortfolioId])
+  }, [])
 
-  const effectiveWallpaper = data?.wallpaperUrl || uploadedWallpaper || selectedWallpaper?.url || Wallpaper.src;
+  const effectiveWallpaper = data?.wallpaperUrl || Wallpaper.src;
   const effectiveGif = data?.desktopGifUrl || GreetingGif;
   const effectiveWidget1 = data?.widget1Url || WaterCd;
   const effectiveWidget2 = data?.widget2Url || CutePuppy;
 
-
+  // Use editor content in preview mode, otherwise use fetched windows
+  const effectiveWindows = fetchedWindows;
 
   const mqDesktop = useMediaQuery("(min-width: 650px)");
   const isDesktop = previewMode ? previewMode === "desktop" : mqDesktop;
@@ -89,34 +102,58 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
   }, [openWindows, isDesktop]);
 
   const getComponentForWindow = (name: string) => {
-    const windowContent = windowContents.find((w: WindowContent) => w.name === name);
-    if (windowContent) {
-      return <div>{windowContent.data.content}</div>;
+    const windowContent = effectiveWindows.find((w: WindowContent) => w.name === name);
+
+    // If we found the window content, use its type to decide what to render
+    if (windowContent && windowContent.data) {
+      // Fix: Access the content correctly based on API structure
+      const contentData = windowContent.data.content || windowContent.data;
+
+      // Handle both possible structures
+      const actualContent = windowContent.data.content || windowContent.data;
+      const windowType = windowContent.data.type;
+
+      switch (windowType) {
+        case "about": return <AboutMe data={actualContent} />;
+        case "resume": return <Resume />;
+        case "projects": return <Projects data={actualContent} />;
+        case "blog": return <Blog data={actualContent} />;
+        case "links": return <Links />;
+        case "contact": return <Contact data={actualContent} />;
+        default: return <div>{windowContent.data.description || "Content"}</div>;
+      }
     }
-    switch (name) {
-      case "About me":
-        return <AboutMe />;
-      case "Resume":
-        return <Resume />;
-      case "Projects":
-        return <Projects />;
-      case "Blog":
-        return <Blog />;
-      case "Links":
-        return <Links />;
-      case "Contact me":
-        return <Contact />;
-      default:
-        return <div>Content for {name}</div>;
-    }
+
+    return <div>No content available</div>;
   };
 
-  const openWindow = (name: string) => {
+  const findWindowByIconId = (iconId: string) => {
+    console.log("Looking for window with iconId:", iconId, "typeof:", typeof iconId);
+    console.log("Available windows:", effectiveWindows.map(w => ({ name: w.name, iconId: w.iconId, iconIdType: typeof w.iconId })));
+
+    const foundWindow = effectiveWindows.find((w: WindowContent) => {
+      // Handle both string and number comparisons
+      const windowIconId = w.iconId;
+      const match = String(windowIconId) === String(iconId);
+      console.log(`Checking window ${w.name}: iconId=${windowIconId} (${typeof windowIconId}), looking for=${iconId} (${typeof iconId}), match=${match}`);
+      return match;
+    });
+
+    console.log("Found window:", foundWindow);
+    return foundWindow;
+  };
+
+  const openWindow = (iconId: string) => {
+    const windowContent = findWindowByIconId(iconId);
+    if (!windowContent) {
+      return;
+    }
+
     setOpenWindows((prev) => {
-      if (prev.find((w) => w.name === name)) return prev;
+      if (prev.find((w) => w.name === windowContent.name)) return prev;
       return [
         ...prev,
-        { name, minimized: false, component: getComponentForWindow(name) },
+        { name: windowContent.name, minimized: false, component: getComponentForWindow(windowContent.name) },
       ];
     });
   };
@@ -138,11 +175,22 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
   };
 
   const handleAppClick = (label: string) => {
-    const win = openWindows.find((w) => w.name === label);
+    // Find the icon by name to get its ID
+    const icon = icons.find((i) => i.name === label);
+    if (!icon) {
+      return;
+    }
+
+    const windowContent = findWindowByIconId(String(icon.id));
+    if (!windowContent) {
+      return;
+    }
+
+    const win = openWindows.find((w) => w.name === windowContent.name);
     if (win?.minimized) {
-      restoreWindow(label);
+      restoreWindow(windowContent.name);
     } else {
-      openWindow(label);
+      openWindow(String(icon.id));
     }
   };
 
@@ -283,165 +331,161 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
   );
 
   return (
-    <SoundProvider>
-      <AudioProvider>
-        <DndContext>
-          <div
-            className={`${preview ? 'w-full h-full' : 'w-screen h-screen'} relative overflow-hidden bg-cover bg-center`}
-            style={{ backgroundImage: `url(${effectiveWallpaper})` }}
-          >
-            {isDesktop && <MenuBar embedded={preview} previewMode={previewMode} />}
+    <DndContext>
+      <div
+        className={`${preview ? 'w-full h-full' : 'w-screen h-screen'} relative overflow-hidden bg-cover bg-center`}
+        style={{ backgroundImage: `url(${effectiveWallpaper})` }}
+      >
+        {isDesktop && <MenuBar embedded={preview} previewMode={previewMode} />}
 
-            {isDesktop && (
-              <div className="absolute top-9 left-1/2 -translate-x-1/2 text-center pointer-events-none">
-                <div ref={greetingRef} className="flex flex-col items-center">
-                  <div ref={greetingImageRef} className="w-24 h-24 mb-2 animate-float relative" style={{
-                    willChange: "transform",
-                    backfaceVisibility: "hidden",
-                  }}>
-                    <Image
-                      src={effectiveGif}
-                      alt="Cute greeting"
-                      width={96}
-                      height={96}
-                      className="w-full h-full"
-                    />
-                  </div>
-                  <h1
-                    ref={greetingTextRef}
-                    className="text-2xl font-bold text-white drop-shadow-md"
-                  >
-                    {greeting}!
-                  </h1>
-                </div>
+        {isDesktop && (
+          <div className="absolute top-9 left-1/2 -translate-x-1/2 text-center pointer-events-none">
+            <div ref={greetingRef} className="flex flex-col items-center">
+              <div ref={greetingImageRef} className="w-24 h-24 mb-2 animate-float relative" style={{
+                willChange: "transform",
+                backfaceVisibility: "hidden",
+              }}>
+                <Image
+                  src={effectiveGif}
+                  alt="Cute greeting"
+                  width={96}
+                  height={96}
+                  className="w-full h-full"
+                />
               </div>
-            )}
+              <h1
+                ref={greetingTextRef}
+                className="text-2xl font-bold text-white drop-shadow-md"
+              >
+                {greeting}!
+              </h1>
+            </div>
+          </div>
+        )}
 
-            {isDesktop ? (
-              <div className="absolute inset-0 flex flex-col gap-4 p-4 pt-12">
-                <div className="flex flex-col flex-wrap gap-4 content-start flex-1 overflow-auto pointer-events-none">
-                  {icons.map((app, index) => (
+        {isDesktop ? (
+          <div className="absolute inset-0 flex flex-col gap-4 p-4 pt-12">
+            <div className="flex flex-col flex-wrap gap-4 content-start flex-1 overflow-auto pointer-events-none">
+              {icons.map((app, index) => (
+                <div
+                  key={app.id}
+                  ref={(el) => {
+                    if (el) desktopIconsRef.current[index] = el;
+                  }}
+                >
+                  <DesktopIcon
+                    id={String(app.id)}
+                    label={app.name}
+                    icon={app.icon}
+                    onDoubleClick={() => openWindow(String(app.id))}
+                  />
+                </div>
+              ))}
+            </div>
+            <MusicPlayerWidget isDesktop={true} embedded={preview} spotifyPlaylistUrl={data?.spotifyPlaylistUrl} />
+            <Taskbar
+              apps={icons.map(icon => ({ id: String(icon.id), label: icon.name, icon: icon.icon }))}
+              openWindows={openWindows}
+              onAppClick={handleAppClick}
+              className="mt-auto"
+              embedded={preview}
+            />
+          </div>
+        ) : (
+          <div className="absolute inset-0 flex flex-col justify-between overflow-hidden gap-8 p-4 pb-24">
+            <div className="flex flex-col gap-4 justify-between h-full">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4 auto-rows-min justify-items-center">
+                  {icons.slice(0, 4).map((app, index) => (
                     <div
                       key={app.id}
                       ref={(el) => {
-                        if (el) desktopIconsRef.current[index] = el;
+                        if (el) mobileIconsRef.current[index] = el;
                       }}
                     >
-                      <DesktopIcon
+                      <MobileIcon
                         id={String(app.id)}
                         label={app.name}
                         icon={app.icon}
-                        onDoubleClick={() => openWindow(app.name)}
+                        onClick={() => openWindow(String(app.id))}
                       />
                     </div>
                   ))}
                 </div>
-                <MusicPlayerWidget isDesktop={true} embedded={preview} spotifyPlaylistUrl={data?.spotifyPlaylistUrl} />
-                <Taskbar
-                  apps={icons.map(icon => ({ id: String(icon.id), label: icon.name, icon: icon.icon }))}
-                  openWindows={openWindows}
-                  onAppClick={handleAppClick}
-                  className="mt-auto"
-                  embedded={preview}
-                />
-              </div>
-            ) : (
-              <div className="absolute inset-0 flex flex-col justify-between overflow-hidden gap-8 p-4 pb-24">
-                <div className="flex flex-col gap-4 justify-between h-full">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid grid-cols-2 gap-4 auto-rows-min justify-items-center">
-                      {icons.slice(0, 4).map((app, index) => (
-                        <div
-                          key={app.id}
-                          ref={(el) => {
-                            if (el) mobileIconsRef.current[index] = el;
-                          }}
-                        >
-                          <MobileIcon
-                            id={String(app.id)}
-                            label={app.name}
-                            icon={app.icon}
-                            onClick={() => openWindow(app.name)}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex justify-center">
-                      <Image
-                        src={effectiveWidget1}
-                        alt="Water CD"
-                        width={160}
-                        height={160}
-                        className="rounded-2xl h-[160px] w-auto animate-float-smooth"
-                        style={{
-                          willChange: "transform",
-                          backfaceVisibility: "hidden",
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex justify-center">
-                      <Image
-                        src={effectiveWidget2}
-                        alt="Cute Puppy"
-                        width={160}
-                        height={160}
-                        className="rounded-2xl h-[160px] w-auto animate-float-smooth"
-                        style={{
-                          willChange: "transform",
-                          backfaceVisibility: "hidden",
-                        }}
-                      />
-                    </div>
-                    <div className="flex flex-col justify-center">
-                      <div className="grid grid-cols-2 gap-4 auto-rows-min justify-items-center">
-                        {icons.slice(4, 6).map((app, index) => (
-                          <div
-                            key={app.id}
-                            ref={(el) => {
-                              if (el) mobileIconsRef.current[index + 4] = el;
-                            }}
-                          >
-                            <MobileIcon
-                              id={String(app.id)}
-                              label={app.name}
-                              icon={app.icon}
-                              onClick={() => openWindow(app.name)}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                      <MobileSettingsBar previewMode={previewMode} embedded={preview} />
-                    </div>
-                  </div>
-                  <MusicPlayerWidget isDesktop={false} embedded={preview} />
+                <div className="flex justify-center">
+                  <Image
+                    src={effectiveWidget1}
+                    alt="Water CD"
+                    width={160}
+                    height={160}
+                    className="rounded-2xl h-40 w-auto animate-float-smooth"
+                    style={{
+                      willChange: "transform",
+                      backfaceVisibility: "hidden",
+                    }}
+                  />
                 </div>
-                <Taskbar
-                  apps={icons.map(icon => ({ id: String(icon.id), label: icon.name, icon: icon.icon }))}
-                  openWindows={openWindows}
-                  onAppClick={handleAppClick}
-                  className="mt-auto"
-                  embedded={preview}
-                />
               </div>
-            )}
-
-            {openWindows.map((win) => (
-              <AppWindow
-                key={win.name}
-                title={win.name}
-                onClose={() => closeWindow(win.name)}
-                onMinimize={() => minimizeWindow(win.name)}
-                isMobile={!isDesktop}
-                isMinimized={win.minimized}
-              >
-                {win.component}
-              </AppWindow>
-            ))}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex justify-center">
+                  <Image
+                    src={effectiveWidget2}
+                    alt="Cute Puppy"
+                    width={160}
+                    height={160}
+                    className="rounded-2xl h-40 w-auto animate-float-smooth"
+                    style={{
+                      willChange: "transform",
+                      backfaceVisibility: "hidden",
+                    }}
+                  />
+                </div>
+                <div className="flex flex-col justify-center">
+                  <div className="grid grid-cols-2 gap-4 auto-rows-min justify-items-center">
+                    {icons.slice(4, 6).map((app, index) => (
+                      <div
+                        key={app.id}
+                        ref={(el) => {
+                          if (el) mobileIconsRef.current[index + 4] = el;
+                        }}
+                      >
+                        <MobileIcon
+                          id={String(app.id)}
+                          label={app.name}
+                          icon={app.icon}
+                          onClick={() => openWindow(String(app.id))}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <MobileSettingsBar previewMode={previewMode} embedded={preview} />
+                </div>
+              </div>
+              <MusicPlayerWidget isDesktop={false} embedded={preview} />
+            </div>
+            <Taskbar
+              apps={icons.map(icon => ({ id: String(icon.id), label: icon.name, icon: icon.icon }))}
+              openWindows={openWindows}
+              onAppClick={handleAppClick}
+              className="mt-auto"
+              embedded={preview}
+            />
           </div>
-        </DndContext>
-      </AudioProvider>
-    </SoundProvider>
+        )}
+
+        {openWindows.map((win) => (
+          <AppWindow
+            key={win.name}
+            title={win.name}
+            onClose={() => closeWindow(win.name)}
+            onMinimize={() => minimizeWindow(win.name)}
+            isMobile={!isDesktop}
+            isMinimized={win.minimized}
+          >
+            {win.component}
+          </AppWindow>
+        ))}
+      </div>
+    </DndContext>
   );
 }

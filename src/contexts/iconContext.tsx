@@ -1,12 +1,13 @@
 "use client"
 
-import React, {createContext, useContext, useState} from 'react'
+import React, { createContext, useContext, useState } from 'react'
 import {
-  addIcon as addIconAPI,
-  deleteIcon as deleteIconAPI,
-  getIcon as getIconAPI,
-  listIcons,
-  updateIcon as updateIconAPI
+    addIcon as addIconAPI,
+    deleteIcon as deleteIconAPI,
+    displayIcons as displayIconsAPI,
+    getIcon as getIconAPI,
+    listIcons,
+    updateIcon as updateIconAPI
 } from '@/lib/services/iconService'
 
 export type Icon = {
@@ -25,6 +26,7 @@ interface IconContextType {
     setIcons: (icons: Icon[]) => void
     loading: boolean
     getAllIcons: (portfolioId: number) => Promise<void>
+    displayIcons: (username: string, portfolioId: number) => Promise<void>
     addIcon: (portfolioId: number, payload: Partial<Icon> & { fileId?: number | string }) => Promise<Icon | undefined>
     updateIcon: (portfolioId: number, payload: Partial<Icon> & { id: number; fileId?: number | string }) => Promise<Icon | undefined>
     deleteIcon: (portfolioId: number, id: number) => Promise<boolean>
@@ -33,7 +35,7 @@ interface IconContextType {
 
 const IconContext = createContext<IconContextType | undefined>(undefined)
 
-export function IconProvider({children}: { children: React.ReactNode }) {
+export function IconProvider({ children }: { children: React.ReactNode }) {
     const [icons, setIcons] = useState<Icon[]>([])
     const [loading, setLoading] = useState(false)
 
@@ -51,7 +53,7 @@ export function IconProvider({children}: { children: React.ReactNode }) {
     const addIcon = async (portfolioId: number, payload: any) => {
         setLoading(true)
         try {
-            const created = await addIconAPI({...payload, portfolioId})
+            const created = await addIconAPI({ ...payload, portfolioId })
             if (created) setIcons((prev) => [...prev, created])
             return created
         } finally {
@@ -61,7 +63,7 @@ export function IconProvider({children}: { children: React.ReactNode }) {
     const updateIcon = async (portfolioId: number, payload: any) => {
         setLoading(true)
         try {
-            const updated = await updateIconAPI({...payload, portfolioId})
+            const updated = await updateIconAPI({ ...payload, portfolioId })
             if (updated) setIcons((prev) => prev.map((i) => (i.id === updated.id ? updated : i)))
             return updated
         } finally {
@@ -87,6 +89,17 @@ export function IconProvider({children}: { children: React.ReactNode }) {
         }
     }
 
+    const displayIcons = async (username: string, portfolioId: number) => {
+        if (!username || !portfolioId) return
+        setLoading(true)
+        try {
+            const res = await displayIconsAPI(username, portfolioId)
+            if (res?.icons) setIcons(res.icons as Icon[])
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
         <IconContext.Provider
             value={{
@@ -94,6 +107,7 @@ export function IconProvider({children}: { children: React.ReactNode }) {
                 setIcons,
                 loading,
                 getAllIcons,
+                displayIcons,
                 addIcon,
                 updateIcon,
                 deleteIcon,

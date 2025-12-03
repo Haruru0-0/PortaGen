@@ -1,13 +1,14 @@
 "use client"
 
-import React, {createContext, useCallback, useContext, useState} from 'react'
-import { DesktopData, getDesktop, updateDesktopGif, updateDesktopSpotify, updateDesktopWallpaper, updateDesktopWidget } from '@/lib/services/desktopService'
+import React, { createContext, useCallback, useContext, useState } from 'react'
+import { DesktopData, displayDesktop, getDesktop, updateDesktopGif, updateDesktopSpotify, updateDesktopWallpaper, updateDesktopWidget } from '@/lib/services/desktopService'
 
 interface DesktopContextType {
   data?: DesktopData
   loading: boolean
   fetching: boolean
   getDesktopData: (portfolioId: number) => Promise<void>
+  displayDesktopData: (username: string, portfolioId: number) => Promise<void>
   updateWallpaper: (portfolioId: number, assetId: number | null) => Promise<void>
   updateGif: (portfolioId: number, assetId: number | null) => Promise<void>
   updateWidget: (portfolioId: number, index: 1 | 2, assetId: number | null) => Promise<void>
@@ -68,11 +69,21 @@ export function DesktopProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const value: DesktopContextType = { data, loading, fetching, getDesktopData, updateWallpaper, updateGif, updateWidget, updateSpotify }
+  const displayDesktopData = async (username: string, portfolioId: number) => {
+    setFetching(true)
+    try {
+      const res = await displayDesktop(username, portfolioId)
+      setData(res)
+    } finally {
+      setFetching(false)
+    }
+  }
+
+  const value: DesktopContextType = { data, loading, fetching, getDesktopData, displayDesktopData, updateWallpaper, updateGif, updateWidget, updateSpotify }
   return (
-      <DesktopContext.Provider value={value}>
-        {children}
-      </DesktopContext.Provider>
+    <DesktopContext.Provider value={value}>
+      {children}
+    </DesktopContext.Provider>
   )
 }
 

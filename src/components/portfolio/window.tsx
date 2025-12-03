@@ -6,7 +6,7 @@ import { Maximize, Minus, X, Square } from "lucide-react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useResizeObserver } from "@/hooks/use-resize-observer";
-import { useAppSound } from "./sound-context";
+import { useAppSound } from "../../contexts/sound-context";
 import { CuteSuspenseFallback } from "./suspense-fallback";
 import { SnapMenu, type SnapType } from "./SnapMenu";
 

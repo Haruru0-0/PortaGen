@@ -1,4 +1,5 @@
 import React, { useState, useEffect, JSX } from "react"
+import { toast } from "sonner"
 import { PixelCard } from "@/components/pixel-card"
 import { PixelButton } from "@/components/pixel-button"
 import { Save, Layout, User, Briefcase, Mail, FileText, Link, BookOpen, ArrowLeft } from "lucide-react"
@@ -72,8 +73,8 @@ export function WindowContentEditor({ windowContent, portfolioId, onSave, onCanc
     useEffect(() => {
         if (windowContent) {
             setName(windowContent.name)
-            setSelectedType(windowContent.data.type)
-            setContentData(windowContent.data.content || {})
+            setSelectedType(windowContent.data?.type || "about")
+            setContentData(windowContent.data?.content || {})
         }
     }, [windowContent])
 
@@ -162,9 +163,10 @@ export function WindowContentEditor({ windowContent, portfolioId, onSave, onCanc
                 }
             }
             onSave(content)
+            toast.success("Window saved successfully!")
         } catch (error) {
             console.error("Failed to save window:", error)
-            // TODO: Show error toast
+            toast.error("Failed to save window. Please try again.")
         } finally {
             setIsUploading(false)
         }

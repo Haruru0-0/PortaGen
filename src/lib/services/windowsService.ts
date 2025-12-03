@@ -68,3 +68,14 @@ export const deleteWindow = async (portfolioId: number, windowId: number) => {
   }
 }
 
+export const displayWindows = async (username: string, portfolioId: number) => {
+  try {
+    const res = await fetch(`/api/windows/display?username=${encodeURIComponent(username)}&portfolioId=${portfolioId}`)
+    if (!res.ok) return { windows: [] as WindowContent[] }
+    return (await res.json()) as { windows: WindowContent[] }
+  } catch (e) {
+    console.error('displayWindows error:', e)
+    return { windows: [] as WindowContent[] }
+  }
+}
+

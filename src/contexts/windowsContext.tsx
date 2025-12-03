@@ -2,13 +2,14 @@
 
 import React, { createContext, useContext, useState } from 'react'
 import type { WindowContent } from '@/lib/types'
-import { listWindows, getWindow as getWindowAPI, createWindow as createWindowAPI, updateWindow as updateWindowAPI, deleteWindow as deleteWindowAPI } from '@/lib/services/windowsService'
+import { displayWindows as displayWindowsAPI, listWindows, getWindow as getWindowAPI, createWindow as createWindowAPI, updateWindow as updateWindowAPI, deleteWindow as deleteWindowAPI } from '@/lib/services/windowsService'
 
 interface WindowsContextType {
   windows: WindowContent[]
   loading: boolean
   setWindows: (rows: WindowContent[]) => void
   fetchWindows: (portfolioId: number) => Promise<void>
+  displayWindows: (username: string, portfolioId: number) => Promise<void>
   getWindow: (portfolioId: number, windowId: number) => Promise<WindowContent | undefined>
   createWindow: (portfolioId: number, name: string, content?: WindowContent['data']['content']) => Promise<WindowContent | undefined>
   updateWindow: (portfolioId: number, windowId: number, payload: Partial<Omit<WindowContent, 'id' | 'portfolioId'>>) => Promise<WindowContent | undefined>
@@ -73,9 +74,19 @@ export function WindowsProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const displayWindows = async (username: string, portfolioId: number) => {
+    setLoading(true)
+    try {
+      const res = await displayWindowsAPI(username, portfolioId)
+      if (res?.windows) setWindows(res.windows)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <WindowsContext.Provider
-      value={{ windows, loading, setWindows, fetchWindows, getWindow, createWindow, updateWindow, deleteWindow }}
+      value={{ windows, loading, setWindows, fetchWindows, displayWindows, getWindow, createWindow, updateWindow, deleteWindow }}
     >
       {children}
     </WindowsContext.Provider>

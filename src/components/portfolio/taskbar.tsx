@@ -2,18 +2,17 @@
 
 import type React from "react"
 import Image from "next/image"
-import type { StaticImageData } from "next/image"
 import { gsap } from "gsap"
 import { useGSAP } from "@gsap/react"
 import { useRef } from "react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { useAppSound } from "./sound-context"
+import { useAppSound } from "../../contexts/sound-context"
 
 interface TaskbarProps {
   apps: {
     id: string
     label: string
-    icon: StaticImageData
+    icon: string
   }[]
   openWindows: {
     name: string

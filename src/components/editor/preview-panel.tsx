@@ -1,12 +1,12 @@
-import { Suspense, useMemo, useRef } from "react"
+import { Suspense, useRef } from "react"
 import { PixelCard } from "@/components/pixel-card"
 import { PixelButton } from "@/components/pixel-button"
 import { Monitor, Smartphone, Lock, Unlock } from "lucide-react"
 import { LockScreen } from "@/components/portfolio/lock-screen"
 import Desktop from "@/components/portfolio/desktop"
 import { CuteSuspenseFallback } from "@/components/portfolio/suspense-fallback"
-import { SoundProvider } from "@/components/portfolio/sound-context"
-import { AudioProvider } from "@/components/portfolio/audio-context"
+import { SoundProvider } from "@/contexts/sound-context"
+import { AudioProvider } from "@/contexts/audio-context"
 import { PortfolioTheme } from "@/lib/portfolio-theme"
 import { useResizeObserver } from "@/hooks/use-resize-observer"
 
@@ -21,9 +21,6 @@ interface PreviewPanelProps {
     previewMode: "desktop" | "mobile"
     isLocked: boolean
     lockScreenEnabled: boolean
-    lockScreenPassword: string
-    lockScreenHint: string
-    lockScreenImage: string
     desktopGif: string
     wallpaper: string
     mobileWidget1: string
@@ -40,17 +37,6 @@ export function PreviewPanel({
     previewMode,
     isLocked,
     lockScreenEnabled,
-    lockScreenPassword,
-    lockScreenHint,
-    lockScreenImage,
-    desktopGif,
-    wallpaper,
-    mobileWidget1,
-    mobileWidget2,
-    musicPlayerIcon,
-    spotifyPlaylistUrl,
-    icons,
-    theme,
     onPreviewModeChange,
     onLockChange,
 }: PreviewPanelProps) {
@@ -66,8 +52,8 @@ export function PreviewPanel({
                         <button
                             onClick={() => onPreviewModeChange("desktop")}
                             className={`px-3 py-2 text-[10px] border-2 border-border flex items-center gap-1 ${previewMode === "desktop"
-                                    ? "bg-primary text-primary-foreground"
-                                    : "bg-card hover:bg-muted"
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-card hover:bg-muted"
                                 } ${isNarrow ? "opacity-60 cursor-not-allowed" : ""}`}
                             disabled={isNarrow}
                             title={isNarrow ? "Desktop preview is available on larger screens" : undefined}
@@ -78,8 +64,8 @@ export function PreviewPanel({
                         <button
                             onClick={() => onPreviewModeChange("mobile")}
                             className={`px-3 py-2 text-[10px] border-2 border-border flex items-center gap-1 ${previewMode === "mobile"
-                                    ? "bg-primary text-primary-foreground"
-                                    : "bg-card hover:bg-muted"
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-card hover:bg-muted"
                                 }`}
                         >
                             <Smartphone className="w-3 h-3" />
@@ -91,8 +77,8 @@ export function PreviewPanel({
                                 <button
                                     onClick={() => onLockChange(true)}
                                     className={`px-3 py-2 text-[10px] border-2 border-border flex items-center gap-1 ${isLocked
-                                            ? "bg-primary text-primary-foreground"
-                                            : "bg-card hover:bg-muted"
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-card hover:bg-muted"
                                         }`}
                                 >
                                     <Lock className="w-3 h-3" />
@@ -101,8 +87,8 @@ export function PreviewPanel({
                                 <button
                                     onClick={() => onLockChange(false)}
                                     className={`px-3 py-2 text-[10px] border-2 border-border flex items-center gap-1 ${!isLocked
-                                            ? "bg-primary text-primary-foreground"
-                                            : "bg-card hover:bg-muted"
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-card hover:bg-muted"
                                         }`}
                                 >
                                     <Unlock className="w-3 h-3" />
@@ -117,24 +103,18 @@ export function PreviewPanel({
                     <div ref={stageContainerRef} className="w-full h-full">
                         {previewMode === "mobile" ? (
                             <div className="mx-auto max-w-[375px] h-[800px]">
-                                <SoundProvider>
-                                    <AudioProvider>
-                                        <Suspense fallback={<CuteSuspenseFallback />}>
-                                            {lockScreenEnabled && isLocked ? (
-                                                <LockScreen
-                                                    password={lockScreenPassword}
-                                                    hint={lockScreenHint}
-                                                    wallpaper={lockScreenImage || "/beautiful-pastel-gradient-wallpaper.jpg"}
-                                                    onUnlock={() => onLockChange(false)}
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full relative" style={{ zIndex: 1 }}>
-                                                    <Desktop preview={true} previewMode={previewMode} />
-                                                </div>
-                                            )}
-                                        </Suspense>
-                                    </AudioProvider>
-                                </SoundProvider>
+                                <Suspense fallback={<CuteSuspenseFallback />}>
+                                    {lockScreenEnabled && isLocked ? (
+                                        <LockScreen
+                                            preview={true}
+                                            onUnlock={() => onLockChange(false)}
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full relative" style={{ zIndex: 1 }}>
+                                            <Desktop preview={true} previewMode={previewMode} />
+                                        </div>
+                                    )}
+                                </Suspense>
                             </div>
                         ) : (
                             <div className="mx-auto w-full" style={{ aspectRatio: "16/9" }}>
@@ -144,24 +124,18 @@ export function PreviewPanel({
                                     </div>
                                 ) : (
                                     <div className="w-full h-full">
-                                        <SoundProvider>
-                                            <AudioProvider>
-                                                <Suspense fallback={<CuteSuspenseFallback />}>
-                                                    {lockScreenEnabled && isLocked ? (
-                                                        <LockScreen
-                                                            password={lockScreenPassword}
-                                                            hint={lockScreenHint}
-                                                            wallpaper={lockScreenImage || "/beautiful-pastel-gradient-wallpaper.jpg"}
-                                                            onUnlock={() => onLockChange(false)}
-                                                        />
-                                                    ) : (
-                                                        <div className="w-full h-full relative" style={{ zIndex: 1 }}>
-                                                            <Desktop preview={true} previewMode={previewMode} />
-                                                        </div>
-                                                    )}
-                                                </Suspense>
-                                            </AudioProvider>
-                                        </SoundProvider>
+                                        <Suspense fallback={<CuteSuspenseFallback />}>
+                                            {lockScreenEnabled && isLocked ? (
+                                                <LockScreen
+                                                    preview={true}
+                                                    onUnlock={() => onLockChange(false)}
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full relative" style={{ zIndex: 1 }}>
+                                                    <Desktop preview={true} previewMode={previewMode} />
+                                                </div>
+                                            )}
+                                        </Suspense>
                                     </div>
                                 )}
                             </div>

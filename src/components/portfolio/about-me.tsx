@@ -11,8 +11,10 @@ import { Badge } from "@/components/ui/badge";
 import { AnimatedSection, AnimatedItem } from "@/components/portfolio/animated-section";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-export default function AboutMe({ windowWidth }: { windowWidth?: number }) {
-  const testimonials = [
+import { AboutMeData } from "@/lib/types";
+
+export default function AboutMe({ windowWidth, data }: { windowWidth?: number; data?: AboutMeData }) {
+  const testimonials = data?.testimonials || [
     {
       name: "Sarah Johnson",
       role: "Project Manager at TechCorp",
@@ -50,7 +52,7 @@ export default function AboutMe({ windowWidth }: { windowWidth?: number }) {
     },
   ];
 
-  const hobbies = [
+  const hobbies = data?.hobbies || [
     {
       name: "Coding",
       icon: "💻",
@@ -84,37 +86,26 @@ export default function AboutMe({ windowWidth }: { windowWidth?: number }) {
     <div className="space-y-8 max-w-4xl mx-auto pixel-text">
       <AnimatedSection variant="scale" duration={0.7} className="text-center">
         <Avatar className="w-24 h-24 mx-auto mb-4 border-2 border-[var(--cute-text)] rounded-none">
-          <AvatarImage src="/profile-photo.jpg" alt="Profile" />
+          <AvatarImage src={data?.profileImage || "/profile-photo.jpg"} alt="Profile" />
           <AvatarFallback className="rounded-none bg-[var(--cute-highlight)] text-[var(--cute-text)]">AK</AvatarFallback>
         </Avatar>
         <h1 className="text-3xl font-bold mb-2 pixel-title">
-          Ahmad Kanaan
+          {data?.title || "Ahmad Kanaan"}
         </h1>
         <p className="mb-4 opacity-80">
-          Full-Stack Developer with 4 years of experience
+          {data?.subtitle || "Full-Stack Developer with 4 years of experience"}
         </p>
         <div className="flex flex-wrap justify-center gap-2">
-          <Badge variant="secondary" className="pixel-badge hover:bg-[var(--cute-highlight)]">Web Development</Badge>
-          <Badge variant="secondary" className="pixel-badge hover:bg-[var(--cute-highlight)]">Web Design</Badge>
-          <Badge variant="secondary" className="pixel-badge hover:bg-[var(--cute-highlight)]">React</Badge>
-          <Badge variant="secondary" className="pixel-badge hover:bg-[var(--cute-highlight)]">Node.js</Badge>
-          <Badge variant="secondary" className="pixel-badge hover:bg-[var(--cute-highlight)]">UI/UX</Badge>
+          {(data?.skills || ["Web Development", "Web Design", "React", "Node.js", "UI/UX"]).map((skill, index) => (
+            <Badge key={index} variant="secondary" className="pixel-badge hover:bg-[var(--cute-highlight)]">{skill}</Badge>
+          ))}
         </div>
       </AnimatedSection>
 
       <AnimatedSection variant="slideUp" delay={0.1}>
         <h2 className="text-2xl font-bold mb-4 pixel-title border-b-2 border-[var(--cute-text)] inline-block">About Me</h2>
         <p className="mb-4 leading-relaxed">
-          I'm a passionate full-stack developer with 4 years of experience
-          building modern web applications. I specialize in creating responsive,
-          user-friendly interfaces with React and building robust backend
-          systems with Node.js. My approach combines technical expertise with
-          creative problem-solving to deliver exceptional digital experiences.
-        </p>
-        <p className="leading-relaxed">
-          When I'm not coding, you can find me exploring new technologies,
-          contributing to open-source projects, or sharing my knowledge through
-          blog posts and community events.
+          {data?.description || "I'm a passionate full-stack developer with 4 years of experience building modern web applications. I specialize in creating responsive, user-friendly interfaces with React and building robust backend systems with Node.js. My approach combines technical expertise with creative problem-solving to deliver exceptional digital experiences."}
         </p>
       </AnimatedSection>
 
@@ -171,8 +162,8 @@ export default function AboutMe({ windowWidth }: { windowWidth?: number }) {
                           </p>
                         </div>
                       </div>
-                      <p className="italic flex-grow opacity-90">
-                        "{testimonial.content}"
+                      <p className="italic grow opacity-90">
+                        {testimonial.content}
                       </p>
                     </CardContent>
                   </Card>

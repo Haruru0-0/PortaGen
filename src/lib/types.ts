@@ -190,6 +190,7 @@ export interface WindowContent {
         content?: TemplateData
     }
     type: WindowContentType
+    iconId: string
 }
 
 export type AssetType = "all" | "wallpaper" | "icon" | "music" | "sound"

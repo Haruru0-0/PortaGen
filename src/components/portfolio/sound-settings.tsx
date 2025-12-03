@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Volume2, VolumeX, Gamepad2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
-import { useAppSound } from './sound-context'
+import { useAppSound } from '../../contexts/sound-context'
 import { useMediaQuery } from '@/hooks/use-media-query'
 import {
   DropdownMenu,

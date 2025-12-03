@@ -25,7 +25,7 @@ interface BlogPost {
   url: string
 }
 
-export default function Blog() {
+export default function Blog({ data }: { data?: any }) {
   const { data: posts, isLoading, isError } = useQuery<PostNode[]>({
     queryKey: ['blogPosts'],
     queryFn: fetchBlogPosts,

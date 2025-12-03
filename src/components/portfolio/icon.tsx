@@ -3,7 +3,7 @@ import Image, { StaticImageData } from "next/image"
 import { gsap } from "gsap"
 import { useGSAP } from "@gsap/react"
 import { useRef } from "react"
-import { useAppSound } from "./sound-context"
+import { useAppSound } from "../../contexts/sound-context"
 
 export function DesktopIcon({
   id,

@@ -63,3 +63,13 @@ export async function updateDesktopSpotify(portfolioId: number, spotifyPlaylistU
   return res.json()
 }
 
+export async function displayDesktop(username: string, portfolioId: number) {
+  try {
+    const res = await fetch(`/api/desktop/display?username=${encodeURIComponent(username)}&portfolioId=${portfolioId}`)
+    if (!res.ok) return undefined
+    return await res.json()
+  } catch (e) {
+    console.error('displayDesktop error:', e)
+  }
+}
+

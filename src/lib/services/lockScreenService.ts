@@ -37,3 +37,13 @@ export async function updateLockScreenPass(portfolioId: number, data: { enabled?
   return res.json()
 }
 
+export async function displayLockScreen(username: string, portfolioId: number) {
+  try {
+    const res = await fetch(`/api/lock-screen/display?username=${encodeURIComponent(username)}&portfolioId=${portfolioId}`)
+    if (!res.ok) return undefined
+    return await res.json()
+  } catch (e) {
+    console.error('displayLockScreen error:', e)
+  }
+}
+

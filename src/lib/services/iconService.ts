@@ -57,3 +57,13 @@ export const listIcons = async (portfolioId: number) => {
   }
 }
 
+export const displayIcons = async (username: string, portfolioId: number) => {
+  try {
+    const res = await fetch(`/api/icons/display?username=${encodeURIComponent(username)}&portfolioId=${portfolioId}`)
+    if (!res.ok) return { icons: [] as any[] }
+    return await res.json()
+  } catch (e) {
+    console.error('displayIcons error:', e)
+    return { icons: [] as any[] }
+  }
+}

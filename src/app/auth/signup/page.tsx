@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -18,13 +17,16 @@ import { PixelCharacter } from "@/components/pixel-character"
 const signupSchema = z.object({
   firstName: z.string().min(1, { message: "FIRST NAME REQUIRED" }),
   lastName: z.string().min(1, { message: "LAST NAME REQUIRED" }),
+  username: z.string().min(3, { message: "USERNAME MUST BE 3+ CHARACTERS" })
+    .max(20, { message: "USERNAME MUST BE 20 OR FEWER CHARACTERS" })
+    .regex(/^[a-zA-Z0-9_]+$/, { message: "USERNAME CAN ONLY CONTAIN LETTERS, NUMBERS, AND UNDERSCORES" }),
   email: z.string().email({ message: "INVALID EMAIL FORMAT" }),
   password: z
-      .string()
-      .min(8, { message: "PASSWORD MUST BE 8+ CHARACTERS" })
-      .regex(/[a-z]/, { message: "PASSWORD NEEDS LOWERCASE LETTER" })
-      .regex(/[A-Z]/, { message: "PASSWORD NEEDS UPPERCASE LETTER" })
-      .regex(/[0-9]/, { message: "PASSWORD NEEDS NUMBER" }),
+    .string()
+    .min(8, { message: "PASSWORD MUST BE 8+ CHARACTERS" })
+    .regex(/[a-z]/, { message: "PASSWORD NEEDS LOWERCASE LETTER" })
+    .regex(/[A-Z]/, { message: "PASSWORD NEEDS UPPERCASE LETTER" })
+    .regex(/[0-9]/, { message: "PASSWORD NEEDS NUMBER" }),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "PASSWORDS DO NOT MATCH",
@@ -47,6 +49,7 @@ export default function SignUpPage() {
     defaultValues: {
       firstName: "",
       lastName: "",
+      username: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -91,6 +94,7 @@ export default function SignUpPage() {
       await signUp.create({
         firstName: data.firstName,
         lastName: data.lastName,
+        username: data.username,
         emailAddress: data.email,
         password: data.password,
       })
@@ -146,81 +150,6 @@ export default function SignUpPage() {
   // OTP Verification View
   if (verifying) {
     return (
-        <div className="min-h-screen relative flex items-center justify-center p-4">
-          <PixelClouds />
-
-          <div className="fixed bottom-0 left-0 right-0 h-48 z-0">
-            <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-[#8B5CF6] to-[#EC4899]" />
-            <div className="absolute bottom-0 w-full flex justify-around items-end">
-              {[...Array(20)].map((_, i) => (
-                  <div
-                      key={i}
-                      className="bg-[#6D28D9]"
-                      style={{
-                        width: "40px",
-                        height: `${Math.random() * 60 + 40}px`,
-                        opacity: 0.8,
-                      }}
-                  />
-              ))}
-            </div>
-          </div>
-
-          <div className="relative z-10 w-full max-w-md">
-            <PixelCard>
-              <div className="space-y-6">
-                <div className="text-center space-y-4">
-                  <div className="flex justify-center">
-                    <PixelCharacter color="#8B5CF6" size={60} />
-                  </div>
-                  <h1 className="text-xl pixel-text-shadow">VERIFY EMAIL</h1>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    ENTER THE CODE SENT TO YOUR EMAIL
-                  </p>
-                </div>
-
-                {error && (
-                    <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 text-[10px] text-center">
-                      {error}
-                    </div>
-                )}
-
-                <form onSubmit={handleVerifyEmail} className="space-y-4">
-                  <PixelInput
-                      label="VERIFICATION CODE"
-                      type="text"
-                      placeholder="123456"
-                      value={code}
-                      onChange={(e) => setCode(e.target.value)}
-                      maxLength={6}
-                  />
-
-                  <PixelButton
-                      type="submit"
-                      variant="primary"
-                      className="w-full"
-                      disabled={loading || code.length !== 6}
-                  >
-                    {loading ? "VERIFYING..." : "VERIFY & CONTINUE"}
-                  </PixelButton>
-
-                  <button
-                      type="button"
-                      onClick={() => setVerifying(false)}
-                      className="w-full text-[10px] text-muted-foreground hover:text-primary"
-                  >
-                    ← BACK TO SIGNUP
-                  </button>
-                </form>
-              </div>
-            </PixelCard>
-          </div>
-        </div>
-    )
-  }
-
-  // Signup Form View
-  return (
       <div className="min-h-screen relative flex items-center justify-center p-4">
         <PixelClouds />
 
@@ -228,184 +157,272 @@ export default function SignUpPage() {
           <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-[#8B5CF6] to-[#EC4899]" />
           <div className="absolute bottom-0 w-full flex justify-around items-end">
             {[...Array(20)].map((_, i) => (
-                <div
-                    key={i}
-                    className="bg-[#6D28D9]"
-                    style={{
-                      width: "40px",
-                      height: `${Math.random() * 60 + 40}px`,
-                      opacity: 0.8,
-                    }}
-                />
+              <div
+                key={i}
+                className="bg-[#6D28D9]"
+                style={{
+                  width: "40px",
+                  height: `${Math.random() * 60 + 40}px`,
+                  opacity: 0.8,
+                }}
+              />
             ))}
           </div>
         </div>
 
-        <div className="relative z-10 w-full max-w-lg">
+        <div className="relative z-10 w-full max-w-md">
           <PixelCard>
             <div className="space-y-6">
               <div className="text-center space-y-4">
                 <div className="flex justify-center">
                   <PixelCharacter color="#8B5CF6" size={60} />
                 </div>
-                <h1 className="text-xl pixel-text-shadow">SIGN UP</h1>
+                <h1 className="text-xl pixel-text-shadow">VERIFY EMAIL</h1>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  CREATE YOUR PIXEL PORTFOLIO
+                  ENTER THE CODE SENT TO YOUR EMAIL
                 </p>
               </div>
 
               {error && (
-                  <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 text-[10px] text-center">
-                    {error}
-                  </div>
+                <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 text-[10px] text-center">
+                  {error}
+                </div>
               )}
 
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <div className="flex justify-between items-start gap-3">
-                  <div>
-                    <PixelInput
-                        label="FIRST NAME"
-                        type="text"
-                        placeholder="JOHN"
-                        {...form.register("firstName")}
-                    />
-                    {form.formState.errors.firstName && (
-                        <p className="text-red-500 text-[10px] mt-1">
-                          {form.formState.errors.firstName.message}
-                        </p>
-                    )}
-                  </div>
+              <form onSubmit={handleVerifyEmail} className="space-y-4">
+                <PixelInput
+                  label="VERIFICATION CODE"
+                  type="text"
+                  placeholder="123456"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  maxLength={6}
+                />
 
-                  <div>
-                    <PixelInput
-                        label="LAST NAME"
-                        type="text"
-                        placeholder="DOE"
-                        {...form.register("lastName")}
-                    />
-                    {form.formState.errors.lastName && (
-                        <p className="text-red-500 text-[10px] mt-1">
-                          {form.formState.errors.lastName.message}
-                        </p>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <PixelInput
-                      label="EMAIL"
-                      type="email"
-                      placeholder="YOU@EXAMPLE.COM"
-                      {...form.register("email")}
-                  />
-                  {form.formState.errors.email && (
-                      <p className="text-red-500 text-[10px] mt-1">
-                        {form.formState.errors.email.message}
-                      </p>
-                  )}
-                </div>
-
-                <div className={"flex justify-between items-start gap-3"}>
-                  <div>
-                    <PixelInput
-                        label="PASSWORD"
-                        type="password"
-                        placeholder="********"
-                        {...form.register("password")}
-                        onChange={handlePasswordChange}
-                    />
-                    {form.formState.errors.password && (
-                        <p className="text-red-500 text-[10px] mt-1">
-                          {form.formState.errors.password.message}
-                        </p>
-                    )}
-
-                    {form.watch("password") && (
-                        <div className="mt-2 space-y-1">
-                          <div className="flex gap-1">
-                            {[...Array(4)].map((_, i) => (
-                                <div
-                                    key={i}
-                                    className={`h-2 flex-1 border-2 border-border ${
-                                        i < passwordStrength / 25 ? getStrengthColor() : "bg-muted"
-                                    }`}
-                                />
-                            ))}
-                          </div>
-                          <p className="text-[10px] text-muted-foreground">
-                            STRENGTH: {getStrengthText()}
-                          </p>
-                        </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <PixelInput
-                        label="CONFIRM PASSWORD"
-                        type="password"
-                        placeholder="********"
-                        {...form.register("confirmPassword")}
-                    />
-                    {form.formState.errors.confirmPassword && (
-                        <p className="text-red-500 text-[10px] mt-1">
-                          {form.formState.errors.confirmPassword.message}
-                        </p>
-                    )}
-                  </div>
-                </div>
                 <PixelButton
-                    type="submit"
-                    variant="primary"
-                    className="w-full"
-                    disabled={loading || !isLoaded}
+                  type="submit"
+                  variant="primary"
+                  className="w-full"
+                  disabled={loading || code.length !== 6}
                 >
-                  {loading ? "CREATING..." : "CREATE ACCOUNT"}
+                  {loading ? "VERIFYING..." : "VERIFY & CONTINUE"}
                 </PixelButton>
+
+                <button
+                  type="button"
+                  onClick={() => setVerifying(false)}
+                  className="w-full text-[10px] text-muted-foreground hover:text-primary"
+                >
+                  ← BACK TO SIGNUP
+                </button>
               </form>
-
-              <div className="space-y-3">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t-2 border-border" />
-                  </div>
-                  <div className="relative flex justify-center text-[10px]">
-                  <span className="bg-card px-2 text-muted-foreground">
-                    OR CONTINUE WITH
-                  </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <PixelButton
-                      variant="secondary"
-                      className="w-full text-[10px]"
-                      onClick={() => handleOAuthSignUp("oauth_google")}
-                      disabled={!isLoaded}
-                      type="button"
-                  >
-                    GOOGLE
-                  </PixelButton>
-                  <PixelButton
-                      variant="secondary"
-                      className="w-full text-[10px]"
-                      onClick={() => handleOAuthSignUp("oauth_github")}
-                      disabled={!isLoaded}
-                      type="button"
-                  >
-                    GITHUB
-                  </PixelButton>
-                </div>
-              </div>
-
-              <p className="text-center text-[10px] text-muted-foreground leading-relaxed">
-                ALREADY HAVE AN ACCOUNT?{" "}
-                <Link href="/auth/login" className="text-primary hover:underline">
-                  LOG IN
-                </Link>
-              </p>
             </div>
           </PixelCard>
         </div>
       </div>
+    )
+  }
+
+  // Signup Form View
+  return (
+    <div className="min-h-screen relative flex items-center justify-center p-4">
+      <PixelClouds />
+
+      <div className="fixed bottom-0 left-0 right-0 h-48 z-0">
+        <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-[#8B5CF6] to-[#EC4899]" />
+        <div className="absolute bottom-0 w-full flex justify-around items-end">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="bg-[#6D28D9]"
+              style={{
+                width: "40px",
+                height: `${Math.random() * 60 + 40}px`,
+                opacity: 0.8,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="relative z-10 w-full max-w-lg">
+        <PixelCard>
+          <div className="space-y-6">
+            <div className="text-center space-y-4">
+              <div className="flex justify-center">
+                <PixelCharacter color="#8B5CF6" size={60} />
+              </div>
+              <h1 className="text-xl pixel-text-shadow">SIGN UP</h1>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                CREATE YOUR PIXEL PORTFOLIO
+              </p>
+            </div>
+
+            {error && (
+              <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 text-[10px] text-center">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <div className="flex justify-between items-start gap-3">
+                <div>
+                  <PixelInput
+                    label="FIRST NAME"
+                    type="text"
+                    placeholder="JOHN"
+                    {...form.register("firstName")}
+                  />
+                  {form.formState.errors.firstName && (
+                    <p className="text-red-500 text-[10px] mt-1">
+                      {form.formState.errors.firstName.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <PixelInput
+                    label="LAST NAME"
+                    type="text"
+                    placeholder="DOE"
+                    {...form.register("lastName")}
+                  />
+                  {form.formState.errors.lastName && (
+                    <p className="text-red-500 text-[10px] mt-1">
+                      {form.formState.errors.lastName.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <PixelInput
+                  label="USERNAME"
+                  type="text"
+                  placeholder="YOURUSERNAME"
+                  {...form.register("username")}
+                />
+                {form.formState.errors.username && (
+                  <p className="text-red-500 text-[10px] mt-1">
+                    {form.formState.errors.username.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <PixelInput
+                  label="EMAIL"
+                  type="email"
+                  placeholder="YOU@EXAMPLE.COM"
+                  {...form.register("email")}
+                />
+                {form.formState.errors.email && (
+                  <p className="text-red-500 text-[10px] mt-1">
+                    {form.formState.errors.email.message}
+                  </p>
+                )}
+              </div>
+
+              <div className={"flex justify-between items-start gap-3"}>
+                <div>
+                  <PixelInput
+                    label="PASSWORD"
+                    type="password"
+                    placeholder="********"
+                    {...form.register("password")}
+                    onChange={handlePasswordChange}
+                  />
+                  {form.formState.errors.password && (
+                    <p className="text-red-500 text-[10px] mt-1">
+                      {form.formState.errors.password.message}
+                    </p>
+                  )}
+
+                  {form.watch("password") && (
+                    <div className="mt-2 space-y-1">
+                      <div className="flex gap-1">
+                        {[...Array(4)].map((_, i) => (
+                          <div
+                            key={i}
+                            className={`h-2 flex-1 border-2 border-border ${i < passwordStrength / 25 ? getStrengthColor() : "bg-muted"
+                              }`}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-[10px] text-muted-foreground">
+                        STRENGTH: {getStrengthText()}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <PixelInput
+                    label="CONFIRM PASSWORD"
+                    type="password"
+                    placeholder="********"
+                    {...form.register("confirmPassword")}
+                  />
+                  {form.formState.errors.confirmPassword && (
+                    <p className="text-red-500 text-[10px] mt-1">
+                      {form.formState.errors.confirmPassword.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <PixelButton
+                type="submit"
+                variant="primary"
+                className="w-full"
+                disabled={loading || !isLoaded}
+              >
+                {loading ? "CREATING..." : "CREATE ACCOUNT"}
+              </PixelButton>
+            </form>
+
+            <div className="space-y-3">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t-2 border-border" />
+                </div>
+                <div className="relative flex justify-center text-[10px]">
+                  <span className="bg-card px-2 text-muted-foreground">
+                    OR CONTINUE WITH
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <PixelButton
+                  variant="secondary"
+                  className="w-full text-[10px]"
+                  onClick={() => handleOAuthSignUp("oauth_google")}
+                  disabled={!isLoaded}
+                  type="button"
+                >
+                  GOOGLE
+                </PixelButton>
+                <PixelButton
+                  variant="secondary"
+                  className="w-full text-[10px]"
+                  onClick={() => handleOAuthSignUp("oauth_github")}
+                  disabled={!isLoaded}
+                  type="button"
+                >
+                  GITHUB
+                </PixelButton>
+              </div>
+            </div>
+
+            <p className="text-center text-[10px] text-muted-foreground leading-relaxed">
+              ALREADY HAVE AN ACCOUNT?{" "}
+              <Link href="/auth/login" className="text-primary hover:underline">
+                LOG IN
+              </Link>
+            </p>
+          </div>
+        </PixelCard>
+      </div>
+    </div>
   )
 }

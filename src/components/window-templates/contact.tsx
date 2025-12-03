@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Mail, Phone, MapPin, Send, Linkedin, Github, Twitter, Link as LinkIcon } from "lucide-react"
 import { AnimatedSection, AnimatedItem } from "@/components/portfolio/animated-section"
-import { useAppSound } from "@/components/portfolio/sound-context"
+import { useAppSound } from "@/contexts/sound-context"
 import emailjs from '@emailjs/browser'
 import type { ContactData } from "@/lib/types"
 

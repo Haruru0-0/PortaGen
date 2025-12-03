@@ -1,13 +1,14 @@
 "use client"
 
-import React, {createContext, useCallback, useContext, useState} from 'react'
-import { getLockScreen, LockScreenData, updateLockScreenPass, updateLockScreenWallpaper } from '@/lib/services/lockScreenService'
+import React, { createContext, useCallback, useContext, useState } from 'react'
+import { displayLockScreen, getLockScreen, LockScreenData, updateLockScreenPass, updateLockScreenWallpaper } from '@/lib/services/lockScreenService'
 
 interface LockScreenContextType {
   data?: LockScreenData
   loading: boolean
   fetching: boolean
   getLockScreenData: (portfolioId: number) => Promise<void>
+  displayLockScreenData: (username: string, portfolioId: number) => Promise<void>
   updateWallpaper: (portfolioId: number, wallpaperAssetId: number | null) => Promise<void>
   updatePass: (portfolioId: number, payload: { enabled?: boolean; password?: string; hint?: string }) => Promise<void>
 }
@@ -49,11 +50,21 @@ export function LockScreenProvider({ children }: { children: React.ReactNode }) 
     }
   }
 
-  const value: LockScreenContextType = { data, loading, fetching, getLockScreenData, updateWallpaper, updatePass }
+  const displayLockScreenData = async (username: string, portfolioId: number) => {
+    setFetching(true)
+    try {
+      const res = await displayLockScreen(username, portfolioId)
+      setData(res)
+    } finally {
+      setFetching(false)
+    }
+  }
+
+  const value: LockScreenContextType = { data, loading, fetching, getLockScreenData, displayLockScreenData, updateWallpaper, updatePass }
   return (
-      <LockScreenContext.Provider value={value}>
-        {children}
-      </LockScreenContext.Provider>
+    <LockScreenContext.Provider value={value}>
+      {children}
+    </LockScreenContext.Provider>
   )
 }
 

@@ -4,11 +4,10 @@ import { useState } from "react"
 import { PixelInput } from "./pixel-input"
 import { THEME_PRESETS, type PortfolioTheme } from "@/lib/portfolio-theme"
 import { Check } from "lucide-react"
-import {PixelButton} from "@/components/pixel-button";
+import { PixelButton } from "@/components/pixel-button";
 
 export function ThemeEditor() {
-  let currentTheme;
-  const [customTheme, setCustomTheme] = useState<PortfolioTheme>(currentTheme)
+  const [customTheme, setCustomTheme] = useState<PortfolioTheme>(THEME_PRESETS[0])
 
   const handlePresetSelect = (preset: PortfolioTheme) => {
     setCustomTheme(preset)
@@ -57,9 +56,8 @@ export function ThemeEditor() {
             <button
               key={preset.id}
               onClick={() => handlePresetSelect(preset)}
-              className={`p-3 border-2 border-border text-left transition-all hover:scale-[1.02] ${
-                customTheme.id === preset.id ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"
-              }`}
+              className={`p-3 border-2 border-border text-left transition-all hover:scale-[1.02] ${customTheme.id === preset.id ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"
+                }`}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -148,11 +146,10 @@ export function ThemeEditor() {
               <button
                 key={pos}
                 onClick={() => handleLayoutChange("taskbarPosition", pos)}
-                className={`px-3 py-2 text-[8px] border-2 border-border ${
-                  customTheme.layout.taskbarPosition === pos
+                className={`px-3 py-2 text-[8px] border-2 border-border ${customTheme.layout.taskbarPosition === pos
                     ? "bg-primary text-primary-foreground"
                     : "bg-card hover:bg-muted"
-                }`}
+                  }`}
               >
                 {pos.toUpperCase()}
               </button>
@@ -166,11 +163,10 @@ export function ThemeEditor() {
               <button
                 key={style}
                 onClick={() => handleLayoutChange("menuBarStyle", style)}
-                className={`px-3 py-2 text-[8px] border-2 border-border ${
-                  customTheme.layout.menuBarStyle === style
+                className={`px-3 py-2 text-[8px] border-2 border-border ${customTheme.layout.menuBarStyle === style
                     ? "bg-primary text-primary-foreground"
                     : "bg-card hover:bg-muted"
-                }`}
+                  }`}
               >
                 {style.toUpperCase()}
               </button>
@@ -184,11 +180,10 @@ export function ThemeEditor() {
               <button
                 key={style}
                 onClick={() => handleLayoutChange("musicPlayerStyle", style)}
-                className={`px-3 py-2 text-[8px] border-2 border-border ${
-                  customTheme.layout.musicPlayerStyle === style
+                className={`px-3 py-2 text-[8px] border-2 border-border ${customTheme.layout.musicPlayerStyle === style
                     ? "bg-primary text-primary-foreground"
                     : "bg-card hover:bg-muted"
-                }`}
+                  }`}
               >
                 {style.toUpperCase()}
               </button>

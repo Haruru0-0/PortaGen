@@ -8,39 +8,40 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ArrowRight, X } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useAppSound } from "./sound-context"
+import { useAppSound } from "../../contexts/sound-context"
 import { gsap } from "gsap"
 import { useGSAP } from "@gsap/react"
 import { useLockScreenContext } from "@/contexts/lockScreenContext"
-import { useEditorContext } from "@/contexts/editorContext"
 import { useParams } from "next/navigation"
 
 interface LockScreenProps {
-  password?: string
-  hint?: string
-  wallpaper?: string
   onUnlock: () => void
+  preview?: boolean
 }
 
-export function LockScreen({ password, hint, wallpaper, onUnlock }: LockScreenProps) {
+export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [showLogin, setShowLogin] = useState(false)
   const [inputPassword, setInputPassword] = useState("")
   const [isWrongPassword, setIsWrongPassword] = useState(false)
   const { playClickSound, playErrorSound, playSuccessSound } = useAppSound()
 
-  const { data, getLockScreenData } = useLockScreenContext()
-  const params = useParams<{ id: string }>()
+  const { data, getLockScreenData, displayLockScreenData } = useLockScreenContext()
+  const params = useParams<{ username: string, id: string }>()
   const currentPortfolioId = Number(params?.id)
 
   useEffect(() => {
     if (currentPortfolioId && !data) {
-      getLockScreenData(currentPortfolioId)
+      if (preview) {
+        getLockScreenData(currentPortfolioId)
+      } else {
+        displayLockScreenData(params?.username, currentPortfolioId)
+      }
     }
   }, [currentPortfolioId, data, getLockScreenData])
 
-  const effectivePassword = data?.password || password || "1234"
-  const effectiveWallpaper = data?.wallpaperUrl || wallpaper || "/placeholder.svg?height=1080&width=1920"
+  const effectivePassword = data?.password || "1234"
+  const effectiveWallpaper = data?.wallpaperUrl || "/placeholder.svg?height=1080&width=1920"
 
   const timeRef = useRef<HTMLHeadingElement>(null)
   const dateRef = useRef<HTMLParagraphElement>(null)

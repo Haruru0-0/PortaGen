@@ -37,7 +37,7 @@ export const TabsNavigation = ({
                     if (el) tabsRef.current[index] = el;
                   }}
                   onClick={() => handleTabChange(tab.id)}
-                  className={`w-full text-left px-4 py-3 text-[10px] border-2 border-border transition-colors ${activeLockScreenTab === tab.id
+                  className={`w-full cursor-pointer text-left px-4 py-3 text-[10px] border-2 border-border transition-colors ${activeLockScreenTab === tab.id
                       ? "bg-primary text-primary-foreground"
                       : "bg-card hover:bg-muted"
                     }`}
@@ -52,7 +52,7 @@ export const TabsNavigation = ({
                     if (el) tabsRef.current[index] = el;
                   }}
                   onClick={() => handleTabChange(tab.id)}
-                  className={`w-full text-left px-4 py-3 text-[10px] border-2 border-border transition-colors ${activeHomeScreenTab === tab.id
+                  className={`w-full cursor-pointer text-left px-4 py-3 text-[10px] border-2 border-border transition-colors ${activeHomeScreenTab === tab.id
                       ? "bg-primary text-primary-foreground"
                       : "bg-card hover:bg-muted"
                     }`}

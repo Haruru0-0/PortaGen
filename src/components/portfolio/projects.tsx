@@ -22,11 +22,11 @@ import { AnimatedSection, AnimatedItem } from "@/components/portfolio/animated-s
 import facilify from "@/assets/Facilify.png";
 import awqafRashaya from "@/assets/AwqadRashaya.png";
 
-export default function Projects() {
+export default function Projects({ data }: { data?: any }) {
   const [activeProject, setActiveProject] = useState(0)
   const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null)
 
-  const projects = [
+  const projects = data?.projects || [
     {
       id: 1,
       title: "Facilify",

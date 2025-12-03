@@ -9,7 +9,7 @@ export function MobileNav() {
 
   const navItems = [
     { href: "/dashboard", icon: Home, label: "HOME" },
-    { href: "/dashboard/editor", icon: FolderOpen, label: "EDITOR" },
+    { href: "/dashboard/portfolios", icon: FolderOpen, label: "PORTFOLIOS" },
     { href: "/dashboard/assets", icon: ImageIcon, label: "ASSETS" },
     { href: "/dashboard/settings", icon: Settings, label: "SETTINGS" },
   ]

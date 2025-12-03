@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Mail, Phone, MapPin, Send, Linkedin, Github, Twitter } from "lucide-react"
 import { AnimatedSection, AnimatedItem } from "@/components/portfolio/animated-section"
-import { useAppSound } from "@/components/portfolio/sound-context"
+import { useAppSound } from "@/contexts/sound-context"
 import emailjs from '@emailjs/browser'
 
-export default function Contact({ windowWidth }: { windowWidth?: number }) {
+export default function Contact({ windowWidth, data }: { windowWidth?: number; data?: any }) {
   const [formState, setFormState] = useState({
     name: "",
     email: "",
