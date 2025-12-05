@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
         })
         if (!portfolio) return NextResponse.json({ error: 'Portfolio not found' }, { status: 404 })
 
-        const rows = await db.query.windows.findMany({ where: eq(windows.portfolioId, portfolioId), orderBy: (t, { asc }) => [asc(t.position)] })
+        const rows = await db.query.windows.findMany({ where: eq(windows.portfolioId, portfolioId) })
         const a = rows.map(r => ({ ...r, data: r.content }))
         return NextResponse.json({ windows: a })
     } catch (error) {

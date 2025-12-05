@@ -21,8 +21,8 @@ export async function GET(req: NextRequest) {
     const owned = await db.query.portfolios.findFirst({ where: and(eq(portfolios.id, portfolioId), eq(portfolios.userId, user.id)) })
     if (!owned) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-    const rows = await db.query.windows.findMany({ where: eq(windows.portfolioId, portfolioId), orderBy: (t, { asc }) => [asc(t.position)] })
-    const a = rows.map(r => ({...r, data: r.content}))
+    const rows = await db.query.windows.findMany({ where: eq(windows.portfolioId, portfolioId) })
+    const a = rows.map(r => ({ ...r, data: r.content }))
     return NextResponse.json({ windows: a })
   } catch (error) {
     console.error('Windows LIST error:', error)

@@ -182,7 +182,6 @@ export type TemplateData = LinksData | AboutMeData | ProjectsData | ContactData 
 export interface WindowContent {
     id: number
     name: string
-    enabled: boolean
     data: {
         type: WindowContentType
         template?: string

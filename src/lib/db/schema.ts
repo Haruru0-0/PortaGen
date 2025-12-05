@@ -66,9 +66,6 @@ export const windows = pgTable('windows', {
     // Optional link to an icon entry that opens this window
     iconId: integer('icon_id').references(() => icons.id, { onDelete: 'set null' }),
 
-    enabled: boolean('enabled').default(true),
-    position: integer('position').notNull().default(0),
-
     // Content stored as JSON
     content: jsonb('content').$type<{
         type: string;

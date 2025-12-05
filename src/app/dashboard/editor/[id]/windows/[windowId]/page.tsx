@@ -37,7 +37,7 @@ export default function EditWindowPage() {
   return (
     <div className="container mx-auto p-4">
       <WindowContentEditor
-        windowContent={windowContent}
+        windowId={windowId}
         portfolioId={portfolioId}
         onSave={handleSave}
         onCancel={handleCancel}

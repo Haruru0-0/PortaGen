@@ -50,6 +50,13 @@
       "when": 1764517764220,
       "tag": "0006_cultured_shen",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1764930347544,
+      "tag": "0007_thin_spiral",
+      "breakpoints": true
     }
   ]
 }

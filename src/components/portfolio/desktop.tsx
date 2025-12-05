@@ -15,8 +15,6 @@ import CutePuppy from "@/assets/cute-puppy.jpg";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
-import { AudioProvider } from "../../contexts/audio-context";
-import { SoundProvider } from "../../contexts/sound-context";
 import { MobileSettingsBar } from "./MobileSettingsBar";
 import { useIconContext } from "@/contexts/iconContext";
 import { useDesktopContext } from "@/contexts/desktopContext";
@@ -106,9 +104,6 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
 
     // If we found the window content, use its type to decide what to render
     if (windowContent && windowContent.data) {
-      // Fix: Access the content correctly based on API structure
-      const contentData = windowContent.data.content || windowContent.data;
-
       // Handle both possible structures
       const actualContent = windowContent.data.content || windowContent.data;
       const windowType = windowContent.data.type;

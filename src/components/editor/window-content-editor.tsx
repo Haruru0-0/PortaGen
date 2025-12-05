@@ -11,6 +11,7 @@ import { ContactForm } from "./forms/contact-form"
 import { ResumeForm } from "./forms/resume-form"
 import { BlogForm } from "./forms/blog-form"
 import { uploadFile } from "@/lib/services/uploadService"
+import { useWindowsContext } from "@/contexts/windowsContext"
 
 // Template definitions metadata
 const CONTENT_TEMPLATES: Record<WindowContentType, {
@@ -56,27 +57,46 @@ const CONTENT_TEMPLATES: Record<WindowContentType, {
 }
 
 interface WindowContentEditorProps {
-    windowContent: WindowContent | null
+    windowId?: number
     portfolioId: number
     onSave: (content: WindowContent) => void
     onCancel: () => void
 }
 
-export function WindowContentEditor({ windowContent, portfolioId, onSave, onCancel }: WindowContentEditorProps) {
-    const [name, setName] = useState(windowContent?.name || "")
-    const [selectedType, setSelectedType] = useState<WindowContentType>(windowContent?.data?.type || "about")
-    const [contentData, setContentData] = useState<TemplateData>(windowContent?.data?.content || {})
+export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }: WindowContentEditorProps) {
+    const { windows, getWindow, loading: contextLoading } = useWindowsContext()
+    const [name, setName] = useState("")
+    const [selectedType, setSelectedType] = useState<WindowContentType>("about")
+    const [contentData, setContentData] = useState<TemplateData>({})
     const [filesToUpload, setFilesToUpload] = useState<Map<string, File>>(new Map())
     const [isUploading, setIsUploading] = useState(false)
-    const isEditing = !!windowContent
+    const isEditing = !!windowId
+
+    // Combine both loading states
+    const isLoading = isUploading || contextLoading
+
+    // Get the current window from context
+    const currentWindow = windowId
+        ? windows.find(w => w.id === windowId)
+        : null
 
     useEffect(() => {
-        if (windowContent) {
-            setName(windowContent.name)
-            setSelectedType(windowContent.data?.type || "about")
-            setContentData(windowContent.data?.content || {})
+        // If we have a windowId but no currentWindow, fetch it
+        if (windowId && !currentWindow && portfolioId) {
+            getWindow(portfolioId, windowId).then(window => {
+                if (window) {
+                    setName(window.name)
+                    setSelectedType(window.data?.type || "about")
+                    setContentData(window.data?.content || {})
+                }
+            })
+        } else if (currentWindow) {
+            // Update from context changes
+            setName(currentWindow.name)
+            setSelectedType(currentWindow.data?.type || "about")
+            setContentData(currentWindow.data?.content || {})
         }
-    }, [windowContent])
+    }, [windowId, currentWindow, portfolioId, getWindow, windows])
 
     const handleTypeChange = (type: WindowContentType) => {
         setSelectedType(type)
@@ -85,7 +105,7 @@ export function WindowContentEditor({ windowContent, portfolioId, onSave, onCanc
         setFilesToUpload(new Map())
 
         // Update window name to match template if it's a new window or using default name
-        if (!windowContent || name === CONTENT_TEMPLATES[selectedType].name) {
+        if (!currentWindow || name === CONTENT_TEMPLATES[selectedType].name) {
             setName(CONTENT_TEMPLATES[type].name)
         }
     }
@@ -151,10 +171,10 @@ export function WindowContentEditor({ windowContent, portfolioId, onSave, onCanc
             }
 
             const content: WindowContent = {
-                id: windowContent?.id || 0,
+                id: currentWindow?.id || 0,
                 name,
-                enabled: windowContent?.enabled ?? true,
                 type: selectedType,
+                iconId: currentWindow?.iconId || "",
                 data: {
                     type: selectedType,
                     template: CONTENT_TEMPLATES[selectedType].name,
@@ -199,7 +219,7 @@ export function WindowContentEditor({ windowContent, portfolioId, onSave, onCanc
                         <button
                             onClick={onCancel}
                             className="w-8 h-8 border-2 border-border bg-card hover:bg-muted transition-colors flex items-center justify-center"
-                            disabled={isUploading}
+                            disabled={isLoading}
                         >
                             <ArrowLeft className="w-3 h-3" />
                         </button>
@@ -217,10 +237,10 @@ export function WindowContentEditor({ windowContent, portfolioId, onSave, onCanc
                         variant="primary"
                         className="text-[10px] flex items-center gap-2"
                         onClick={handleSave}
-                        disabled={isUploading}
+                        disabled={isLoading}
                     >
                         <Save className="w-3 h-3" />
-                        {isUploading ? "SAVING..." : (isEditing ? "UPDATE" : "CREATE")}
+                        {isLoading ? "SAVING..." : (isEditing ? "UPDATE" : "CREATE")}
                     </PixelButton>
                 </div>
 
@@ -236,7 +256,7 @@ export function WindowContentEditor({ windowContent, portfolioId, onSave, onCanc
                                     ? "border-primary bg-primary text-primary-foreground"
                                     : "border-border bg-card hover:bg-muted hover:border-muted-foreground"
                                     }`}
-                                disabled={isUploading}
+                                disabled={isLoading}
                             >
                                 <div className="flex items-center gap-2 mb-2">
                                     {template.icon}

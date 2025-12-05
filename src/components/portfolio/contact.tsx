@@ -9,8 +9,9 @@ import { Mail, Phone, MapPin, Send, Linkedin, Github, Twitter } from "lucide-rea
 import { AnimatedSection, AnimatedItem } from "@/components/portfolio/animated-section"
 import { useAppSound } from "@/contexts/sound-context"
 import emailjs from '@emailjs/browser'
+import { ContactData, ContactInfoItem, SocialLink } from "@/lib/types"
 
-export default function Contact({ windowWidth, data }: { windowWidth?: number; data?: any }) {
+export default function Contact({ windowWidth, data }: { windowWidth?: number; data?: ContactData }) {
   const [formState, setFormState] = useState({
     name: "",
     email: "",
@@ -34,9 +35,10 @@ export default function Contact({ windowWidth, data }: { windowWidth?: number; d
     setError("")
 
     try {
-      const serviceId = 'service_gu9vlg7'
-      const templateId = 'template_rfakvho'
-      const publicKey = '684VFv9sBjrGrc0-P'
+      // Use form config from data or fall back to hardcoded values
+      const serviceId = data?.formConfig?.serviceId || 'service_gu9vlg7'
+      const templateId = data?.formConfig?.templateId || 'template_rfakvho'
+      const publicKey = data?.formConfig?.publicKey || '684VFv9sBjrGrc0-P'
 
       await emailjs.send(
         serviceId,
@@ -67,57 +69,113 @@ export default function Contact({ windowWidth, data }: { windowWidth?: number; d
     }
   }
 
-  const contactInfo = [
-    {
-      icon: <Mail className="h-5 w-5" />,
-      title: "Email",
-      value: "ahmad.w.kanaan@gmail.com",
-      link: "mailto:ahmad.w.kanaan@gmail.com",
-    },
-    {
-      icon: <Phone className="h-5 w-5" />,
-      title: "Phone",
-      value: "+961 81 849 055",
-      link: "tel:+96181849055",
-    },
-    {
-      icon: <MapPin className="h-5 w-5" />,
-      title: "Location",
-      value: "Beirut, Lebanon",
-      link: "https://maps.google.com/?q=San+Francisco,+CA",
-    },
-  ]
+  // Helper function to get link for contact type
+  const getLinkForType = (type: string, value: string): string => {
+    switch (type) {
+      case 'email': return `mailto:${value}`;
+      case 'phone': return `tel:${value.replace(/\s+/g, '')}`;
+      case 'location': return `https://maps.google.com/?q=${encodeURIComponent(value)}`;
+      default: return value;
+    }
+  };
 
-  const socialLinks = [
-    {
-      icon: <Linkedin className="h-5 w-5" />,
-      name: "LinkedIn",
-      url: "https://linkedin.com/in/username",
-    },
-    {
-      icon: <Github className="h-5 w-5" />,
-      name: "GitHub",
-      url: "https://github.com/username",
-    },
-    {
-      icon: <Twitter className="h-5 w-5" />,
-      name: "Twitter",
-      url: "https://twitter.com/username",
-    },
-  ]
+  // Helper function to extract platform from URL
+  const getPlatformFromUrl = (url: string): string => {
+    try {
+      const domain = new URL(url).hostname;
+      if (domain.includes('linkedin.com')) return 'linkedin';
+      if (domain.includes('github.com')) return 'github';
+      if (domain.includes('twitter.com') || domain.includes('x.com')) return 'twitter';
+      return 'custom';
+    } catch {
+      return 'custom';
+    }
+  };
+
+  // Use data from props or provide defaults
+  const contactInfo = data?.contactInfo?.map((item: ContactInfoItem, index: number) => {
+    // Map contact info items to the expected format
+    const icons: Record<string, React.ReactNode> = {
+      email: <Mail className="h-5 w-5" />,
+      phone: <Phone className="h-5 w-5" />,
+      location: <MapPin className="h-5 w-5" />,
+      custom: <Mail className="h-5 w-5" />, // Default icon for custom
+    };
+
+    return {
+      icon: icons[item.type] || icons.custom,
+      title: item.label || item.type.charAt(0).toUpperCase() + item.type.slice(1),
+      value: item.value,
+      link: item.link || getLinkForType(item.type, item.value),
+    };
+  }) || [
+      {
+        icon: <Mail className="h-5 w-5" />,
+        title: "Email",
+        value: data?.email || "ahmad.w.kanaan@gmail.com",
+        link: data?.email ? `mailto:${data.email}` : "mailto:ahmad.w.kanaan@gmail.com",
+      },
+      {
+        icon: <Phone className="h-5 w-5" />,
+        title: "Phone",
+        value: data?.phone || "+961 81 849 055",
+        link: data?.phone ? `tel:${data.phone.replace(/\s+/g, '')}` : "tel:+96181849055",
+      },
+      {
+        icon: <MapPin className="h-5 w-5" />,
+        title: "Location",
+        value: data?.location || "Beirut, Lebanon",
+        link: data?.location ? `https://maps.google.com/?q=${encodeURIComponent(data.location)}` : "https://maps.google.com/?q=San+Francisco,+CA",
+      },
+    ];
+
+  const socialLinks = data?.socialLinks?.map((social: SocialLink, index: number) => {
+    // Map social links to the expected format with icons
+    const socialIcons: Record<string, React.ReactNode> = {
+      linkedin: <Linkedin className="h-5 w-5" />,
+      github: <Github className="h-5 w-5" />,
+      twitter: <Twitter className="h-5 w-5" />,
+      // Add more social platforms as needed
+    };
+
+    const platform = social.platform?.toLowerCase() || getPlatformFromUrl(social.url);
+
+    return {
+      icon: socialIcons[platform] || <Linkedin className="h-5 w-5" />,
+      name: social.name || social.platform || "Social",
+      url: social.url,
+    };
+  }) || [
+      {
+        icon: <Linkedin className="h-5 w-5" />,
+        name: "LinkedIn",
+        url: "https://linkedin.com/in/username",
+      },
+      {
+        icon: <Github className="h-5 w-5" />,
+        name: "GitHub",
+        url: "https://github.com/username",
+      },
+      {
+        icon: <Twitter className="h-5 w-5" />,
+        name: "Twitter",
+        url: "https://twitter.com/username",
+      },
+    ];
 
   const isMultiColumn = windowWidth ? windowWidth >= 750 : false;
+
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto pixel-text">
       <AnimatedSection variant="scale" duration={0.7} className="text-center">
-        <h1 className="text-3xl font-bold mb-2 pixel-title">Get In Touch</h1>
-        <p className="opacity-80">Have a question or want to work together? Drop me a message!</p>
+        <h1 className="text-3xl font-bold mb-2 pixel-title">{data?.title || "Get In Touch"}</h1>
+        <p className="opacity-80">{data?.description || "Have a question or want to work together? Drop me a message!"}</p>
       </AnimatedSection>
 
       <div className={`grid ${isMultiColumn ? 'grid-cols-3' : 'grid-cols-1'} gap-8`}>
         <AnimatedSection variant="slideRight" delay={0.1} className={`${isMultiColumn ? 'col-span-1' : ''} space-y-6`}>
-          {contactInfo.map((info, index) => (
+          {contactInfo.map((info: any, index: number) => (
             <AnimatedItem key={index}>
               <Card className="hover:shadow-md transition-shadow border-0 pixel-card">
                 <CardContent className="p-4 flex items-center gap-4">
@@ -142,7 +200,7 @@ export default function Contact({ windowWidth, data }: { windowWidth?: number; d
           <div className="pt-4">
             <h3 className="font-medium mb-3 pixel-title">Connect on Social Media</h3>
             <div className="flex flex-wrap gap-3">
-              {socialLinks.map((social, index) => (
+              {socialLinks.map((social: any, index: number) => (
                 <a
                   key={index}
                   href={social.url}
@@ -172,7 +230,7 @@ export default function Contact({ windowWidth, data }: { windowWidth?: number; d
                     Thank you for reaching out. I'll get back to you as soon as possible.
                   </p>
                 </div>
-              ) : (
+              ) : data?.showForm !== false ? (
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {error && (
                     <div className="bg-red-100 text-red-800 p-3 rounded-none border-2 border-red-800">
@@ -249,26 +307,34 @@ export default function Contact({ windowWidth, data }: { windowWidth?: number; d
                     )}
                   </Button>
                 </form>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="opacity-80">
+                    {data?.showForm === false ? "Contact form is disabled for this portfolio." : "Thank you for your interest!"}
+                  </p>
+                </div>
               )}
             </CardContent>
           </Card>
         </AnimatedSection>
       </div>
 
-      <AnimatedSection variant="fadeIn" delay={0.4} threshold={.2}>
-        <div className="mt-8 rounded-none overflow-hidden h-64 border-2 border-[var(--cute-text)]">
-          <iframe
-            title="Map"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d100939.98555098464!2d-122.50764017948551!3d37.75781499657633!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80859a6d00690021%3A0x4a501367f076adff!2sSan%20Francisco%2C%20CA!5e0!3m2!1sen!2sus!4v1652813309840!5m2!1sen!2sus"
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          ></iframe>
-        </div>
-      </AnimatedSection>
+      {data?.mapUrl && (
+        <AnimatedSection variant="fadeIn" delay={0.4} threshold={.2}>
+          <div className="mt-8 rounded-none overflow-hidden h-64 border-2 border-[var(--cute-text)]">
+            <iframe
+              title="Map"
+              src={data.mapUrl}
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+        </AnimatedSection>
+      )}
     </div>
   )
 }
