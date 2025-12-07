@@ -10,6 +10,8 @@ import { FileUpload } from "@/components/file-upload"
 import { Plus, Trash2, Settings2, X } from "lucide-react"
 import { AnimatedSection } from "@/components/portfolio/animated-section"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel"
+import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
+import { useMediaQuery } from "@/hooks/use-media-query"
 import type { ProjectsData, ProjectItem } from "@/lib/types"
 
 interface ProjectsFormProps {
@@ -21,6 +23,7 @@ export function ProjectsForm({ initialData, onChange }: ProjectsFormProps) {
     const [data, setData] = useState<ProjectsData>(initialData)
     const [activeProject, setActiveProject] = useState(0)
     const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null)
+    const isDesktop = useMediaQuery("(min-width: 768px)")
 
     useEffect(() => {
         setData(initialData)
@@ -80,7 +83,7 @@ export function ProjectsForm({ initialData, onChange }: ProjectsFormProps) {
         <div className="space-y-8 max-w-5xl mx-auto pixel-text relative">
             {/* Header Section */}
             <AnimatedSection variant="fadeIn" duration={0.6} className="text-center group relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
-                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute right-2 top-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
                     <Settings2 className="w-4 h-4 text-muted-foreground" />
                 </div>
                 <Input
@@ -99,7 +102,7 @@ export function ProjectsForm({ initialData, onChange }: ProjectsFormProps) {
             <AnimatedSection variant="scale" delay={0.1} duration={0.7} className="relative group/section border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold pixel-title opacity-50">Featured View</h2>
-                    <Button variant="ghost" size="sm" onClick={addProject} className="h-6 w-6 p-0 opacity-0 group-hover/section:opacity-100 transition-opacity">
+                    <Button variant="ghost" size="sm" onClick={addProject} className="h-6 w-6 p-0 opacity-100 lg:opacity-0 lg:group-hover/section:opacity-100 transition-opacity">
                         <Plus className="w-4 h-4" />
                     </Button>
                 </div>
@@ -107,58 +110,103 @@ export function ProjectsForm({ initialData, onChange }: ProjectsFormProps) {
                 <Carousel setApi={setCarouselApi} className="w-full">
                     <CarouselContent>
                         {(data.projects || []).map((project, index) => (
-                            <CarouselItem key={project.id}>
+                            <CarouselItem key={project.id} className="basis-full md:basis-1/2 lg:basis-1/3">
                                 <Card className="pixel-card border-0 shadow-lg overflow-hidden relative group">
-                                    <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex gap-1 bg-background/80 backdrop-blur-sm p-1 rounded-md border border-border">
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                                    <Settings2 className="w-3 h-3" />
-                                                </Button>
-                                            </DialogTrigger>
-                                            <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)]">
-                                                <DialogHeader>
-                                                    <DialogTitle>Project Links</DialogTitle>
-                                                    <DialogDescription>
-                                                        Manage your project URLs.
-                                                    </DialogDescription>
-                                                </DialogHeader>
-                                                <div className="grid gap-4 py-4">
-                                                    <div className="grid grid-cols-4 items-center gap-4">
-                                                        <Label className="text-right">Demo URL</Label>
-                                                        <Input
-                                                            value={project.demoUrl || ""}
-                                                            onChange={(e) => updateProject(index, "demoUrl", e.target.value)}
-                                                            className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
-                                                        />
-                                                    </div>
-                                                    <div className="grid grid-cols-4 items-center gap-4">
-                                                        <Label className="text-right">GitHub URL</Label>
-                                                        <Input
-                                                            value={typeof project.githubUrl === 'string' ? project.githubUrl : ''}
-                                                            onChange={(e) => updateProject(index, "githubUrl", e.target.value)}
-                                                            className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
-                                                            placeholder="https://github.com/..."
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <DialogFooter className="sm:justify-between">
-                                                    <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
-                                                        removeProject(index)
-                                                        const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
-                                                        closeButton?.click()
-                                                    }}>
-                                                        <Trash2 className="w-4 h-4 mr-2" /> Remove Project
+                                    <div className="absolute right-2 top-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity z-10 flex gap-1 bg-background/80 backdrop-blur-sm p-1 rounded-md border border-border">
+                                        {isDesktop ? (
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                                        <Settings2 className="w-3 h-3" />
                                                     </Button>
-                                                    <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
-                                                        const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
-                                                        closeButton?.click()
-                                                    }}>
-                                                        Done
+                                                </DialogTrigger>
+                                                <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+                                                    <DialogHeader className="bg-white dark:bg-zinc-950">
+                                                        <DialogTitle>Project Links</DialogTitle>
+                                                        <DialogDescription>
+                                                            Manage your project URLs.
+                                                        </DialogDescription>
+                                                    </DialogHeader>
+                                                    <div className="grid gap-4 py-4">
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label className="text-right">Demo URL</Label>
+                                                            <Input
+                                                                value={project.demoUrl || ""}
+                                                                onChange={(e) => updateProject(index, "demoUrl", e.target.value)}
+                                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                            />
+                                                        </div>
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label className="text-right">GitHub URL</Label>
+                                                            <Input
+                                                                value={typeof project.githubUrl === 'string' ? project.githubUrl : ''}
+                                                                onChange={(e) => updateProject(index, "githubUrl", e.target.value)}
+                                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                                placeholder="https://github.com/..."
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <DialogFooter className="sm:justify-between bg-white dark:bg-zinc-950">
+                                                        <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
+                                                            removeProject(index)
+                                                            const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                            closeButton?.click()
+                                                        }}>
+                                                            <Trash2 className="w-4 h-4 mr-2" /> Remove Project
+                                                        </Button>
+                                                        <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
+                                                            const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                            closeButton?.click()
+                                                        }}>
+                                                            Done
+                                                        </Button>
+                                                    </DialogFooter>
+                                                </DialogContent>
+                                            </Dialog>
+                                        ) : (
+                                            <Drawer>
+                                                <DrawerTrigger asChild>
+                                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                                        <Settings2 className="w-3 h-3" />
                                                     </Button>
-                                                </DialogFooter>
-                                            </DialogContent>
-                                        </Dialog>
+                                                </DrawerTrigger>
+                                                <DrawerContent className="rounded-t-none border-t-4 border-x-4 border-[var(--cute-text)] shadow-[0px_-4px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+                                                    <DrawerHeader className="text-left bg-white dark:bg-zinc-950">
+                                                        <DrawerTitle>Project Links</DrawerTitle>
+                                                        <DrawerDescription>
+                                                            Manage your project URLs.
+                                                        </DrawerDescription>
+                                                    </DrawerHeader>
+                                                    <div className="grid gap-4 p-4">
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label className="text-right">Demo URL</Label>
+                                                            <Input
+                                                                value={project.demoUrl || ""}
+                                                                onChange={(e) => updateProject(index, "demoUrl", e.target.value)}
+                                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                            />
+                                                        </div>
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label className="text-right">GitHub URL</Label>
+                                                            <Input
+                                                                value={typeof project.githubUrl === 'string' ? project.githubUrl : ''}
+                                                                onChange={(e) => updateProject(index, "githubUrl", e.target.value)}
+                                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                                placeholder="https://github.com/..."
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <DrawerFooter className="flex-col gap-2 bg-white dark:bg-zinc-950">
+                                                        <Button variant="destructive" size="sm" className="w-full rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => removeProject(index)}>
+                                                            <Trash2 className="w-4 h-4 mr-2" /> Remove Project
+                                                        </Button>
+                                                        <Button type="button" className="w-full rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]">
+                                                            Done
+                                                        </Button>
+                                                    </DrawerFooter>
+                                                </DrawerContent>
+                                            </Drawer>
+                                        )}
                                     </div>
 
                                     <div className="grid gap-2 px-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 400px), 1fr))" }}>
@@ -218,7 +266,7 @@ export function ProjectsForm({ initialData, onChange }: ProjectsFormProps) {
                                 </Card>
                             </CarouselItem>
                         ))}
-                        <CarouselItem>
+                        <CarouselItem className="basis-full md:basis-1/2 lg:basis-1/3">
                             <div className="p-1 h-full">
                                 <Button
                                     variant="ghost"

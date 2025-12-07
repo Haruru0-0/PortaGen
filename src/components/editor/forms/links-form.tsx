@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
+import { useMediaQuery } from "@/hooks/use-media-query"
 import { Label } from "@/components/ui/label"
 import { Github, Linkedin, Twitter, Instagram, Youtube, Globe, Mail, FileText, Bookmark, Plus, Trash2, Settings2 } from "lucide-react"
 import { AnimatedSection, AnimatedItem } from "@/components/portfolio/animated-section"
@@ -22,6 +24,7 @@ interface LinksFormProps {
 
 export function LinksForm({ initialData, onChange }: LinksFormProps) {
     const [data, setData] = useState<LinksData>(initialData)
+    const isDesktop = useMediaQuery("(min-width: 768px)")
 
     useEffect(() => {
         setData(initialData)
@@ -114,87 +117,164 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
                 <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))" }}>
                     {(data.socials || []).map((link, index) => (
                         <AnimatedItem key={index}>
-                            <Dialog>
-                                <DialogTrigger asChild>
-                                    <div className="relative group cursor-pointer">
-                                        <Button variant="default" className={`w-full ${link.color || 'bg-primary'} text-white rounded-none border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_rgba(0,0,0,0.2)] transition-all`}>
-                                            {getIcon(link.icon)}
-                                            <span className="ml-2 truncate">{link.name || link.platform}</span>
-                                        </Button>
-                                        <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                                            <div className="bg-background border border-border rounded-full p-1 shadow-sm">
-                                                <Settings2 className="w-3 h-3" />
+                            {isDesktop ? (
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <div className="relative group cursor-pointer">
+                                            <Button variant="default" className={`w-full ${link.color || 'bg-primary'} text-white rounded-none border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_rgba(0,0,0,0.2)] transition-all`}>
+                                                {getIcon(link.icon)}
+                                                <span className="ml-2 truncate">{link.name || link.platform}</span>
+                                            </Button>
+                                            <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                                <div className="bg-background border border-border rounded-full p-1 shadow-sm">
+                                                    <Settings2 className="w-3 h-3" />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </DialogTrigger>
-                                <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)]">
-                                    <DialogHeader>
-                                        <DialogTitle>Edit Link</DialogTitle>
-                                        <DialogDescription>
-                                            Update social link details.
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    <div className="grid gap-4 py-4">
-                                        <div className="grid grid-cols-4 items-center gap-4">
-                                            <Label htmlFor={`name-${index}`} className="text-right">Name</Label>
-                                            <Input
-                                                id={`name-${index}`}
-                                                value={link.name || ""}
-                                                onChange={(e) => updateSocial(index, "name", e.target.value)}
-                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
-                                            />
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+                                        <DialogHeader className="bg-white dark:bg-zinc-950">
+                                            <DialogTitle>Edit Link</DialogTitle>
+                                            <DialogDescription>
+                                                Update social link details.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="grid gap-4 py-4">
+                                            <div className="grid grid-cols-4 items-center gap-4">
+                                                <Label htmlFor={`name-${index}`} className="text-right">Name</Label>
+                                                <Input
+                                                    id={`name-${index}`}
+                                                    value={link.name || ""}
+                                                    onChange={(e) => updateSocial(index, "name", e.target.value)}
+                                                    className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-4 items-center gap-4">
+                                                <Label htmlFor={`url-${index}`} className="text-right">URL</Label>
+                                                <Input
+                                                    id={`url-${index}`}
+                                                    value={link.url || ""}
+                                                    onChange={(e) => updateSocial(index, "url", e.target.value)}
+                                                    className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-4 items-center gap-4">
+                                                <Label htmlFor={`icon-${index}`} className="text-right">Icon</Label>
+                                                <select
+                                                    id={`icon-${index}`}
+                                                    value={link.icon || "Globe"}
+                                                    onChange={(e) => updateSocial(index, "icon", e.target.value)}
+                                                    className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
+                                                >
+                                                    {AVAILABLE_ICONS.map(icon => (
+                                                        <option key={icon} value={icon}>{icon}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div className="grid grid-cols-4 items-center gap-4">
+                                                <Label htmlFor={`color-${index}`} className="text-right">Color</Label>
+                                                <Input
+                                                    id={`color-${index}`}
+                                                    value={link.color || ""}
+                                                    onChange={(e) => updateSocial(index, "color", e.target.value)}
+                                                    className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                    placeholder="bg-primary"
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="grid grid-cols-4 items-center gap-4">
-                                            <Label htmlFor={`url-${index}`} className="text-right">URL</Label>
-                                            <Input
-                                                id={`url-${index}`}
-                                                value={link.url || ""}
-                                                onChange={(e) => updateSocial(index, "url", e.target.value)}
-                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
-                                            />
+                                        <DialogFooter className="sm:justify-between bg-white dark:bg-zinc-950">
+                                            <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
+                                                removeSocial(index)
+                                                const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                closeButton?.click()
+                                            }}>
+                                                <Trash2 className="w-4 h-4 mr-2" /> Remove
+                                            </Button>
+                                            <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
+                                                const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                closeButton?.click()
+                                            }}>
+                                                Done
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                            ) : (
+                                <Drawer>
+                                    <DrawerTrigger asChild>
+                                        <div className="relative group cursor-pointer">
+                                            <Button variant="default" className={`w-full ${link.color || 'bg-primary'} text-white rounded-none border-2 border-black shadow-[2px_2px_0px_rgba(0,0,0,0.2)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_rgba(0,0,0,0.2)] transition-all`}>
+                                                {getIcon(link.icon)}
+                                                <span className="ml-2 truncate">{link.name || link.platform}</span>
+                                            </Button>
+                                            <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                                <div className="bg-background border border-border rounded-full p-1 shadow-sm">
+                                                    <Settings2 className="w-3 h-3" />
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="grid grid-cols-4 items-center gap-4">
-                                            <Label htmlFor={`icon-${index}`} className="text-right">Icon</Label>
-                                            <select
-                                                id={`icon-${index}`}
-                                                value={link.icon || "Globe"}
-                                                onChange={(e) => updateSocial(index, "icon", e.target.value)}
-                                                className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
-                                            >
-                                                {AVAILABLE_ICONS.map(icon => (
-                                                    <option key={icon} value={icon}>{icon}</option>
-                                                ))}
-                                            </select>
+                                    </DrawerTrigger>
+                                    <DrawerContent className="rounded-t-none border-t-4 border-x-4 border-[var(--cute-text)] shadow-[0px_-4px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+                                        <DrawerHeader className="text-left bg-white dark:bg-zinc-950">
+                                            <DrawerTitle>Edit Link</DrawerTitle>
+                                            <DrawerDescription>
+                                                Update social link details.
+                                            </DrawerDescription>
+                                        </DrawerHeader>
+                                        <div className="grid gap-4 p-4">
+                                            <div className="grid grid-cols-4 items-center gap-4">
+                                                <Label htmlFor={`name-${index}`} className="text-right">Name</Label>
+                                                <Input
+                                                    id={`name-${index}`}
+                                                    value={link.name || ""}
+                                                    onChange={(e) => updateSocial(index, "name", e.target.value)}
+                                                    className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-4 items-center gap-4">
+                                                <Label htmlFor={`url-${index}`} className="text-right">URL</Label>
+                                                <Input
+                                                    id={`url-${index}`}
+                                                    value={link.url || ""}
+                                                    onChange={(e) => updateSocial(index, "url", e.target.value)}
+                                                    className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-4 items-center gap-4">
+                                                <Label htmlFor={`icon-${index}`} className="text-right">Icon</Label>
+                                                <select
+                                                    id={`icon-${index}`}
+                                                    value={link.icon || "Globe"}
+                                                    onChange={(e) => updateSocial(index, "icon", e.target.value)}
+                                                    className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
+                                                >
+                                                    {AVAILABLE_ICONS.map(icon => (
+                                                        <option key={icon} value={icon}>{icon}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div className="grid grid-cols-4 items-center gap-4">
+                                                <Label htmlFor={`color-${index}`} className="text-right">Color</Label>
+                                                <Input
+                                                    id={`color-${index}`}
+                                                    value={link.color || ""}
+                                                    onChange={(e) => updateSocial(index, "color", e.target.value)}
+                                                    className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                    placeholder="bg-primary"
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="grid grid-cols-4 items-center gap-4">
-                                            <Label htmlFor={`color-${index}`} className="text-right">Color</Label>
-                                            <Input
-                                                id={`color-${index}`}
-                                                value={link.color || ""}
-                                                onChange={(e) => updateSocial(index, "color", e.target.value)}
-                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
-                                                placeholder="bg-primary"
-                                            />
-                                        </div>
-                                    </div>
-                                    <DialogFooter className="sm:justify-between">
-                                        <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
-                                            removeSocial(index)
-                                            const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
-                                            closeButton?.click()
-                                        }}>
-                                            <Trash2 className="w-4 h-4 mr-2" /> Remove
-                                        </Button>
-                                        <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
-                                            const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
-                                            closeButton?.click()
-                                        }}>
-                                            Done
-                                        </Button>
-                                    </DialogFooter>
-                                </DialogContent>
-                            </Dialog>
+                                        <DrawerFooter className="flex-col gap-2 bg-white dark:bg-zinc-950">
+                                            <Button variant="destructive" size="sm" className="w-full rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => removeSocial(index)}>
+                                                <Trash2 className="w-4 h-4 mr-2" /> Remove
+                                            </Button>
+                                            <Button type="button" className="w-full rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]">
+                                                Done
+                                            </Button>
+                                        </DrawerFooter>
+                                    </DrawerContent>
+                                </Drawer>
+                            )}
                         </AnimatedItem>
                     ))}
                     <AnimatedItem>
@@ -221,58 +301,106 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
                             <Card className="h-full hover:shadow-md transition-shadow pixel-card border-0 relative group">
                                 <CardContent className="p-4">
                                     <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex gap-1">
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                                    <Settings2 className="w-3 h-3" />
-                                                </Button>
-                                            </DialogTrigger>
-                                            <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)]">
-                                                <DialogHeader>
-                                                    <DialogTitle>Edit Project</DialogTitle>
-                                                    <DialogDescription>
-                                                        Update project details.
-                                                    </DialogDescription>
-                                                </DialogHeader>
-                                                <div className="grid gap-4 py-4">
-                                                    <div className="grid grid-cols-4 items-center gap-4">
-                                                        <Label className="text-right">URL</Label>
-                                                        <Input
-                                                            value={link.url || ""}
-                                                            onChange={(e) => updateProject(index, "url", e.target.value)}
-                                                            className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
-                                                        />
-                                                    </div>
-                                                    <div className="grid grid-cols-4 items-center gap-4">
-                                                        <Label className="text-right">Icon</Label>
-                                                        <select
-                                                            value={link.icon || "Globe"}
-                                                            onChange={(e) => updateProject(index, "icon", e.target.value)}
-                                                            className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
-                                                        >
-                                                            {AVAILABLE_ICONS.map(icon => (
-                                                                <option key={icon} value={icon}>{icon}</option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <DialogFooter className="sm:justify-between">
-                                                    <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
-                                                        removeProject(index)
-                                                        const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
-                                                        closeButton?.click()
-                                                    }}>
-                                                        <Trash2 className="w-4 h-4 mr-2" /> Remove
+                                        {isDesktop ? (
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                                        <Settings2 className="w-3 h-3" />
                                                     </Button>
-                                                    <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
-                                                        const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
-                                                        closeButton?.click()
-                                                    }}>
-                                                        Done
+                                                </DialogTrigger>
+                                                <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+                                                    <DialogHeader className="bg-white dark:bg-zinc-950">
+                                                        <DialogTitle>Edit Project</DialogTitle>
+                                                        <DialogDescription>
+                                                            Update project details.
+                                                        </DialogDescription>
+                                                    </DialogHeader>
+                                                    <div className="grid gap-4 py-4">
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label className="text-right">URL</Label>
+                                                            <Input
+                                                                value={link.url || ""}
+                                                                onChange={(e) => updateProject(index, "url", e.target.value)}
+                                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                            />
+                                                        </div>
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label className="text-right">Icon</Label>
+                                                            <select
+                                                                value={link.icon || "Globe"}
+                                                                onChange={(e) => updateProject(index, "icon", e.target.value)}
+                                                                className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
+                                                            >
+                                                                {AVAILABLE_ICONS.map(icon => (
+                                                                    <option key={icon} value={icon}>{icon}</option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <DialogFooter className="sm:justify-between bg-white dark:bg-zinc-950">
+                                                        <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
+                                                            removeProject(index)
+                                                            const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                            closeButton?.click()
+                                                        }}>
+                                                            <Trash2 className="w-4 h-4 mr-2" /> Remove
+                                                        </Button>
+                                                        <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
+                                                            const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                            closeButton?.click()
+                                                        }}>
+                                                            Done
+                                                        </Button>
+                                                    </DialogFooter>
+                                                </DialogContent>
+                                            </Dialog>
+                                        ) : (
+                                            <Drawer>
+                                                <DrawerTrigger asChild>
+                                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                                        <Settings2 className="w-3 h-3" />
                                                     </Button>
-                                                </DialogFooter>
-                                            </DialogContent>
-                                        </Dialog>
+                                                </DrawerTrigger>
+                                                <DrawerContent className="rounded-t-none border-t-4 border-x-4 border-[var(--cute-text)] shadow-[0px_-4px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+                                                    <DrawerHeader className="text-left bg-white dark:bg-zinc-950">
+                                                        <DrawerTitle>Edit Project</DrawerTitle>
+                                                        <DrawerDescription>
+                                                            Update project details.
+                                                        </DrawerDescription>
+                                                    </DrawerHeader>
+                                                    <div className="grid gap-4 p-4">
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label className="text-right">URL</Label>
+                                                            <Input
+                                                                value={link.url || ""}
+                                                                onChange={(e) => updateProject(index, "url", e.target.value)}
+                                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                            />
+                                                        </div>
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label className="text-right">Icon</Label>
+                                                            <select
+                                                                value={link.icon || "Globe"}
+                                                                onChange={(e) => updateProject(index, "icon", e.target.value)}
+                                                                className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
+                                                            >
+                                                                {AVAILABLE_ICONS.map(icon => (
+                                                                    <option key={icon} value={icon}>{icon}</option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <DrawerFooter className="flex-col gap-2 bg-white dark:bg-zinc-950">
+                                                        <Button variant="destructive" size="sm" className="w-full rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => removeProject(index)}>
+                                                            <Trash2 className="w-4 h-4 mr-2" /> Remove
+                                                        </Button>
+                                                        <Button type="button" className="w-full rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]">
+                                                            Done
+                                                        </Button>
+                                                    </DrawerFooter>
+                                                </DrawerContent>
+                                            </Drawer>
+                                        )}
                                     </div>
 
                                     <div className="flex items-start gap-3">

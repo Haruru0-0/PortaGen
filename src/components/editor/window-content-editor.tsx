@@ -10,6 +10,7 @@ import { ProjectsForm } from "./forms/projects-form"
 import { ContactForm } from "./forms/contact-form"
 import { ResumeForm } from "./forms/resume-form"
 import { BlogForm } from "./forms/blog-form"
+import { BlankTemplateEditor } from "./forms/blank-template-editor"
 import { uploadFile } from "@/lib/services/uploadService"
 import { useWindowsContext } from "@/contexts/windowsContext"
 
@@ -206,6 +207,8 @@ export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }:
                 return <BlogForm initialData={contentData as BlogData} onChange={setContentData} />
             case "links":
                 return <LinksForm initialData={contentData as LinksData} onChange={setContentData} />
+            case "blank":
+                return <BlankTemplateEditor initialData={contentData as any} onChange={setContentData} />
             default:
                 return <div className="p-4 text-center text-muted-foreground">Select a content type to start editing</div>
         }

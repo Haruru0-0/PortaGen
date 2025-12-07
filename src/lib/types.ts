@@ -177,7 +177,22 @@ export interface BlogData {
     rssUrl?: string
 }
 
-export type TemplateData = LinksData | AboutMeData | ProjectsData | ContactData | ResumeData | BlogData | any
+export type ComponentType = 'text' | 'image' | 'card' | 'carousel' | 'button' | 'divider' | 'spacer' | 'card-group' | 'vertical-separator'
+
+export interface DraggableComponent {
+    id: string
+    type: ComponentType
+    props: Record<string, any>
+}
+
+export interface BlankTemplateData {
+    components: DraggableComponent[]
+    backgroundColor?: string
+    padding?: string
+    gap?: string
+}
+
+export type TemplateData = LinksData | AboutMeData | ProjectsData | ContactData | ResumeData | BlogData | BlankTemplateData | any
 
 export interface WindowContent {
     id: number

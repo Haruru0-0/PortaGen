@@ -5,6 +5,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
+import { useMediaQuery } from "@/hooks/use-media-query"
 import { Mail, Phone, MapPin, Send, Linkedin, Github, Twitter, Link as LinkIcon, Plus, Trash2, Settings2 } from "lucide-react"
 import { AnimatedSection, AnimatedItem } from "@/components/portfolio/animated-section"
 import type { ContactData, ContactInfoItem, SocialLink } from "@/lib/types"
@@ -40,6 +42,7 @@ interface ContactFormProps {
 
 export function ContactForm({ initialData, onChange }: ContactFormProps) {
     const [data, setData] = useState<ContactData>(initialData)
+    const isDesktop = useMediaQuery("(min-width: 768px)")
 
     useEffect(() => {
         setData(initialData)
@@ -133,58 +136,106 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                         <AnimatedItem key={index}>
                             <Card className="hover:shadow-md transition-shadow border-0 pixel-card relative group">
                                 <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex gap-1">
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                                <Settings2 className="w-3 h-3" />
-                                            </Button>
-                                        </DialogTrigger>
-                                        <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)]">
-                                            <DialogHeader>
-                                                <DialogTitle>Edit Contact Info</DialogTitle>
-                                                <DialogDescription>
-                                                    Update your contact details below.
-                                                </DialogDescription>
-                                            </DialogHeader>
-                                            <div className="grid gap-4 py-4">
-                                                <div className="grid grid-cols-4 items-center gap-4">
-                                                    <Label className="text-right">Type</Label>
-                                                    <select
-                                                        value={info.type}
-                                                        onChange={(e) => updateContactInfo(index, "type", e.target.value)}
-                                                        className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
-                                                    >
-                                                        {INFO_TYPES.map(type => (
-                                                            <option key={type.value} value={type.value}>{type.label}</option>
-                                                        ))}
-                                                    </select>
-                                                </div>
-                                                <div className="grid grid-cols-4 items-center gap-4">
-                                                    <Label className="text-right">Link</Label>
-                                                    <Input
-                                                        value={info.link || ""}
-                                                        onChange={(e) => updateContactInfo(index, "link", e.target.value)}
-                                                        className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
-                                                    />
-                                                </div>
-                                            </div>
-                                            <DialogFooter className="sm:justify-between">
-                                                <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
-                                                    removeContactInfo(index)
-                                                    const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
-                                                    closeButton?.click()
-                                                }}>
-                                                    <Trash2 className="w-4 h-4 mr-2" /> Remove
+                                    {isDesktop ? (
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                                    <Settings2 className="w-3 h-3" />
                                                 </Button>
-                                                <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
-                                                    const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
-                                                    closeButton?.click()
-                                                }}>
-                                                    Done
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+                                                <DialogHeader className="bg-white dark:bg-zinc-950">
+                                                    <DialogTitle>Edit Contact Info</DialogTitle>
+                                                    <DialogDescription>
+                                                        Update your contact details below.
+                                                    </DialogDescription>
+                                                </DialogHeader>
+                                                <div className="grid gap-4 py-4">
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label className="text-right">Type</Label>
+                                                        <select
+                                                            value={info.type}
+                                                            onChange={(e) => updateContactInfo(index, "type", e.target.value)}
+                                                            className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
+                                                        >
+                                                            {INFO_TYPES.map(type => (
+                                                                <option key={type.value} value={type.value}>{type.label}</option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label className="text-right">Link</Label>
+                                                        <Input
+                                                            value={info.link || ""}
+                                                            onChange={(e) => updateContactInfo(index, "link", e.target.value)}
+                                                            className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <DialogFooter className="sm:justify-between bg-white dark:bg-zinc-950">
+                                                    <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
+                                                        removeContactInfo(index)
+                                                        const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                        closeButton?.click()
+                                                    }}>
+                                                        <Trash2 className="w-4 h-4 mr-2" /> Remove
+                                                    </Button>
+                                                    <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
+                                                        const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                        closeButton?.click()
+                                                    }}>
+                                                        Done
+                                                    </Button>
+                                                </DialogFooter>
+                                            </DialogContent>
+                                        </Dialog>
+                                    ) : (
+                                        <Drawer>
+                                            <DrawerTrigger asChild>
+                                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                                    <Settings2 className="w-3 h-3" />
                                                 </Button>
-                                            </DialogFooter>
-                                        </DialogContent>
-                                    </Dialog>
+                                            </DrawerTrigger>
+                                            <DrawerContent className="rounded-t-none border-t-4 border-x-4 border-[var(--cute-text)] shadow-[0px_-4px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+                                                <DrawerHeader className="text-left bg-white dark:bg-zinc-950">
+                                                    <DrawerTitle>Edit Contact Info</DrawerTitle>
+                                                    <DrawerDescription>
+                                                        Update your contact details below.
+                                                    </DrawerDescription>
+                                                </DrawerHeader>
+                                                <div className="grid gap-4 p-4">
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label className="text-right">Type</Label>
+                                                        <select
+                                                            value={info.type}
+                                                            onChange={(e) => updateContactInfo(index, "type", e.target.value)}
+                                                            className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
+                                                        >
+                                                            {INFO_TYPES.map(type => (
+                                                                <option key={type.value} value={type.value}>{type.label}</option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                    <div className="grid grid-cols-4 items-center gap-4">
+                                                        <Label className="text-right">Link</Label>
+                                                        <Input
+                                                            value={info.link || ""}
+                                                            onChange={(e) => updateContactInfo(index, "link", e.target.value)}
+                                                            className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <DrawerFooter className="flex-col gap-2 bg-white dark:bg-zinc-950">
+                                                    <Button variant="destructive" size="sm" className="w-full rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => removeContactInfo(index)}>
+                                                        <Trash2 className="w-4 h-4 mr-2" /> Remove
+                                                    </Button>
+                                                    <Button type="button" className="w-full rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]">
+                                                        Done
+                                                    </Button>
+                                                </DrawerFooter>
+                                            </DrawerContent>
+                                        </Drawer>
+                                    )}
                                 </div>
 
                                 <CardContent className="p-4 flex items-center gap-4">
@@ -217,63 +268,116 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                         </div>
                         <div className="flex flex-wrap gap-3">
                             {(data.socialLinks || []).map((social, index) => (
-                                <Dialog key={index}>
-                                    <DialogTrigger asChild>
-                                        <button
-                                            className="bg-[var(--cute-highlight)] hover:bg-[var(--cute-highlight)]/80 p-2 rounded-none border-2 border-[var(--cute-text)] text-[var(--cute-text)] transition-colors relative group"
-                                        >
-                                            {getIcon(social.platform)}
-                                        </button>
-                                    </DialogTrigger>
-                                    <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)]">
-                                        <DialogHeader>
-                                            <DialogTitle>Edit Social Link</DialogTitle>
-                                            <DialogDescription>
-                                                Update your social media link details.
-                                            </DialogDescription>
-                                        </DialogHeader>
-                                        <div className="grid gap-4 py-4">
-                                            <div className="grid grid-cols-4 items-center gap-4">
-                                                <Label className="text-right">Platform</Label>
-                                                <select
-                                                    value={social.platform}
-                                                    onChange={(e) => {
-                                                        updateSocialLink(index, "platform", e.target.value)
-                                                        updateSocialLink(index, "icon", e.target.value)
-                                                    }}
-                                                    className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
-                                                >
-                                                    {SOCIAL_PLATFORMS.map(platform => (
-                                                        <option key={platform.value} value={platform.value}>{platform.label}</option>
-                                                    ))}
-                                                </select>
+                                isDesktop ? (
+                                    <Dialog key={index}>
+                                        <DialogTrigger asChild>
+                                            <button
+                                                className="bg-[var(--cute-highlight)] hover:bg-[var(--cute-highlight)]/80 p-2 rounded-none border-2 border-[var(--cute-text)] text-[var(--cute-text)] transition-colors relative group"
+                                            >
+                                                {getIcon(social.platform)}
+                                            </button>
+                                        </DialogTrigger>
+                                        <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+                                            <DialogHeader className="bg-white dark:bg-zinc-950">
+                                                <DialogTitle>Edit Social Link</DialogTitle>
+                                                <DialogDescription>
+                                                    Update your social media link details.
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <div className="grid gap-4 py-4">
+                                                <div className="grid grid-cols-4 items-center gap-4">
+                                                    <Label className="text-right">Platform</Label>
+                                                    <select
+                                                        value={social.platform}
+                                                        onChange={(e) => {
+                                                            updateSocialLink(index, "platform", e.target.value)
+                                                            updateSocialLink(index, "icon", e.target.value)
+                                                        }}
+                                                        className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
+                                                    >
+                                                        {SOCIAL_PLATFORMS.map(platform => (
+                                                            <option key={platform.value} value={platform.value}>{platform.label}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <div className="grid grid-cols-4 items-center gap-4">
+                                                    <Label className="text-right">URL</Label>
+                                                    <Input
+                                                        value={social.url}
+                                                        onChange={(e) => updateSocialLink(index, "url", e.target.value)}
+                                                        className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className="grid grid-cols-4 items-center gap-4">
-                                                <Label className="text-right">URL</Label>
-                                                <Input
-                                                    value={social.url}
-                                                    onChange={(e) => updateSocialLink(index, "url", e.target.value)}
-                                                    className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
-                                                />
+                                            <DialogFooter className="sm:justify-between bg-white dark:bg-zinc-950">
+                                                <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
+                                                    removeSocialLink(index)
+                                                    const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                    closeButton?.click()
+                                                }}>
+                                                    <Trash2 className="w-4 h-4 mr-2" /> Remove
+                                                </Button>
+                                                <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
+                                                    const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                    closeButton?.click()
+                                                }}>
+                                                    Done
+                                                </Button>
+                                            </DialogFooter>
+                                        </DialogContent>
+                                    </Dialog>
+                                ) : (
+                                    <Drawer key={index}>
+                                        <DrawerTrigger asChild>
+                                            <button
+                                                className="bg-[var(--cute-highlight)] hover:bg-[var(--cute-highlight)]/80 p-2 rounded-none border-2 border-[var(--cute-text)] text-[var(--cute-text)] transition-colors relative group"
+                                            >
+                                                {getIcon(social.platform)}
+                                            </button>
+                                        </DrawerTrigger>
+                                        <DrawerContent className="rounded-t-none border-t-4 border-x-4 border-[var(--cute-text)] shadow-[0px_-4px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+                                            <DrawerHeader className="text-left bg-white dark:bg-zinc-950">
+                                                <DrawerTitle>Edit Social Link</DrawerTitle>
+                                                <DrawerDescription>
+                                                    Update your social media link details.
+                                                </DrawerDescription>
+                                            </DrawerHeader>
+                                            <div className="grid gap-4 p-4">
+                                                <div className="grid grid-cols-4 items-center gap-4">
+                                                    <Label className="text-right">Platform</Label>
+                                                    <select
+                                                        value={social.platform}
+                                                        onChange={(e) => {
+                                                            updateSocialLink(index, "platform", e.target.value)
+                                                            updateSocialLink(index, "icon", e.target.value)
+                                                        }}
+                                                        className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
+                                                    >
+                                                        {SOCIAL_PLATFORMS.map(platform => (
+                                                            <option key={platform.value} value={platform.value}>{platform.label}</option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <div className="grid grid-cols-4 items-center gap-4">
+                                                    <Label className="text-right">URL</Label>
+                                                    <Input
+                                                        value={social.url}
+                                                        onChange={(e) => updateSocialLink(index, "url", e.target.value)}
+                                                        className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                    />
+                                                </div>
                                             </div>
-                                        </div>
-                                        <DialogFooter className="sm:justify-between">
-                                            <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
-                                                removeSocialLink(index)
-                                                const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
-                                                closeButton?.click()
-                                            }}>
-                                                <Trash2 className="w-4 h-4 mr-2" /> Remove
-                                            </Button>
-                                            <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
-                                                const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
-                                                closeButton?.click()
-                                            }}>
-                                                Done
-                                            </Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
+                                            <DrawerFooter className="flex-col gap-2 bg-white dark:bg-zinc-950">
+                                                <Button variant="destructive" size="sm" className="w-full rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => removeSocialLink(index)}>
+                                                    <Trash2 className="w-4 h-4 mr-2" /> Remove
+                                                </Button>
+                                                <Button type="button" className="w-full rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]">
+                                                    Done
+                                                </Button>
+                                            </DrawerFooter>
+                                        </DrawerContent>
+                                    </Drawer>
+                                )
                             ))}
                             <Button variant="outline" size="sm" className="h-[42px] w-[42px] pixel-badge cursor-pointer" onClick={addSocialLink}>
                                 <Plus className="w-4 h-4" />
@@ -327,10 +431,10 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                         </Card>
                     </div>
                 </AnimatedSection>
-            </div>
+            </div >
 
             {/* Map URL Section */}
-            <AnimatedSection variant="fadeIn" delay={0.4} className="group relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
+            < AnimatedSection variant="fadeIn" delay={0.4} className="group relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors" >
                 <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <Settings2 className="w-4 h-4 text-muted-foreground" />
                 </div>
@@ -342,7 +446,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                     placeholder="https://www.google.com/maps/embed?pb=..."
                     className="border-2 border-[var(--cute-text)] bg-[var(--card-bg)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)] rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)]"
                 />
-            </AnimatedSection>
-        </div>
+            </AnimatedSection >
+        </div >
     )
 }

@@ -12,6 +12,8 @@ import { Plus, Trash2, Settings2, X } from "lucide-react"
 import { AnimatedSection, AnimatedItem } from "@/components/portfolio/animated-section"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
+import { useMediaQuery } from "@/hooks/use-media-query"
 import type { AboutMeData, Testimonial, Hobby } from "@/lib/types"
 
 interface AboutMeFormProps {
@@ -22,6 +24,7 @@ interface AboutMeFormProps {
 
 export function AboutMeForm({ initialData, onChange, onFileSelect }: AboutMeFormProps) {
     const [data, setData] = useState<AboutMeData>(initialData)
+    const isDesktop = useMediaQuery("(min-width: 768px)")
 
     useEffect(() => {
         setData(initialData)
@@ -141,65 +144,125 @@ export function AboutMeForm({ initialData, onChange, onFileSelect }: AboutMeForm
                             </button>
                         </Badge>
                     ))}
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Badge
-                                variant="outline"
-                                className="pixel-badge border-dashed border-2 cursor-pointer hover:border-solid hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors gap-1"
-                            >
-                                <Plus className="w-3 h-3" />
-                                Add Skill
-                            </Badge>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)]">
-                            <DialogHeader>
-                                <DialogTitle>Add New Skill</DialogTitle>
-                                <DialogDescription>
-                                    Enter a skill to add to your profile.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="skill" className="text-right">
-                                        Skill
-                                    </Label>
-                                    <Input
-                                        id="skill"
-                                        placeholder="e.g. React, TypeScript"
-                                        className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
-                                        onKeyPress={(e) => {
-                                            if (e.key === 'Enter') {
-                                                const value = (e.target as HTMLInputElement).value
-                                                if (value.trim()) {
-                                                    addSkill(value)
-                                                        ; (e.target as HTMLInputElement).value = ''
-                                                    const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
-                                                    closeButton?.click()
+                    {isDesktop ? (
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Badge
+                                    variant="outline"
+                                    className="pixel-badge border-dashed border-2 cursor-pointer hover:border-solid hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors gap-1"
+                                >
+                                    <Plus className="w-3 h-3" />
+                                    Add Skill
+                                </Badge>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+                                <DialogHeader className="bg-white dark:bg-zinc-950">
+                                    <DialogTitle>Add New Skill</DialogTitle>
+                                    <DialogDescription>
+                                        Enter a skill to add to your profile.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="grid gap-4 py-4">
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="skill" className="text-right">
+                                            Skill
+                                        </Label>
+                                        <Input
+                                            id="skill"
+                                            placeholder="e.g. React, TypeScript"
+                                            className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                            onKeyPress={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    const value = (e.target as HTMLInputElement).value
+                                                    if (value.trim()) {
+                                                        addSkill(value)
+                                                            ; (e.target as HTMLInputElement).value = ''
+                                                        const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                        closeButton?.click()
+                                                    }
                                                 }
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <DialogFooter className="bg-white dark:bg-zinc-950">
+                                    <Button
+                                        type="button"
+                                        onClick={() => {
+                                            const input = document.getElementById('skill') as HTMLInputElement
+                                            if (input?.value.trim()) {
+                                                addSkill(input.value)
+                                                input.value = ''
+                                                const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                closeButton?.click()
                                             }
                                         }}
-                                    />
-                                </div>
-                            </div>
-                            <DialogFooter>
-                                <Button
-                                    type="button"
-                                    onClick={() => {
-                                        const input = document.getElementById('skill') as HTMLInputElement
-                                        if (input?.value.trim()) {
-                                            addSkill(input.value)
-                                            input.value = ''
-                                            const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
-                                            closeButton?.click()
-                                        }
-                                    }}
-                                    className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]"
+                                        className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]"
+                                    >
+                                        Add Skill
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                    ) : (
+                        <Drawer>
+                            <DrawerTrigger asChild>
+                                <Badge
+                                    variant="outline"
+                                    className="pixel-badge border-dashed border-2 cursor-pointer hover:border-solid hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors gap-1"
                                 >
+                                    <Plus className="w-3 h-3" />
                                     Add Skill
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                                </Badge>
+                            </DrawerTrigger>
+                            <DrawerContent className="rounded-t-none border-t-4 border-x-4 border-[var(--cute-text)] shadow-[0px_-4px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+                                <DrawerHeader className="text-left bg-white dark:bg-zinc-950">
+                                    <DrawerTitle>Add New Skill</DrawerTitle>
+                                    <DrawerDescription>
+                                        Enter a skill to add to your profile.
+                                    </DrawerDescription>
+                                </DrawerHeader>
+                                <div className="grid gap-4 p-4">
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="skill-mobile" className="text-right">
+                                            Skill
+                                        </Label>
+                                        <Input
+                                            id="skill-mobile"
+                                            placeholder="e.g. React, TypeScript"
+                                            className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                            onKeyPress={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    const value = (e.target as HTMLInputElement).value
+                                                    if (value.trim()) {
+                                                        addSkill(value)
+                                                            ; (e.target as HTMLInputElement).value = ''
+                                                        // Drawer doesn't use data-slot="dialog-close" typically, but radix drawer might.
+                                                        // We'll rely on user closing or automated close if needed, but for now standard behavior.
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <DrawerFooter className="bg-white dark:bg-zinc-950">
+                                    <Button
+                                        type="button"
+                                        onClick={() => {
+                                            const input = document.getElementById('skill-mobile') as HTMLInputElement
+                                            if (input?.value.trim()) {
+                                                addSkill(input.value)
+                                                input.value = ''
+                                            }
+                                        }}
+                                        className="w-full rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]"
+                                    >
+                                        Add Skill
+                                    </Button>
+                                </DrawerFooter>
+                            </DrawerContent>
+                        </Drawer>
+                    )}
                 </div>
             </AnimatedSection>
 
@@ -235,81 +298,149 @@ export function AboutMeForm({ initialData, onChange, onFileSelect }: AboutMeForm
                 >
                     <CarouselContent>
                         {(data.testimonials || []).map((testimonial, index) => (
-                            <CarouselItem key={index} className="basis-1/2 lg:basis-1/3">
+                            <CarouselItem key={index} className="basis-full sm:basis-1/2 lg:basis-1/3">
                                 <div className="p-1 h-full relative group">
-                                    <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex gap-1">
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 bg-background/80 backdrop-blur-sm border border-border hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors">
-                                                    <Settings2 className="w-3 h-3" />
-                                                </Button>
-                                            </DialogTrigger>
-                                            <DialogContent className="rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)]">
-                                                <DialogHeader>
-                                                    <DialogTitle>Edit Testimonial</DialogTitle>
-                                                    <DialogDescription>
-                                                        Update the testimonial details below.
-                                                    </DialogDescription>
-                                                </DialogHeader>
-                                                <div className="grid gap-4 py-4">
-                                                    <div className="grid grid-cols-4 items-center gap-4">
-                                                        <Label className="text-right">Name</Label>
-                                                        <Input
-                                                            value={testimonial.name}
-                                                            onChange={(e) => updateTestimonial(index, "name", e.target.value)}
-                                                            className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
-                                                        />
-                                                    </div>
-                                                    <div className="grid grid-cols-4 items-center gap-4">
-                                                        <Label className="text-right">Role</Label>
-                                                        <Input
-                                                            value={testimonial.role}
-                                                            onChange={(e) => updateTestimonial(index, "role", e.target.value)}
-                                                            className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
-                                                        />
-                                                    </div>
-                                                    <div className="grid grid-cols-4 items-center gap-4">
-                                                        <Label className="text-right">Content</Label>
-                                                        <Textarea
-                                                            value={testimonial.content}
-                                                            onChange={(e) => updateTestimonial(index, "content", e.target.value)}
-                                                            className="col-span-3 min-h-[100px] rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
-                                                        />
-                                                    </div>
-                                                    <div className="grid grid-cols-4 items-center gap-4">
-                                                        <Label className="text-right">Avatar</Label>
-                                                        <div className="col-span-3">
-                                                            <FileUpload
-                                                                accept="image/*"
-                                                                onFileSelect={(file) => {
-                                                                    const url = URL.createObjectURL(file)
-                                                                    updateTestimonial(index, "avatar", url)
-                                                                    onFileSelect?.(`testimonials[${index}].avatar`, file)
-                                                                }}
-                                                                label="Upload Avatar"
-                                                                maxSize={5}
-                                                                className="w-full"
+                                    <div className="absolute right-2 top-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity z-10 flex gap-1">
+                                        {isDesktop ? (
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0 bg-background/80 backdrop-blur-sm border border-border hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors">
+                                                        <Settings2 className="w-3 h-3" />
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DialogContent className="rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+                                                    <DialogHeader className="bg-white dark:bg-zinc-950">
+                                                        <DialogTitle>Edit Testimonial</DialogTitle>
+                                                        <DialogDescription>
+                                                            Update the testimonial details below.
+                                                        </DialogDescription>
+                                                    </DialogHeader>
+                                                    <div className="grid gap-4 py-4">
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label className="text-right">Name</Label>
+                                                            <Input
+                                                                value={testimonial.name}
+                                                                onChange={(e) => updateTestimonial(index, "name", e.target.value)}
+                                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
                                                             />
                                                         </div>
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label className="text-right">Role</Label>
+                                                            <Input
+                                                                value={testimonial.role}
+                                                                onChange={(e) => updateTestimonial(index, "role", e.target.value)}
+                                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                            />
+                                                        </div>
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label className="text-right">Content</Label>
+                                                            <Textarea
+                                                                value={testimonial.content}
+                                                                onChange={(e) => updateTestimonial(index, "content", e.target.value)}
+                                                                className="col-span-3 min-h-[100px] rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                            />
+                                                        </div>
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label className="text-right">Avatar</Label>
+                                                            <div className="col-span-3">
+                                                                <FileUpload
+                                                                    accept="image/*"
+                                                                    onFileSelect={(file) => {
+                                                                        const url = URL.createObjectURL(file)
+                                                                        updateTestimonial(index, "avatar", url)
+                                                                        onFileSelect?.(`testimonials[${index}].avatar`, file)
+                                                                    }}
+                                                                    label="Upload Avatar"
+                                                                    maxSize={5}
+                                                                    className="w-full"
+                                                                />
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <DialogFooter className="sm:justify-between">
-                                                    <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
-                                                        removeTestimonial(index)
-                                                        const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
-                                                        closeButton?.click()
-                                                    }}>
-                                                        <Trash2 className="w-4 h-4 mr-2" /> Remove
+                                                    <DialogFooter className="sm:justify-between bg-white dark:bg-zinc-950">
+                                                        <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
+                                                            removeTestimonial(index)
+                                                            const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                            closeButton?.click()
+                                                        }}>
+                                                            <Trash2 className="w-4 h-4 mr-2" /> Remove
+                                                        </Button>
+                                                        <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
+                                                            const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
+                                                            closeButton?.click()
+                                                        }}>
+                                                            Done
+                                                        </Button>
+                                                    </DialogFooter>
+                                                </DialogContent>
+                                            </Dialog>
+                                        ) : (
+                                            <Drawer>
+                                                <DrawerTrigger asChild>
+                                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0 bg-background/80 backdrop-blur-sm border border-border hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors">
+                                                        <Settings2 className="w-3 h-3" />
                                                     </Button>
-                                                    <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
-                                                        const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
-                                                        closeButton?.click()
-                                                    }}>
-                                                        Done
-                                                    </Button>
-                                                </DialogFooter>
-                                            </DialogContent>
-                                        </Dialog>
+                                                </DrawerTrigger>
+                                                <DrawerContent className="rounded-t-none border-t-4 border-x-4 border-[var(--cute-text)] shadow-[0px_-4px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+                                                    <DrawerHeader className="text-left bg-white dark:bg-zinc-950">
+                                                        <DrawerTitle>Edit Testimonial</DrawerTitle>
+                                                        <DrawerDescription>
+                                                            Update the testimonial details below.
+                                                        </DrawerDescription>
+                                                    </DrawerHeader>
+                                                    <div className="grid gap-4 p-4 overflow-y-auto max-h-[70vh]">
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label className="text-right">Name</Label>
+                                                            <Input
+                                                                value={testimonial.name}
+                                                                onChange={(e) => updateTestimonial(index, "name", e.target.value)}
+                                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                            />
+                                                        </div>
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label className="text-right">Role</Label>
+                                                            <Input
+                                                                value={testimonial.role}
+                                                                onChange={(e) => updateTestimonial(index, "role", e.target.value)}
+                                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                            />
+                                                        </div>
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label className="text-right">Content</Label>
+                                                            <Textarea
+                                                                value={testimonial.content}
+                                                                onChange={(e) => updateTestimonial(index, "content", e.target.value)}
+                                                                className="col-span-3 min-h-[100px] rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                            />
+                                                        </div>
+                                                        <div className="grid grid-cols-4 items-center gap-4">
+                                                            <Label className="text-right">Avatar</Label>
+                                                            <div className="col-span-3">
+                                                                <FileUpload
+                                                                    accept="image/*"
+                                                                    onFileSelect={(file) => {
+                                                                        const url = URL.createObjectURL(file)
+                                                                        updateTestimonial(index, "avatar", url)
+                                                                        onFileSelect?.(`testimonials[${index}].avatar`, file)
+                                                                    }}
+                                                                    label="Upload Avatar"
+                                                                    maxSize={5}
+                                                                    className="w-full"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <DrawerFooter className="flex-col gap-2 bg-white dark:bg-zinc-950">
+                                                        <Button variant="destructive" size="sm" className="w-full rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => removeTestimonial(index)}>
+                                                            <Trash2 className="w-4 h-4 mr-2" /> Remove
+                                                        </Button>
+                                                        <Button type="button" className="w-full rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]">
+                                                            Done
+                                                        </Button>
+                                                    </DrawerFooter>
+                                                </DrawerContent>
+                                            </Drawer>
+                                        )}
                                     </div>
 
                                     <Card className="h-full pixel-card">
@@ -336,7 +467,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect }: AboutMeForm
                                 </div>
                             </CarouselItem>
                         ))}
-                        <CarouselItem className="basis-1/2 lg:basis-1/3">
+                        <CarouselItem className="basis-full sm:basis-1/2 lg:basis-1/3">
                             <div className="p-1 h-full">
                                 <Button
                                     variant="ghost"
