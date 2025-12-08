@@ -1,11 +1,12 @@
-import React from "react"
+import React, { useState } from "react"
 import { DraggableComponent } from "@/lib/types"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Plus, Trash2 } from "lucide-react"
+import { Plus, Trash2, Pencil, X } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
 interface PropertiesPanelProps {
     component: DraggableComponent | null
@@ -13,6 +14,9 @@ interface PropertiesPanelProps {
 }
 
 export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
+    const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null)
+    const [tempItem, setTempItem] = useState<any>(null)
+
     if (!component) {
         return (
             <div className="p-4 text-center text-muted-foreground text-sm">
@@ -23,6 +27,22 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
 
     const handleChange = (key: string, value: any) => {
         onChange(component.id, { [key]: value })
+    }
+
+    const handleEditItem = (index: number) => {
+        const items = component.props.items || []
+        setTempItem({ ...items[index] })
+        setEditingItemIndex(index)
+    }
+
+    const handleSaveItem = () => {
+        if (editingItemIndex !== null && tempItem) {
+            const items = [...(component.props.items || [])]
+            items[editingItemIndex] = tempItem
+            handleChange("items", items)
+            setEditingItemIndex(null)
+            setTempItem(null)
+        }
     }
 
     const renderFields = () => {
@@ -146,7 +166,7 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                     variant="outline"
                                     size="sm"
                                     onClick={() => {
-                                        const newItems = [...items, { name: "New Item", role: "Role", content: "Content", avatar: "" }]
+                                        const newItems = [...items, { name: "New Item", role: "Role", content: "Content", avatar: "", image: "" }]
                                         handleChange("items", newItems)
                                     }}
                                     className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all active:translate-y-1 active:shadow-none bg-background text-foreground hover:bg-muted"
@@ -156,77 +176,120 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                 </Button>
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
                                 {items.map((item: any, index: number) => (
-                                    <div key={index} className="border border-border p-3 rounded-md space-y-3 relative">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="absolute top-2 right-2 h-6 w-6 p-0 text-muted-foreground hover:text-white hover:bg-red-500 border-2 border-transparent hover:border-foreground rounded-none transition-none z-10"
-                                            onClick={() => {
-                                                const newItems = items.filter((_: any, i: number) => i !== index)
-                                                handleChange("items", newItems)
-                                            }}
-                                        >
-                                            <Trash2 className="w-3 h-3" />
-                                        </Button>
-
-                                        <div className="space-y-1">
-                                            <Label className="text-xs">Name</Label>
-                                            <Input
-                                                value={item.name}
-                                                onChange={(e) => {
-                                                    const newItems = [...items]
-                                                    newItems[index] = { ...item, name: e.target.value }
-                                                    handleChange("items", newItems)
-                                                }}
-                                                className="h-8 border-2 border-foreground rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:translate-y-0.5 focus:shadow-none transition-all"
-                                            />
+                                    <div key={index} className="flex items-center justify-between border-2 border-border p-2 bg-card hover:bg-muted/50 transition-colors">
+                                        <div className="flex items-center gap-2 overflow-hidden">
+                                            <div className="w-8 h-8 bg-muted border border-border flex items-center justify-center shrink-0">
+                                                {item.avatar ? (
+                                                    <img src={item.avatar} alt={item.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <span className="text-xs font-bold text-muted-foreground">{item.name?.charAt(0) || "?"}</span>
+                                                )}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-bold truncate">{item.name || "Unnamed"}</p>
+                                                <p className="text-xs text-muted-foreground truncate">{item.role || "No role"}</p>
+                                            </div>
                                         </div>
-
-                                        <div className="space-y-1">
-                                            <Label className="text-xs">Role</Label>
-                                            <Input
-                                                value={item.role}
-                                                onChange={(e) => {
-                                                    const newItems = [...items]
-                                                    newItems[index] = { ...item, role: e.target.value }
+                                        <div className="flex items-center gap-1">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 w-8 p-0 hover:bg-foreground hover:text-background rounded-none"
+                                                onClick={() => handleEditItem(index)}
+                                            >
+                                                <Pencil className="w-3 h-3" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 w-8 p-0 hover:bg-red-500 hover:text-white rounded-none"
+                                                onClick={() => {
+                                                    const newItems = items.filter((_: any, i: number) => i !== index)
                                                     handleChange("items", newItems)
                                                 }}
-                                                className="h-8 border-2 border-foreground rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:translate-y-0.5 focus:shadow-none transition-all"
-                                            />
-                                        </div>
-
-                                        <div className="space-y-1">
-                                            <Label className="text-xs">Content</Label>
-                                            <Textarea
-                                                value={item.content}
-                                                onChange={(e) => {
-                                                    const newItems = [...items]
-                                                    newItems[index] = { ...item, content: e.target.value }
-                                                    handleChange("items", newItems)
-                                                }}
-                                                className="min-h-[60px] text-xs border-2 border-foreground rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:translate-y-0.5 focus:shadow-none transition-all"
-                                            />
-                                        </div>
-
-                                        <div className="space-y-1">
-                                            <Label className="text-xs">Avatar URL</Label>
-                                            <Input
-                                                value={item.avatar}
-                                                onChange={(e) => {
-                                                    const newItems = [...items]
-                                                    newItems[index] = { ...item, avatar: e.target.value }
-                                                    handleChange("items", newItems)
-                                                }}
-                                                className="h-8 border-2 border-foreground rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:translate-y-0.5 focus:shadow-none transition-all"
-                                                placeholder="https://..."
-                                            />
+                                            >
+                                                <Trash2 className="w-3 h-3" />
+                                            </Button>
                                         </div>
                                     </div>
                                 ))}
+                                {items.length === 0 && (
+                                    <div className="text-center p-4 border-2 border-dashed border-border text-muted-foreground text-xs">
+                                        No items added yet.
+                                    </div>
+                                )}
                             </div>
                         </div>
+
+                        {/* Edit Item Dialog */}
+                        <Dialog open={editingItemIndex !== null} onOpenChange={(open) => !open && setEditingItemIndex(null)}>
+                            <DialogContent className="max-w-md border-4 border-foreground rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-0 gap-0">
+                                <DialogHeader className="border-b-4 border-foreground p-4 bg-muted/20">
+                                    <DialogTitle className="font-bold text-lg uppercase tracking-wider">Edit Item</DialogTitle>
+                                </DialogHeader>
+                                <div className="p-4 space-y-4">
+                                    <div className="space-y-2">
+                                        <Label>Name</Label>
+                                        <Input
+                                            value={tempItem?.name || ""}
+                                            onChange={(e) => setTempItem({ ...tempItem, name: e.target.value })}
+                                            className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Role</Label>
+                                        <Input
+                                            value={tempItem?.role || ""}
+                                            onChange={(e) => setTempItem({ ...tempItem, role: e.target.value })}
+                                            className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Content</Label>
+                                        <Textarea
+                                            value={tempItem?.content || ""}
+                                            onChange={(e) => setTempItem({ ...tempItem, content: e.target.value })}
+                                            className="min-h-[100px] border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Avatar URL (Optional)</Label>
+                                        <Input
+                                            value={tempItem?.avatar || ""}
+                                            onChange={(e) => setTempItem({ ...tempItem, avatar: e.target.value })}
+                                            placeholder="https://..."
+                                            className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Card Image URL (Optional)</Label>
+                                        <Input
+                                            value={tempItem?.image || ""}
+                                            onChange={(e) => setTempItem({ ...tempItem, image: e.target.value })}
+                                            placeholder="https://..."
+                                            className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                                        />
+                                    </div>
+                                </div>
+                                <DialogFooter className="p-4 border-t-4 border-foreground bg-muted/20">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setEditingItemIndex(null)}
+                                        className="rounded-none border-2 border-foreground hover:bg-muted"
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        onClick={handleSaveItem}
+                                        className="rounded-none border-2 border-foreground shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all bg-primary text-primary-foreground"
+                                    >
+                                        Save Changes
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 )
             case "card-group":

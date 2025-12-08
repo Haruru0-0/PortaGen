@@ -75,11 +75,11 @@ export function ComponentRenderer({
                                 align: "start",
                                 loop: true,
                             }}
-                            className="w-[calc(100%-96px)] mx-auto"
+                            className="w-full px-12"
                         >
-                            <CarouselContent>
+                            <CarouselContent className="-ml-4">
                                 {items.length === 0 ? (
-                                    <CarouselItem className={basisClass}>
+                                    <CarouselItem className={`pl-4 ${basisClass}`}>
                                         <div className="p-1 h-full">
                                             <Card className="h-full pixel-card border-4 border-dashed border-[var(--cute-text)]/50">
                                                 <CardContent className="pt-6 flex-grow flex flex-col items-center justify-center gap-2">
@@ -92,9 +92,19 @@ export function ComponentRenderer({
                                     </CarouselItem>
                                 ) : (
                                     items.map((item: any, index: number) => (
-                                        <CarouselItem key={index} className={`${basisClass} lg:${basisClass}`}>
+                                        <CarouselItem key={index} className={`pl-4 ${basisClass}`}>
                                             <div className="p-1 h-full">
-                                                <Card className="h-full pixel-card">
+                                                <Card className="h-full pixel-card overflow-hidden flex flex-col">
+                                                    {item.image && (
+                                                        <div className="w-full aspect-video relative overflow-hidden bg-muted border-b-2 border-border">
+                                                            <img
+                                                                src={item.image}
+                                                                alt={item.name}
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => (e.currentTarget.style.display = 'none')}
+                                                            />
+                                                        </div>
+                                                    )}
                                                     <CardContent className="pt-6 flex-grow flex flex-col">
                                                         <div className="flex items-start gap-4 mb-4">
                                                             <Avatar className="shrink-0 border-2 border-[var(--cute-text)] rounded-none w-10 h-10">
@@ -108,7 +118,7 @@ export function ComponentRenderer({
                                                                 <p className="text-sm opacity-70 truncate">{item.role}</p>
                                                             </div>
                                                         </div>
-                                                        <p className="italic flex-grow opacity-90 text-sm line-clamp-3">
+                                                        <p className="italic flex-grow opacity-90 text-sm line-clamp-4 whitespace-pre-wrap">
                                                             {item.content}
                                                         </p>
                                                     </CardContent>
@@ -118,8 +128,8 @@ export function ComponentRenderer({
                                     ))
                                 )}
                             </CarouselContent>
-                            <CarouselPrevious className="border-2 border-[var(--cute-text)] rounded-none text-[var(--cute-text)] hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors" />
-                            <CarouselNext className="border-2 border-[var(--cute-text)] rounded-none text-[var(--cute-text)] hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors" />
+                            <CarouselPrevious className="left-0 border-2 border-[var(--cute-text)] rounded-none text-[var(--cute-text)] hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors" />
+                            <CarouselNext className="right-0 border-2 border-[var(--cute-text)] rounded-none text-[var(--cute-text)] hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors" />
                         </Carousel>
                     </div>
                 )

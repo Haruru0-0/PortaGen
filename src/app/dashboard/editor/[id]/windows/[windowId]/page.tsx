@@ -35,7 +35,7 @@ export default function EditWindowPage() {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="h-full">
       <WindowContentEditor
         windowId={windowId}
         portfolioId={portfolioId}

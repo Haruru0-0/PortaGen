@@ -215,9 +215,9 @@ export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }:
     }
 
     return (
-        <PixelCard className="w-full max-w-4xl mx-auto">
-            <div className="space-y-6">
-                <div className="flex items-center justify-between border-b-2 border-border pb-4">
+        <PixelCard className="w-full h-full flex flex-col">
+            <div className="flex-none space-y-6 flex flex-col h-full">
+                <div className="flex items-center justify-between border-b-2 border-border pb-4 flex-none">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={onCancel}
@@ -248,7 +248,7 @@ export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }:
                 </div>
 
                 {/* Template Selection */}
-                <div className="space-y-3">
+                <div className="space-y-3 flex-none">
                     <label className="block text-xs uppercase tracking-wider">CONTENT TEMPLATE</label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         {(Object.entries(CONTENT_TEMPLATES) as [WindowContentType, typeof CONTENT_TEMPLATES[WindowContentType]][]).map(([key, template]) => (
@@ -274,7 +274,7 @@ export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }:
                 </div>
 
                 {/* Specific Form Rendering */}
-                <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 border-2 border-border p-4 bg-muted/20">
+                <div className="flex-1 overflow-y-auto border-2 border-border p-4 bg-muted/20">
                     {renderForm()}
                 </div>
             </div>

@@ -155,9 +155,6 @@
 
   body {
     @apply bg-background text-foreground;
-    image-rendering: pixelated;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: crisp-edges;
   }
 
   /* Neo-brutalism inspired styles with bold borders and shadows */
