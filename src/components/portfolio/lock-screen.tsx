@@ -77,6 +77,12 @@ export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
   }
 
   const handleScreenClick = () => {
+    if (data && !data.enabled) {
+      playSuccessSound()
+      onUnlock()
+      return
+    }
+
     if (!showLogin) {
       playClickSound()
       setShowLogin(true)

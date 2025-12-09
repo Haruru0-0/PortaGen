@@ -1,5 +1,5 @@
 import { Monitor, Moon, Sun } from "lucide-react";
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,40 +12,101 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useTheme } from "@/components/theme-provider";
+import { useTheme as usePortfolioTheme } from "@/contexts/theme-context";
 import { useMediaQuery } from "@/hooks/use-media-query";
+
+// Style configurations for each menubar theme
+const STYLE_CONFIGS = {
+  "liquid-glass": {
+    wrapper: "liquidGlass-wrapper dropdown",
+    content: "liquidGlass-content p-2 w-full",
+    item: "w-full cursor-pointer hover:bg-sky-400/30 focus:bg-sky-400/30 text-slate-900 focus:text-slate-900",
+    icon: "text-gray-600",
+    hasGlassLayers: true
+  },
+  "retro": {
+    wrapper: "bg-[#c0c0c0] border-2 border-l-white border-t-white border-r-black border-b-black shadow-md",
+    content: "p-2 w-full",
+    item: "w-full cursor-pointer hover:bg-[#000080] hover:text-white text-black",
+    icon: "text-black",
+    hasGlassLayers: false
+  },
+  "windows-xp": {
+    wrapper: "border border-[#1a3a8a] shadow-lg",
+    content: "p-2 w-full text-white",
+    item: "w-full cursor-pointer hover:bg-[#3168d5] text-white",
+    icon: "text-white",
+    hasGlassLayers: false,
+    customBg: "linear-gradient(to bottom, #3168d5 0%, #2252b7 100%)"
+  },
+  "windows-7": {
+    wrapper: "backdrop-blur-md border border-white/20 rounded-lg shadow-xl",
+    content: "p-2 w-full text-white",
+    item: "w-full cursor-pointer hover:bg-white/20 text-white/90 rounded",
+    icon: "text-white/70",
+    hasGlassLayers: false,
+    customBg: "linear-gradient(to bottom, rgba(80,120,180,0.9) 0%, rgba(40,70,130,0.95) 100%)"
+  },
+  "pixel": {
+    wrapper: "bg-[#0f380f] border-4 border-[#8bac0f]",
+    content: "p-2 w-full font-pixel text-[#9bbc0f]",
+    item: "w-full cursor-pointer hover:bg-[#306230] text-[#9bbc0f]",
+    icon: "text-[#9bbc0f]",
+    hasGlassLayers: false
+  },
+  "window": {
+    wrapper: "bg-black/60 backdrop-blur-xl border border-white/10 rounded-lg",
+    content: "p-2 w-full",
+    item: "w-full cursor-pointer hover:bg-white/10 text-white/90",
+    icon: "text-white/70",
+    hasGlassLayers: false
+  }
+};
+
+function getStyleConfig(styleId: string) {
+  return STYLE_CONFIGS[styleId as keyof typeof STYLE_CONFIGS] || STYLE_CONFIGS["liquid-glass"];
+}
 
 export function ModeToggle({ previewMode, embedded = false }: { previewMode?: "desktop" | "mobile"; embedded?: boolean }) {
   const { theme, setTheme } = useTheme();
+  const { activeTheme } = usePortfolioTheme();
   const [open, setOpen] = useState(false);
   const mqDesktop = useMediaQuery("(min-width: 768px)");
   const isDesktop = previewMode ? previewMode === "desktop" : mqDesktop;
 
-  // Show drawer if previewMode is mobile AND embedded, otherwise use normal desktop/mobile logic
   const shouldShowDrawer = (previewMode === "mobile" && embedded) || (!previewMode && !isDesktop);
+  const styleConfig = getStyleConfig(activeTheme.menubarStyleId || "liquid-glass") as typeof STYLE_CONFIGS["liquid-glass"] & { customBg?: string };
 
   const ModeContent = (
-    <div className="liquidGlass-wrapper dropdown">
-      <div className="liquidGlass-effect"></div>
-      <div className="liquidGlass-tint"></div>
-      <div className="liquidGlass-shine"></div>
-      <div className="liquidGlass-content p-2 w-full">
+    <div
+      className={styleConfig.wrapper}
+      style={styleConfig.customBg ? { background: styleConfig.customBg } : undefined}
+    >
+      {styleConfig.hasGlassLayers && (
+        <>
+          <div className="liquidGlass-effect"></div>
+          <div className="liquidGlass-tint"></div>
+          <div className="liquidGlass-shine"></div>
+        </>
+      )}
+      <div className={styleConfig.content}>
         <div
           onClick={() => setTheme("light")}
-          className="w-full cursor-pointer hover:bg-sky-400/30 dark:hover:bg-sky-400/30 text-slate-900 focus:text-slate-900 flex items-center p-2 rounded-sm"
+          className={`${styleConfig.item} flex items-center p-2 rounded-sm`}
         >
-          <Sun className="h-[1rem] w-[1rem] mr-2" /> Light
+          <Sun className={`h-[1.2rem] w-[1.2rem] mr-2 ${styleConfig.icon}`} /> Light
         </div>
         <div
           onClick={() => setTheme("dark")}
-          className="w-full cursor-pointer hover:bg-sky-400/30 dark:hover:bg-sky-400/30 text-slate-900 focus:text-slate-900 flex items-center p-2 rounded-sm"
+          className={`${styleConfig.item} flex items-center p-2 rounded-sm`}
         >
-          <Moon className="h-[1rem] w-[1rem] mr-2" /> Dark
+          <Moon className={`h-[1.2rem] w-[1.2rem] mr-2 ${styleConfig.icon}`} /> Dark
         </div>
         <div
           onClick={() => setTheme("system")}
-          className="w-full cursor-pointer hover:bg-sky-400/30 dark:hover:bg-sky-400/30 text-slate-900 focus:text-slate-900 flex items-center p-2 rounded-sm"
+          className={`${styleConfig.item} flex items-center p-2 rounded-sm`}
         >
-          <Monitor className="h-[1rem] w-[1rem] mr-2" /> System
+          <Monitor className={`h-[1.2rem] w-[1.2rem] mr-2 ${styleConfig.icon}`} /> System
         </div>
       </div>
     </div>
@@ -93,22 +154,7 @@ export function ModeToggle({ previewMode, embedded = false }: { previewMode?: "d
         align="end"
         className="w-40 p-0 bg-transparent border-none shadow-none z-50"
       >
-        <div className="liquidGlass-wrapper dropdown">
-          <div className="liquidGlass-effect"></div>
-          <div className="liquidGlass-tint"></div>
-          <div className="liquidGlass-shine"></div>
-          <div className="liquidGlass-content p-2 w-full">
-            <DropdownMenuItem onClick={() => setTheme("light")} className="w-full cursor-pointer hover:bg-sky-400/30 focus:bg-sky-400/30 text-slate-900 focus:text-slate-900">
-              <Sun className="h-[1rem] w-[1rem] mr-2 text-gray-600" /> Light
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTheme("dark")} className="w-full cursor-pointer hover:bg-sky-400/30 focus:bg-sky-400/30 text-slate-900 focus:text-slate-900">
-              <Moon className="h-[1rem] w-[1rem] mr-2 text-gray-600" /> Dark
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTheme("system")} className="w-full cursor-pointer hover:bg-sky-400/30 focus:bg-sky-400/30 text-slate-900 focus:text-slate-900">
-              <Monitor className="h-[1rem] w-[1rem] mr-2 text-gray-600" /> System
-            </DropdownMenuItem>
-          </div>
-        </div>
+        {ModeContent}
       </DropdownMenuContent>
     </DropdownMenu>
   );

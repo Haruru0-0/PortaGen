@@ -1,12 +1,9 @@
 import { Suspense, useRef } from "react"
 import { PixelCard } from "@/components/pixel-card"
-import { PixelButton } from "@/components/pixel-button"
 import { Monitor, Smartphone, Lock, Unlock } from "lucide-react"
 import { LockScreen } from "@/components/portfolio/lock-screen"
 import Desktop from "@/components/portfolio/desktop"
 import { CuteSuspenseFallback } from "@/components/portfolio/suspense-fallback"
-import { SoundProvider } from "@/contexts/sound-context"
-import { AudioProvider } from "@/contexts/audio-context"
 import { PortfolioTheme } from "@/lib/portfolio-theme"
 import { useResizeObserver } from "@/hooks/use-resize-observer"
 
@@ -141,22 +138,6 @@ export function PreviewPanel({
                             </div>
                         )}
                     </div>
-                </div>
-
-                <div className="flex gap-2 md:gap-3 flex-wrap">
-                    <PixelButton variant="secondary" className="text-[10px] flex-1 sm:flex-none">
-                        ↶ UNDO
-                    </PixelButton>
-                    <PixelButton variant="secondary" className="text-[10px] flex-1 sm:flex-none">
-                        ↷ REDO
-                    </PixelButton>
-                    <div className="hidden sm:block flex-1" />
-                    <PixelButton variant="accent" className="text-[10px] flex-1 sm:flex-none">
-                        SAVE
-                    </PixelButton>
-                    <PixelButton variant="primary" className="text-[10px] flex-1 sm:flex-none">
-                        PUBLISH
-                    </PixelButton>
                 </div>
             </div>
         </PixelCard>

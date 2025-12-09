@@ -32,9 +32,20 @@ type HomeScreenTab =
     | "mobile widgets"
     | "desktop widget"
 
+import { useTheme } from "@/contexts/theme-context"
+import { useEffect } from "react"
+
 function EditorContent() {
     const params = useParams<{ id: string }>()
     const currentPortfolioId = Number(params?.id)
+    const { getThemeData } = useTheme()
+
+    useEffect(() => {
+        if (currentPortfolioId) {
+            getThemeData(currentPortfolioId)
+        }
+    }, [currentPortfolioId, getThemeData])
+
     const {
         activeCategory,
         setActiveCategory,
@@ -223,9 +234,6 @@ function EditorContent() {
                         previewMode={previewMode}
                         isLocked={isLocked}
                         lockScreenEnabled={lockScreenEnabled}
-                        lockScreenPassword={lockScreenPassword}
-                        lockScreenHint={lockScreenHint}
-                        lockScreenImage={lockScreenImage}
                         desktopGif={desktopGif}
                         wallpaper={
                             activeCategory === "lockScreen"

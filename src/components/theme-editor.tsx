@@ -4,10 +4,17 @@ import { useState } from "react"
 import { PixelInput } from "./pixel-input"
 import { THEME_PRESETS, type PortfolioTheme } from "@/lib/portfolio-theme"
 import { Check } from "lucide-react"
-import { PixelButton } from "@/components/pixel-button";
+import { PixelButton } from "@/components/pixel-button"
+import { TASKBAR_TEMPLATES, MENUBAR_TEMPLATES } from "@/lib/constants/theme-templates"
+import { useTheme } from "@/contexts/theme-context"
+import { useParams } from "next/navigation"
+
 
 export function ThemeEditor() {
   const [customTheme, setCustomTheme] = useState<PortfolioTheme>(THEME_PRESETS[0])
+  const { activeTheme, updateTheme } = useTheme()
+  const params = useParams<{ id: string }>()
+  const portfolioId = Number(params?.id)
 
   const handlePresetSelect = (preset: PortfolioTheme) => {
     setCustomTheme(preset)
@@ -147,8 +154,8 @@ export function ThemeEditor() {
                 key={pos}
                 onClick={() => handleLayoutChange("taskbarPosition", pos)}
                 className={`px-3 py-2 text-[8px] border-2 border-border ${customTheme.layout.taskbarPosition === pos
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-card hover:bg-muted"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card hover:bg-muted"
                   }`}
               >
                 {pos.toUpperCase()}
@@ -156,19 +163,38 @@ export function ThemeEditor() {
             ))}
           </div>
         </div>
+        {/* Taskbar Style */}
         <div className="space-y-2">
-          <label className="text-[8px] uppercase">MENU BAR STYLE</label>
-          <div className="grid grid-cols-3 gap-2">
-            {["classic", "modern", "minimal"].map((style) => (
+          <label className="text-[8px] uppercase">TASKBAR STYLE</label>
+          <div className="grid grid-cols-2 gap-2">
+            {TASKBAR_TEMPLATES.map((template) => (
               <button
-                key={style}
-                onClick={() => handleLayoutChange("menuBarStyle", style)}
-                className={`px-3 py-2 text-[8px] border-2 border-border ${customTheme.layout.menuBarStyle === style
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-card hover:bg-muted"
+                key={template.id}
+                onClick={() => updateTheme(portfolioId, { taskbarStyleId: template.id })}
+                className={`px-3 py-2 text-[8px] border-2 border-border ${activeTheme.taskbarStyleId === template.id
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card hover:bg-muted"
                   }`}
               >
-                {style.toUpperCase()}
+                {template.name.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
+        {/* Menubar Style */}
+        <div className="space-y-2">
+          <label className="text-[8px] uppercase">MENUBAR STYLE</label>
+          <div className="grid grid-cols-2 gap-2">
+            {MENUBAR_TEMPLATES.map((template) => (
+              <button
+                key={template.id}
+                onClick={() => updateTheme(portfolioId, { menubarStyleId: template.id })}
+                className={`px-3 py-2 text-[8px] border-2 border-border ${activeTheme.menubarStyleId === template.id
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card hover:bg-muted"
+                  }`}
+              >
+                {template.name.toUpperCase()}
               </button>
             ))}
           </div>
@@ -181,8 +207,8 @@ export function ThemeEditor() {
                 key={style}
                 onClick={() => handleLayoutChange("musicPlayerStyle", style)}
                 className={`px-3 py-2 text-[8px] border-2 border-border ${customTheme.layout.musicPlayerStyle === style
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-card hover:bg-muted"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card hover:bg-muted"
                   }`}
               >
                 {style.toUpperCase()}

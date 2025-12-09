@@ -185,6 +185,8 @@ export const themeSettings = pgTable('theme_settings', {
             primary: string
             secondary: string
         }
+        taskbarStyleId?: string
+        menubarStyleId?: string
     }>(),
 
     createdAt: timestamp('created_at').defaultNow().notNull(),
