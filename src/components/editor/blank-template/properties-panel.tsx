@@ -14,9 +14,6 @@ interface PropertiesPanelProps {
 }
 
 export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
-    const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null)
-    const [tempItem, setTempItem] = useState<any>(null)
-
     if (!component) {
         return (
             <div className="p-4 text-center text-muted-foreground text-sm">
@@ -27,22 +24,6 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
 
     const handleChange = (key: string, value: any) => {
         onChange(component.id, { [key]: value })
-    }
-
-    const handleEditItem = (index: number) => {
-        const items = component.props.items || []
-        setTempItem({ ...items[index] })
-        setEditingItemIndex(index)
-    }
-
-    const handleSaveItem = () => {
-        if (editingItemIndex !== null && tempItem) {
-            const items = [...(component.props.items || [])]
-            items[editingItemIndex] = tempItem
-            handleChange("items", items)
-            setEditingItemIndex(null)
-            setTempItem(null)
-        }
     }
 
     const renderFields = () => {
@@ -148,6 +129,16 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                 return (
                     <div className="space-y-4">
                         <div className="space-y-2">
+                            <Label>Number of Slides</Label>
+                            <Input
+                                type="number"
+                                value={component.props.count || 3}
+                                onChange={(e) => handleChange("count", Math.max(1, parseInt(e.target.value) || 1))}
+                                min={1}
+                                className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                            />
+                        </div>
+                        <div className="space-y-2">
                             <Label>Items Per Slide</Label>
                             <Input
                                 type="number"
@@ -196,14 +187,6 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                className="h-8 w-8 p-0 hover:bg-foreground hover:text-background rounded-none"
-                                                onClick={() => handleEditItem(index)}
-                                            >
-                                                <Pencil className="w-3 h-3" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
                                                 className="h-8 w-8 p-0 hover:bg-red-500 hover:text-white rounded-none"
                                                 onClick={() => {
                                                     const newItems = items.filter((_: any, i: number) => i !== index)
@@ -223,73 +206,6 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                             </div>
                         </div>
 
-                        {/* Edit Item Dialog */}
-                        <Dialog open={editingItemIndex !== null} onOpenChange={(open) => !open && setEditingItemIndex(null)}>
-                            <DialogContent className="max-w-md border-4 border-foreground rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-0 gap-0">
-                                <DialogHeader className="border-b-4 border-foreground p-4 bg-muted/20">
-                                    <DialogTitle className="font-bold text-lg uppercase tracking-wider">Edit Item</DialogTitle>
-                                </DialogHeader>
-                                <div className="p-4 space-y-4">
-                                    <div className="space-y-2">
-                                        <Label>Name</Label>
-                                        <Input
-                                            value={tempItem?.name || ""}
-                                            onChange={(e) => setTempItem({ ...tempItem, name: e.target.value })}
-                                            className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Role</Label>
-                                        <Input
-                                            value={tempItem?.role || ""}
-                                            onChange={(e) => setTempItem({ ...tempItem, role: e.target.value })}
-                                            className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Content</Label>
-                                        <Textarea
-                                            value={tempItem?.content || ""}
-                                            onChange={(e) => setTempItem({ ...tempItem, content: e.target.value })}
-                                            className="min-h-[100px] border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Avatar URL (Optional)</Label>
-                                        <Input
-                                            value={tempItem?.avatar || ""}
-                                            onChange={(e) => setTempItem({ ...tempItem, avatar: e.target.value })}
-                                            placeholder="https://..."
-                                            className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Card Image URL (Optional)</Label>
-                                        <Input
-                                            value={tempItem?.image || ""}
-                                            onChange={(e) => setTempItem({ ...tempItem, image: e.target.value })}
-                                            placeholder="https://..."
-                                            className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
-                                        />
-                                    </div>
-                                </div>
-                                <DialogFooter className="p-4 border-t-4 border-foreground bg-muted/20">
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => setEditingItemIndex(null)}
-                                        className="rounded-none border-2 border-foreground hover:bg-muted"
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        onClick={handleSaveItem}
-                                        className="rounded-none border-2 border-foreground shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all bg-primary text-primary-foreground"
-                                    >
-                                        Save Changes
-                                    </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
                     </div>
                 )
             case "card-group":

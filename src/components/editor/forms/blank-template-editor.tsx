@@ -4,6 +4,7 @@ import { BlankTemplateData, DraggableComponent, ComponentType } from "@/lib/type
 import { Canvas } from "../blank-template/canvas"
 import { Toolbar, TOOLBAR_ITEMS } from "../blank-template/toolbar"
 import { PropertiesDialog } from "../blank-template/properties-dialog"
+import { ItemEditorDialog } from "../blank-template/item-editor-dialog"
 import { PixelCard } from "@/components/pixel-card"
 
 // Simple ID generator to avoid uuid dependency issues
@@ -19,6 +20,7 @@ export function BlankTemplateEditor({ initialData, onChange }: BlankTemplateEdit
     const [selectedId, setSelectedId] = useState<string | null>(null)
     const [activeDragType, setActiveDragType] = useState<ComponentType | null>(null)
     const [showPropertiesDialog, setShowPropertiesDialog] = useState(false)
+    const [editingItem, setEditingItem] = useState<{ componentId: string, index: number } | null>(null)
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -80,6 +82,39 @@ export function BlankTemplateEditor({ initialData, onChange }: BlankTemplateEdit
         if (selectedId === id) setSelectedId(null)
     }
 
+    const handleEditItem = (componentId: string, index: number) => {
+        setEditingItem({ componentId, index })
+    }
+
+    const handleUpdateItem = (data: any) => {
+        if (!editingItem) return
+
+        setComponents(prev => prev.map(c => {
+            if (c.id === editingItem.componentId) {
+                const items = [...(c.props.items || [])]
+
+                // Lazy initialization for card-group and carousel if count exists but items don't
+                if ((c.type === 'card-group' || c.type === 'carousel') && items.length === 0 && c.props.count) {
+                    const defaultItem = c.type === 'carousel'
+                        ? { name: "New Slide", role: "Role", content: "Slide content" }
+                        : { title: "New Card", description: "Card content placeholder" }
+
+                    for (let i = 0; i < (c.props.count || 0); i++) {
+                        items[i] = { ...defaultItem, title: defaultItem.name || defaultItem.title }
+                    }
+                }
+
+                while (items.length <= editingItem.index) {
+                    items.push({})
+                }
+
+                items[editingItem.index] = { ...items[editingItem.index], ...data }
+                return { ...c, props: { ...c.props, items } }
+            }
+            return c
+        }))
+    }
+
     const handleMoveUp = (id: string) => {
         const index = components.findIndex(c => c.id === id)
         if (index > 0) {
@@ -127,6 +162,7 @@ export function BlankTemplateEditor({ initialData, onChange }: BlankTemplateEdit
                             onMoveUp={handleMoveUp}
                             onMoveDown={handleMoveDown}
                             onEdit={handleEditComponent}
+                            onEditItem={handleEditItem}
                             data={{
                                 backgroundColor: initialData.backgroundColor,
                                 padding: initialData.padding,
@@ -150,6 +186,30 @@ export function BlankTemplateEditor({ initialData, onChange }: BlankTemplateEdit
                 onChange={handleUpdateComponent}
                 isOpen={showPropertiesDialog}
                 onClose={() => setShowPropertiesDialog(false)}
+            />
+            <ItemEditorDialog
+                isOpen={!!editingItem}
+                onClose={() => setEditingItem(null)}
+                onSave={handleUpdateItem}
+                initialData={(() => {
+                    if (!editingItem) return {}
+                    const component = components.find(c => c.id === editingItem.componentId)
+                    if (!component) return {}
+                    const items = component.props.items || []
+
+                    if ((component.type === 'card-group' || component.type === 'carousel') && items.length === 0) {
+                        if (component.type === 'carousel') {
+                            return { name: `Slide ${editingItem.index + 1}`, role: "Role", content: "Slide content" }
+                        }
+                        return {
+                            title: `Card ${editingItem.index + 1}`,
+                            description: "Card content placeholder"
+                        }
+                    }
+
+                    return items[editingItem.index] || {}
+                })()}
+                title={editingItem ? `Edit ${components.find(c => c.id === editingItem.componentId)?.type === 'carousel' ? 'Slide' : 'Card'} Content` : 'Edit Item'}
             />
         </DndContext>
     )

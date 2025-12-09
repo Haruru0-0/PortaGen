@@ -28,8 +28,8 @@ export default function RootLayout({
         <ClerkProvider>
             <html lang="en" suppressHydrationWarning>
                 <body className={`${pressStart2P.className} font-sans antialiased`}>
-                    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-                        {children}
+                     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+                       {children}
                         <Toaster />
                     </ThemeProvider>
                     <Analytics />

@@ -11,6 +11,7 @@ interface CanvasProps {
     onMoveUp: (id: string) => void
     onMoveDown: (id: string) => void
     onEdit: (id: string) => void
+    onEditItem: (id: string, index: number) => void
     data: {
         backgroundColor?: string;
         padding?: string;
@@ -18,7 +19,7 @@ interface CanvasProps {
     }
 }
 
-export function Canvas({ components, selectedId, onSelect, onDelete, onMoveUp, onMoveDown, onEdit, data }: CanvasProps) {
+export function Canvas({ components, selectedId, onSelect, onDelete, onMoveUp, onMoveDown, onEdit, onEditItem, data }: CanvasProps) {
     const { setNodeRef, isOver } = useDroppable({
         id: "canvas-droppable",
     })
@@ -56,6 +57,7 @@ export function Canvas({ components, selectedId, onSelect, onDelete, onMoveUp, o
                     onMoveUp={() => onMoveUp(component.id)}
                     onMoveDown={() => onMoveDown(component.id)}
                     onEdit={() => onEdit(component.id)}
+                    onEditItem={(index) => onEditItem(component.id, index)}
                 />
             ))}
         </div>

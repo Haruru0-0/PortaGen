@@ -14,6 +14,7 @@ interface ComponentRendererProps {
     onMoveUp: () => void
     onMoveDown: () => void
     onEdit: () => void
+    onEditItem: (index: number) => void
 }
 
 export function ComponentRenderer({
@@ -23,7 +24,8 @@ export function ComponentRenderer({
     onDelete,
     onMoveUp,
     onMoveDown,
-    onEdit
+    onEdit,
+    onEditItem
 }: ComponentRendererProps) {
     const renderContent = () => {
         switch (component.type) {
@@ -67,6 +69,7 @@ export function ComponentRenderer({
                 const items = component.props.items || []
                 const itemsPerSlide = component.props.itemsPerSlide || 3
                 const basisClass = itemsPerSlide === 1 ? "basis-full" : itemsPerSlide === 2 ? "basis-1/2" : "basis-1/3"
+                const itemCount = Math.max(component.props.count || 3, items.length)
 
                 return (
                     <div className="w-full py-4">
@@ -78,22 +81,11 @@ export function ComponentRenderer({
                             className="w-full px-12"
                         >
                             <CarouselContent className="-ml-4">
-                                {items.length === 0 ? (
-                                    <CarouselItem className={`pl-4 ${basisClass}`}>
-                                        <div className="p-1 h-full">
-                                            <Card className="h-full pixel-card border-4 border-dashed border-[var(--cute-text)]/50">
-                                                <CardContent className="pt-6 flex-grow flex flex-col items-center justify-center gap-2">
-                                                    <Plus className="w-8 h-8 text-[var(--cute-text)]" />
-                                                    <span className="font-medium text-[var(--cute-text)]">Add Items</span>
-                                                    <span className="text-sm opacity-70 text-center">This carousel is empty</span>
-                                                </CardContent>
-                                            </Card>
-                                        </div>
-                                    </CarouselItem>
-                                ) : (
-                                    items.map((item: any, index: number) => (
+                                {Array.from({ length: itemCount }).map((_, index) => {
+                                    const item = items[index] || {}
+                                    return (
                                         <CarouselItem key={index} className={`pl-4 ${basisClass}`}>
-                                            <div className="p-1 h-full">
+                                            <div className="p-1 h-full relative group/item">
                                                 <Card className="h-full pixel-card overflow-hidden flex flex-col">
                                                     {item.image && (
                                                         <div className="w-full aspect-video relative overflow-hidden bg-muted border-b-2 border-border">
@@ -110,23 +102,36 @@ export function ComponentRenderer({
                                                             <Avatar className="shrink-0 border-2 border-[var(--cute-text)] rounded-none w-10 h-10">
                                                                 <AvatarImage src={item.avatar || "/placeholder.svg"} alt={item.name} />
                                                                 <AvatarFallback className="rounded-none bg-[var(--cute-highlight)] text-[var(--cute-text)]">
-                                                                    {item.name.charAt(0)}
+                                                                    {(item.name || "?").charAt(0)}
                                                                 </AvatarFallback>
                                                             </Avatar>
                                                             <div className="min-w-0 flex-1">
-                                                                <p className="font-medium pixel-text truncate">{item.name}</p>
-                                                                <p className="text-sm opacity-70 truncate">{item.role}</p>
+                                                                <p className="font-medium pixel-text truncate">{item.name || `Slide ${index + 1}`}</p>
+                                                                <p className="text-sm opacity-70 truncate">{item.role || "Role"}</p>
                                                             </div>
                                                         </div>
                                                         <p className="italic flex-grow opacity-90 text-sm line-clamp-4 whitespace-pre-wrap">
-                                                            {item.content}
+                                                            {item.content || "Slide content placeholder"}
                                                         </p>
                                                     </CardContent>
                                                 </Card>
+                                                {/* Edit Item Overlay */}
+                                                <div className="absolute top-2 right-2 opacity-0 group-hover/item:opacity-100 transition-opacity z-10">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            onEditItem(index)
+                                                        }}
+                                                        className="p-2 bg-white border-2 border-foreground hover:bg-muted text-foreground cursor-pointer shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 hover:shadow-none transition-all"
+                                                        title="Edit Slide"
+                                                    >
+                                                        <Pencil className="w-4 h-4" />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </CarouselItem>
-                                    ))
-                                )}
+                                    )
+                                })}
                             </CarouselContent>
                             <CarouselPrevious className="left-0 border-2 border-[var(--cute-text)] rounded-none text-[var(--cute-text)] hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors" />
                             <CarouselNext className="right-0 border-2 border-[var(--cute-text)] rounded-none text-[var(--cute-text)] hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors" />
@@ -134,16 +139,42 @@ export function ComponentRenderer({
                     </div>
                 )
             case "card-group":
+                const cardItems = component.props.items || []
+                const cardCount = Math.max(component.props.count || 3, cardItems.length)
+
                 return (
                     <div className={`grid gap-4 w-full`} style={{
                         gridTemplateColumns: `repeat(${component.props.columns || 3}, minmax(0, 1fr))`
                     }}>
-                        {Array.from({ length: component.props.count || 3 }).map((_, i) => (
-                            <PixelCard key={i} className="p-4">
-                                <h4 className="font-bold mb-2">Card {i + 1}</h4>
-                                <p className="text-xs text-muted-foreground">Card content placeholder</p>
-                            </PixelCard>
-                        ))}
+                        {Array.from({ length: cardCount }).map((_, i) => {
+                            const item = cardItems[i] || {}
+                            return (
+                                <div key={i} className="relative group/item">
+                                    <PixelCard className="p-4 h-full flex flex-col">
+                                        <h4 className="font-bold mb-2">{item.title || `Card ${i + 1}`}</h4>
+                                        <p className="text-sm text-muted-foreground flex-grow whitespace-pre-wrap">{item.description || "Card content placeholder"}</p>
+                                        {item.image && (
+                                            <div className="mt-2 w-full aspect-video rounded-sm overflow-hidden bg-muted">
+                                                <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                                            </div>
+                                        )}
+                                    </PixelCard>
+                                    {/* Edit Item Overlay */}
+                                    <div className="absolute top-2 right-2 opacity-0 group-hover/item:opacity-100 transition-opacity z-10">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                onEditItem(i)
+                                            }}
+                                            className="p-2 bg-white border-2 border-foreground hover:bg-muted text-foreground cursor-pointer shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-0.5 hover:shadow-none transition-all"
+                                            title="Edit Card"
+                                        >
+                                            <Pencil className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            )
+                        })}
                     </div>
                 )
             case "vertical-separator":
