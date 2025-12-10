@@ -1,0 +1,235 @@
+#taskbar:before {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  content: "";
+  z-index: -1
+}
+
+#taskbar:before {
+  left: 0
+}
+
+#taskbar:before {
+  right: 0
+}
+
+#taskbar:before {
+  background: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, .2392156863)), color-stop(70%, rgba(0, 0, 0, .2392156863)), color-stop(90%, rgba(0, 0, 0, .4)))
+}
+
+#taskbar:before {
+  -webkit-box-shadow: inset 0 1px 0 rgba(0, 0, 0, .6666666667), inset 0 2px 0 hsla(0, 0%, 100%, .6666666667);
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, .6666666667), inset 0 2px 0 hsla(0, 0%, 100%, .6666666667)
+}
+
+#taskbar:before {
+  background: linear-gradient(90deg, rgba(0, 0, 0, .2392156863), rgba(0, 0, 0, .2392156863) 70%, rgba(0, 0, 0, .4) 90%)
+}
+
+#taskbar:before {
+  background: linear-gradient(270deg, rgba(0, 0, 0, .2392156863), rgba(0, 0, 0, .2392156863) 70%, rgba(0, 0, 0, .4) 90%)
+}
+
+#startButton {
+  width: 57px;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center
+}
+
+#startButton {
+  padding: 0;
+  margin: 0
+}
+
+#startButton>span {
+  width: 57px;
+  height: 40px
+}
+
+#startButton>span {
+  background: url('../../../assets/start-button.0abbc64f.webp') -5px -9px no-repeat;
+  background-size: 57px
+}
+
+#startButton.active>span,
+#startButton:hover>span {
+  background-position-y: -66px
+}
+
+.taskbarItem {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  position: relative;
+  color: #fff;
+  height: 100%;
+  width: 60px;
+}
+
+.taskbarItem {
+  background: none;
+  border: 1px solid transparent;
+  border-top: none;
+  padding: 0;
+  margin: 0
+}
+
+.taskbarItem:after,
+.taskbarItem:before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  content: "";
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  z-index: -1
+}
+
+.taskbarItem:after,
+.taskbarItem:before {
+  left: 0;
+  right: 0;
+  -webkit-transition: opacity .2s;
+  transition: opacity .2s
+}
+
+.taskbarItem:not(.opened):hover:before {
+  opacity: 1
+}
+
+.taskbarItem:not(.opened):hover:before {
+  background-image: radial-gradient(circle at bottom, rgba(191, 220, 250, .6666666667) 5%, transparent 15%), radial-gradient(circle at 0 50%, rgba(0, 0, 0, .3333333333), transparent), radial-gradient(circle at 100% 50%, rgba(0, 0, 0, .3333333333), transparent), radial-gradient(circle at 0 50%, hsla(0, 0%, 100%, .3333333333), transparent), radial-gradient(circle at 100% 50%, hsla(0, 0%, 100%, .3333333333), transparent);
+  background-size: 100%, 1px, 1px, 1px, 1px;
+  background-repeat: no-repeat;
+  -webkit-transition: none;
+  transition: none
+}
+
+.taskbarItem:not(.opened):hover:before {
+  background-position-x: center, 0, calc(100% - 1px), 1px, 100%
+}
+
+.taskbarItem:not(.opened):hover:before {
+  background-position-x: center, 100%, 1px, 1px, 0
+}
+
+.taskbarItem:not(.opened).active:before {
+  background-image: radial-gradient(circle at bottom, rgba(191, 220, 250, .6666666667) 5%, transparent 15%), radial-gradient(circle at 0 50%, rgba(0, 0, 0, .3333333333), transparent), radial-gradient(circle at 100% 50%, rgba(0, 0, 0, .3333333333), transparent), radial-gradient(circle at 0 50%, hsla(0, 0%, 100%, .3333333333), transparent), radial-gradient(circle at 100% 50%, hsla(0, 0%, 100%, .3333333333), transparent), -webkit-gradient(linear, left top, left bottom, color-stop(5%, transparent), color-stop(rgba(0, 0, 0, .3333333333)), color-stop(95%, transparent));
+  opacity: 1
+}
+
+.taskbarItem:not(.opened).active:before {
+  background-image: radial-gradient(circle at bottom, rgba(191, 220, 250, .6666666667) 5%, transparent 15%), radial-gradient(circle at 0 50%, rgba(0, 0, 0, .3333333333), transparent), radial-gradient(circle at 100% 50%, rgba(0, 0, 0, .3333333333), transparent), radial-gradient(circle at 0 50%, hsla(0, 0%, 100%, .3333333333), transparent), radial-gradient(circle at 100% 50%, hsla(0, 0%, 100%, .3333333333), transparent), linear-gradient(180deg, transparent 5%, rgba(0, 0, 0, .3333333333), transparent 95%);
+  background-size: 100%, 1px, 1px, 1px, 1px, 100%;
+  background-repeat: no-repeat;
+  -webkit-transition: none;
+  transition: none
+}
+
+.taskbarItem:not(.opened).active:before {
+  background-position-x: center, 0, calc(100% - 1px), 1px, 100%, center
+}
+
+.taskbarItem:not(.opened).active:before {
+  background-position-x: center, 100%, 1px, 1px, 0, center
+}
+
+.taskbarItem.opened:before {
+  opacity: 1
+}
+
+.taskbarItem.opened:before {
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, .5333333333);
+  -webkit-box-shadow: inset 0 0 0 1px hsla(0, 0%, 100%, .5333333333);
+  box-shadow: inset 0 0 0 1px hsla(0, 0%, 100%, .5333333333);
+  -webkit-transition: background-color .3s;
+  transition: background-color .3s
+}
+
+.taskbarItem.opened:before {
+  background: linear-gradient(155deg, hsla(0, 0%, 100%, .7019607843), transparent 40%)
+}
+
+.taskbarItem.opened:before {
+  background: linear-gradient(-155deg, hsla(0, 0%, 100%, .7019607843), transparent 40%)
+}
+
+.taskbarItem.opened:hover:before {
+  z-index: -1
+}
+
+.taskbarItem.opened:hover:before {
+  background-color: hsla(0, 0%, 100%, .3333333333);
+  -webkit-transition: background-color .3s;
+  transition: background-color .3s
+}
+
+.taskbarItem.opened.active:after {
+  width: 100%;
+  opacity: 1;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(10%, hsla(0, 0%, 100%, .5019607843)), color-stop(hsla(0, 0%, 100%, .2)), color-stop(80%, hsla(0, 0%, 100%, .6)))
+}
+
+.taskbarItem.opened.active:after {
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, .5333333333);
+  -webkit-box-shadow: inset 0 0 0 1px hsla(0, 0%, 100%, .5333333333);
+  box-shadow: inset 0 0 0 1px hsla(0, 0%, 100%, .5333333333);
+  background: linear-gradient(180deg, hsla(0, 0%, 100%, .5019607843) 10%, hsla(0, 0%, 100%, .2), hsla(0, 0%, 100%, .6) 80%);
+  -webkit-transition: background-color .3s;
+  transition: background-color .3s
+}
+
+.taskbarItem.opened.active:hover:after {
+  z-index: -1
+}
+
+.taskbarItem.opened.active:hover:after {
+  background-color: hsla(0, 0%, 100%, .3333333333);
+  -webkit-transition: background-color .3s;
+  transition: background-color .3s
+}
+
+#taskbar-items>.taskbarItem {
+  width: 60px
+}
+
+#taskbar-items>.taskbarItem {
+  background: var(--icon) 50% no-repeat;
+  background-size: 55%;
+}
+
+#taskbar-items>.taskbarItem {
+  margin-right: 2px
+}
+
+#taskbar-items>.taskbarItem {
+  margin-left: 2px
+}
+
+#taskbar-items>.taskbarItem:active {
+  background-position: 55% 70%
+}
+
+#taskbar-items>.taskbarItem:active {
+  background-position: 45% 70%
+}

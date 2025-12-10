@@ -45,7 +45,9 @@ export function PreviewPanel({
             <div className="space-y-4 h-full flex flex-col">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                     <h3 className="text-sm dashboard-pixel-text-shadow">LIVE PREVIEW</h3>
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="flex gap-2 flex-wrap items-center">
+                        {/* Screen Size Toggle */}
+                        <span className="text-[9px] text-muted-foreground font-bold uppercase">View:</span>
                         <button
                             onClick={() => onPreviewModeChange("desktop")}
                             className={`px-3 py-2 text-[10px] border-2 border-border flex items-center gap-1 ${previewMode === "desktop"
@@ -71,6 +73,11 @@ export function PreviewPanel({
 
                         {lockScreenEnabled && (
                             <>
+                                {/* Separator between groups */}
+                                <div className="w-px h-6 bg-border mx-1" />
+
+                                {/* Page Toggle */}
+                                <span className="text-[9px] text-muted-foreground font-bold uppercase">Page:</span>
                                 <button
                                     onClick={() => onLockChange(true)}
                                     className={`px-3 py-2 text-[10px] border-2 border-border flex items-center gap-1 ${isLocked
@@ -89,7 +96,7 @@ export function PreviewPanel({
                                         }`}
                                 >
                                     <Unlock className="w-3 h-3" />
-                                    DESKTOP
+                                    HOME
                                 </button>
                             </>
                         )}
