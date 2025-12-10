@@ -26,17 +26,12 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json().catch(() => ({}))
     const name: string = body?.portfolioName || 'MY PORTFOLIO'
-
-    const base = slugify(name || 'portfolio') || 'portfolio'
-    const suffix = uniqueSuffix()
-    const slug = `${base}-${suffix}`
-    const username = `${(user.username || `user-${user.id}`).toLowerCase()}-${suffix}`
+    const bio: string = body?.bio || ''
 
     const [created] = await db.insert(portfolios).values({
       userId: user.id,
       portfolioName: name,
-      username,
-      slug,
+      bio,
     }).returning()
 
     // initialize defaults for settings to keep editor happy

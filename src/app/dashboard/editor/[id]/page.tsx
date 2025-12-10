@@ -13,6 +13,7 @@ import gsap from "gsap"
 import { useGSAP } from "@gsap/react"
 import { useEditorContext } from "@/contexts/editorContext"
 import { useIconContext } from "@/contexts/iconContext"
+import { usePortfolioContext } from "@/contexts/portfolioContext"
 import { saveData, } from "@/lib/services/portfolioService"
 import { CategorySelection } from "@/components/editor/CategorySelection"
 import { TabsNavigation } from "@/components/editor/TabsNavigation"
@@ -39,12 +40,14 @@ function EditorContent() {
     const params = useParams<{ id: string }>()
     const currentPortfolioId = Number(params?.id)
     const { getThemeData } = useTheme()
+    const { portfolioInfo, fetchInfo, updateInfo, setPortfolioName, setBio, loading: portfolioLoading } = usePortfolioContext()
 
     useEffect(() => {
         if (currentPortfolioId) {
             getThemeData(currentPortfolioId)
+            fetchInfo(currentPortfolioId)
         }
-    }, [currentPortfolioId, getThemeData])
+    }, [currentPortfolioId, getThemeData, fetchInfo])
 
     const {
         activeCategory,
@@ -53,10 +56,6 @@ function EditorContent() {
         setActiveLockScreenTab,
         activeHomeScreenTab,
         setActiveHomeScreenTab,
-        portfolioName,
-        setPortfolioName,
-        lockScreenPassword,
-        lockScreenHint,
         lockScreenImage,
         lockScreenEnabled,
         isLocked,
@@ -84,10 +83,10 @@ function EditorContent() {
     } = useEditorContext()
     const { icons } = useIconContext()
 
-    const handleUpdatePortfolioName = async () => {
-        await saveData("portfolio/settings", {
-            portfolioId: currentPortfolioId,
-            portfolioName,
+    const handleSavePortfolioInfo = async () => {
+        await updateInfo({
+            portfolioName: portfolioInfo?.portfolioName,
+            bio: portfolioInfo?.bio || "",
         })
     }
     const handleUpdateDesktopSettings = async () => {
@@ -176,27 +175,38 @@ function EditorContent() {
 
     return (
         <>
-            <PortfolioUrlShare username={portfolioName} />
+            <PortfolioUrlShare username={portfolioInfo?.portfolioName || ""} />
 
             <div className="min-h-[calc(100vh-180px)] flex flex-col mt-8">
-                {/* Portfolio Name */}
+                {/* Portfolio Name & Bio */}
                 <div className="mb-6">
                     <PixelCard>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex flex-col gap-4">
                             <div>
-                                <label className="block text-xs uppercase tracking-wider">Portfolio Name</label>
+                                <label className="block text-xs uppercase tracking-wider mb-1">Portfolio Name</label>
                                 <PixelInput
-                                    value={portfolioName}
+                                    value={portfolioInfo?.portfolioName || ""}
                                     onChange={(e) => setPortfolioName(e.target.value)}
                                     placeholder="MY PORTFOLIO"
                                 />
                             </div>
+                            <div>
+                                <label className="block text-xs uppercase tracking-wider mb-1">Bio</label>
+                                <textarea
+                                    value={portfolioInfo?.bio || ""}
+                                    onChange={(e) => setBio(e.target.value)}
+                                    placeholder="A short description..."
+                                    className="w-full px-4 py-2 text-xs bg-input border-4 border-border focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                                    rows={2}
+                                />
+                            </div>
                             <div className="flex items-end justify-end">
                                 <button
-                                    className="px-4 py-2 text-[10px] border-2 border-border bg-primary text-primary-foreground"
-                                    onClick={handleUpdatePortfolioName}
+                                    className="px-4 py-2 text-[10px] border-2 border-border bg-primary text-primary-foreground disabled:opacity-50"
+                                    onClick={handleSavePortfolioInfo}
+                                    disabled={portfolioLoading}
                                 >
-                                    Save Name
+                                    {portfolioLoading ? "Saving..." : "Save Info"}
                                 </button>
                             </div>
                         </div>

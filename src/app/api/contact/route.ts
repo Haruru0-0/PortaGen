@@ -8,7 +8,7 @@ import { and, eq } from 'drizzle-orm'
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}))
-    const { name, email, subject, message, portfolioId, slug } = body || {}
+    const { name, email, subject, message, portfolioId } = body || {}
 
     if (!name || !email || !message) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -27,13 +27,11 @@ export async function POST(req: NextRequest) {
       } : undefined,
     })
 
-    // Resolve recipient: portfolio owner email if portfolioId/slug provided; otherwise fallback to CONTACT_TO/SMTP_USER
+    // Resolve recipient: portfolio owner email if portfolioId provided; otherwise fallback to CONTACT_TO/SMTP_USER
     let to: string | undefined = process.env.CONTACT_TO || process.env.SMTP_USER || undefined
-    if (portfolioId || slug) {
+    if (portfolioId) {
       const portRow = await db.query.portfolios.findFirst({
-        where: portfolioId
-          ? eq(portfolios.id, Number(portfolioId))
-          : eq(portfolios.slug, String(slug)),
+        where: eq(portfolios.id, Number(portfolioId)),
         with: { user: true },
       })
       if (portRow?.user?.email) {
@@ -54,7 +52,7 @@ Subject: ${subject}
 ${message}`,
       html: `<p><strong>From:</strong> ${safe(name)} &lt;${safe(email)}&gt;</p>
 <p><strong>Subject:</strong> ${safe(subject || '')}</p>
-<p>${(String(message) || '').replace(/\n/g,'<br/>')}</p>`,
+<p>${(String(message) || '').replace(/\n/g, '<br/>')}</p>`,
     })
 
     return NextResponse.json({ ok: true })

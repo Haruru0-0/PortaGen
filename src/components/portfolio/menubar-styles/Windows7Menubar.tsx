@@ -11,9 +11,9 @@ export function Windows7Menubar({ embedded, previewMode, currentTime }: MenubarS
             <div
                 className="h-8 flex items-center justify-between px-4 backdrop-blur-md text-white text-sm"
                 style={{
-                    background: "linear-gradient(to bottom, rgba(80,120,180,0.75) 0%, rgba(40,70,130,0.85) 50%, rgba(20,45,100,0.9) 100%)",
-                    borderBottom: "1px solid rgba(255,255,255,0.2)",
-                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2)"
+                    backgroundImage: "linear-gradient(90deg,rgba(0,0,0,.1333333333) 50px,transparent 80px),linear-gradient(270deg,rgba(0,0,0,.1333333333) 200px,transparent 230px)",
+                    backgroundColor: "rgba(170,209,251,0.65)",
+                    backdropFilter: "blur(4px)",
                 }}
             >
                 <div className="flex items-center gap-4">

@@ -3,7 +3,6 @@
 
 import { createContext, ReactNode, useContext, useState } from "react"
 import {
-  fetchPortfolioData,
   saveData,
   uploadFile,
 } from "@/lib/services/portfolioService"
@@ -177,7 +176,6 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
 
 
   const loadPortfolio = async (portfolioId: number) => {
-    const data = await fetchPortfolioData(portfolioId)
     if (!data) return
     setPortfolioName(data.portfolioName)
     setLockScreenEnabled(data.lockScreenSettings.enabled)

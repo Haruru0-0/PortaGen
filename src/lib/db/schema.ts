@@ -37,19 +37,12 @@ export const portfolios = pgTable('portfolios', {
 
     // Basic Info
     portfolioName: text('portfolio_name').notNull().default('MY PORTFOLIO'),
-    username: varchar('username', { length: 100 }).notNull().unique(),
-    slug: varchar('slug', { length: 100 }).notNull().unique(),
     bio: text('bio'),
-
-    // Privacy
-    isPublic: boolean('is_public').default(true),
-    isPublished: boolean('is_published').default(false),
 
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => ({
     userIdIdx: index('portfolio_user_id_idx').on(table.userId),
-    slugIdx: index('portfolio_slug_idx').on(table.slug),
 }))
 
 // ============================================

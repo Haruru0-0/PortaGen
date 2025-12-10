@@ -23,8 +23,7 @@ export async function GET(req: NextRequest) {
             columns: {
                 id: true,
                 portfolioName: true,
-                slug: true,
-                isPublished: true,
+                bio: true,
                 createdAt: true,
             },
         })

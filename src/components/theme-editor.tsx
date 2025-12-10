@@ -145,24 +145,6 @@ export function ThemeEditor() {
 
       {/* Layout Options */}
       <div className="space-y-3">
-        <h4 className="text-[10px] pixel-text-shadow">LAYOUT</h4>
-        <div className="space-y-2">
-          <label className="text-[8px] uppercase">TASKBAR POSITION</label>
-          <div className="grid grid-cols-2 gap-2">
-            {["bottom", "top", "left", "right"].map((pos) => (
-              <button
-                key={pos}
-                onClick={() => handleLayoutChange("taskbarPosition", pos)}
-                className={`px-3 py-2 text-[8px] border-2 border-border ${customTheme.layout.taskbarPosition === pos
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card hover:bg-muted"
-                  }`}
-              >
-                {pos.toUpperCase()}
-              </button>
-            ))}
-          </div>
-        </div>
         {/* Taskbar Style */}
         <div className="space-y-2">
           <label className="text-[8px] uppercase">TASKBAR STYLE</label>

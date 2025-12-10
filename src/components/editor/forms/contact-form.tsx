@@ -388,19 +388,6 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
 
                 {/* Contact Form Preview (Non-editable) */}
                 <AnimatedSection variant="slideLeft" delay={0.2} className="md:col-span-2 relative group border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
-                    <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                        <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm p-2 rounded-md border border-border">
-                            <input
-                                type="checkbox"
-                                id="showForm"
-                                checked={data.showForm !== false}
-                                onChange={(e) => updateData({ ...data, showForm: e.target.checked })}
-                                className="w-4 h-4"
-                            />
-                            <label htmlFor="showForm" className="text-xs font-bold">SHOW FORM</label>
-                        </div>
-                    </div>
-
                     <div className={data.showForm === false ? "opacity-50 grayscale pointer-events-none" : ""}>
                         <Card className="border-0 pixel-card">
                             <CardContent className="p-6">

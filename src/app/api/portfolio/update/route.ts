@@ -1,9 +1,9 @@
-// app/api/portfolio/settings/route.ts
+// app/api/portfolio/info/update/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
 import { portfolios } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { getUserByClerkId } from '@/lib/db/helpers'
 
 export async function POST(req: NextRequest) {
@@ -18,25 +18,39 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 })
         }
 
-        const data = await req.json()
-        const { portfolioId, ...settings } = data
+        const body = await req.json()
+        const { portfolioId, portfolioName, bio } = body
 
         if (!portfolioId) {
             return NextResponse.json({ error: 'Portfolio ID required' }, { status: 400 })
         }
 
+        // Verify ownership
+        const existing = await db.query.portfolios.findFirst({
+            where: and(eq(portfolios.id, portfolioId), eq(portfolios.userId, user.id)),
+        })
+
+        if (!existing) {
+            return NextResponse.json({ error: 'Portfolio not found or access denied' }, { status: 404 })
+        }
+
         const [updated] = await db
             .update(portfolios)
             .set({
-                ...settings,
+                portfolioName: portfolioName ?? existing.portfolioName,
+                bio: bio ?? existing.bio,
                 updatedAt: new Date(),
             })
             .where(eq(portfolios.id, portfolioId))
-            .returning()
+            .returning({
+                id: portfolios.id,
+                portfolioName: portfolios.portfolioName,
+                bio: portfolios.bio,
+            })
 
         return NextResponse.json(updated)
     } catch (error) {
-        console.error('Portfolio settings update error:', error)
-        return NextResponse.json({ error: 'Failed to update portfolio settings' }, { status: 500 })
+        console.error('Portfolio info UPDATE error:', error)
+        return NextResponse.json({ error: 'Failed to update portfolio info' }, { status: 500 })
     }
 }

@@ -5,7 +5,6 @@ import { PixelButton } from "@/components/pixel-button";
 import { Library } from "lucide-react";
 import { useState } from "react";
 import { useIconContext } from "@/contexts/iconContext";
-import { useEditorContext } from "@/contexts/editorContext";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";

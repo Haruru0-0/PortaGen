@@ -5,7 +5,6 @@ import { Edit2, Plus, Trash2 } from "lucide-react"
 import Placeholder from "@/assets/Placeholder.png"
 import Image from "next/image";
 import { Icon, useIconContext } from "@/contexts/iconContext";
-import { useEditorContext } from "@/contexts/editorContext";
 import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal";
 import { AddIconModal } from "@/components/editor/modals/AddIconModal";
 import { EditIconModal } from "@/components/editor/modals/EditIconModal";

@@ -10,8 +10,6 @@ import { Plus, Loader2 } from "lucide-react"
 interface Portfolio {
     id: number
     name: string
-    slug: string
-    isPublished: boolean
 }
 
 interface PortfolioSelectorProps {
@@ -22,11 +20,11 @@ interface PortfolioSelectorProps {
 }
 
 export function PortfolioSelector({
-                                      portfolios,
-                                      currentPortfolioId,
-                                      onPortfolioChange,
-                                      onPortfolioCreated
-                                  }: PortfolioSelectorProps) {
+    portfolios,
+    currentPortfolioId,
+    onPortfolioChange,
+    onPortfolioCreated
+}: PortfolioSelectorProps) {
     const [isCreatePortfolioModalOpen, setIsCreatePortfolioModalOpen] = useState(false)
     const [newPortfolioName, setNewPortfolioName] = useState("")
     const [creatingPortfolio, setCreatingPortfolio] = useState(false)
@@ -46,8 +44,6 @@ export function PortfolioSelector({
                 },
                 body: JSON.stringify({
                     portfolioName: newPortfolioName,
-                    username: newPortfolioName.toLowerCase().replace(/\s+/g, '-'),
-                    slug: newPortfolioName.toLowerCase().replace(/\s+/g, '-'),
                 }),
             })
 
@@ -91,7 +87,7 @@ export function PortfolioSelector({
                         <option value="">SELECT PORTFOLIO</option>
                         {portfolios.map(portfolio => (
                             <option key={portfolio.id} value={portfolio.id}>
-                                {portfolio.name} ({portfolio.slug})
+                                {portfolio.name}
                             </option>
                         ))}
                     </select>
