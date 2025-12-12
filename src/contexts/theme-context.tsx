@@ -1,6 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useCallback } from "react"
+import { toast } from "sonner"
 import { Theme, getTheme, saveTheme, getDisplayTheme } from "@/lib/services/themeService"
 import {
     TASKBAR_TEMPLATES,
@@ -67,8 +68,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
             setActiveTheme(merged)
 
             await saveTheme(portfolioId, merged)
+            toast.success("Theme saved successfully!")
         } catch (e) {
             console.error("Failed to save theme:", e)
+            toast.error("Failed to save theme")
             // Ideally revert optimistic update here if needed, but keeping simple for now
         } finally {
             setSaving(false)
@@ -101,8 +104,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           --theme-accent: ${activeTheme.colors.accent};
           --theme-background: ${activeTheme.colors.background};
           --theme-text: ${activeTheme.colors.text};
-          --font-primary: ${activeTheme.fonts.primary};
-          --font-secondary: ${activeTheme.fonts.secondary};
+          --font: ${activeTheme.font};
         }
       `}</style>
             {children}

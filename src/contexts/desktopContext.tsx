@@ -1,6 +1,7 @@
 "use client"
 
 import React, { createContext, useCallback, useContext, useState } from 'react'
+import { toast } from 'sonner'
 import { DesktopData, displayDesktop, getDesktop, updateDesktopGif, updateDesktopSpotify, updateDesktopWallpaper, updateDesktopWidget } from '@/lib/services/desktopService'
 
 interface DesktopContextType {
@@ -37,6 +38,10 @@ export function DesktopProvider({ children }: { children: React.ReactNode }) {
     try {
       await updateDesktopWallpaper(portfolioId, assetId)
       await getDesktopData(portfolioId)
+      toast.success("Wallpaper updated successfully!")
+    } catch (error) {
+      console.error("Failed to update wallpaper:", error)
+      toast.error("Failed to update wallpaper")
     } finally {
       setLoading(false)
     }
@@ -46,6 +51,10 @@ export function DesktopProvider({ children }: { children: React.ReactNode }) {
     try {
       await updateDesktopGif(portfolioId, assetId)
       await getDesktopData(portfolioId)
+      toast.success("GIF updated successfully!")
+    } catch (error) {
+      console.error("Failed to update GIF:", error)
+      toast.error("Failed to update GIF")
     } finally {
       setLoading(false)
     }
@@ -55,6 +64,10 @@ export function DesktopProvider({ children }: { children: React.ReactNode }) {
     try {
       await updateDesktopWidget(portfolioId, index, assetId)
       await getDesktopData(portfolioId)
+      toast.success(`Widget ${index} updated successfully!`)
+    } catch (error) {
+      console.error("Failed to update widget:", error)
+      toast.error("Failed to update widget")
     } finally {
       setLoading(false)
     }
@@ -64,6 +77,10 @@ export function DesktopProvider({ children }: { children: React.ReactNode }) {
     try {
       await updateDesktopSpotify(portfolioId, url)
       await getDesktopData(portfolioId)
+      toast.success("Spotify playlist updated successfully!")
+    } catch (error) {
+      console.error("Failed to update Spotify playlist:", error)
+      toast.error("Failed to update Spotify playlist")
     } finally {
       setLoading(false)
     }

@@ -64,6 +64,13 @@
       "when": 1765373936400,
       "tag": "0008_neat_rictor",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1765460292382,
+      "tag": "0009_flashy_warstar",
+      "breakpoints": true
     }
   ]
 }

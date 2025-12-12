@@ -8,6 +8,7 @@ import { WindowsProvider } from "@/contexts/windowsContext"
 import { SoundProvider } from "@/contexts/sound-context"
 import { AudioProvider } from "@/contexts/audio-context"
 import { ThemeProvider } from "@/contexts/theme-context"
+import { SoundEffectProvider } from "@/contexts/soundEffectContext"
 
 export default function EditorLayout({ children }: { children: React.ReactNode }) {
     return (
@@ -19,7 +20,9 @@ export default function EditorLayout({ children }: { children: React.ReactNode }
                             <LockScreenProvider>
                                 <IconProvider>
                                     <WindowsProvider>
-                                        {children}
+                                        <SoundEffectProvider>
+                                            {children}
+                                        </SoundEffectProvider>
                                     </WindowsProvider>
                                 </IconProvider>
                             </LockScreenProvider>

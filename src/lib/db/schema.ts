@@ -136,24 +136,17 @@ export const portfolioAssets = pgTable('portfolio_assets', {
     assetIdIdx: index('portfolio_assets_asset_id_idx').on(table.assetId),
 }))
 
-// Sound effects table
+// Sound effects table - simplified to store only preset ID with portfolio ID
 export const soundEffects = pgTable('sound_effects', {
     id: serial('id').primaryKey(),
-    portfolioId: integer('portfolio_id').notNull().references(() => portfolios.id, { onDelete: 'cascade' }),
+    portfolioId: integer('portfolio_id').notNull().references(() => portfolios.id, { onDelete: 'cascade' }).unique(),
 
-    effectId: varchar('effect_id', { length: 100 }).notNull(), // 'click', 'hover', 'open', 'close'
-    name: varchar('name', { length: 255 }).notNull(),
-
-    audioAssetId: integer('audio_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
-
-    volume: integer('volume').default(50), // 0-100
-    enabled: boolean('enabled').default(true),
+    // Store only the preset ID (e.g., 'arcade', 'nintendo', 'minimal', 'sci-fi', 'retro-pop')
+    presetId: varchar('preset_id', { length: 50 }).notNull().default('arcade'),
 
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
-}, (table) => ({
-    portfolioEffectIdx: unique('portfolio_effect_unique').on(table.portfolioId, table.effectId),
-}))
+})
 
 // ============================================
 // SETTINGS TABLES
@@ -174,10 +167,7 @@ export const themeSettings = pgTable('theme_settings', {
             background: string
             text: string
         }
-        fonts: {
-            primary: string
-            secondary: string
-        }
+        font: string
         taskbarStyleId?: string
         menubarStyleId?: string
     }>(),
@@ -251,7 +241,7 @@ export const uploadedAssetsRelations = relations(uploadedAssets, ({ one, many })
     icons: many(icons),
     lockScreenSettings: many(lockScreenSettings),
     desktopSettings: many(desktopSettings),
-    soundEffects: many(soundEffects),
+    // Removed soundEffects relation since we're now only storing preset IDs
 }))
 
 export const portfolioAssetsRelations = relations(portfolioAssets, ({ one }) => ({
@@ -283,10 +273,7 @@ export const soundEffectsRelations = relations(soundEffects, ({ one }) => ({
         fields: [soundEffects.portfolioId],
         references: [portfolios.id],
     }),
-    asset: one(uploadedAssets, {
-        fields: [soundEffects.audioAssetId],
-        references: [uploadedAssets.id],
-    }),
+    // Removed asset relation since we're now only storing preset IDs
 }))
 
 export const lockScreenSettingsRelations = relations(lockScreenSettings, ({ one }) => ({

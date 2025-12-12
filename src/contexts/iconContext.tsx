@@ -1,6 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState } from 'react'
+import { toast } from 'sonner'
 import {
     addIcon as addIconAPI,
     deleteIcon as deleteIconAPI,
@@ -54,8 +55,16 @@ export function IconProvider({ children }: { children: React.ReactNode }) {
         setLoading(true)
         try {
             const created = await addIconAPI({ ...payload, portfolioId })
-            if (created) setIcons((prev) => [...prev, created])
+            if (created) {
+                setIcons((prev) => [...prev, created])
+                toast.success("Icon added successfully!")
+            } else {
+                toast.error("Failed to add icon")
+            }
             return created
+        } catch (error) {
+            console.error("Failed to add icon:", error)
+            toast.error("Failed to add icon")
         } finally {
             setLoading(false)
         }
@@ -64,8 +73,16 @@ export function IconProvider({ children }: { children: React.ReactNode }) {
         setLoading(true)
         try {
             const updated = await updateIconAPI({ ...payload, portfolioId })
-            if (updated) setIcons((prev) => prev.map((i) => (i.id === updated.id ? updated : i)))
+            if (updated) {
+                setIcons((prev) => prev.map((i) => (i.id === updated.id ? updated : i)))
+                toast.success("Icon updated successfully!")
+            } else {
+                toast.error("Failed to update icon")
+            }
             return updated
+        } catch (error) {
+            console.error("Failed to update icon:", error)
+            toast.error("Failed to update icon")
         } finally {
             setLoading(false)
         }
@@ -74,8 +91,17 @@ export function IconProvider({ children }: { children: React.ReactNode }) {
         setLoading(true)
         try {
             const ok = await deleteIconAPI(id)
-            if (ok) setIcons((prev) => prev.filter((i) => i.id !== id))
+            if (ok) {
+                setIcons((prev) => prev.filter((i) => i.id !== id))
+                toast.success("Icon deleted successfully!")
+            } else {
+                toast.error("Failed to delete icon")
+            }
             return ok
+        } catch (error) {
+            console.error("Failed to delete icon:", error)
+            toast.error("Failed to delete icon")
+            return false
         } finally {
             setLoading(false)
         }

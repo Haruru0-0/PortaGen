@@ -1,6 +1,7 @@
 "use client"
 
 import React, { createContext, useCallback, useContext, useState } from 'react'
+import { toast } from 'sonner'
 import { displayLockScreen, getLockScreen, LockScreenData, updateLockScreenPass, updateLockScreenWallpaper } from '@/lib/services/lockScreenService'
 
 interface LockScreenContextType {
@@ -35,6 +36,10 @@ export function LockScreenProvider({ children }: { children: React.ReactNode }) 
     try {
       await updateLockScreenWallpaper(portfolioId, wallpaperAssetId)
       await getLockScreenData(portfolioId)
+      toast.success("Lock screen wallpaper updated!")
+    } catch (error) {
+      console.error("Failed to update lock screen wallpaper:", error)
+      toast.error("Failed to update lock screen wallpaper")
     } finally {
       setLoading(false)
     }
@@ -45,6 +50,10 @@ export function LockScreenProvider({ children }: { children: React.ReactNode }) 
     try {
       await updateLockScreenPass(portfolioId, payload)
       await getLockScreenData(portfolioId)
+      toast.success("Lock screen settings updated!")
+    } catch (error) {
+      console.error("Failed to update lock screen settings:", error)
+      toast.error("Failed to update lock screen settings")
     } finally {
       setLoading(false)
     }

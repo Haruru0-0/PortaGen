@@ -774,3 +774,168 @@
     border-radius: 0.75rem;
   }
 }
+
+/* Enhanced Sound Effects Tab Pixel Retro Styles - White/Blue Scheme */
+.pixel-retro-card {
+  border: 4px solid var(--luna-blue-darkest) !important;
+  background: white !important;
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.4) !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+  border-radius: 0 !important;
+  padding: 1rem !important;
+  cursor: pointer !important;
+}
+
+.pixel-retro-card::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 2px solid var(--luna-blue-darkest);
+  z-index: -1;
+  opacity: 0.3;
+  border-radius: 0 !important;
+}
+
+.pixel-retro-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 1px dashed var(--luna-blue-darkest);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.2;
+  border-radius: 0 !important;
+}
+
+.pixel-retro-card-white {
+  background: white !important;
+  border-color: var(--luna-blue-darkest) !important;
+}
+
+.pixel-retro-card-white:hover {
+  transform: translate(-4px, -4px) !important;
+  box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.4) !important;
+}
+
+.pixel-retro-card-selected {
+  background: var(--luna-blue) !important;
+  border-color: var(--luna-blue-darkest) !important;
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.4), 0 0 10px rgba(52, 152, 219, 0.5) !important;
+  transform: translate(-2px, -2px) !important;
+}
+
+.pixel-retro-card-selected::before {
+  opacity: 0.5;
+  animation: pulse-selected 2s infinite !important;
+}
+
+.pixel-retro-text {
+  font-family: "Press Start 2P", "Courier New", monospace !important;
+  font-size: 0.9rem !important;
+  color: var(--luna-blue-darkest) !important;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3) !important;
+  letter-spacing: 2px !important;
+  margin-bottom: 0.5rem !important;
+  font-weight: bold !important;
+}
+
+.pixel-retro-card-selected .pixel-retro-text {
+  color: white !important;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5) !important;
+}
+
+.pixel-retro-description {
+  font-family: "Pixelify Sans", monospace !important;
+  font-size: 0.7rem !important;
+  color: var(--luna-blue-darkest) !important;
+  opacity: 0.8 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  line-height: 1.2 !important;
+}
+
+.pixel-retro-card-selected .pixel-retro-description {
+  color: white !important;
+  opacity: 0.9 !important;
+}
+
+.pixel-retro-button {
+  border: 3px solid var(--luna-blue-darkest) !important;
+  background: white !important;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.1s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+}
+
+.pixel-retro-button:active {
+  transform: translate(3px, 3px) !important;
+  box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Animation for selected card - Blue glow */
+@keyframes pulse-selected {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 0 10px rgba(52, 152, 219, 0);
+  }
+}
+
+/* Dark mode adjustments for white/blue scheme */
+.dark .pixel-retro-card {
+  background: var(--luna-blue-dark) !important;
+  border-color: var(--luna-cyan) !important;
+}
+
+.dark .pixel-retro-card-white {
+  background: var(--luna-blue-dark) !important;
+  border-color: var(--luna-cyan) !important;
+}
+
+.dark .pixel-retro-card-white:hover {
+  box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.6) !important;
+}
+
+.dark .pixel-retro-card-selected {
+  background: var(--luna-cyan) !important;
+  border-color: var(--luna-blue) !important;
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.6), 0 0 10px rgba(52, 152, 219, 0.3) !important;
+}
+
+.dark .pixel-retro-text,
+.dark .pixel-retro-description {
+  color: var(--luna-cyan-light) !important;
+}
+
+.dark .pixel-retro-button {
+  background: var(--luna-blue-dark) !important;
+  border-color: var(--luna-cyan) !important;
+}
+
+/* Pixel grid background pattern - Blue theme */
+.pixel-retro-card::before {
+  background-image:
+    linear-gradient(45deg, var(--luna-blue-darkest) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--luna-blue-darkest) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--luna-blue-darkest) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--luna-blue-darkest) 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+  opacity: 0.15;
+}

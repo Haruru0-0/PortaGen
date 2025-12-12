@@ -7,6 +7,7 @@ import { WindowsProvider } from "@/contexts/windowsContext"
 import { SoundProvider } from "@/contexts/sound-context"
 import { AudioProvider } from "@/contexts/audio-context"
 import { ThemeProvider } from "@/contexts/theme-context"
+import { SoundEffectProvider } from "@/contexts/soundEffectContext"
 
 export default function PortfolioLayout({
     children,
@@ -21,7 +22,9 @@ export default function PortfolioLayout({
                         <IconProvider>
                             <WindowsProvider>
                                 <ThemeProvider>
-                                    {children}
+                                    <SoundEffectProvider>
+                                        {children}
+                                    </SoundEffectProvider>
                                 </ThemeProvider>
                             </WindowsProvider>
                         </IconProvider>

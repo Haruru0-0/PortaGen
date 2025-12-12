@@ -1,9 +1,5 @@
-export type ThemeStyle = "retro" | "neon" | "minimal" | "glassmorphism" | "brutalist"
-
 export interface PortfolioTheme {
-  id: string
   name: string
-  style: ThemeStyle
   colors: {
     primary: string
     secondary: string
@@ -11,27 +7,14 @@ export interface PortfolioTheme {
     background: string
     text: string
   }
-  fonts: {
-    heading: string
-    body: string
-  }
-  layout: {
-    taskbarPosition: "bottom" | "top" | "left" | "right"
-    menuBarStyle: "classic" | "modern" | "minimal"
-    musicPlayerStyle: "widget" | "bar" | "floating"
-  }
-  animations: {
-    windowOpen: string
-    windowClose: string
-    iconHover: string
-  }
+  font: string
+  taskbarStyleId?: string
+  menubarStyleId?: string
 }
 
 export const THEME_PRESETS: PortfolioTheme[] = [
   {
-    id: "retro",
     name: "Retro Gaming",
-    style: "retro",
     colors: {
       primary: "#8B5CF6",
       secondary: "#EC4899",
@@ -39,25 +22,12 @@ export const THEME_PRESETS: PortfolioTheme[] = [
       background: "#1a1a2e",
       text: "#ffffff",
     },
-    fonts: {
-      heading: "Press Start 2P",
-      body: "Press Start 2P",
-    },
-    layout: {
-      taskbarPosition: "bottom",
-      menuBarStyle: "classic",
-      musicPlayerStyle: "widget",
-    },
-    animations: {
-      windowOpen: "scale",
-      windowClose: "fade",
-      iconHover: "bounce",
-    },
+    font: "Press Start 2P",
+    taskbarStyleId: "classic",
+    menubarStyleId: "classic",
   },
   {
-    id: "neon",
     name: "Neon Nights",
-    style: "neon",
     colors: {
       primary: "#00F5FF",
       secondary: "#FF00FF",
@@ -65,25 +35,12 @@ export const THEME_PRESETS: PortfolioTheme[] = [
       background: "#0a0a0a",
       text: "#00F5FF",
     },
-    fonts: {
-      heading: "Orbitron",
-      body: "Rajdhani",
-    },
-    layout: {
-      taskbarPosition: "bottom",
-      menuBarStyle: "modern",
-      musicPlayerStyle: "bar",
-    },
-    animations: {
-      windowOpen: "glow",
-      windowClose: "shrink",
-      iconHover: "glow",
-    },
+    font: "Orbitron",
+    taskbarStyleId: "modern",
+    menubarStyleId: "modern",
   },
   {
-    id: "minimal",
     name: "Minimal Clean",
-    style: "minimal",
     colors: {
       primary: "#000000",
       secondary: "#666666",
@@ -91,25 +48,12 @@ export const THEME_PRESETS: PortfolioTheme[] = [
       background: "#f5f5f5",
       text: "#000000",
     },
-    fonts: {
-      heading: "Inter",
-      body: "Inter",
-    },
-    layout: {
-      taskbarPosition: "bottom",
-      menuBarStyle: "minimal",
-      musicPlayerStyle: "floating",
-    },
-    animations: {
-      windowOpen: "slide",
-      windowClose: "fade",
-      iconHover: "lift",
-    },
+    font: "Inter",
+    taskbarStyleId: "minimal",
+    menubarStyleId: "minimal",
   },
   {
-    id: "glassmorphism",
     name: "Glass Effect",
-    style: "glassmorphism",
     colors: {
       primary: "#54ACBF",
       secondary: "#A7EBF2",
@@ -117,25 +61,12 @@ export const THEME_PRESETS: PortfolioTheme[] = [
       background: "#023859",
       text: "#ffffff",
     },
-    fonts: {
-      heading: "Poppins",
-      body: "Poppins",
-    },
-    layout: {
-      taskbarPosition: "bottom",
-      menuBarStyle: "modern",
-      musicPlayerStyle: "widget",
-    },
-    animations: {
-      windowOpen: "blur",
-      windowClose: "blur",
-      iconHover: "float",
-    },
+    font: "Poppins",
+    taskbarStyleId: "modern",
+    menubarStyleId: "modern",
   },
   {
-    id: "brutalist",
     name: "Neo Brutalism",
-    style: "brutalist",
     colors: {
       primary: "#000000",
       secondary: "#FFFF00",
@@ -143,20 +74,9 @@ export const THEME_PRESETS: PortfolioTheme[] = [
       background: "#ffffff",
       text: "#000000",
     },
-    fonts: {
-      heading: "Space Grotesk",
-      body: "Space Grotesk",
-    },
-    layout: {
-      taskbarPosition: "bottom",
-      menuBarStyle: "classic",
-      musicPlayerStyle: "bar",
-    },
-    animations: {
-      windowOpen: "snap",
-      windowClose: "snap",
-      iconHover: "shake",
-    },
+    font: "Space Grotesk",
+    taskbarStyleId: "classic",
+    menubarStyleId: "classic",
   },
 ]
 

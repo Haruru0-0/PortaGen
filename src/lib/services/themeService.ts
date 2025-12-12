@@ -1,5 +1,5 @@
 import { DEFAULT_THEME } from '../constants/theme-templates'
-
+ 
 export interface ThemeColors {
     primary: string
     secondary: string
@@ -16,7 +16,7 @@ export interface ThemeFonts {
 export interface Theme {
     name: string
     colors: ThemeColors
-    fonts: ThemeFonts
+    font: string
     taskbarStyleId?: string
     menubarStyleId?: string
 }
@@ -28,7 +28,7 @@ export interface ThemeSettingsData {
 }
 
 export async function getTheme(portfolioId?: number): Promise<ThemeSettingsData | null> {
-    const url = portfolioId ? `/api/theme?portfolioId=${portfolioId}` : '/api/theme'
+    const url = portfolioId ? `/api/theme/get?portfolioId=${portfolioId}` : '/api/theme/get'
     const res = await fetch(url)
     if (!res.ok) {
         if (res.status === 404) return null
@@ -38,7 +38,7 @@ export async function getTheme(portfolioId?: number): Promise<ThemeSettingsData 
 }
 
 export async function saveTheme(portfolioId: number, theme: Theme) {
-    const res = await fetch('/api/theme', {
+    const res = await fetch('/api/theme/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ portfolioId, theme }),

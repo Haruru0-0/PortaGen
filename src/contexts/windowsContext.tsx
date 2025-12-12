@@ -1,6 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState } from 'react'
+import { toast } from 'sonner'
 import type { WindowContent } from '@/lib/types'
 import { displayWindows as displayWindowsAPI, listWindows, getWindow as getWindowAPI, createWindow as createWindowAPI, updateWindow as updateWindowAPI, deleteWindow as deleteWindowAPI } from '@/lib/services/windowsService'
 
@@ -45,8 +46,16 @@ export function WindowsProvider({ children }: { children: React.ReactNode }) {
     setLoading(true)
     try {
       const created = await createWindowAPI(portfolioId, name, content)
-      if (created) setWindows((prev) => [...prev, created])
+      if (created) {
+        setWindows((prev) => [...prev, created])
+        toast.success("Window created successfully!")
+      } else {
+        toast.error("Failed to create window")
+      }
       return created
+    } catch (error) {
+      console.error("Failed to create window:", error)
+      toast.error("Failed to create window")
     } finally {
       setLoading(false)
     }
@@ -56,8 +65,16 @@ export function WindowsProvider({ children }: { children: React.ReactNode }) {
     setLoading(true)
     try {
       const updated = await updateWindowAPI(portfolioId, windowId, payload)
-      if (updated) setWindows((prev) => prev.map((w) => (w.id === windowId ? updated : w)))
+      if (updated) {
+        setWindows((prev) => prev.map((w) => (w.id === windowId ? updated : w)))
+        toast.success("Window saved successfully!")
+      } else {
+        toast.error("Failed to save window")
+      }
       return updated
+    } catch (error) {
+      console.error("Failed to save window:", error)
+      toast.error("Failed to save window")
     } finally {
       setLoading(false)
     }
@@ -67,8 +84,17 @@ export function WindowsProvider({ children }: { children: React.ReactNode }) {
     setLoading(true)
     try {
       const ok = await deleteWindowAPI(portfolioId, windowId)
-      if (ok) setWindows((prev) => prev.filter((w) => w.id !== windowId))
+      if (ok) {
+        setWindows((prev) => prev.filter((w) => w.id !== windowId))
+        toast.success("Window deleted successfully!")
+      } else {
+        toast.error("Failed to delete window")
+      }
       return ok
+    } catch (error) {
+      console.error("Failed to delete window:", error)
+      toast.error("Failed to delete window")
+      return false
     } finally {
       setLoading(false)
     }

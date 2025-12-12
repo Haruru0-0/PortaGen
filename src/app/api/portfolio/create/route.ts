@@ -2,19 +2,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
-import { portfolios, lockScreenSettings, desktopSettings, themeSettings } from '@/lib/db/schema'
+import { portfolios, lockScreenSettings, desktopSettings, themeSettings, soundEffects } from '@/lib/db/schema'
 import { getUserByClerkId } from '@/lib/db/helpers'
-
-function slugify(input: string) {
-  return input
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)+/g, '')
-}
-
-function uniqueSuffix() {
-  return Math.random().toString(36).slice(2, 8)
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -48,12 +37,17 @@ export async function POST(req: NextRequest) {
           background: '#1F2937',
           text: '#F9FAFB',
         },
-        fonts: {
-          primary: 'Press Start 2P',
-          secondary: 'Courier New',
-        },
+        font: 'Press Start 2P',
+        taskbarStyleId: "liquid-glass",
+        menubarStyleId: "liquid-glass",
       },
     })
+
+    // Initialize sound effects with default preset
+    await db.insert(soundEffects).values({
+      portfolioId: created.id,
+      presetId: 'arcade',
+    } as any)
 
     return NextResponse.json(created)
   } catch (error) {

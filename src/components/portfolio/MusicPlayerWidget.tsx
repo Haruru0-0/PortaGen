@@ -164,7 +164,6 @@ export default function MusicPlayerWidget({
           headers: { Authorization: `Bearer ${spotifyAccessTokenRef.current}` },
         }
       );
-      console.log("Current track API response status:", res.status);
       if (res.status === 204) {
         console.log("No track currently playing");
         return;
@@ -175,7 +174,6 @@ export default function MusicPlayerWidget({
           const data = await res.json();
           if (data.item) {
             setSpotifyCurrentTrack(data.item);
-            console.log("Fetched current Spotify track:", data.item.name);
           } else {
             console.log("No item in current track response");
           }
@@ -203,13 +201,11 @@ export default function MusicPlayerWidget({
           headers: { Authorization: `Bearer ${spotifyAccessTokenRef.current}` },
         }
       );
-      console.log("Playlist tracks API response status:", res.status);
       if (res.ok) {
         const contentType = res.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
           const data = await res.json();
           setSpotifyPlaylistTracks(data.items.map((item: { track: SpotifyTrack }) => item.track));
-          console.log("Fetched Spotify playlist tracks:", data.items.length);
         } else {
           console.error("Unexpected content type for playlist:", contentType);
         }
@@ -230,45 +226,24 @@ export default function MusicPlayerWidget({
       try {
         // Get access token
         const res = await fetch("/api/auth/spotify/token");
-        console.log("Token API response status:", res.status);
         if (!res.ok) {
-          console.error(
-            "Failed to get Spotify token:",
-            res.status,
-            await res.text()
-          );
           setSpotifyFailed(true);
           return;
         }
         const tokenData = await res.json();
-        console.log("Token API response data:", tokenData);
         const { accessToken } = tokenData;
         if (cancelled) return;
         if (!accessToken) {
-          console.error("No access token received from Spotify");
           setSpotifyFailed(true);
           return;
         }
-        console.log(
-          "Spotify token obtained successfully:",
-          typeof accessToken,
-          accessToken.substring(0, 10) + "..."
-        );
         spotifyAccessTokenRef.current = accessToken;
 
-        console.log("Setting up Spotify Web Playback SDK ready callback");
         (window as Window & { onSpotifyWebPlaybackSDKReady?: () => void }).onSpotifyWebPlaybackSDKReady = () => {
-          console.log("Spotify Web Playback SDK ready callback fired");
           if (cancelled) return;
           const player = new (window as Window & { Spotify?: { Player: new (config: SpotifyPlayerConfig) => SpotifyPlayer } }).Spotify!.Player({
             name: "PortaGen Player",
             getOAuthToken: function (cb: (token: string) => void) {
-              console.log(
-                "getOAuthToken called, cb type:",
-                typeof cb,
-                "token available:",
-                !!accessToken
-              );
               if (typeof cb === "function") {
                 cb(accessToken);
               } else {
@@ -297,7 +272,6 @@ export default function MusicPlayerWidget({
           player.addListener("ready", async (state: unknown) => {
             const { device_id } = state as SpotifyDeviceReady;
             if (cancelled) return;
-            console.log("Spotify player ready! Device ID:", device_id);
             spotifyDeviceIdRef.current = device_id;
             setSpotifyReady(true);
             setSpotifyFailed(false);
@@ -310,7 +284,6 @@ export default function MusicPlayerWidget({
               console.warn("No playlist ID found in URL:", spotifyPlaylistUrl);
               return;
             }
-            console.log("Starting Spotify playlist:", playlistId);
             try {
               // Transfer playback to SDK device and start playlist
               await fetch("https://api.spotify.com/v1/me/player", {
@@ -342,11 +315,6 @@ export default function MusicPlayerWidget({
           player.addListener("player_state_changed", async (state: unknown) => {
             if (!state) return;
             const playerState = state as SpotifyPlayerState;
-            console.log("Spotify player_state_changed:", {
-              paused: playerState.paused,
-              position: playerState.position,
-              duration: playerState.duration,
-            });
             setSpIsPlaying(!playerState.paused);
             setSpPositionMs(playerState.position || 0);
             setSpDurationMs(playerState.duration || 0);
@@ -371,11 +339,9 @@ export default function MusicPlayerWidget({
             setSpotifyFailed(true);
           });
 
-          console.log("Connecting Spotify player...");
           player
             .connect()
             .then((success: boolean) => {
-              console.log("Spotify player connect result:", success);
               if (!success) {
                 setSpotifyFailed(true);
               }
@@ -389,17 +355,11 @@ export default function MusicPlayerWidget({
 
         // Load SDK if not present
         if (!(window as Window & { Spotify?: { Player: new (config: SpotifyPlayerConfig) => SpotifyPlayer } }).Spotify) {
-          console.log("Loading Spotify Web Playback SDK script...");
-          console.log("Creating Spotify SDK script element");
           await new Promise<void>((resolve) => {
             const script = document.createElement("script");
             script.src = "https://sdk.scdn.co/spotify-player.js";
             script.async = true;
             script.onload = () => {
-              console.log(
-                "Spotify SDK script loaded successfully, Spotify available:",
-                !!(window as Window & { Spotify?: { Player: new (config: SpotifyPlayerConfig) => SpotifyPlayer } }).Spotify
-              );
               resolve();
             };
             script.onerror = (e: unknown) => {
@@ -411,7 +371,6 @@ export default function MusicPlayerWidget({
         } else if (
           typeof (window as Window & { onSpotifyWebPlaybackSDKReady?: () => void }).onSpotifyWebPlaybackSDKReady === "function"
         ) {
-          console.log("Spotify SDK already loaded, calling ready callback");
           (window as Window & { onSpotifyWebPlaybackSDKReady?: () => void }).onSpotifyWebPlaybackSDKReady!();
         }
       } catch (e) {

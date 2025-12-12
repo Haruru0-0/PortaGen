@@ -1,5 +1,4 @@
 import React, { useState, useEffect, JSX } from "react"
-import { toast } from "sonner"
 import { PixelCard } from "@/components/pixel-card"
 import { PixelButton } from "@/components/pixel-button"
 import { Save, Layout, User, Briefcase, Mail, FileText, Link, BookOpen, ArrowLeft } from "lucide-react"
@@ -184,10 +183,8 @@ export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }:
                 }
             }
             onSave(content)
-            toast.success("Window saved successfully!")
         } catch (error) {
             console.error("Failed to save window:", error)
-            toast.error("Failed to save window. Please try again.")
         } finally {
             setIsUploading(false)
         }

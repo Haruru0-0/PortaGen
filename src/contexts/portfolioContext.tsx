@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, ReactNode, useContext, useState, useCallback } from "react"
+import { toast } from "sonner"
 import {
     getPortfolioInfo,
     updatePortfolioInfo,
@@ -107,13 +108,16 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
                         ? { ...p, portfolioName: updated.portfolioName, bio: updated.bio }
                         : p
                 ))
+                toast.success("Portfolio info saved successfully!")
                 return true
             } else {
                 setError("Failed to update portfolio info")
+                toast.error("Failed to update portfolio info")
                 return false
             }
         } catch (err) {
             setError("Failed to update portfolio info")
+            toast.error("Failed to update portfolio info")
             console.error(err)
             return false
         } finally {
@@ -158,10 +162,13 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
                     createdAt: new Date().toISOString(),
                 }
                 setPortfolios(prev => [newItem, ...prev])
+                toast.success("Portfolio created successfully!")
                 return newItem
             }
+            toast.error("Failed to create portfolio")
         } catch (err) {
             console.error("Failed to create portfolio:", err)
+            toast.error("Failed to create portfolio")
         }
         return null
     }, [])
@@ -177,10 +184,13 @@ export const PortfolioProvider = ({ children }: { children: ReactNode }) => {
                     setPortfolioInfo(null)
                     setCurrentPortfolioData(null)
                 }
+                toast.success("Portfolio deleted successfully!")
                 return true
             }
+            toast.error("Failed to delete portfolio")
         } catch (err) {
             console.error("Failed to delete portfolio:", err)
+            toast.error("Failed to delete portfolio")
         }
         return false
     }, [currentPortfolioId])

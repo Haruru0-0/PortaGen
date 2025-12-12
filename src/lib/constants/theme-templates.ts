@@ -94,10 +94,7 @@ export const DEFAULT_THEME = {
         background: '#008080',
         text: '#000000',
     },
-    fonts: {
-        primary: 'Inter, sans-serif',
-        secondary: 'Courier New, monospace',
-    },
+    font: 'Inter, sans-serif',
     taskbarStyleId: 'retro',
     menubarStyleId: 'retro',
 }
