@@ -1,0 +1,104 @@
+.windowContainer {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  border-radius: 8px 8px 0 0;
+  box-shadow: inset -1px -1px #00138c, inset 1px 1px #0831d9, inset -2px -2px #001ea0, inset 2px 2px #166aee,
+    inset -3px -3px #003bda, inset 3px 3px #0855dd;
+  padding: 0 0 3px 0;
+  border: none;
+}
+
+.windowDragHandle {
+  height: 30px;
+  display: block;
+  padding: 5px 4px 4px 5px;
+  font-family: "Trebuchet MS", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: .1px;
+  text-shadow: 1px 1px #c7c2d1;
+  line-height: 21px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  text-shadow: 1px 1px #0a1883;
+  background: radial-gradient(circle at 0 20%, #0032c1 0, #0032c188 1%, #0032c100 2%, #0032c100 100%), radial-gradient(circle at 100% 20%, #0032c1 0, #0032c188 1%, #0032c100 2%, #0032c100 100%), linear-gradient(to bottom, #3d95ff 0, #2b90ff 7%, #0372ff 9%, #0054e3 18%, #0054e3 19%, #0058ee 50%, #026afe 80%, #026afe 90%, #0065fd 93%, #71aaff 96%, #c4d6ff 100%);
+  box-shadow: inset -1px -1px 1px #0026acaa, inset -2px -1px 1px #0020c8aa, inset -3px -1px 1px #003be0aa, inset 1px -1px 1px #0020c8aa, inset 2px -1px 1px #0038d8aa, inset 3px -1px 1px #0046e4aa, inset 0 -1px red;
+  border-radius: 7px 7px 0 0;
+}
+
+.titleBarControls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.titleBarControls button {
+  min-width: 21px;
+  min-height: 21px;
+  background-repeat: no-repeat;
+  background-position: center;
+  box-shadow: none;
+  background-color: #0050ee;
+  transition: background 100ms;
+  border: none;
+}
+
+.titleBarControls button:active,
+.titleBarControls button:hover,
+.titleBarControls button:focus {
+  box-shadow: none !important;
+}
+
+/* Minimize */
+.titleBarControls button[aria-label="Minimize"] {
+  background-image: url("../../../assets/xp-icons/minimize.svg");
+}
+
+.titleBarControls button[aria-label="Minimize"]:hover {
+  background-image: url("../../../assets/xp-icons/minimize-hover.svg");
+}
+
+.titleBarControls button[aria-label="Minimize"]:not(:disabled):active {
+  background-image: url("../../../assets/xp-icons/minimize-active.svg");
+}
+
+/* Maximize */
+.titleBarControls button[aria-label="Maximize"] {
+  background-image: url("../../../assets/xp-icons/maximize.svg");
+}
+
+.titleBarControls button[aria-label="Maximize"]:hover {
+  background-image: url("../../../assets/xp-icons/maximize-hover.svg");
+}
+
+.titleBarControls button[aria-label="Maximize"]:not(:disabled):active {
+  background-image: url("../../../assets/xp-icons/maximize-active.svg");
+}
+
+/* Restore */
+.titleBarControls button[aria-label="Restore"] {
+  background-image: url("../../../assets/xp-icons/restore.svg");
+}
+
+.titleBarControls button[aria-label="Restore"]:hover {
+  background-image: url("../../../assets/xp-icons/restore-hover.svg");
+}
+
+.titleBarControls button[aria-label="Restore"]:not(:disabled):active {
+  background-image: url("../../../assets/xp-icons/restore-active.svg");
+}
+
+/* Close */
+.titleBarControls button[aria-label="Close"] {
+  background-image: url("../../../assets/xp-icons/close.svg");
+}
+
+.titleBarControls button[aria-label="Close"]:hover {
+  background-image: url("../../../assets/xp-icons/close-hover.svg");
+}
+
+.titleBarControls button[aria-label="Close"]:not(:disabled):active {
+  background-image: url("../../../assets/xp-icons/close-active.svg");
+}

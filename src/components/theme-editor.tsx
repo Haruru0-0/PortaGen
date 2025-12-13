@@ -5,7 +5,7 @@ import { PixelInput } from "./pixel-input"
 import { THEME_PRESETS, type PortfolioTheme } from "@/lib/portfolio-theme"
 import { Check } from "lucide-react"
 import { PixelButton } from "@/components/pixel-button"
-import { TASKBAR_TEMPLATES, MENUBAR_TEMPLATES } from "@/lib/constants/theme-templates"
+import { TASKBAR_TEMPLATES, MENUBAR_TEMPLATES, WINDOW_TEMPLATES } from "@/lib/constants/theme-templates"
 import { useTheme } from "@/contexts/theme-context"
 import { useParams } from "next/navigation"
 
@@ -158,6 +158,24 @@ export function ThemeEditor() {
               </button>
             ))}
           </div>
+        </div>
+      </div>
+      {/* Window Style */}
+      <div className="space-y-2">
+        <label className="text-[8px] uppercase">WINDOW STYLE</label>
+        <div className="grid grid-cols-2 gap-2">
+          {WINDOW_TEMPLATES.map((template) => (
+            <button
+              key={template.id}
+              onClick={() => updateTheme(currentPortfolioId, { windowStyleId: template.id })}
+              className={`px-3 py-2 text-[8px] border-2 border-border ${activeTheme.windowStyleId === template.id
+                ? "bg-primary text-primary-foreground"
+                : "bg-card hover:bg-muted"
+                }`}
+            >
+              {template.name.toUpperCase()}
+            </button>
+          ))}
         </div>
       </div>
       <div className="mt-6">

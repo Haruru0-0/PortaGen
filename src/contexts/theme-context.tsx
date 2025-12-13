@@ -6,15 +6,18 @@ import { Theme, getTheme, saveTheme, getDisplayTheme } from "@/lib/services/them
 import {
     TASKBAR_TEMPLATES,
     MENUBAR_TEMPLATES,
+    WINDOW_TEMPLATES,
     DEFAULT_THEME,
     TaskbarTemplate,
     MenubarTemplate,
+    WindowTemplate,
 } from "@/lib/constants/theme-templates"
 
 interface ThemeContextType {
     activeTheme: Theme
     taskbarTemplate: TaskbarTemplate
     menubarTemplate: MenubarTemplate
+    windowTemplate: WindowTemplate
     loading: boolean
     saving: boolean
     getThemeData: (portfolioId: number) => Promise<void>
@@ -83,6 +86,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         TASKBAR_TEMPLATES.find((t) => t.id === activeTheme.taskbarStyleId) || TASKBAR_TEMPLATES[0]
     const menubarTemplate =
         MENUBAR_TEMPLATES.find((t) => t.id === activeTheme.menubarStyleId) || MENUBAR_TEMPLATES[0]
+    const windowTemplate =
+        WINDOW_TEMPLATES.find((t) => t.id === activeTheme.windowStyleId) || WINDOW_TEMPLATES[0]
 
     return (
         <ThemeContext.Provider
@@ -90,6 +95,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                 activeTheme,
                 taskbarTemplate,
                 menubarTemplate,
+                windowTemplate,
                 loading,
                 saving,
                 getThemeData,

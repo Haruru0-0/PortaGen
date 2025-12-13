@@ -19,6 +19,17 @@ export interface MenubarTemplate {
     }
 }
 
+export interface WindowTemplate {
+    id: string
+    name: string
+    classNames: {
+        container: string
+        header: string
+        content: string
+        buttons: string
+    }
+}
+
 export const TASKBAR_TEMPLATES: TaskbarTemplate[] = [
     {
         id: "liquid-glass",
@@ -85,6 +96,39 @@ export const MENUBAR_TEMPLATES: MenubarTemplate[] = [
     },
 ]
 
+export const WINDOW_TEMPLATES: WindowTemplate[] = [
+    {
+        id: "liquid-glass",
+        name: "Liquid Glass",
+        classNames: { container: "", header: "", content: "", buttons: "" },
+    },
+    {
+        id: "retro",
+        name: "Windows 95",
+        classNames: { container: "", header: "", content: "", buttons: "" },
+    },
+    {
+        id: "windows-xp",
+        name: "Windows XP",
+        classNames: { container: "", header: "", content: "", buttons: "" },
+    },
+    {
+        id: "windows-7",
+        name: "Windows 7",
+        classNames: { container: "", header: "", content: "", buttons: "" },
+    },
+    {
+        id: "pixel",
+        name: "Pixel Art",
+        classNames: { container: "", header: "", content: "", buttons: "" },
+    },
+    {
+        id: "window",
+        name: "Modern Window",
+        classNames: { container: "", header: "", content: "", buttons: "" },
+    },
+]
+
 export const DEFAULT_THEME = {
     name: 'Default',
     colors: {
@@ -97,4 +141,5 @@ export const DEFAULT_THEME = {
     font: 'Inter, sans-serif',
     taskbarStyleId: 'retro',
     menubarStyleId: 'retro',
+    windowStyleId: 'retro',
 }

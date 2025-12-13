@@ -7774,6 +7774,11 @@ wrap-ansi@^7.0.0:
     string-width "^4.1.0"
     strip-ansi "^6.0.0"
 
+xp.css@^0.2.6:
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/xp.css/-/xp.css-0.2.6.tgz#ec78a023897a0da594e0d0100a931e7310a4f5cd"
+  integrity sha512-v0qUB4wOvyXIMLNid5bIpm+0n5aL4i8wE5dqJH8LNVxE04PxUUxjwf2rNzengegUIK03XC4vbfLVCPAfMLtuqA==
+
 xtend@^4.0.0:
   version "4.0.2"
   resolved "https://registry.npmjs.org/xtend/-/xtend-4.0.2.tgz"

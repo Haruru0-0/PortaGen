@@ -10,6 +10,7 @@ export interface PortfolioTheme {
   font: string
   taskbarStyleId?: string
   menubarStyleId?: string
+  windowStyleId?: string
 }
 
 export const THEME_PRESETS: PortfolioTheme[] = [

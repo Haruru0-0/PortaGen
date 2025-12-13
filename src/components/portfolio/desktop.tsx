@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { DndContext } from "@dnd-kit/core";
 import { useEffect, useState, useRef } from "react";
-import { AppWindow } from "./window";
+import { Window } from "./window";
 import { DesktopIcon } from "./icon";
 import { MobileIcon } from "./MobileIcon";
 import { Taskbar } from "./taskbar";
@@ -469,7 +469,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
         )}
 
         {openWindows.map((win) => (
-          <AppWindow
+          <Window
             key={win.name}
             title={win.name}
             onClose={() => closeWindow(win.name)}
@@ -478,7 +478,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
             isMinimized={win.minimized}
           >
             {win.component}
-          </AppWindow>
+          </Window>
         ))}
       </div>
     </DndContext>

@@ -173,7 +173,7 @@ export function DashboardSidebar() {
           )}
           <button
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="w-8 h-8 border-2 border-border bg-muted hover:bg-accent transition-colors flex items-center justify-center ml-auto"
+              className="w-8 h-8 border-2 border-border bg-card hover:bg-background transition-colors flex items-center justify-center ml-auto"
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}

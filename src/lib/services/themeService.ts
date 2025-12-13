@@ -1,5 +1,5 @@
 import { DEFAULT_THEME } from '../constants/theme-templates'
- 
+
 export interface ThemeColors {
     primary: string
     secondary: string
@@ -19,6 +19,7 @@ export interface Theme {
     font: string
     taskbarStyleId?: string
     menubarStyleId?: string
+    windowStyleId?: string
 }
 
 export interface ThemeSettingsData {
