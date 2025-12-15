@@ -31,7 +31,7 @@ const getOptimalWindowSize = (title: string) => {
     }
 };
 
-export function RetroWindow({
+export function Window98Window({
     title,
     children,
     onClose,

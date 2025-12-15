@@ -9,6 +9,7 @@ import { useAppSound } from "../../../contexts/sound-context";
 import { CuteSuspenseFallback } from "../suspense-fallback";
 import { SnapMenu, type SnapType } from "../SnapMenu";
 import ReactDOM from "react-dom";
+import styles from "./Window7Style.module.css"
 
 let globalZ = 100;
 const getOptimalWindowSize = (title: string) => {
@@ -535,7 +536,7 @@ export function Windows7Window({
                                 setPosition(pos);
                                 setIsDragging(false);
                             }}
-                            dragHandleClassName="window-drag-handle"
+                            dragHandleClassName={styles.windowDragHandle}
                             onClick={bringToFront}
                             onMouseDownCapture={bringToFront}
                             minWidth={350}
@@ -547,39 +548,22 @@ export function Windows7Window({
                                 height: size.height,
                             }}
                             style={{ zIndex: zIndex }}
-                            className="window-container bg-white border border-gray-300 shadow-xl"
+                            className={`${styles.windowContainer} bg-white`}
                         >
-                            <div className="window-drag-handle relative z-50 bg-gradient-to-b from-[#0078d7] to-[#005499] text-white px-3 py-2">
+                            <div className={`${styles.windowDragHandle} relative z-50`}>
                                 <span className="font-semibold text-sm truncate">{title}</span>
-                                <div className="flex gap-1 shrink-0">
+                                <div className={styles.titleBarControls}>
                                     <button
                                         onClick={() => handleButtonClick(handleMinimize)}
-                                        className="window-button hover:bg-[#005499] hover:text-white"
-                                        onMouseEnter={(e) => handleButtonAnimation(e, "enter")}
-                                        onMouseLeave={(e) => handleButtonAnimation(e, "leave")}
-                                        onMouseDown={(e) => handleButtonAnimation(e, "down")}
-                                        onMouseUp={(e) => handleButtonAnimation(e, "up")}
+                                        aria-label="Minimize"
                                     >
-                                        <Minus size={14} />
                                     </button>
                                     {!isMobile && (
-                                        <div className="relative" onMouseLeave={handleMaximizeLeave}>
+                                        <div className="relative h-[23px]" onMouseLeave={handleMaximizeLeave}>
                                             <button
                                                 onClick={() => handleButtonClick(toggleMaximize)}
-                                                className="window-button hover:bg-[#005499] hover:text-white"
-                                                onMouseEnter={(e) => {
-                                                    handleButtonAnimation(e, "enter");
-                                                    handleMaximizeHover();
-                                                }}
-                                                onMouseLeave={(e) => handleButtonAnimation(e, "leave")}
-                                                onMouseDown={(e) => handleButtonAnimation(e, "down")}
-                                                onMouseUp={(e) => handleButtonAnimation(e, "up")}
+                                                aria-label={isMaximized ? "Restore" : "Maximize"}
                                             >
-                                                {isMaximized ? (
-                                                    <Square size={14} />
-                                                ) : (
-                                                    <Maximize size={14} />
-                                                )}
                                             </button>
                                             {showSnapMenu && (
                                                 <SnapMenu
@@ -592,19 +576,14 @@ export function Windows7Window({
                                     )}
                                     <button
                                         onClick={() => handleButtonClick(handleClose)}
-                                        className="window-button window-button-close hover:bg-red-500 hover:text-white"
-                                        onMouseEnter={(e) => handleButtonAnimation(e, "enter")}
-                                        onMouseLeave={(e) => handleButtonAnimation(e, "leave")}
-                                        onMouseDown={(e) => handleButtonAnimation(e, "down")}
-                                        onMouseUp={(e) => handleButtonAnimation(e, "up")}
+                                        aria-label="Close"
                                     >
-                                        <X size={14} />
                                     </button>
                                 </div>
                             </div>
                             <div
                                 ref={contentRef}
-                                className="window-content bg-white"
+                                className={styles.windowBody}
                                 data-width={contentWidth}
                             >
                                 <React.Suspense fallback={<CuteSuspenseFallback />}>

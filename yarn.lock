@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"7.css@^0.21.1":
+  version "0.21.1"
+  resolved "https://registry.yarnpkg.com/7.css/-/7.css-0.21.1.tgz#e4a92060b4f33ea28bce0322cfc84086783cb7af"
+  integrity sha512-Q+/aFUpGemoR/Zltj4a7yvHonyxfb+9cgiwBL+j/Lm+H28EOoLzWoJki7MdGPV+3mLCvKSCVqr3M2x2uNYyeWw==
+
 "@alloc/quick-lru@^5.2.0":
   version "5.2.0"
   resolved "https://registry.npmjs.org/@alloc/quick-lru/-/quick-lru-5.2.0.tgz"

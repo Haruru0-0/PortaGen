@@ -5,7 +5,7 @@ import HalloGif from "@/assets/hallo.gif"
 import Image from "next/image"
 import { MenubarStyleProps } from "./types"
 
-export function RetroMenubar({ embedded, previewMode, currentTime }: MenubarStyleProps) {
+export function Windows98Menubar({ embedded, previewMode, currentTime }: MenubarStyleProps) {
     return (
         <div className={embedded ? "absolute top-0 left-0 right-0 z-50" : "fixed top-0 left-0 right-0 z-50"}>
             <div className="h-8 bg-[#c0c0c0] border-b-2 border-white shadow-[0_1px_0_#808080] flex items-center justify-between px-2 font-ms-sans select-none text-black">

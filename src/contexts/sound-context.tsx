@@ -331,20 +331,11 @@ const generateRetroMenuSound = (volume: number) => {
 }
 
 export function SoundProvider({ children }: { children: React.ReactNode }) {
-  const [isSoundEnabled, setSoundEnabled] = useState(() => {
-    const saved = localStorage.getItem('portfolio-sound-enabled')
-    return saved !== null ? JSON.parse(saved) : true
-  })
+  const [isSoundEnabled, setSoundEnabled] = useState(true)
 
-  const [volume, setVolume] = useState(() => {
-    const saved = localStorage.getItem('portfolio-sound-volume')
-    return saved !== null ? JSON.parse(saved) : 0.6
-  })
+  const [volume, setVolume] = useState(0.6)
 
-  const [currentPreset, setCurrentPreset] = useState(() => {
-    const saved = localStorage.getItem('portfolio-sound-preset')
-    return saved || 'arcade'
-  })
+  const [currentPreset, setCurrentPreset] = useState('arcade')
 
   // Initialize audio context on first user interaction
   useEffect(() => {

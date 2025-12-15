@@ -1,11 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Copy, Check, ExternalLink } from "lucide-react"
 import { PixelButton } from "./pixel-button"
 import { gsap } from "gsap"
 import { useGSAP } from "@gsap/react"
 import { useRef } from "react"
+import { useUser } from "@clerk/nextjs"
+import { useParams } from "next/navigation"
 
 interface PortfolioUrlShareProps {
   username?: string
@@ -13,8 +15,15 @@ interface PortfolioUrlShareProps {
 
 export function PortfolioUrlShare({ username = "demo-user" }: PortfolioUrlShareProps) {
   const [copied, setCopied] = useState(false)
+  const [portfolioUrl, setPortfolioUrl] = useState("/portfolio/preview")
   const containerRef = useRef<HTMLDivElement>(null)
-  const portfolioUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/portfolio/preview`
+  const { user } = useUser()
+  const params = useParams<{ id: string }>()
+  const currentPortfolioId = Number(params?.id)
+
+  useEffect(() => {
+    setPortfolioUrl(`${window.location.origin}/portfolio/${user?.username}/${currentPortfolioId}`)
+  }, [user, currentPortfolioId])
 
   useGSAP(() => {
     if (containerRef.current) {

@@ -37,8 +37,8 @@ export const TASKBAR_TEMPLATES: TaskbarTemplate[] = [
         classNames: { container: "", item: "", activeItem: "" },
     },
     {
-        id: "retro",
-        name: "Windows 95",
+        id: "windows-98",
+        name: "Windows 98",
         classNames: { container: "", item: "", activeItem: "" },
     },
     {
@@ -70,8 +70,8 @@ export const MENUBAR_TEMPLATES: MenubarTemplate[] = [
         classNames: { container: "", item: "", dropdown: "" },
     },
     {
-        id: "retro",
-        name: "Windows 95",
+        id: "windows-98",
+        name: "Windows 98",
         classNames: { container: "", item: "", dropdown: "" },
     },
     {
@@ -103,8 +103,8 @@ export const WINDOW_TEMPLATES: WindowTemplate[] = [
         classNames: { container: "", header: "", content: "", buttons: "" },
     },
     {
-        id: "retro",
-        name: "Windows 95",
+        id: "windows-98",
+        name: "Windows 98",
         classNames: { container: "", header: "", content: "", buttons: "" },
     },
     {
@@ -139,7 +139,7 @@ export const DEFAULT_THEME = {
         text: '#000000',
     },
     font: 'Inter, sans-serif',
-    taskbarStyleId: 'retro',
-    menubarStyleId: 'retro',
-    windowStyleId: 'retro',
+    taskbarStyleId: 'liquid-glass',
+    menubarStyleId: 'liquid-glass',
+    windowStyleId: 'liquid-glass',
 }

@@ -1,7 +1,6 @@
 import React from "react";
 import { Rnd } from "react-rnd";
 import { useEffect, useState, useRef } from "react";
-import { Maximize, Minus, X, Square } from "lucide-react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useResizeObserver } from "@/hooks/use-resize-observer";

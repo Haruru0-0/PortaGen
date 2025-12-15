@@ -31,6 +31,27 @@ export function ThemeEditor() {
     setCustomTheme(preset)
   }
 
+  const handleTaskbarStyleChange = (styleId: string) => {
+    setCustomTheme({
+      ...customTheme,
+      taskbarStyleId: styleId,
+    })
+  }
+
+  const handleMenubarStyleChange = (styleId: string) => {
+    setCustomTheme({
+      ...customTheme,
+      menubarStyleId: styleId,
+    })
+  }
+
+  const handleWindowStyleChange = (styleId: string) => {
+    setCustomTheme({
+      ...customTheme,
+      windowStyleId: styleId,
+    })
+  }
+
   const handleColorChange = (key: keyof PortfolioTheme["colors"], value: string) => {
     const updated = {
       ...customTheme,
@@ -130,8 +151,8 @@ export function ThemeEditor() {
             {TASKBAR_TEMPLATES.map((template) => (
               <button
                 key={template.id}
-                onClick={() => updateTheme(currentPortfolioId, { taskbarStyleId: template.id })}
-                className={`px-3 py-2 text-[8px] border-2 border-border ${activeTheme.taskbarStyleId === template.id
+                onClick={() => handleTaskbarStyleChange(template.id)}
+                className={`px-3 py-2 text-[8px] border-2 border-border ${customTheme.taskbarStyleId === template.id
                   ? "bg-primary text-primary-foreground"
                   : "bg-card hover:bg-muted"
                   }`}
@@ -148,8 +169,8 @@ export function ThemeEditor() {
             {MENUBAR_TEMPLATES.map((template) => (
               <button
                 key={template.id}
-                onClick={() => updateTheme(currentPortfolioId, { menubarStyleId: template.id })}
-                className={`px-3 py-2 text-[8px] border-2 border-border ${activeTheme.menubarStyleId === template.id
+                onClick={() => handleMenubarStyleChange(template.id)}
+                className={`px-3 py-2 text-[8px] border-2 border-border ${customTheme.menubarStyleId === template.id
                   ? "bg-primary text-primary-foreground"
                   : "bg-card hover:bg-muted"
                   }`}
@@ -167,8 +188,8 @@ export function ThemeEditor() {
           {WINDOW_TEMPLATES.map((template) => (
             <button
               key={template.id}
-              onClick={() => updateTheme(currentPortfolioId, { windowStyleId: template.id })}
-              className={`px-3 py-2 text-[8px] border-2 border-border ${activeTheme.windowStyleId === template.id
+              onClick={() => handleWindowStyleChange(template.id)}
+              className={`px-3 py-2 text-[8px] border-2 border-border ${customTheme.windowStyleId === template.id
                 ? "bg-primary text-primary-foreground"
                 : "bg-card hover:bg-muted"
                 }`}

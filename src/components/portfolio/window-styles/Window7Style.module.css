@@ -1,0 +1,371 @@
+.windowContainer {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  border: 1px solid #000000b3;
+  border-radius: 6px;
+  box-shadow: 2px 2px 10px 1px #000000b3, inset 0 0 0 1px #fffa;
+  font: 9pt Segoe UI, SegoeUI, Noto Sans, sans-serif;
+  position: relative;
+  z-index: 0;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-bottom: 5px;
+  padding-top: 1px;
+}
+
+.windowContainer:before {
+  background: linear-gradient(transparent 20%, #ffffffb3 40%, transparent 41%), linear-gradient(90deg, #ffffff66, #0000001a, #ffffff33), #4580c4;
+  background-color: #4580c4;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px #fffd;
+  content: "";
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: -1
+}
+
+.windowBody {
+  background: #f0f0f0;
+  border: 1px solid #000000b3;
+  box-shadow: 0 0 0 1px #fff9;
+  padding: 20px;
+  transition: none;
+  overscroll-behavior: contain;
+  overflow-x: hidden;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  height: calc(100% - 32px);
+  overflow: auto;
+}
+
+.windowDragHandle {
+  align-items: center;
+  background: linear-gradient(90deg, #ffffff66, #0000001a, #ffffff33), #4580c4;
+  background-color: #4580c4;
+  border-bottom: 1px solid #000000b3;
+  display: flex;
+  font: 9pt Segoe UI, SegoeUI, Noto Sans, sans-serif;
+  justify-content: space-between;
+  padding-bottom: 6px;
+}
+
+.titleBarControls {
+  background: #fff3;
+  border: 1px solid #0000004d;
+  border-radius: 0 0 5px 5px;
+  border-top: 0;
+  box-shadow: 0 1px 0 #fffa, 1px 0 0 #fffa, -1px 0 0 #fffa;
+  display: flex
+}
+
+.titleBarControls button {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  border-right: 1px solid #0000004d;
+  box-shadow: none;
+  box-sizing: border-box;
+  height: 23px;
+  min-width: 29px;
+  padding: 0;
+  position: relative
+}
+
+.titleBarControls button:after {
+  content: none
+}
+
+.titleBarControls button:active,
+.titleBarControls button:hover {
+  background: none
+}
+
+.titleBarControls button:disabled:before {
+  opacity: .4
+}
+
+.titleBarControls button:before {
+  border-radius: 0;
+  bottom: 0;
+  box-shadow: inset 0 0 0 1px #fff5;
+  content: "";
+  left: 0;
+  opacity: 1;
+  position: absolute;
+  right: 0;
+  top: 0
+}
+
+.titleBarControls button:not(:hover):before {
+  opacity: 1;
+  transition: none
+}
+
+.titleBarControls button.is-minimize:before,
+.titleBarControls button[aria-label=Minimize]:before {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAFCAYAAABxeg0vAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAA7SURBVHgBlY+xDQAgDMNaiQ9B8AHcxAlI/NYtKwj6QOohUzxYc+1HAqQ3e03qXNpwwcyE5QsAaEGjDRf8ZAza6Bz6VQAAAABJRU5ErkJggg==") no-repeat center 10px
+}
+
+.titleBarControls button.is-maximize:before,
+.titleBarControls button[aria-label=Maximize]:before {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAYAAACALL/6AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABsSURBVHgBlZHBCYAwDEVT6YaKbqArOILgBLqBosP1VkhAaQ6S1lKad+ihPy8kxLT9+IACG57r2KqKu2GCBpTYtEMOOQELzrnv4z53I4vDjjJnwXsPJWTOAiJGHVNB5pGwLjPk+AlEBLUY7eFebCosBHOR7vYAAAAASUVORK5CYII=") no-repeat 50%
+}
+
+.titleBarControls button.is-help:before,
+.titleBarControls button[aria-label=Help]:before {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMBAMAAACtsOGuAAAAG1BMVEUAAABTVmb////39/fa2trm5ubj4+Pq6urg4OByvnYHAAAAAXRSTlMAQObYZgAAADtJREFUCNdjYBQUFGAQVFISZBBSUlJkEDYUNmQQFBAvZGBgDA1kYBBLE2RgkGgUYGAQBDIYRBwhBJgLAKBIBQ2X+PZ0AAAAAElFTkSuQmCC") no-repeat 50%
+}
+
+.titleBarControls button.is-restore:before,
+.titleBarControls button[aria-label=Restore]:before {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACVSURBVHgBlVDLCoMwENwU/7ClvRYK7b2lCIJHEQQ/QEHwqujfBXJIQMnihg34iHPJ7GNm2AhYcL2/JwhAxIuhq3aXb48PiFBna2YFERVHzoQLnAQmSCmxeL5+3rBtSsdpBwVKKTcY+1rY197G+8RRoLVejed94igwxrgB/zXeJ+4Jijz2Erjg+8/WE7ZAt6EgSUsIxQwaJEWv7G6SSgAAAABJRU5ErkJggg==") no-repeat 50%
+}
+
+.titleBarControls button.is-close,
+.titleBarControls button[aria-label=Close] {
+  min-width: 48px
+}
+
+.titleBarControls button.is-close:before,
+.titleBarControls button[aria-label=Close]:before {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAKCAYAAABi8KSDAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACUSURBVHgBlZFNCoQwDIVbmRvOMHOAAd0K/uDGlYKiCG4VPICi9yu0oCSQoFUXFtKEl6+voZXvr7sKay1TL690FOexY+Hz87i2decOuDKQsNGVe8AGYTRJIh0Y+orBvxszCPllOymlxN06jNE26Qnwg4zdHQLrMhFaawwAqAadDPE1ijwUxhiMKCmxCZk06OMYTz5lAx3xWDeXkLNAAAAAAElFTkSuQmCC") no-repeat 50%
+}
+
+.titleBarControls button[aria-label=Minimize],
+.titleBarControls button[aria-label=Minimize]:before {
+  border-bottom-left-radius: 5px
+}
+
+.titleBarControls button[aria-label=Close],
+.titleBarControls button[aria-label=Close]:before {
+  border: 0;
+  border-bottom-right-radius: 5px
+}
+
+.titleBarControls button:focus {
+  -webkit-animation: none;
+  animation: none;
+  outline: none;
+}
+
+.windowDragHandle .titleBarControls,
+.windowContainer .windowDragHandle .titleBarControls {
+  border-color: #000000b3
+}
+
+.windowDragHandle .titleBarControls button,
+.windowContainer .windowDragHandle .titleBarControls button {
+  border-color: #000000b3;
+  box-shadow: inset 0 0 0 1px #fffa
+}
+
+.windowDragHandle .titleBarControls button:after,
+.windowContainer .windowDragHandle .titleBarControls button:after {
+  content: none
+}
+
+.windowDragHandle .titleBarControls button.is-minimize,
+.windowDragHandle .titleBarControls button[aria-label=Minimize],
+.windowContainer .windowDragHandle .titleBarControls button.is-minimize,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Minimize] {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAFCAYAAABxeg0vAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAA7SURBVHgBlY+xDQAgDMNaiQ9B8AHcxAlI/NYtKwj6QOohUzxYc+1HAqQ3e03qXNpwwcyE5QsAaEGjDRf8ZAza6Bz6VQAAAABJRU5ErkJggg==") no-repeat center 10px, linear-gradient(#ffffff80, #ffffff4d 45%, #0000001a 50%, #0000001a 75%, #ffffff80)
+}
+
+.windowDragHandle .titleBarControls button.is-minimize:before,
+.windowDragHandle .titleBarControls button[aria-label=Minimize]:before,
+.windowContainer .windowDragHandle .titleBarControls button.is-minimize:before,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Minimize]:before {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAFCAYAAABxeg0vAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAA7SURBVHgBlY+xDQAgDMNaiQ9B8AHcxAlI/NYtKwj6QOohUzxYc+1HAqQ3e03qXNpwwcyE5QsAaEGjDRf8ZAza6Bz6VQAAAABJRU5ErkJggg==") no-repeat center 10px, radial-gradient(circle at bottom, #2aceda, transparent 65%), linear-gradient(#b6d9ee 50%, #1a6ca1 0);
+  border-bottom-left-radius: 5px;
+  box-shadow: 0 0 7px 3px #5dc4f0, inset 0 0 0 1px #fffa;
+  content: "";
+  opacity: 0;
+  transition: opacity .3s linear
+}
+
+.windowDragHandle .titleBarControls button.is-minimize:focus-visible:before,
+.windowDragHandle .titleBarControls button.is-minimize:hover:before,
+.windowDragHandle .titleBarControls button[aria-label=Minimize]:focus-visible:before,
+.windowDragHandle .titleBarControls button[aria-label=Minimize]:hover:before,
+.windowContainer .windowDragHandle .titleBarControls button.is-minimize:focus-visible:before,
+.windowContainer .windowDragHandle .titleBarControls button.is-minimize:hover:before,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Minimize]:focus-visible:before,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Minimize]:hover:before {
+  opacity: 1;
+  transition: opacity .1s linear
+}
+
+.windowDragHandle .titleBarControls button.is-minimize:active:before,
+.windowDragHandle .titleBarControls button[aria-label=Minimize]:active:before,
+.windowContainer .windowDragHandle .titleBarControls button.is-minimize:active:before,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Minimize]:active:before {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAFCAYAAABxeg0vAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAA7SURBVHgBlY+xDQAgDMNaiQ9B8AHcxAlI/NYtKwj6QOohUzxYc+1HAqQ3e03qXNpwwcyE5QsAaEGjDRf8ZAza6Bz6VQAAAABJRU5ErkJggg==") no-repeat center 10px, radial-gradient(circle at bottom, #0bfdfa, transparent 65%), linear-gradient(#86a7bc 50%, #092747 0)
+}
+
+.windowDragHandle .titleBarControls button.is-maximize,
+.windowDragHandle .titleBarControls button[aria-label=Maximize],
+.windowContainer .windowDragHandle .titleBarControls button.is-maximize,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Maximize] {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAYAAACALL/6AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABsSURBVHgBlZHBCYAwDEVT6YaKbqArOILgBLqBosP1VkhAaQ6S1lKad+ihPy8kxLT9+IACG57r2KqKu2GCBpTYtEMOOQELzrnv4z53I4vDjjJnwXsPJWTOAiJGHVNB5pGwLjPk+AlEBLUY7eFebCosBHOR7vYAAAAASUVORK5CYII=") no-repeat 50%, linear-gradient(#ffffff80, #ffffff4d 45%, #0000001a 50%, #0000001a 75%, #ffffff80)
+}
+
+.windowDragHandle .titleBarControls button.is-maximize:before,
+.windowDragHandle .titleBarControls button[aria-label=Maximize]:before,
+.windowContainer .windowDragHandle .titleBarControls button.is-maximize:before,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Maximize]:before {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAYAAACALL/6AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABsSURBVHgBlZHBCYAwDEVT6YaKbqArOILgBLqBosP1VkhAaQ6S1lKad+ihPy8kxLT9+IACG57r2KqKu2GCBpTYtEMOOQELzrnv4z53I4vDjjJnwXsPJWTOAiJGHVNB5pGwLjPk+AlEBLUY7eFebCosBHOR7vYAAAAASUVORK5CYII=") no-repeat 50%, radial-gradient(circle at bottom, #2aceda, transparent 65%), linear-gradient(#b6d9ee 50%, #1a6ca1 0);
+  box-shadow: 0 0 7px 3px #5dc4f0, inset 0 0 0 1px #fffa;
+  content: "";
+  opacity: 0;
+  transition: opacity .3s linear;
+}
+
+.windowDragHandle .titleBarControls button.is-maximize:focus-visible:before,
+.windowDragHandle .titleBarControls button.is-maximize:hover:before,
+.windowDragHandle .titleBarControls button[aria-label=Maximize]:focus-visible:before,
+.windowDragHandle .titleBarControls button[aria-label=Maximize]:hover:before,
+.windowContainer .windowDragHandle .titleBarControls button.is-maximize:focus-visible:before,
+.windowContainer .windowDragHandle .titleBarControls button.is-maximize:hover:before,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Maximize]:focus-visible:before,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Maximize]:hover:before {
+  opacity: 1;
+  transition: opacity .1s linear
+}
+
+.windowDragHandle .titleBarControls button.is-maximize:active:before,
+.windowDragHandle .titleBarControls button[aria-label=Maximize]:active:before,
+.windowContainer .windowDragHandle .titleBarControls button.is-maximize:active:before,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Maximize]:active:before {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAYAAACALL/6AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABsSURBVHgBlZHBCYAwDEVT6YaKbqArOILgBLqBosP1VkhAaQ6S1lKad+ihPy8kxLT9+IACG57r2KqKu2GCBpTYtEMOOQELzrnv4z53I4vDjjJnwXsPJWTOAiJGHVNB5pGwLjPk+AlEBLUY7eFebCosBHOR7vYAAAAASUVORK5CYII=") no-repeat 50%, radial-gradient(circle at bottom, #0bfdfa, transparent 65%), linear-gradient(#86a7bc 50%, #092747 0)
+}
+
+.windowDragHandle .titleBarControls button.is-restore,
+.windowDragHandle .titleBarControls button[aria-label=Restore],
+.windowContainer .windowDragHandle .titleBarControls button.is-restore,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Restore] {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACVSURBVHgBlVDLCoMwENwU/7ClvRYK7b2lCIJHEQQ/QEHwqujfBXJIQMnihg34iHPJ7GNm2AhYcL2/JwhAxIuhq3aXb48PiFBna2YFERVHzoQLnAQmSCmxeL5+3rBtSsdpBwVKKTcY+1rY197G+8RRoLVejed94igwxrgB/zXeJ+4Jijz2Erjg+8/WE7ZAt6EgSUsIxQwaJEWv7G6SSgAAAABJRU5ErkJggg==") no-repeat 50%, linear-gradient(#ffffff80, #ffffff4d 45%, #0000001a 50%, #0000001a 75%, #ffffff80)
+}
+
+.windowDragHandle .titleBarControls button.is-restore:before,
+.windowDragHandle .titleBarControls button[aria-label=Restore]:before,
+.windowContainer .windowDragHandle .titleBarControls button.is-restore:before,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Restore]:before {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACVSURBVHgBlVDLCoMwENwU/7ClvRYK7b2lCIJHEQQ/QEHwqujfBXJIQMnihg34iHPJ7GNm2AhYcL2/JwhAxIuhq3aXb48PiFBna2YFERVHzoQLnAQmSCmxeL5+3rBtSsdpBwVKKTcY+1rY197G+8RRoLVejed94igwxrgB/zXeJ+4Jijz2Erjg+8/WE7ZAt6EgSUsIxQwaJEWv7G6SSgAAAABJRU5ErkJggg==") no-repeat 50%, radial-gradient(circle at bottom, #2aceda, transparent 65%), linear-gradient(#b6d9ee 50%, #1a6ca1 0);
+  box-shadow: 0 0 7px 3px #5dc4f0, inset 0 0 0 1px #fffa;
+  content: "";
+  opacity: 0;
+  transition: opacity .3s linear
+}
+
+.windowDragHandle .titleBarControls button.is-restore:focus-visible:before,
+.windowDragHandle .titleBarControls button.is-restore:hover:before,
+.windowDragHandle .titleBarControls button[aria-label=Restore]:focus-visible:before,
+.windowDragHandle .titleBarControls button[aria-label=Restore]:hover:before,
+.windowContainer .windowDragHandle .titleBarControls button.is-restore:focus-visible:before,
+.windowContainer .windowDragHandle .titleBarControls button.is-restore:hover:before,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Restore]:focus-visible:before,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Restore]:hover:before {
+  opacity: 1;
+  transition: opacity .1s linear
+}
+
+.windowDragHandle .titleBarControls button.is-restore:active:before,
+.windowDragHandle .titleBarControls button[aria-label=Restore]:active:before,
+.windowContainer .windowDragHandle .titleBarControls button.is-restore:active:before,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Restore]:active:before {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACVSURBVHgBlVDLCoMwENwU/7ClvRYK7b2lCIJHEQQ/QEHwqujfBXJIQMnihg34iHPJ7GNm2AhYcL2/JwhAxIuhq3aXb48PiFBna2YFERVHzoQLnAQmSCmxeL5+3rBtSsdpBwVKKTcY+1rY197G+8RRoLVejed94igwxrgB/zXeJ+4Jijz2Erjg+8/WE7ZAt6EgSUsIxQwaJEWv7G6SSgAAAABJRU5ErkJggg==") no-repeat 50%, radial-gradient(circle at bottom, #0bfdfa, transparent 65%), linear-gradient(#86a7bc 50%, #092747 0)
+}
+
+.windowDragHandle .titleBarControls button.is-close,
+.windowDragHandle .titleBarControls button[aria-label=Close],
+.windowContainer .windowDragHandle .titleBarControls button.is-close,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Close] {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAKCAYAAABi8KSDAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACUSURBVHgBlZFNCoQwDIVbmRvOMHOAAd0K/uDGlYKiCG4VPICi9yu0oCSQoFUXFtKEl6+voZXvr7sKay1TL690FOexY+Hz87i2decOuDKQsNGVe8AGYTRJIh0Y+orBvxszCPllOymlxN06jNE26Qnwg4zdHQLrMhFaawwAqAadDPE1ijwUxhiMKCmxCZk06OMYTz5lAx3xWDeXkLNAAAAAAElFTkSuQmCC") no-repeat 50%, linear-gradient(#ffffff80, #ffffff4d 45%, #0000001a 50%, #0000001a 75%, #ffffff80), radial-gradient(circle at -60% 50%, #0007 5% 10%, #0000 50%), radial-gradient(circle at 160% 50%, #0007 5% 10%, #0000 50%), linear-gradient(#e0a197e5, #cf796a 25% 50%, #d54f36 50%);
+  box-shadow: inset 0 0 0 1px #fffa
+}
+
+.windowDragHandle .titleBarControls button.is-close:before,
+.windowDragHandle .titleBarControls button[aria-label=Close]:before,
+.windowContainer .windowDragHandle .titleBarControls button.is-close:before,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Close]:before {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAKCAYAAABi8KSDAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACUSURBVHgBlZFNCoQwDIVbmRvOMHOAAd0K/uDGlYKiCG4VPICi9yu0oCSQoFUXFtKEl6+voZXvr7sKay1TL690FOexY+Hz87i2decOuDKQsNGVe8AGYTRJIh0Y+orBvxszCPllOymlxN06jNE26Qnwg4zdHQLrMhFaawwAqAadDPE1ijwUxhiMKCmxCZk06OMYTz5lAx3xWDeXkLNAAAAAAElFTkSuQmCC") no-repeat 50%, linear-gradient(#ffffff80, #ffffff4d 45%, #0000001a 50%, #0000001a 75%, #ffffff80), radial-gradient(circle at 50% 170%, #f4e676 10% 20%, #0000 60%), radial-gradient(circle at -60% 50%, #000a 5% 10%, #0000 50%), radial-gradient(circle at 160% 50%, #000a 5% 10%, #0000 50%), linear-gradient(#fb9d8b, #ee6d56 25% 50%, #d42809 50%);
+  border-bottom-right-radius: 5px;
+  box-shadow: 0 0 7px 3px #e68e75, inset 0 0 0 1px #fffa;
+  content: "";
+  opacity: 0;
+  transition: opacity .3s linear
+}
+
+.windowDragHandle .titleBarControls button.is-close:focus-visible:before,
+.windowDragHandle .titleBarControls button.is-close:hover:before,
+.windowDragHandle .titleBarControls button[aria-label=Close]:focus-visible:before,
+.windowDragHandle .titleBarControls button[aria-label=Close]:hover:before,
+.windowContainer .windowDragHandle .titleBarControls button.is-close:focus-visible:before,
+.windowContainer .windowDragHandle .titleBarControls button.is-close:hover:before,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Close]:focus-visible:before,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Close]:hover:before {
+  opacity: 1;
+  transition: opacity .1s linear
+}
+
+.windowDragHandle .titleBarControls button.is-close:active:before,
+.windowDragHandle .titleBarControls button[aria-label=Close]:active:before,
+.windowContainer .windowDragHandle .titleBarControls button.is-close:active:before,
+.windowContainer .windowDragHandle .titleBarControls button[aria-label=Close]:active:before {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAKCAYAAABi8KSDAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACUSURBVHgBlZFNCoQwDIVbmRvOMHOAAd0K/uDGlYKiCG4VPICi9yu0oCSQoFUXFtKEl6+voZXvr7sKay1TL690FOexY+Hz87i2decOuDKQsNGVe8AGYTRJIh0Y+orBvxszCPllOymlxN06jNE26Qnwg4zdHQLrMhFaawwAqAadDPE1ijwUxhiMKCmxCZk06OMYTz5lAx3xWDeXkLNAAAAAAElFTkSuQmCC") no-repeat 50%, linear-gradient(#ffffff80, #ffffff4d 45%, #0000001a 50%, #0000001a 75%, #ffffff80), radial-gradient(circle at 50% 170%, #dcc03f 10% 20%, #0000 60%), radial-gradient(circle at -60% 50%, #000 5% 10%, #0000 50%), radial-gradient(circle at 160% 50%, #000 5% 10%, #0000 50%), linear-gradient(#d1a894, #b67562 25% 50%, #7d0d01 50%)
+}
+
+.windowDragHandle .titleBarControls button:disabled.is-minimize,
+.windowDragHandle .titleBarControls button:disabled[aria-label=Minimize],
+.windowContainer .windowDragHandle .titleBarControls button:disabled.is-minimize,
+.windowContainer .windowDragHandle .titleBarControls button:disabled[aria-label=Minimize] {
+  background: linear-gradient(#ffffff80, #ffffff4d 45%, #0000001a 50%, #0000001a 75%, #ffffff80)
+}
+
+.windowDragHandle .titleBarControls button:disabled.is-minimize:before,
+.windowDragHandle .titleBarControls button:disabled[aria-label=Minimize]:before,
+.windowContainer .windowDragHandle .titleBarControls button:disabled.is-minimize:before,
+.windowContainer .windowDragHandle .titleBarControls button:disabled[aria-label=Minimize]:before {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAFCAYAAABxeg0vAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAA7SURBVHgBlY+xDQAgDMNaiQ9B8AHcxAlI/NYtKwj6QOohUzxYc+1HAqQ3e03qXNpwwcyE5QsAaEGjDRf8ZAza6Bz6VQAAAABJRU5ErkJggg==") no-repeat center 10px;
+  box-shadow: none;
+  content: "";
+  opacity: .4
+}
+
+.windowDragHandle .titleBarControls button:disabled.is-maximize,
+.windowDragHandle .titleBarControls button:disabled[aria-label=Maximize],
+.windowContainer .windowDragHandle .titleBarControls button:disabled.is-maximize,
+.windowContainer .windowDragHandle .titleBarControls button:disabled[aria-label=Maximize] {
+  background: linear-gradient(#ffffff80, #ffffff4d 45%, #0000001a 50%, #0000001a 75%, #ffffff80)
+}
+
+.windowDragHandle .titleBarControls button:disabled.is-maximize:before,
+.windowDragHandle .titleBarControls button:disabled[aria-label=Maximize]:before,
+.windowContainer .windowDragHandle .titleBarControls button:disabled.is-maximize:before,
+.windowContainer .windowDragHandle .titleBarControls button:disabled[aria-label=Maximize]:before {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAYAAACALL/6AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABsSURBVHgBlZHBCYAwDEVT6YaKbqArOILgBLqBosP1VkhAaQ6S1lKad+ihPy8kxLT9+IACG57r2KqKu2GCBpTYtEMOOQELzrnv4z53I4vDjjJnwXsPJWTOAiJGHVNB5pGwLjPk+AlEBLUY7eFebCosBHOR7vYAAAAASUVORK5CYII=") no-repeat 50%;
+  box-shadow: none;
+  content: "";
+  opacity: .4
+}
+
+.windowDragHandle .titleBarControls button:disabled.is-close,
+.windowDragHandle .titleBarControls button:disabled[aria-label=Close],
+.windowContainer .windowDragHandle .titleBarControls button:disabled.is-close,
+.windowContainer .windowDragHandle .titleBarControls button:disabled[aria-label=Close] {
+  background: linear-gradient(#ffffff80, #ffffff4d 45%, #0000001a 50%, #0000001a 75%, #ffffff80), radial-gradient(circle at -60% 50%, #0007 5% 10%, #0000 50%), radial-gradient(circle at 160% 50%, #0007 5% 10%, #0000 50%), linear-gradient(#e0a197e5, #cf796a 25% 50%, #d54f36 50%);
+  filter: contrast(.7) brightness(1.1)
+}
+
+.windowDragHandle .titleBarControls button:disabled.is-close:before,
+.windowDragHandle .titleBarControls button:disabled[aria-label=Close]:before,
+.windowContainer .windowDragHandle .titleBarControls button:disabled.is-close:before,
+.windowContainer .windowDragHandle .titleBarControls button:disabled[aria-label=Close]:before {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAKCAYAAABi8KSDAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACUSURBVHgBlZFNCoQwDIVbmRvOMHOAAd0K/uDGlYKiCG4VPICi9yu0oCSQoFUXFtKEl6+voZXvr7sKay1TL690FOexY+Hz87i2decOuDKQsNGVe8AGYTRJIh0Y+orBvxszCPllOymlxN06jNE26Qnwg4zdHQLrMhFaawwAqAadDPE1ijwUxhiMKCmxCZk06OMYTz5lAx3xWDeXkLNAAAAAAElFTkSuQmCC") no-repeat 50%;
+  box-shadow: none;
+  content: "";
+  opacity: .4
+}

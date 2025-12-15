@@ -5,7 +5,7 @@ import { useGSAP } from "@gsap/react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { TaskbarStyleProps } from "./types"
 
-export function RetroTaskbar({ apps, openWindows, onAppClick, handleMouseEnter, className = "", embedded = false }: TaskbarStyleProps) {
+export function Windows98Taskbar({ apps, openWindows, onAppClick, handleMouseEnter, className = "", embedded = false }: TaskbarStyleProps) {
     const taskbarRef = useRef<HTMLDivElement>(null)
 
     useGSAP(() => {
