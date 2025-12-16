@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import { Theme, DEFAULT_THEME } from '@/lib/constants/theme-templates'
+import { Theme } from '@/lib/services/themeService'
+import { DEFAULT_THEME } from '@/lib/constants/theme-templates'
 
 interface ThemeStoreState extends Theme {
     setTheme: (theme: Partial<Theme>) => void
