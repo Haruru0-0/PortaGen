@@ -12,7 +12,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useTheme } from "@/components/theme-provider";
-import { useTheme as usePortfolioTheme } from "@/contexts/theme-context";
+import { useThemeStore } from "@/lib/stores/theme-store";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
 // Style configurations for each menubar theme
@@ -69,13 +69,13 @@ function getStyleConfig(styleId: string) {
 
 export function ModeToggle({ previewMode, embedded = false }: { previewMode?: "desktop" | "mobile"; embedded?: boolean }) {
   const { theme, setTheme } = useTheme();
-  const { activeTheme } = usePortfolioTheme();
+  const menubarStyleId = useThemeStore((state) => (state as any).menubarStyleId);
   const [open, setOpen] = useState(false);
   const mqDesktop = useMediaQuery("(min-width: 768px)");
   const isDesktop = previewMode ? previewMode === "desktop" : mqDesktop;
 
   const shouldShowDrawer = (previewMode === "mobile" && embedded) || (!previewMode && !isDesktop);
-  const styleConfig = getStyleConfig(activeTheme.menubarStyleId || "liquid-glass") as typeof STYLE_CONFIGS["liquid-glass"] & { customBg?: string };
+  const styleConfig = getStyleConfig(menubarStyleId || "liquid-glass") as typeof STYLE_CONFIGS["liquid-glass"] & { customBg?: string };
 
   const ModeContent = (
     <div

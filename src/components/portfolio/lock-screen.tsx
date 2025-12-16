@@ -12,6 +12,7 @@ import { useAppSound } from "../../contexts/sound-context"
 import { gsap } from "gsap"
 import { useGSAP } from "@gsap/react"
 import { useLockScreenContext } from "@/contexts/lockScreenContext"
+import { useLockScreenStore } from "@/lib/stores/lock-screen-store"
 import { useParams } from "next/navigation"
 
 interface LockScreenProps {
@@ -21,10 +22,19 @@ interface LockScreenProps {
 
 export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [showLogin, setShowLogin] = useState(false)
-  const [inputPassword, setInputPassword] = useState("")
-  const [isWrongPassword, setIsWrongPassword] = useState(false)
   const { playClickSound, playErrorSound, playSuccessSound } = useAppSound()
+  const {
+    enabled,
+    password,
+    wallpaper,
+    showLogin,
+    setShowLogin,
+    inputPassword,
+    setInputPassword,
+    isWrongPassword,
+    setIsWrongPassword,
+    setLockScreenState
+  } = useLockScreenStore()
 
   const { data, getLockScreenData, displayLockScreenData } = useLockScreenContext()
   const params = useParams<{ username: string, id: string }>()
@@ -40,8 +50,20 @@ export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
     }
   }, [currentPortfolioId, data, getLockScreenData])
 
-  const effectivePassword = data?.password || "1234"
-  const effectiveWallpaper = data?.wallpaperUrl || "/placeholder.svg?height=1080&width=1920"
+  useEffect(() => {
+    if (data) {
+      setLockScreenState({
+        enabled: data.enabled,
+        password: data.password || '1234',
+        hint: data.hint || '',
+        wallpaper: data.wallpaperUrl || '',
+        wallpaperFileId: data.wallpaperAssetId?.toString() || null
+      })
+    }
+  }, [data, setLockScreenState])
+
+  const effectivePassword = password
+  const effectiveWallpaper = wallpaper || "/placeholder.svg?height=1080&width=1920"
 
   const timeRef = useRef<HTMLHeadingElement>(null)
   const dateRef = useRef<HTMLParagraphElement>(null)
@@ -77,7 +99,7 @@ export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
   }
 
   const handleScreenClick = () => {
-    if (data && !data.enabled) {
+    if (!enabled) {
       playSuccessSound()
       onUnlock()
       return
@@ -203,7 +225,7 @@ export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
 
   return (
     <div
-      className="relative flex flex-col items-center justify-center w-full min-h-screen overflow-hidden bg-cover bg-center"
+      className="relative flex flex-col items-center justify-center w-full h-full overflow-hidden bg-cover bg-center"
       style={{ backgroundImage: `url(${effectiveWallpaper})` }}
       onClick={handleScreenClick}
     >

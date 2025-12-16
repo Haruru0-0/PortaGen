@@ -1,6 +1,6 @@
 "use client"
 
-import { EditorProvider } from "@/contexts/editorContext"
+
 import { LockScreenProvider } from "@/contexts/lockScreenContext"
 import { DesktopProvider } from "@/contexts/desktopContext"
 import { IconProvider } from "@/contexts/iconContext"
@@ -14,21 +14,19 @@ export default function EditorLayout({ children }: { children: React.ReactNode }
     return (
         <SoundProvider>
             <AudioProvider>
-                <EditorProvider>
-                    <ThemeProvider>
-                        <DesktopProvider>
-                            <LockScreenProvider>
-                                <IconProvider>
-                                    <WindowsProvider>
-                                        <SoundEffectProvider>
-                                            {children}
-                                        </SoundEffectProvider>
-                                    </WindowsProvider>
-                                </IconProvider>
-                            </LockScreenProvider>
-                        </DesktopProvider>
-                    </ThemeProvider>
-                </EditorProvider>
+                <ThemeProvider>
+                    <DesktopProvider>
+                        <LockScreenProvider>
+                            <IconProvider>
+                                <WindowsProvider>
+                                    <SoundEffectProvider>
+                                        {children}
+                                    </SoundEffectProvider>
+                                </WindowsProvider>
+                            </IconProvider>
+                        </LockScreenProvider>
+                    </DesktopProvider>
+                </ThemeProvider>
             </AudioProvider>
         </SoundProvider>
     )

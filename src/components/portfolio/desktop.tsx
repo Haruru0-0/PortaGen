@@ -18,6 +18,7 @@ import { useGSAP } from "@gsap/react";
 import { MobileSettingsBar } from "./MobileSettingsBar";
 import { useIconContext } from "@/contexts/iconContext";
 import { useDesktopContext } from "@/contexts/desktopContext";
+import { useDesktopStore } from "@/lib/stores/desktop-store";
 import type { WindowContent } from "@/lib/types";
 import { useParams } from "next/navigation";
 
@@ -40,6 +41,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
   const params = useParams<{ username: string, id: string }>()
   const currentPortfolioId = Number(params?.id)
   const { data, getDesktopData, displayDesktopData } = useDesktopContext();
+  const { wallpaper, desktopGif, mobileWidget1, mobileWidget2, setDesktopState } = useDesktopStore();
   const { icons, getAllIcons, displayIcons } = useIconContext();
   const { windows: fetchedWindows, fetchWindows, displayWindows } = useWindowsContext();
 
@@ -54,6 +56,17 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
   }, []);
 
   useEffect(() => {
+    if (data) {
+      setDesktopState({
+        wallpaper: data.wallpaperUrl || '',
+        desktopGif: data.desktopGifUrl || '',
+        mobileWidget1: data.widget1Url || '',
+        mobileWidget2: data.widget2Url || ''
+      })
+    }
+  }, [data, setDesktopState])
+
+  useEffect(() => {
     if (currentPortfolioId) {
       if (preview) {
         void getAllIcons(currentPortfolioId)
@@ -66,10 +79,10 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
     }
   }, [])
 
-  const effectiveWallpaper = data?.wallpaperUrl || Wallpaper.src;
-  const effectiveGif = data?.desktopGifUrl || GreetingGif;
-  const effectiveWidget1 = data?.widget1Url || WaterCd;
-  const effectiveWidget2 = data?.widget2Url || CutePuppy;
+  const effectiveWallpaper = wallpaper || Wallpaper.src;
+  const effectiveGif = desktopGif || GreetingGif.src;
+  const effectiveWidget1 = mobileWidget1 || WaterCd.src;
+  const effectiveWidget2 = mobileWidget2 || CutePuppy.src;
 
   // Use editor content in preview mode, otherwise use fetched windows
   const effectiveWindows = fetchedWindows;

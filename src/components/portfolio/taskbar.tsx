@@ -1,8 +1,13 @@
 "use client"
 
 import type React from "react"
-import { useTheme } from "@/contexts/theme-context"
-import { getTaskbarComponent } from "./taskbar-styles"
+import { useThemeStore } from "@/lib/stores/theme-store"
+import { LiquidGlassTaskbar } from "./taskbar-styles/LiquidGlassTaskbar"
+import { Windows98Taskbar } from "./taskbar-styles/Windows98Taskbar"
+import { PixelTaskbar } from "./taskbar-styles/PixelTaskbar"
+import { WindowTaskbar } from "./taskbar-styles/WindowTaskbar"
+import { WindowsXPTaskbar } from "./taskbar-styles/WindowsXPTaskbar"
+import { Windows7Taskbar } from "./taskbar-styles/Windows7Taskbar"
 import { useAppSound } from "../../contexts/sound-context"
 
 interface TaskbarProps {
@@ -23,15 +28,32 @@ interface TaskbarProps {
 
 export function Taskbar(props: TaskbarProps) {
   const { playHoverSound } = useAppSound()
-  const { activeTheme } = useTheme()
-  const styleId = activeTheme.taskbarStyleId || "liquid-glass"
+  const { taskbarStyleId } = useThemeStore()
+  const styleId = taskbarStyleId || "liquid-glass"
 
-  const TaskbarComponent = getTaskbarComponent(styleId)
+  let content
+  switch (styleId) {
+    case "liquid-glass":
+      content = <LiquidGlassTaskbar {...props} handleMouseEnter={playHoverSound} />
+      break
+    case "windows-98":
+      content = <Windows98Taskbar {...props} handleMouseEnter={playHoverSound} />
+      break
+    case "pixel":
+      content = <PixelTaskbar {...props} handleMouseEnter={playHoverSound} />
+      break
+    case "window":
+      content = <WindowTaskbar {...props} handleMouseEnter={playHoverSound} />
+      break
+    case "windows-xp":
+      content = <WindowsXPTaskbar {...props} handleMouseEnter={playHoverSound} />
+      break
+    case "windows-7":
+      content = <Windows7Taskbar {...props} handleMouseEnter={playHoverSound} />
+      break
+    default:
+      content = <LiquidGlassTaskbar {...props} handleMouseEnter={playHoverSound} />
+  }
 
-  return (
-    <TaskbarComponent
-      {...props}
-      handleMouseEnter={playHoverSound}
-    />
-  )
+  return content
 }

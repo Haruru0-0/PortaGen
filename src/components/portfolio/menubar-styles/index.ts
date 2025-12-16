@@ -20,3 +20,8 @@ export const MENUBAR_COMPONENTS: Record<string, React.ComponentType<MenubarStyle
 export function getMenubarComponent(styleId: string) {
     return MENUBAR_COMPONENTS[styleId] || LiquidGlassMenubar
 }
+
+export function getMenubarJSX(styleId: string, props: MenubarStyleProps): React.JSX.Element {
+    const Component = getMenubarComponent(styleId)
+    return React.createElement(Component, props)
+}

@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react'
+import { uploadedAssets } from '@/lib/db/schema'
 
 // Update the type to match your asset system
 type AssetType = 'wallpaper' | 'icon' | 'music' | 'sound'
+type Asset = typeof uploadedAssets.$inferSelect
 
 export function useFileUpload() {
     const [uploading, setUploading] = useState(false)
@@ -13,7 +15,7 @@ export function useFileUpload() {
         file: File,
         assetType: AssetType,
         customFileName?: string // Add this parameter
-    ) => {
+    ): Promise<{ success: boolean; data?: Asset; error?: string }> => {
         setUploading(true)
         setError(null)
         setProgress(0)

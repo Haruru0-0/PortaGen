@@ -2,6 +2,7 @@ import { PixelCard } from "@/components/pixel-card"
 import { PixelButton } from "@/components/pixel-button"
 import { FileUpload } from "@/components/file-upload"
 import { useDesktopContext } from "@/contexts/desktopContext"
+import { useDesktopStore } from "@/lib/stores/desktop-store"
 import { useEffect, useState } from "react"
 import { PixelModal } from "@/components/pixel-modal"
 import { PixelInput } from "@/components/pixel-input"
@@ -12,70 +13,171 @@ export function MobileWidgetsTab() {
     const params = useParams<{ id: string }>()
     const currentPortfolioId = Number(params?.id)
     const { data, getDesktopData, updateWidget } = useDesktopContext()
+    const { mobileWidget1, mobileWidget2, setMobileWidget1, setMobileWidget2, pendingWidget1File, setPendingWidget1File, pendingWidget2File, setPendingWidget2File } = useDesktopStore()
     const { uploadFile, uploading } = useFileUpload()
 
-    const [renameOpen, setRenameOpen] = useState(false)
-    const [pendingFile, setPendingFile] = useState<File | null>(null)
-    const [pendingIndex, setPendingIndex] = useState<1 | 2 | null>(null)
-    const [customName, setCustomName] = useState("")
+    const [renameOpen1, setRenameOpen1] = useState(false)
+    const [renameOpen2, setRenameOpen2] = useState(false)
+    const [customName1, setCustomName1] = useState("")
+    const [customName2, setCustomName2] = useState("")
+    const [previewUrl1, setPreviewUrl1] = useState<string | null>(null)
+    const [previewUrl2, setPreviewUrl2] = useState<string | null>(null)
 
     useEffect(() => {
         if (currentPortfolioId) void getDesktopData(currentPortfolioId)
     }, [currentPortfolioId])
 
-    const beginWidgetUpload = (file: File, index: 1 | 2) => {
-        if (!currentPortfolioId) return
-        const base = file.name.replace(/\.[^/.]+$/, "")
-        setPendingFile(file)
-        setPendingIndex(index)
-        setCustomName(base)
-        setRenameOpen(true)
-    }
-    const onUploadWidget1 = async (file: File) => beginWidgetUpload(file, 1)
-    const onUploadWidget2 = async (file: File) => beginWidgetUpload(file, 2)
 
-    const confirmUpload = async () => {
-        if (!pendingFile || !currentPortfolioId || !pendingIndex) return
-        const name = customName.trim() || pendingFile.name.replace(/\.[^/.]+$/, "")
-        // Use 'icon' category for widget images
-        const result = await uploadFile(pendingFile, 'icon', name)
+    useEffect(() => {
+        return () => {
+            if (previewUrl1) URL.revokeObjectURL(previewUrl1)
+            if (previewUrl2) URL.revokeObjectURL(previewUrl2)
+        }
+    }, [previewUrl1, previewUrl2])
+
+    const onUploadWidget1 = (file: File) => {
+        const base = file.name.replace(/\.[^/.]+$/, "")
+        setPendingWidget1File(file)
+        setCustomName1(base)
+        const url = URL.createObjectURL(file)
+        setPreviewUrl1(url)
+        setMobileWidget1(url) // Update store for immediate preview
+    }
+    const onUploadWidget2 = (file: File) => {
+        const base = file.name.replace(/\.[^/.]+$/, "")
+        setPendingWidget2File(file)
+        setCustomName2(base)
+        const url = URL.createObjectURL(file)
+        setPreviewUrl2(url)
+        setMobileWidget2(url) // Update store for immediate preview
+    }
+
+    const handleSave1 = () => {
+        if (pendingWidget1File) {
+            setRenameOpen1(true)
+        }
+    }
+
+    const handleSave2 = () => {
+        if (pendingWidget2File) {
+            setRenameOpen2(true)
+        }
+    }
+
+    const confirmUpload1 = async () => {
+        if (!pendingWidget1File || !currentPortfolioId) return
+        const name = customName1.trim() || pendingWidget1File.name.replace(/\.[^/.]+$/, "")
+        const result = await uploadFile(pendingWidget1File, 'icon', name)
         if (result?.success && result.data?.id) {
-            await updateWidget(currentPortfolioId, pendingIndex, result.data.id)
-            setRenameOpen(false)
-            setPendingFile(null)
-            setPendingIndex(null)
-            setCustomName("")
+            await updateWidget(currentPortfolioId, 1, result.data.id)
+            setRenameOpen1(false)
+            setPendingWidget1File(null)
+            setCustomName1("")
+            setPreviewUrl1(null)
+            // The store will be updated via the context after updateWidget
         } else if (!result?.success) {
             alert(result?.error || 'Upload failed')
         }
     }
 
-    const onSave = async () => undefined
+    const confirmUpload2 = async () => {
+        if (!pendingWidget2File || !currentPortfolioId) return
+        const name = customName2.trim() || pendingWidget2File.name.replace(/\.[^/.]+$/, "")
+        const result = await uploadFile(pendingWidget2File, 'icon', name)
+        if (result?.success && result.data?.id) {
+            await updateWidget(currentPortfolioId, 2, result.data.id)
+            setRenameOpen2(false)
+            setPendingWidget2File(null)
+            setCustomName2("")
+            setPreviewUrl2(null)
+            // The store will be updated via the context after updateWidget
+        } else if (!result?.success) {
+            alert(result?.error || 'Upload failed')
+        }
+    }
 
     return (
         <PixelCard>
             <div className="space-y-4">
                 <h3 className="text-sm dashboard-pixel-text-shadow">MOBILE WIDGETS</h3>
-                <FileUpload accept="image/*" onFileSelect={onUploadWidget1} label="WIDGET 1"
-                    preview={data?.widget1Url || ''} maxSize={5} />
-                <FileUpload accept="image/*" onFileSelect={onUploadWidget2} label="WIDGET 2"
-                    preview={data?.widget2Url || ''} maxSize={5} />
-            </div>
-            <div className="mt-6">
-                <PixelButton onClick={onSave} className="w-full text-[10px]"
-                    disabled={uploading}>{uploading ? 'UPLOADING…' : 'SAVE'}</PixelButton>
+                <div className="space-y-2">
+                    <FileUpload accept="image/*" onFileSelect={onUploadWidget1} label="WIDGET 1"
+                        preview={previewUrl1 || data?.widget1Url || ''} maxSize={5} />
+                    {pendingWidget1File && (
+                        <PixelButton
+                            className="w-full text-[10px]"
+                            onClick={handleSave1}
+                        >
+                            SAVE WIDGET 1
+                        </PixelButton>
+                    )}
+                </div>
+                <div className="space-y-2">
+                    <FileUpload accept="image/*" onFileSelect={onUploadWidget2} label="WIDGET 2"
+                        preview={previewUrl2 || data?.widget2Url || ''} maxSize={5} />
+                    {pendingWidget2File && (
+                        <PixelButton
+                            className="w-full text-[10px]"
+                            onClick={handleSave2}
+                        >
+                            SAVE WIDGET 2
+                        </PixelButton>
+                    )}
+                </div>
             </div>
 
-            <PixelModal isOpen={renameOpen} onClose={() => !uploading && setRenameOpen(false)} title="RENAME WIDGET">
+            <PixelModal isOpen={renameOpen1} onClose={() => !uploading && setRenameOpen1(false)} title="RENAME WIDGET 1">
                 <div className="space-y-4">
-                    <p className="text-[10px] text-muted-foreground">SET A NAME FOR YOUR WIDGET IMAGE</p>
-                    <PixelInput value={customName} onChange={(e) => setCustomName(e.target.value)}
-                        placeholder="Enter name" />
+                    <p className="text-[10px] text-muted-foreground">SET A NAME FOR YOUR WIDGET</p>
+                    <PixelInput
+                        value={customName1}
+                        onChange={(e) => setCustomName1(e.target.value)}
+                        placeholder="Enter name"
+                    />
                     <div className="flex gap-3 pt-2">
-                        <PixelButton variant="secondary" className="flex-1 text-[10px]"
-                            onClick={() => setRenameOpen(false)} disabled={uploading}>CANCEL</PixelButton>
-                        <PixelButton className="flex-1 text-[10px]" onClick={confirmUpload}
-                            disabled={uploading || !pendingFile}>{uploading ? 'UPLOADING…' : 'UPLOAD'}</PixelButton>
+                        <PixelButton
+                            variant="secondary"
+                            className="flex-1 text-[10px]"
+                            onClick={() => setRenameOpen1(false)}
+                            disabled={uploading}
+                        >
+                            CANCEL
+                        </PixelButton>
+                        <PixelButton
+                            className="flex-1 text-[10px]"
+                            onClick={confirmUpload1}
+                            disabled={uploading || !pendingWidget1File}
+                        >
+                            {uploading ? 'UPLOADING…' : 'UPLOAD'}
+                        </PixelButton>
+                    </div>
+                </div>
+            </PixelModal>
+
+            <PixelModal isOpen={renameOpen2} onClose={() => !uploading && setRenameOpen2(false)} title="RENAME WIDGET 2">
+                <div className="space-y-4">
+                    <p className="text-[10px] text-muted-foreground">SET A NAME FOR YOUR WIDGET</p>
+                    <PixelInput
+                        value={customName2}
+                        onChange={(e) => setCustomName2(e.target.value)}
+                        placeholder="Enter name"
+                    />
+                    <div className="flex gap-3 pt-2">
+                        <PixelButton
+                            variant="secondary"
+                            className="flex-1 text-[10px]"
+                            onClick={() => setRenameOpen2(false)}
+                            disabled={uploading}
+                        >
+                            CANCEL
+                        </PixelButton>
+                        <PixelButton
+                            className="flex-1 text-[10px]"
+                            onClick={confirmUpload2}
+                            disabled={uploading || !pendingWidget2File}
+                        >
+                            {uploading ? 'UPLOADING…' : 'UPLOAD'}
+                        </PixelButton>
                     </div>
                 </div>
             </PixelModal>

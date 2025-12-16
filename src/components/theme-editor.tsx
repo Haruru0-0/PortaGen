@@ -6,14 +6,18 @@ import { THEME_PRESETS, type PortfolioTheme } from "@/lib/portfolio-theme"
 import { Check } from "lucide-react"
 import { PixelButton } from "@/components/pixel-button"
 import { TASKBAR_TEMPLATES, MENUBAR_TEMPLATES, WINDOW_TEMPLATES } from "@/lib/constants/theme-templates"
+import { useThemeStore } from "@/lib/stores/theme-store"
 import { useTheme } from "@/contexts/theme-context"
 import { useParams } from "next/navigation"
 
 export function ThemeEditor() {
   const [customTheme, setCustomTheme] = useState<PortfolioTheme>(THEME_PRESETS[0])
-  const { activeTheme, updateTheme, loading, saving, getThemeData } = useTheme()
+  const { name, colors, font, taskbarStyleId, menubarStyleId, windowStyleId, setTheme, setThemeState } = useThemeStore()
+  const { updateTheme, loading, saving, getThemeData } = useTheme()
   const params = useParams<{ id: string }>()
   const currentPortfolioId = Number(params?.id)
+
+  const activeTheme = { name, colors, font, taskbarStyleId, menubarStyleId, windowStyleId }
 
   // Fetch theme data when component mounts
   useEffect(() => {
@@ -29,27 +33,34 @@ export function ThemeEditor() {
 
   const handlePresetSelect = (preset: PortfolioTheme) => {
     setCustomTheme(preset)
+    setTheme(preset)
   }
 
   const handleTaskbarStyleChange = (styleId: string) => {
-    setCustomTheme({
+    const updated = {
       ...customTheme,
       taskbarStyleId: styleId,
-    })
+    }
+    setCustomTheme(updated)
+    setTheme(updated)
   }
 
   const handleMenubarStyleChange = (styleId: string) => {
-    setCustomTheme({
+    const updated = {
       ...customTheme,
       menubarStyleId: styleId,
-    })
+    }
+    setCustomTheme(updated)
+    setTheme(updated)
   }
 
   const handleWindowStyleChange = (styleId: string) => {
-    setCustomTheme({
+    const updated = {
       ...customTheme,
       windowStyleId: styleId,
-    })
+    }
+    setCustomTheme(updated)
+    setTheme(updated)
   }
 
   const handleColorChange = (key: keyof PortfolioTheme["colors"], value: string) => {
@@ -61,13 +72,16 @@ export function ThemeEditor() {
       },
     }
     setCustomTheme(updated)
+    setTheme(updated)
   }
 
   const handleFontChange = (value: string) => {
-    setCustomTheme({
+    const updated = {
       ...customTheme,
       font: value,
-    })
+    }
+    setCustomTheme(updated)
+    setTheme(updated)
   }
 
 

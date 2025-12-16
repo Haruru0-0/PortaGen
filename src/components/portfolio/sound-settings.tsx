@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { useAppSound } from '../../contexts/sound-context'
 import { useMediaQuery } from '@/hooks/use-media-query'
-import { useTheme as usePortfolioTheme } from "@/contexts/theme-context"
+import { useThemeStore } from "@/lib/stores/theme-store"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -190,13 +190,13 @@ function SoundContent({ styleConfig, customBg }: { styleConfig: typeof STYLE_CON
 
 export function SoundSettings({ previewMode, embedded = false }: { previewMode?: "desktop" | "mobile"; embedded?: boolean }) {
   const { isSoundEnabled } = useAppSound()
-  const { activeTheme } = usePortfolioTheme()
+  const menubarStyleId = useThemeStore((state) => (state as any).menubarStyleId)
   const [open, setOpen] = useState(false)
   const mqDesktop = useMediaQuery("(min-width: 768px)")
   const isDesktop = previewMode ? previewMode === "desktop" : mqDesktop
 
   const shouldShowDrawer = (previewMode === "mobile" && embedded) || (!previewMode && !isDesktop)
-  const styleConfig = getStyleConfig(activeTheme.menubarStyleId || "liquid-glass") as typeof STYLE_CONFIGS["liquid-glass"] & { customBg?: string }
+  const styleConfig = getStyleConfig(menubarStyleId || "liquid-glass") as typeof STYLE_CONFIGS["liquid-glass"] & { customBg?: string }
 
   const TriggerButton = (
     <Button

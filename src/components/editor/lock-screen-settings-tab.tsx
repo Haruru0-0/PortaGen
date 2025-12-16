@@ -5,6 +5,7 @@ import { PixelInput } from "@/components/pixel-input"
 import { PixelButton } from "@/components/pixel-button"
 import { Switch } from "@/components/ui/switch";
 import { useLockScreenContext } from "@/contexts/lockScreenContext";
+import { useLockScreenStore } from "@/lib/stores/lock-screen-store";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -22,23 +23,20 @@ const schema = z.object({
 
 export function LockScreenSettingsTab() {
     const { data, updatePass, getLockScreenData, loading, fetching } = useLockScreenContext()
+    const { enabled, password, setEnabled, setPassword } = useLockScreenStore()
     const params = useParams<{ id: string }>()
     const currentPortfolioId = Number(params?.id)
 
     const form = useForm<z.input<typeof schema>>({
         resolver: zodResolver(schema),
-        defaultValues: { enabled: true, password: "" },
+        defaultValues: { enabled, password },
     })
 
     useEffect(() => {
         if (currentPortfolioId) void getLockScreenData(currentPortfolioId)
     }, [currentPortfolioId, getLockScreenData])
 
-    useEffect(() => {
-        if (data) {
-            form.reset({ enabled: !!data.enabled, password: data.password || "" })
-        }
-    }, [data, form])
+    // Form initializes with store values and persists changes without resetting
 
     const onSubmit = async (values: z.input<typeof schema>) => {
         await updatePass(currentPortfolioId, values)
@@ -58,7 +56,13 @@ export function LockScreenSettingsTab() {
                                 <div className="flex items-center justify-between p-3 border-2 border-border bg-muted">
                                     <span className="text-[10px]">ENABLE LOCK SCREEN</span>
                                     <FormControl>
-                                        <Switch checked={!!field.value} onCheckedChange={field.onChange} />
+                                        <Switch
+                                            checked={!!field.value}
+                                            onCheckedChange={(checked) => {
+                                                field.onChange(checked)
+                                                setEnabled(checked)
+                                            }}
+                                        />
                                     </FormControl>
                                 </div>
                             </FormItem>
@@ -72,7 +76,15 @@ export function LockScreenSettingsTab() {
                             <FormItem>
                                 <FormLabel>PASSWORD</FormLabel>
                                 <FormControl>
-                                    <PixelInput type="password" placeholder="Enter password" {...field} />
+                                    <PixelInput
+                                        type="password"
+                                        placeholder="Enter password"
+                                        {...field}
+                                        onChange={(e) => {
+                                            field.onChange(e)
+                                            setPassword(e.target.value)
+                                        }}
+                                    />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

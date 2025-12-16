@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, useState, useCallback } from "react"
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo, useRef } from "react"
 import { toast } from "sonner"
 import { Theme, getTheme, saveTheme, getDisplayTheme } from "@/lib/services/themeService"
 import {
@@ -12,9 +12,9 @@ import {
     MenubarTemplate,
     WindowTemplate,
 } from "@/lib/constants/theme-templates"
+import { useThemeStore, useTheme as useThemeStoreSelector } from "@/lib/stores/theme-store"
 
 interface ThemeContextType {
-    activeTheme: Theme
     taskbarTemplate: TaskbarTemplate
     menubarTemplate: MenubarTemplate
     windowTemplate: WindowTemplate
@@ -23,15 +23,23 @@ interface ThemeContextType {
     getThemeData: (portfolioId: number) => Promise<void>
     displayThemeData: (username: string, portfolioId: number) => Promise<void>
     updateTheme: (portfolioId: number, newTheme: Partial<Theme>) => Promise<void>
+    setActiveTheme: (theme: Theme) => void
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const [activeTheme, setActiveTheme] = useState<Theme>(DEFAULT_THEME)
+    const { name, colors, font, taskbarStyleId, menubarStyleId, windowStyleId, setTheme, setThemeState } = useThemeStore()
     const [loading, setLoading] = useState(false)
     const [saving, setSaving] = useState(false)
     // We can store loaded Portfolio ID if needed, but for now we rely on the component passing it.
+
+    const activeThemeRef = useRef<Theme>({ name, colors, font, taskbarStyleId, menubarStyleId, windowStyleId })
+    const activeTheme = activeThemeRef.current
+
+    useEffect(() => {
+        activeThemeRef.current = { name, colors, font, taskbarStyleId, menubarStyleId, windowStyleId }
+    }, [name, colors.primary, colors.secondary, colors.accent, colors.background, colors.text, font, taskbarStyleId, menubarStyleId, windowStyleId])
 
     // Auth mode fetch
     const getThemeData = useCallback(async (portfolioId: number) => {
@@ -39,14 +47,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         try {
             const data = await getTheme(portfolioId)
             if (data && data.theme) {
-                setActiveTheme({ ...DEFAULT_THEME, ...data.theme })
+                setThemeState({ ...DEFAULT_THEME, ...data.theme })
             }
         } catch (e) {
             console.error("Failed to load theme:", e)
         } finally {
             setLoading(false)
         }
-    }, [])
+    }, [setThemeState])
 
     // Public display fetch
     const displayThemeData = useCallback(async (username: string, portfolioId: number) => {
@@ -54,21 +62,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         try {
             const data = await getDisplayTheme(portfolioId, username)
             if (data && data.theme) {
-                setActiveTheme({ ...DEFAULT_THEME, ...data.theme })
+                setThemeState({ ...DEFAULT_THEME, ...data.theme })
             }
         } catch (e) {
             console.error("Failed to display theme:", e)
         } finally {
             setLoading(false)
         }
-    }, [])
+    }, [setThemeState])
 
     const updateTheme = async (portfolioId: number, newTheme: Partial<Theme>) => {
         setSaving(true)
         try {
             const merged: Theme = { ...activeTheme, ...newTheme }
             // Optimistic update
-            setActiveTheme(merged)
+            setTheme(merged)
 
             await saveTheme(portfolioId, merged)
             toast.success("Theme saved successfully!")
@@ -79,6 +87,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         } finally {
             setSaving(false)
         }
+    }
+
+    const setActiveThemeLocal = (theme: Theme) => {
+        setTheme(theme)
     }
 
     // Resolve templates
@@ -92,7 +104,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return (
         <ThemeContext.Provider
             value={{
-                activeTheme,
                 taskbarTemplate,
                 menubarTemplate,
                 windowTemplate,
@@ -101,6 +112,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                 getThemeData,
                 displayThemeData,
                 updateTheme,
+                setActiveTheme: setActiveThemeLocal,
             }}
         >
             <style jsx global>{`

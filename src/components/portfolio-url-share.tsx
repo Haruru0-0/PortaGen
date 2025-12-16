@@ -9,11 +9,7 @@ import { useRef } from "react"
 import { useUser } from "@clerk/nextjs"
 import { useParams } from "next/navigation"
 
-interface PortfolioUrlShareProps {
-  username?: string
-}
-
-export function PortfolioUrlShare({ username = "demo-user" }: PortfolioUrlShareProps) {
+export function PortfolioUrlShare() {
   const [copied, setCopied] = useState(false)
   const [portfolioUrl, setPortfolioUrl] = useState("/portfolio/preview")
   const containerRef = useRef<HTMLDivElement>(null)
