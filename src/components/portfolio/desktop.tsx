@@ -30,6 +30,7 @@ const Links = React.lazy(() => import("./links"));
 const Contact = React.lazy(() => import("./contact"));
 
 import { useWindowsContext } from "@/contexts/windowsContext";
+import { useThemeStore } from "@/lib/stores/theme-store";
 
 export default function Desktop({ preview = false, previewMode }: { preview?: boolean; previewMode?: "desktop" | "mobile" }) {
   type WindowData = {
@@ -44,6 +45,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
   const { wallpaper, desktopGif, mobileWidget1, mobileWidget2, setDesktopState } = useDesktopStore();
   const { icons, getAllIcons, displayIcons } = useIconContext();
   const { windows: fetchedWindows, fetchWindows, displayWindows } = useWindowsContext();
+  const musicPlayerStyleId = useThemeStore((state) => state.musicPlayerStyleId);
 
   useEffect(() => {
     if (currentPortfolioId && !data) {
@@ -390,7 +392,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
                 </div>
               ))}
             </div>
-            <MusicPlayerWidget isDesktop={true} embedded={preview} spotifyPlaylistUrl={data?.spotifyPlaylistUrl} />
+            <MusicPlayerWidget isDesktop={true} embedded={preview} spotifyPlaylistUrl={data?.spotifyPlaylistUrl} musicPlayerStyleId={musicPlayerStyleId} />
             <Taskbar
               apps={icons.map(icon => ({ id: String(icon.id), label: icon.name, icon: icon.icon }))}
               openWindows={openWindows}
@@ -469,7 +471,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
                   <MobileSettingsBar previewMode={previewMode} embedded={preview} />
                 </div>
               </div>
-              <MusicPlayerWidget isDesktop={false} embedded={preview} />
+              <MusicPlayerWidget isDesktop={false} embedded={preview} musicPlayerStyleId={musicPlayerStyleId} />
             </div>
             <Taskbar
               apps={icons.map(icon => ({ id: String(icon.id), label: icon.name, icon: icon.icon }))}

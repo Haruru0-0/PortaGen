@@ -5,19 +5,19 @@ import { PixelInput } from "./pixel-input"
 import { THEME_PRESETS, type PortfolioTheme } from "@/lib/portfolio-theme"
 import { Check } from "lucide-react"
 import { PixelButton } from "@/components/pixel-button"
-import { TASKBAR_TEMPLATES, MENUBAR_TEMPLATES, WINDOW_TEMPLATES } from "@/lib/constants/theme-templates"
+import { TASKBAR_TEMPLATES, MENUBAR_TEMPLATES, WINDOW_TEMPLATES, MUSIC_PLAYER_TEMPLATES } from "@/lib/constants/theme-templates"
 import { useThemeStore } from "@/lib/stores/theme-store"
 import { useTheme } from "@/contexts/theme-context"
 import { useParams } from "next/navigation"
 
 export function ThemeEditor() {
   const [customTheme, setCustomTheme] = useState<PortfolioTheme>(THEME_PRESETS[0])
-  const { name, colors, font, taskbarStyleId, menubarStyleId, windowStyleId, setTheme, setThemeState } = useThemeStore()
+  const { name, colors, font, taskbarStyleId, menubarStyleId, windowStyleId, musicPlayerStyleId, setTheme, setThemeState } = useThemeStore()
   const { updateTheme, loading, saving, getThemeData } = useTheme()
   const params = useParams<{ id: string }>()
   const currentPortfolioId = Number(params?.id)
 
-  const activeTheme = { name, colors, font, taskbarStyleId, menubarStyleId, windowStyleId }
+  const activeTheme = { name, colors, font, taskbarStyleId, menubarStyleId, windowStyleId, musicPlayerStyleId }
 
   // Fetch theme data when component mounts
   useEffect(() => {
@@ -58,6 +58,15 @@ export function ThemeEditor() {
     const updated = {
       ...customTheme,
       windowStyleId: styleId,
+    }
+    setCustomTheme(updated)
+    setTheme(updated)
+  }
+
+  const handleMusicPlayerStyleChange = (styleId: string) => {
+    const updated = {
+      ...customTheme,
+      musicPlayerStyleId: styleId,
     }
     setCustomTheme(updated)
     setTheme(updated)
@@ -204,6 +213,24 @@ export function ThemeEditor() {
               key={template.id}
               onClick={() => handleWindowStyleChange(template.id)}
               className={`px-3 py-2 text-[8px] border-2 border-border ${customTheme.windowStyleId === template.id
+                ? "bg-primary text-primary-foreground"
+                : "bg-card hover:bg-muted"
+                }`}
+            >
+              {template.name.toUpperCase()}
+            </button>
+          ))}
+        </div>
+      </div>
+      {/* Music Player Style */}
+      <div className="space-y-2">
+        <label className="text-[8px] uppercase">MUSIC PLAYER STYLE</label>
+        <div className="grid grid-cols-2 gap-2">
+          {MUSIC_PLAYER_TEMPLATES.map((template) => (
+            <button
+              key={template.id}
+              onClick={() => handleMusicPlayerStyleChange(template.id)}
+              className={`px-3 py-2 text-[8px] border-2 border-border ${customTheme.musicPlayerStyleId === template.id
                 ? "bg-primary text-primary-foreground"
                 : "bg-card hover:bg-muted"
                 }`}

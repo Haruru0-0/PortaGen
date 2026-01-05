@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import {useParams} from "next/navigation";
+import { useParams } from "next/navigation";
 
 export function MusicTab() {
   const [connected, setConnected] = useState<boolean>(false)
@@ -39,7 +39,7 @@ export function MusicTab() {
           const data = await res.json()
           setConnected(!!data.connected)
         }
-      } catch {}
+      } catch { }
     }
     check()
   }, [])
@@ -118,7 +118,7 @@ export function MusicTab() {
           </PixelButton>
         )}
       </div>
-      
+
     </PixelCard>
   )
 }

@@ -7,10 +7,12 @@ import {
     TASKBAR_TEMPLATES,
     MENUBAR_TEMPLATES,
     WINDOW_TEMPLATES,
+    MUSIC_PLAYER_TEMPLATES,
     DEFAULT_THEME,
     TaskbarTemplate,
     MenubarTemplate,
     WindowTemplate,
+    MusicPlayerTemplate,
 } from "@/lib/constants/theme-templates"
 import { useThemeStore, useTheme as useThemeStoreSelector } from "@/lib/stores/theme-store"
 
@@ -18,6 +20,7 @@ interface ThemeContextType {
     taskbarTemplate: TaskbarTemplate
     menubarTemplate: MenubarTemplate
     windowTemplate: WindowTemplate
+    musicPlayerTemplate: MusicPlayerTemplate
     loading: boolean
     saving: boolean
     getThemeData: (portfolioId: number) => Promise<void>
@@ -29,17 +32,17 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const { name, colors, font, taskbarStyleId, menubarStyleId, windowStyleId, setTheme, setThemeState } = useThemeStore()
+    const { name, colors, font, taskbarStyleId, menubarStyleId, windowStyleId, musicPlayerStyleId, setTheme, setThemeState } = useThemeStore()
     const [loading, setLoading] = useState(false)
     const [saving, setSaving] = useState(false)
     // We can store loaded Portfolio ID if needed, but for now we rely on the component passing it.
 
-    const activeThemeRef = useRef<Theme>({ name, colors, font, taskbarStyleId, menubarStyleId, windowStyleId })
+    const activeThemeRef = useRef<Theme>({ name, colors, font, taskbarStyleId, menubarStyleId, windowStyleId, musicPlayerStyleId })
     const activeTheme = activeThemeRef.current
 
     useEffect(() => {
-        activeThemeRef.current = { name, colors, font, taskbarStyleId, menubarStyleId, windowStyleId }
-    }, [name, colors.primary, colors.secondary, colors.accent, colors.background, colors.text, font, taskbarStyleId, menubarStyleId, windowStyleId])
+        activeThemeRef.current = { name, colors, font, taskbarStyleId, menubarStyleId, windowStyleId, musicPlayerStyleId }
+    }, [name, colors.primary, colors.secondary, colors.accent, colors.background, colors.text, font, taskbarStyleId, menubarStyleId, windowStyleId, musicPlayerStyleId])
 
     // Auth mode fetch
     const getThemeData = useCallback(async (portfolioId: number) => {
@@ -100,6 +103,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         MENUBAR_TEMPLATES.find((t) => t.id === activeTheme.menubarStyleId) || MENUBAR_TEMPLATES[0]
     const windowTemplate =
         WINDOW_TEMPLATES.find((t) => t.id === activeTheme.windowStyleId) || WINDOW_TEMPLATES[0]
+    const musicPlayerTemplate =
+        MUSIC_PLAYER_TEMPLATES.find((t) => t.id === activeTheme.musicPlayerStyleId) || MUSIC_PLAYER_TEMPLATES[0]
 
     return (
         <ThemeContext.Provider
@@ -107,6 +112,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
                 taskbarTemplate,
                 menubarTemplate,
                 windowTemplate,
+                musicPlayerTemplate,
                 loading,
                 saving,
                 getThemeData,

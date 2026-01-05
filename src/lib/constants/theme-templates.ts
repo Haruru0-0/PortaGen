@@ -129,6 +129,55 @@ export const WINDOW_TEMPLATES: WindowTemplate[] = [
     },
 ]
 
+export interface MusicPlayerTemplate {
+    id: string
+    name: string
+    classNames: {
+        container: string
+        collapsed: string
+        expanded: string
+        mobile: string
+    }
+}
+
+export const MUSIC_PLAYER_TEMPLATES: MusicPlayerTemplate[] = [
+    {
+        id: "default",
+        name: "Default",
+        classNames: { container: "", collapsed: "", expanded: "", mobile: "" },
+    },
+    {
+        id: "liquid-glass",
+        name: "Liquid Glass",
+        classNames: { container: "liquidGlass-wrapper", collapsed: "liquidGlass-collapsed", expanded: "liquidGlass-expanded", mobile: "liquidGlass-mobile" },
+    },
+    {
+        id: "windows-98",
+        name: "Windows 98",
+        classNames: { container: "windows98-wrapper", collapsed: "windows98-collapsed", expanded: "windows98-expanded", mobile: "windows98-mobile" },
+    },
+    {
+        id: "windows-xp",
+        name: "Windows XP",
+        classNames: { container: "windowsXP-wrapper", collapsed: "windowsXP-collapsed", expanded: "windowsXP-expanded", mobile: "windowsXP-mobile" },
+    },
+    {
+        id: "windows-7",
+        name: "Windows 7",
+        classNames: { container: "windows7-wrapper", collapsed: "windows7-collapsed", expanded: "windows7-expanded", mobile: "windows7-mobile" },
+    },
+    {
+        id: "pixel",
+        name: "Pixel Art",
+        classNames: { container: "pixel-wrapper", collapsed: "pixel-collapsed", expanded: "pixel-expanded", mobile: "pixel-mobile" },
+    },
+    {
+        id: "modern-window",
+        name: "Modern Window",
+        classNames: { container: "modernWindow-wrapper", collapsed: "modernWindow-collapsed", expanded: "modernWindow-expanded", mobile: "modernWindow-mobile" },
+    },
+]
+
 export const DEFAULT_THEME = {
     name: 'Default',
     colors: {
@@ -142,4 +191,5 @@ export const DEFAULT_THEME = {
     taskbarStyleId: 'liquid-glass',
     menubarStyleId: 'liquid-glass',
     windowStyleId: 'liquid-glass',
+    musicPlayerStyleId: 'default',
 }

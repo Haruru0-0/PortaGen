@@ -20,6 +20,7 @@ export interface Theme {
     taskbarStyleId?: string
     menubarStyleId?: string
     windowStyleId?: string
+    musicPlayerStyleId?: string
 }
 
 export interface ThemeSettingsData {

@@ -21,4 +21,5 @@ export const useTheme = () => useThemeStore((state) => ({
     taskbarStyleId: state.taskbarStyleId,
     menubarStyleId: state.menubarStyleId,
     windowStyleId: state.windowStyleId,
+    musicPlayerStyleId: state.musicPlayerStyleId,
 }))

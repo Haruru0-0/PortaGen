@@ -11,6 +11,7 @@ export interface PortfolioTheme {
   taskbarStyleId?: string
   menubarStyleId?: string
   windowStyleId?: string
+  musicPlayerStyleId?: string
 }
 
 export const THEME_PRESETS: PortfolioTheme[] = [
@@ -26,6 +27,7 @@ export const THEME_PRESETS: PortfolioTheme[] = [
     font: "Press Start 2P",
     taskbarStyleId: "classic",
     menubarStyleId: "classic",
+    musicPlayerStyleId: "pixel",
   },
   {
     name: "Neon Nights",
@@ -39,6 +41,7 @@ export const THEME_PRESETS: PortfolioTheme[] = [
     font: "Orbitron",
     taskbarStyleId: "modern",
     menubarStyleId: "modern",
+    musicPlayerStyleId: "liquid-glass",
   },
   {
     name: "Minimal Clean",
@@ -52,6 +55,7 @@ export const THEME_PRESETS: PortfolioTheme[] = [
     font: "Inter",
     taskbarStyleId: "minimal",
     menubarStyleId: "minimal",
+    musicPlayerStyleId: "window",
   },
   {
     name: "Glass Effect",
@@ -65,6 +69,7 @@ export const THEME_PRESETS: PortfolioTheme[] = [
     font: "Poppins",
     taskbarStyleId: "modern",
     menubarStyleId: "modern",
+    musicPlayerStyleId: "liquid-glass",
   },
   {
     name: "Neo Brutalism",
@@ -78,6 +83,7 @@ export const THEME_PRESETS: PortfolioTheme[] = [
     font: "Space Grotesk",
     taskbarStyleId: "classic",
     menubarStyleId: "classic",
+    musicPlayerStyleId: "windows-98",
   },
 ]
 
