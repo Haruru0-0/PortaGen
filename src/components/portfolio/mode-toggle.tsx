@@ -22,14 +22,16 @@ const STYLE_CONFIGS = {
     content: "liquidGlass-content p-2 w-full",
     item: "w-full cursor-pointer hover:bg-sky-400/30 focus:bg-sky-400/30 text-slate-900 focus:text-slate-900",
     icon: "text-gray-600",
-    hasGlassLayers: true
+    hasGlassLayers: true,
+    trigger: "relative flex items-center justify-center w-10 h-10 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 transition-colors"
   },
-  "retro": {
+  "windows-98": {
     wrapper: "bg-[#c0c0c0] border-2 border-l-white border-t-white border-r-black border-b-black shadow-md",
     content: "p-2 w-full",
     item: "w-full cursor-pointer hover:bg-[#000080] hover:text-white text-black",
     icon: "text-black",
-    hasGlassLayers: false
+    hasGlassLayers: false,
+    trigger: "flex items-center justify-center w-8 h-8 bg-[#c0c0c0] border-2 border-l-white border-t-white border-r-black border-b-black active:border-l-black active:border-t-black active:border-r-white active:border-b-white text-black"
   },
   "windows-xp": {
     wrapper: "border border-[#1a3a8a] shadow-lg",
@@ -37,7 +39,8 @@ const STYLE_CONFIGS = {
     item: "w-full cursor-pointer hover:bg-[#3168d5] text-white",
     icon: "text-white",
     hasGlassLayers: false,
-    customBg: "linear-gradient(to bottom, #3168d5 0%, #2252b7 100%)"
+    customBg: "linear-gradient(to bottom, #3168d5 0%, #2252b7 100%)",
+    trigger: "flex items-center justify-center w-8 h-8 rounded-sm hover:bg-white/10 text-white"
   },
   "windows-7": {
     wrapper: "backdrop-blur-md border border-white/20 rounded-lg shadow-xl",
@@ -45,21 +48,24 @@ const STYLE_CONFIGS = {
     item: "w-full cursor-pointer hover:bg-white/20 text-white/90 rounded",
     icon: "text-white/70",
     hasGlassLayers: false,
-    customBg: "linear-gradient(to bottom, rgba(80,120,180,0.9) 0%, rgba(40,70,130,0.95) 100%)"
+    customBg: "linear-gradient(to bottom, rgba(80,120,180,0.9) 0%, rgba(40,70,130,0.95) 100%)",
+    trigger: "flex items-center justify-center w-8 h-8 rounded-md hover:bg-white/20 text-white shadow-[inset_0_1px_rgba(255,255,255,0.4)]"
   },
   "pixel": {
     wrapper: "bg-[#0f380f] border-4 border-[#8bac0f]",
     content: "p-2 w-full font-pixel text-[#9bbc0f]",
     item: "w-full cursor-pointer hover:bg-[#306230] text-[#9bbc0f]",
     icon: "text-[#9bbc0f]",
-    hasGlassLayers: false
+    hasGlassLayers: false,
+    trigger: "flex items-center justify-center w-10 h-10 border-4 border-[#8bac0f] bg-[#0f380f] active:bg-[#306230] text-[#9bbc0f] font-pixel"
   },
   "window": {
     wrapper: "bg-black/60 backdrop-blur-xl border border-white/10 rounded-lg",
     content: "p-2 w-full",
     item: "w-full cursor-pointer hover:bg-white/10 text-white/90",
     icon: "text-white/70",
-    hasGlassLayers: false
+    hasGlassLayers: false,
+    trigger: "flex items-center justify-center w-9 h-9 rounded-lg border border-white/10 hover:bg-white/10 text-white/90"
   }
 };
 
@@ -113,7 +119,7 @@ export function ModeToggle({ previewMode, embedded = false }: { previewMode?: "d
   );
 
   const TriggerButton = (
-    <button className="relative flex items-center justify-center w-10 h-10 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 transition-colors">
+    <button className={styleConfig.trigger}>
       <Sun
         className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 data-[theme=system]:rotate-90 data-[theme=system]:scale-0"
         data-theme={theme}

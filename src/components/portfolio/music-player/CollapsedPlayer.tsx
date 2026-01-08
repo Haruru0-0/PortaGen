@@ -35,8 +35,7 @@ export const CollapsedPlayer: React.FC<CollapsedPlayerProps> = ({
     return (
         <div
             ref={playerRef}
-            className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 ${embedded ? "z-10" : "z-50"
-                }`}
+            className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 z-99`}
         >
             <button
                 ref={(el) => {

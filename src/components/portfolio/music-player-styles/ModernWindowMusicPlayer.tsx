@@ -16,7 +16,7 @@ export function ModernWindowMusicPlayer(props: MusicPlayerStyleProps) {
         return (
             <div
                 ref={playerRef}
-                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 ${embedded ? "z-10" : "z-50"}
+                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 z-99
                 modernWindow-wrapper music-player`}
             >
                 <button
@@ -60,8 +60,7 @@ export function ModernWindowMusicPlayer(props: MusicPlayerStyleProps) {
         return (
             <div
                 ref={playerRef}
-                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 ${embedded ? "z-10" : "z-50"
-                    } modernWindow-expanded shadow-2xl transition-all duration-300`}
+                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 z-99 modernWindow-expanded shadow-2xl transition-all duration-300`}
                 style={{ width: "min(380px, 90vw)", height: "min(400px, 80vh)" }}
             >
                 <div className="modernWindow-content relative flex flex-col h-full w-full overflow-hidden p-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl">
@@ -214,11 +213,11 @@ export function ModernWindowMusicPlayer(props: MusicPlayerStyleProps) {
         const displayTracks = useSpotify ? mobileProps.spotifyPlaylistTracks : mobileProps.playlist;
 
         return (
-            <div className="flex flex-col items-center justify-center w-full px-4">
+            <div className="flex flex-col items-center justify-center w-full px-1">
                 <div
                     ref={playerRef}
                     className="w-full bg-white dark:bg-zinc-900 rounded-2xl shadow-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 transition-all duration-300"
-                    style={{ height: "220px" }}
+                    style={{ minHeight: "220px" }}
                 >
                     <div className="flex flex-col h-full overflow-hidden">
                         {mobileProps.showPlaylist ? (

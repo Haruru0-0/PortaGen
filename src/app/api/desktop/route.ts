@@ -25,7 +25,14 @@ export async function GET(req: NextRequest) {
 
     const row = await db.query.desktopSettings.findFirst({
       where: eq(desktopSettings.portfolioId, portfolioId),
-      with: { wallpaperAsset: true, desktopGifAsset: true, widget1Asset: true, widget2Asset: true, musicPlayerIconAsset: true },
+      with: {
+        wallpaperAsset: true,
+        desktopGifAsset: true,
+        widget1Asset: true,
+        widget2Asset: true,
+        musicPlayerIconAsset: true,
+        menubarIconAsset: true
+      },
     })
     if (!row) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
@@ -42,6 +49,9 @@ export async function GET(req: NextRequest) {
       widget2Url: row.widget2Asset?.thumbnailUrl || '',
       musicPlayerIconAssetId: row.musicPlayerIconAssetId ?? undefined,
       musicPlayerIconUrl: row.musicPlayerIconAsset?.displayUrl || '',
+      menubarIconAssetId: row.menubarIconAssetId ?? undefined,
+      menubarIconUrl: row.menubarIconAsset?.displayUrl || '',
+      menubarText: row.menubarText || '',
     })
   } catch (e) {
     console.error('Desktop settings fetch error:', e)

@@ -225,7 +225,7 @@ export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
 
   return (
     <div
-      className="relative flex flex-col items-center justify-center w-full h-full overflow-hidden bg-cover bg-center"
+      className={`${preview ? 'w-full h-full' : 'w-screen h-screen'} relative flex flex-col items-center justify-center overflow-hidden bg-cover bg-center`}
       style={{ backgroundImage: `url(${effectiveWallpaper})` }}
       onClick={handleScreenClick}
     >

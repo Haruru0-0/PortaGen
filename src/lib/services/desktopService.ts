@@ -11,6 +11,9 @@ export interface DesktopData {
   widget2Url?: string
   musicPlayerIconAssetId?: number
   musicPlayerIconUrl?: string
+  menubarIconAssetId?: number
+  menubarIconUrl?: string
+  menubarText?: string
 }
 
 export async function getDesktop(portfolioId: number): Promise<DesktopData | undefined> {
@@ -60,6 +63,16 @@ export async function updateDesktopSpotify(portfolioId: number, spotifyPlaylistU
     body: JSON.stringify({ portfolioId, spotifyPlaylistUrl }),
   })
   if (!res.ok) throw new Error('Failed to update desktop spotify url')
+  return res.json()
+}
+
+export async function updateDesktopMenubar(portfolioId: number, menubarIconAssetId: number | null, menubarText: string) {
+  const res = await fetch('/api/desktop/menubar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ portfolioId, menubarIconAssetId, menubarText }),
+  })
+  if (!res.ok) throw new Error('Failed to update desktop menubar settings')
   return res.json()
 }
 

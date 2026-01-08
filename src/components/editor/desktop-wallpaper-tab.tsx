@@ -14,11 +14,20 @@ export function DesktopWallpaperTab() {
   const params = useParams<{ id: string }>()
   const currentPortfolioId = Number(params?.id)
   const { data, getDesktopData, updateWallpaper } = useDesktopContext()
-  const { wallpaper, setWallpaper, pendingWallpaperFile, setPendingWallpaperFile } = useDesktopStore()
+  const {
+    wallpaper, setWallpaper, pendingWallpaperFile, setPendingWallpaperFile,
+    menubarIcon, setMenubarIcon, pendingMenubarIconFile, setPendingMenubarIconFile,
+    menubarText, setMenubarText
+  } = useDesktopStore()
   const { uploadFile, uploading } = useFileUpload()
   const [renameOpen, setRenameOpen] = useState(false)
   const [customName, setCustomName] = useState("")
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
+  // Menubar icon preview
+  const [menubarIconPreview, setMenubarIconPreview] = useState<string | null>(null)
+
+  const { updateMenubar } = useDesktopContext()
 
   useEffect(() => {
     if (currentPortfolioId) void getDesktopData(currentPortfolioId)
@@ -33,12 +42,19 @@ export function DesktopWallpaperTab() {
   }, [pendingWallpaperFile, setWallpaper])
 
   useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
-      }
+    if (pendingMenubarIconFile) {
+      const url = URL.createObjectURL(pendingMenubarIconFile)
+      setMenubarIconPreview(url)
+      setMenubarIcon(url)
     }
-  }, [previewUrl])
+  }, [pendingMenubarIconFile, setMenubarIcon])
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
+      if (menubarIconPreview) URL.revokeObjectURL(menubarIconPreview)
+    }
+  }, [previewUrl, menubarIconPreview])
 
   const onUploadWallpaper = (file: File) => {
     const base = file.name.replace(/\.[^/.]+$/, "")
@@ -46,16 +62,45 @@ export function DesktopWallpaperTab() {
     setCustomName(base)
     const url = URL.createObjectURL(file)
     setPreviewUrl(url)
-    setWallpaper(url) // Update store for immediate preview
+    setWallpaper(url)
   }
 
-  const handleSave = () => {
+  const onUploadMenubarIcon = (file: File) => {
+    setPendingMenubarIconFile(file)
+    const url = URL.createObjectURL(file)
+    setMenubarIconPreview(url)
+    setMenubarIcon(url)
+    // Save immediately or wait? Let's save on button click for consistency or add a save button
+    // We'll reuse the pattern: show preview and have a "SAVE SETTINGS" button later or per section
+  }
+
+  const handleSaveWallpaper = () => {
     if (pendingWallpaperFile) {
       setRenameOpen(true)
     }
   }
 
-  const confirmUpload = async () => {
+  // Simplified save for menubar for now
+  const handleSaveMenubar = async () => {
+    if (!currentPortfolioId) return
+
+    let assetId = data?.menubarIconAssetId || null
+
+    if (pendingMenubarIconFile) {
+      const result = await uploadFile(pendingMenubarIconFile, 'icon', 'menubar-icon')
+      if (result?.success && result.data?.id) {
+        assetId = result.data.id
+      } else {
+        return // Error is handled by hooks or should be shown
+      }
+    }
+
+    await updateMenubar(currentPortfolioId, assetId, menubarText)
+    setPendingMenubarIconFile(null)
+    setMenubarIconPreview(null)
+  }
+
+  const confirmUploadWallpaper = async () => {
     if (!pendingWallpaperFile || !currentPortfolioId) return
     const name = customName.trim() || pendingWallpaperFile.name.replace(/\.[^/.]+$/, "")
     const result = await uploadFile(pendingWallpaperFile, 'wallpaper', name)
@@ -65,7 +110,6 @@ export function DesktopWallpaperTab() {
       setPendingWallpaperFile(null)
       setCustomName("")
       setPreviewUrl(null)
-      // The store will be updated via the context after updateWallpaper
     } else if (!result?.success) {
       alert(result?.error || 'Upload failed')
     }
@@ -73,33 +117,71 @@ export function DesktopWallpaperTab() {
 
   return (
     <PixelCard>
-      <div className="space-y-4">
-        <h3 className="text-sm dashboard-pixel-text-shadow">DESKTOP WALLPAPER</h3>
+      <div className="space-y-6">
+        {/* WALLPAPER SECTION */}
+        <div className="space-y-4">
+          <h3 className="text-sm dashboard-pixel-text-shadow">DESKTOP WALLPAPER</h3>
+          <FileUpload
+            accept="image/*"
+            onFileSelect={onUploadWallpaper}
+            preview={previewUrl || data?.wallpaperUrl || ''}
+            label=""
+            maxSize={10}
+          />
+          {pendingWallpaperFile && (
+            <PixelButton
+              className="w-full text-[10px]"
+              onClick={handleSaveWallpaper}
+            >
+              SAVE WALLPAPER
+            </PixelButton>
+          )}
+        </div>
 
-        <FileUpload
-          accept="image/*"
-          onFileSelect={onUploadWallpaper}
-          preview={previewUrl || data?.wallpaperUrl || ''}
-          label=""
-          maxSize={10}
-        />
+        <div className="h-[1px] bg-border w-full" />
 
-        {pendingWallpaperFile && (
+        {/* MENU BAR SECTION */}
+        <div className="space-y-4">
+          <h3 className="text-sm dashboard-pixel-text-shadow">MENU BAR SETTINGS</h3>
+
+          <div className="space-y-2">
+            <p className="text-[10px] text-muted-foreground uppercase">Menu Bar Icon</p>
+            <FileUpload
+              accept="image/*"
+              onFileSelect={onUploadMenubarIcon}
+              preview={menubarIconPreview || data?.menubarIconUrl || ''}
+              label=""
+              maxSize={2}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-[10px] text-muted-foreground uppercase">Menu Bar Name</p>
+            <PixelInput
+              value={menubarText}
+              onChange={(e) => setMenubarText(e.target.value)}
+              placeholder="e.g. Ahmad kanaan"
+            />
+          </div>
+
           <PixelButton
             className="w-full text-[10px]"
-            onClick={handleSave}
+            onClick={handleSaveMenubar}
+            disabled={uploading}
           >
-            SAVE WALLPAPER
+            {uploading ? 'SAVING...' : 'SAVE MENU BAR SETTINGS'}
           </PixelButton>
-        )}
+        </div>
+
       </div>
+
       <PixelModal isOpen={renameOpen} onClose={() => !uploading && setRenameOpen(false)} title="RENAME WALLPAPER">
         <div className="space-y-4">
           <p className="text-[10px] text-muted-foreground">SET A NAME FOR YOUR WALLPAPER</p>
           <PixelInput value={customName} onChange={(e) => setCustomName(e.target.value)} placeholder="Enter name" />
           <div className="flex gap-3 pt-2">
             <PixelButton variant="secondary" className="flex-1 text-[10px]" onClick={() => setRenameOpen(false)} disabled={uploading}>CANCEL</PixelButton>
-            <PixelButton className="flex-1 text-[10px]" onClick={confirmUpload} disabled={uploading || !pendingWallpaperFile}>{uploading ? 'UPLOADING…' : 'UPLOAD'}</PixelButton>
+            <PixelButton className="flex-1 text-[10px]" onClick={confirmUploadWallpaper} disabled={uploading || !pendingWallpaperFile}>{uploading ? 'UPLOADING…' : 'UPLOAD'}</PixelButton>
           </div>
         </div>
       </PixelModal>

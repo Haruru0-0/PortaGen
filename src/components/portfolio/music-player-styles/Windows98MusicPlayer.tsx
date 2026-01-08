@@ -14,8 +14,7 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
         return (
             <div
                 ref={playerRef}
-                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 ${embedded ? "z-10" : "z-50"}
-                music-player win98-window`}
+                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 z-99 music-player win98-window`}
             >
                 <button
                     ref={(el) => { if (el) buttonsRef.current[0] = el }}
@@ -55,8 +54,7 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
         return (
             <div
                 ref={playerRef}
-                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 ${embedded ? "z-10" : "z-50"
-                    } bg-[#c0c0c0] border-t-2 border-l-2 border-white border-b-2 border-r-2 border-[#808080] shadow-[1px_1px_0_0_#000] p-1 flex flex-col font-['MS_Sans_Serif',sans-serif]`}
+                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 z-99 bg-[#c0c0c0] border-t-2 border-l-2 border-white border-b-2 border-r-2 border-[#808080] shadow-[1px_1px_0_0_#000] p-1 flex flex-col font-['MS_Sans_Serif',sans-serif]`}
                 style={{ width: "min(380px, 90vw)", height: "min(400px, 80vh)" }}
             >
                 {/* Win98 Title Bar */}
@@ -220,11 +218,11 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
         const displayTracks = useSpotify ? mobileProps.spotifyPlaylistTracks : mobileProps.playlist;
 
         return (
-            <div className="flex flex-col items-center justify-center w-full px-4 font-['MS_Sans_Serif',sans-serif]">
+            <div className="flex flex-col items-center justify-center w-full px-1 font-['MS_Sans_Serif',sans-serif]">
                 <div
                     ref={playerRef}
                     className="w-full bg-[#c0c0c0] border-t-2 border-l-2 border-white border-b-2 border-r-2 border-[#808080] shadow-[1px_1px_0_0_#000] p-1 overflow-hidden transition-all duration-300"
-                    style={{ height: "220px" }}
+                    style={{ minHeight: "220px" }}
                 >
                     <div className="flex flex-col h-full">
                         {/* Mobile Title */}

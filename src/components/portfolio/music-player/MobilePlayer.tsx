@@ -72,15 +72,15 @@ export const MobilePlayer: React.FC<MobilePlayerProps> = ({
         <div className="flex flex-col items-center justify-center">
             <div
                 ref={playerRef}
-                className="w-full h-[220px] rounded-3xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl bg-cover bg-center"
-                style={{ backgroundImage: `url(${MusicWallpaper.src})`, height: "220px" }}
+                className="w-full min-h-[220px] rounded-3xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl bg-cover bg-center"
+                style={{ backgroundImage: `url(${MusicWallpaper.src})` }}
             >
                 {!showPlaylist ? (
                     <div className="p-4 gap-4 flex flex-row items-center h-full">
                         <div
                             ref={albumCoverRef}
                             className={cn(
-                                "w-32 h-32 rounded-2xl overflow-hidden shadow-md transform transition-transform flex-shrink-0",
+                                "w-24 h-24 sm:w-32 sm:h-32 rounded-2xl overflow-hidden shadow-md transform transition-transform flex-shrink-0",
                                 isLoading ? "opacity-80" : "opacity-100"
                             )}
                         >
@@ -103,7 +103,7 @@ export const MobilePlayer: React.FC<MobilePlayerProps> = ({
                         <div className="flex flex-col flex-1 gap-3 h-full justify-between min-w-0">
                             <div className="w-full flex flex-col items-start min-w-0">
                                 <h2
-                                    className="text-xl font-bold text-gray-800 dark:text-white w-full leading-tight"
+                                    className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white w-full leading-tight"
                                     style={{
                                         display: "-webkit-box",
                                         WebkitLineClamp: 2,
@@ -285,7 +285,7 @@ export const MobilePlayer: React.FC<MobilePlayerProps> = ({
                                         <div
                                             key={track.id}
                                             className={cn(
-                                                "flex flex-row gap-2 z-99 items-center bg-white/20 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-2 cursor-pointer transition-all duration-200 border",
+                                                "flex flex-row gap-2 shrink-0 min-w-[200px] max-w-[200px] items-center bg-white/20 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-2 cursor-pointer transition-all duration-200 border",
                                                 (useSpotify
                                                     ? spotifyCurrentTrack?.id
                                                     : currentTrack.id) === track.id

@@ -204,6 +204,10 @@ export const desktopSettings = pgTable('desktop_settings', {
     // Spotify playlist URL to drive the music player via Web Playback SDK
     spotifyPlaylistUrl: text('spotify_playlist_url'),
 
+    // Menu Bar Customization
+    menubarIconAssetId: integer('menubar_icon_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
+    menubarText: varchar('menubar_text', { length: 100 }),
+
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
@@ -310,6 +314,10 @@ export const desktopSettingsRelations = relations(desktopSettings, ({ one }) => 
     }),
     musicPlayerIconAsset: one(uploadedAssets, {
         fields: [desktopSettings.musicPlayerIconAssetId],
+        references: [uploadedAssets.id],
+    }),
+    menubarIconAsset: one(uploadedAssets, {
+        fields: [desktopSettings.menubarIconAssetId],
         references: [uploadedAssets.id],
     }),
 }))

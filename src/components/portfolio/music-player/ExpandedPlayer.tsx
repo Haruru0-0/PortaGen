@@ -110,11 +110,10 @@ export const ExpandedPlayer: React.FC<ExpandedPlayerProps> = ({
     return (
         <div
             ref={playerRef}
-            className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 ${embedded ? "z-10" : "z-50"
-                } backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 overflow-hidden bg-cover bg-center transition-all duration-300`}
+            className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 z-99 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 overflow-hidden bg-cover bg-center transition-all duration-300`}
             style={{
-                width: "380px",
-                height: "300px",
+                width: "min(380px, 90vw)",
+                height: "min(300px, 60vh)",
                 backgroundImage: `url(${MusicWallpaper.src})`,
             }}
         >

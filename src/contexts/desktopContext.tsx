@@ -14,6 +14,7 @@ interface DesktopContextType {
   updateGif: (portfolioId: number, assetId: number | null) => Promise<void>
   updateWidget: (portfolioId: number, index: 1 | 2, assetId: number | null) => Promise<void>
   updateSpotify: (portfolioId: number, url: string) => Promise<void>
+  updateMenubar: (portfolioId: number, assetId: number | null, text: string) => Promise<void>
 }
 
 const DesktopContext = createContext<DesktopContextType | undefined>(undefined)
@@ -86,6 +87,24 @@ export function DesktopProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const updateMenubar = async (portfolioId: number, assetId: number | null, text: string) => {
+    setLoading(true)
+    try {
+      // Lazy import to avoid circular dependency if possible, but Service is fine
+      // We need to import updateDesktopMenubar from service above
+      // But we can just use any type if not imported, or update import
+      const { updateDesktopMenubar } = await import('@/lib/services/desktopService')
+      await updateDesktopMenubar(portfolioId, assetId, text)
+      await getDesktopData(portfolioId)
+      toast.success("Menu bar updated successfully!")
+    } catch (error) {
+      console.error("Failed to update menu bar:", error)
+      toast.error("Failed to update menu bar")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const displayDesktopData = async (username: string, portfolioId: number) => {
     setFetching(true)
     try {
@@ -96,7 +115,18 @@ export function DesktopProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const value: DesktopContextType = { data, loading, fetching, getDesktopData, displayDesktopData, updateWallpaper, updateGif, updateWidget, updateSpotify }
+  const value: DesktopContextType = {
+    data,
+    loading,
+    fetching,
+    getDesktopData,
+    displayDesktopData,
+    updateWallpaper,
+    updateGif,
+    updateWidget,
+    updateSpotify,
+    updateMenubar
+  }
   return (
     <DesktopContext.Provider value={value}>
       {children}

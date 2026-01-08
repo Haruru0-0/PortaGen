@@ -5,80 +5,80 @@ import { cn } from "@/lib/utils";
 
 interface SliderProps
     extends React.ComponentProps<typeof SliderPrimitive.Root> {
-  trackClassName?: string;
-  rangeClassName?: string;
-  thumbClassName?: string;
-  defaultValue?: number[];
-  value?: number[];
-  min?: number;
-  max?: number;
-  thumb?: React.ReactNode;
+    trackClassName?: string;
+    rangeClassName?: string;
+    thumbClassName?: string;
+    defaultValue?: number[];
+    value?: number[];
+    min?: number;
+    max?: number;
+    thumb?: React.ReactNode;
 }
 
 function Slider({
-                  className,
-                  trackClassName,
-                  rangeClassName,
-                  thumbClassName,
-                  defaultValue,
-                  value,
-                  min = 0,
-                  max = 100,
-                  thumb,
-                  ...props
-                }: SliderProps) {
-  const _values = React.useMemo(
-      () =>
-          Array.isArray(value)
-              ? value
-              : Array.isArray(defaultValue)
-                  ? defaultValue
-                  : [min, max],
-      [value, defaultValue, min, max]
-  );
+    className,
+    trackClassName,
+    rangeClassName,
+    thumbClassName,
+    defaultValue,
+    value,
+    min = 0,
+    max = 100,
+    thumb,
+    ...props
+}: SliderProps) {
+    const _values = React.useMemo(
+        () =>
+            Array.isArray(value)
+                ? value
+                : Array.isArray(defaultValue)
+                    ? defaultValue
+                    : [min, max],
+        [value, defaultValue, min, max]
+    );
 
-  return (
-      <SliderPrimitive.Root
-          data-slot="slider"
-          defaultValue={defaultValue}
-          value={value}
-          min={min}
-          max={max}
-          className={cn(
-              "relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col",
-              className
-          )}
-          {...props}
-      >
-        <SliderPrimitive.Track
-            data-slot="slider-track"
+    return (
+        <SliderPrimitive.Root
+            data-slot="slider"
+            defaultValue={defaultValue}
+            value={value}
+            min={min}
+            max={max}
             className={cn(
-                "bg-muted relative grow overflow-hidden rounded-full data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5",
-                trackClassName
+                "relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col group",
+                className
             )}
+            {...props}
         >
-          <SliderPrimitive.Range
-              data-slot="slider-range"
-              className={cn(
-                  "bg-primary absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full",
-                  rangeClassName
-              )}
-          />
-        </SliderPrimitive.Track>
-        {Array.from({ length: _values.length }, (_, index) => (
-            <SliderPrimitive.Thumb
-                data-slot="slider-thumb"
-                key={index}
+            <SliderPrimitive.Track
+                data-slot="slider-track"
                 className={cn(
-                    "bg-white/10 backdrop-blur-xs border-none rounded-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#ccf2fc]",
-                    thumbClassName
+                    "bg-muted relative grow overflow-hidden rounded-full data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5",
+                    trackClassName
                 )}
             >
-              {thumb ? thumb : null}
-            </SliderPrimitive.Thumb>
-        ))}
-      </SliderPrimitive.Root>
-  );
+                <SliderPrimitive.Range
+                    data-slot="slider-range"
+                    className={cn(
+                        "bg-primary absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full transition-all duration-300 ease-linear group-active:transition-none group-active:duration-0",
+                        rangeClassName
+                    )}
+                />
+            </SliderPrimitive.Track>
+            {Array.from({ length: _values.length }, (_, index) => (
+                <SliderPrimitive.Thumb
+                    data-slot="slider-thumb"
+                    key={index}
+                    className={cn(
+                        "bg-white/10 backdrop-blur-xs border-none rounded-full focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#ccf2fc]",
+                        thumbClassName
+                    )}
+                >
+                    {thumb ? thumb : null}
+                </SliderPrimitive.Thumb>
+            ))}
+        </SliderPrimitive.Root>
+    );
 }
 
 export { Slider };

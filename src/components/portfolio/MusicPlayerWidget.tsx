@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState, memo } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import MusicWallpaper from "@/assets/MusicWallPaper.gif";
@@ -79,67 +79,72 @@ interface SpotifyPlayerConfig {
 }
 
 interface MusicPlayerProps {
-    isDesktop?: boolean;
-    embedded?: boolean;
-    spotifyPlaylistUrl?: string;
-    musicPlayerStyleId?: string;
+  isDesktop?: boolean;
+  embedded?: boolean;
+  spotifyPlaylistUrl?: string;
+  musicPlayerStyleId?: string;
 }
 
 interface ThemedMusicPlayerProps extends Partial<MusicPlayerStyleProps> {
-    musicPlayerStyleId: string;
-    playerType: "collapsed" | "expanded" | "mobile";
+  musicPlayerStyleId: string;
+  playerType: "collapsed" | "expanded" | "mobile";
 }
 
 function ThemedMusicPlayer(props: ThemedMusicPlayerProps) {
-    const { musicPlayerStyleId, playerType, ...restProps } = props;
-    
-    // Provide default values for required props
-    const musicPlayerProps: MusicPlayerStyleProps = {
-        playerType,
-        embedded: restProps.embedded || false,
-        playerRef: restProps.playerRef || { current: null },
-        buttonsRef: restProps.buttonsRef || { current: [] },
-        handleExpandClick: restProps.handleExpandClick || (() => {}),
-        handleButtonClick: restProps.handleButtonClick || (() => {}),
-        handleButtonHover: restProps.handleButtonHover || (() => {}),
-        handleButtonLeave: restProps.handleButtonLeave || (() => {}),
-        isLoading: restProps.isLoading || false,
-        albumCoverRef: restProps.albumCoverRef || { current: null },
-        useSpotify: restProps.useSpotify || false,
-        spotifyCurrentTrack: restProps.spotifyCurrentTrack || null,
-        currentTrack: restProps.currentTrack || { id: 0, title: "", artist: "", cover: "", duration: "", src: "" },
-        showPlaylist: restProps.showPlaylist || false,
-        setShowPlaylist: restProps.setShowPlaylist || (() => {}),
-        handlePlaylistToggle: restProps.handlePlaylistToggle || (() => {}),
-        handleDesktopClose: restProps.handleDesktopClose || (() => {}),
-        progress: restProps.progress || 0,
-        handleSeek: restProps.handleSeek || (() => {}),
-        formatTime: restProps.formatTime || ((progress: number) => "0:00"),
-        spDurationMs: restProps.spDurationMs || 0,
-        isPlaying: restProps.isPlaying || false,
-        onPlayPause: restProps.onPlayPause || (() => {}),
-        onNext: restProps.onNext || (() => {}),
-        onPrevious: restProps.onPrevious || (() => {}),
-        volume: restProps.volume || 50,
-        setVolume: restProps.setVolume || (() => {}),
-        spotifyPlayerRef: restProps.spotifyPlayerRef || { current: null },
-        playClickSound: restProps.playClickSound || (() => {}),
-        playlistRef: restProps.playlistRef || { current: null },
-        spotifyPlaylistTracks: restProps.spotifyPlaylistTracks || [],
-        playlist: restProps.playlist || [],
-        changeTrack: restProps.changeTrack || (() => {}),
-        formatDuration: restProps.formatDuration || ((ms: number) => "0:00"),
-        previewMode: restProps.previewMode || "desktop",
-    };
-    
-    return getMusicPlayerJSX(musicPlayerStyleId, musicPlayerProps);
+  const { musicPlayerStyleId, playerType, ...restProps } = props;
+
+  // Provide default values for required props
+  // We use useMemo here to avoid creating a new object on every render if possible
+  // though it depends on many props that change frequently
+  const musicPlayerProps: MusicPlayerStyleProps = {
+    playerType,
+    embedded: restProps.embedded || false,
+    playerRef: restProps.playerRef || { current: null },
+    buttonsRef: restProps.buttonsRef || { current: [] },
+    handleExpandClick: restProps.handleExpandClick || (() => { }),
+    handleButtonClick: restProps.handleButtonClick || (() => { }),
+    handleButtonHover: restProps.handleButtonHover || (() => { }),
+    handleButtonLeave: restProps.handleButtonLeave || (() => { }),
+    isLoading: restProps.isLoading || false,
+    albumCoverRef: restProps.albumCoverRef || { current: null },
+    useSpotify: restProps.useSpotify || false,
+    spotifyCurrentTrack: restProps.spotifyCurrentTrack || null,
+    currentTrack: restProps.currentTrack || { id: 0, title: "", artist: "", cover: "", duration: "", src: "" },
+    showPlaylist: restProps.showPlaylist || false,
+    setShowPlaylist: restProps.setShowPlaylist || (() => { }),
+    handlePlaylistToggle: restProps.handlePlaylistToggle || (() => { }),
+    handleDesktopClose: restProps.handleDesktopClose || (() => { }),
+    progress: restProps.progress || 0,
+    handleSeek: restProps.handleSeek || (() => { }),
+    formatTime: restProps.formatTime || ((progress: number) => "0:00"),
+    spDurationMs: restProps.spDurationMs || 0,
+    isPlaying: restProps.isPlaying || false,
+    onPlayPause: restProps.onPlayPause || (() => { }),
+    onNext: restProps.onNext || (() => { }),
+    onPrevious: restProps.onPrevious || (() => { }),
+    volume: restProps.volume || 50,
+    setVolume: restProps.setVolume || (() => { }),
+    spotifyPlayerRef: restProps.spotifyPlayerRef || { current: null },
+    playClickSound: restProps.playClickSound || (() => { }),
+    playlistRef: restProps.playlistRef || { current: null },
+    spotifyPlaylistTracks: restProps.spotifyPlaylistTracks || [],
+    playlist: restProps.playlist || [],
+    changeTrack: restProps.changeTrack || (() => { }),
+    formatDuration: restProps.formatDuration || ((ms: number) => "0:00"),
+    handlePlayPause: restProps.onPlayPause || (() => { }),
+    handleNext: restProps.onNext || (() => { }),
+    handlePrevious: restProps.onPrevious || (() => { }),
+    previewMode: restProps.previewMode || "desktop",
+  };
+
+  return getMusicPlayerJSX(musicPlayerStyleId, musicPlayerProps);
 }
 
-export default function MusicPlayerWidget({
-    isDesktop = false,
-    embedded = false,
-    spotifyPlaylistUrl,
-    musicPlayerStyleId = "default",
+const MusicPlayerWidget = memo(function MusicPlayerWidget({
+  isDesktop = false,
+  embedded = false,
+  spotifyPlaylistUrl,
+  musicPlayerStyleId = "default",
 }: MusicPlayerProps) {
   const {
     audioRef,
@@ -375,7 +380,10 @@ export default function MusicPlayerWidget({
             const pct = playerState.duration
               ? (playerState.position / playerState.duration) * 100
               : 0;
-            setProgress(isNaN(pct) ? 0 : pct);
+            if (!isDraggingSlider.current) {
+              setProgress(isNaN(pct) ? 0 : pct);
+            }
+            lastUpdateRef.current = Date.now();
             setIsPlaying(!playerState.paused);
 
             // Fetch current track info when track changes
@@ -444,6 +452,8 @@ export default function MusicPlayerWidget({
   const albumCoverRef = useRef<HTMLDivElement>(null);
   const buttonsRef = useRef<HTMLButtonElement[]>([]);
   const rotationTweenRef = useRef<gsap.core.Tween | null>(null);
+  const isDraggingSlider = useRef(false);
+  const lastUpdateRef = useRef<number>(Date.now());
 
   // Handle album cover rotation
   const handleAlbumRotation = useCallback(() => {
@@ -459,7 +469,8 @@ export default function MusicPlayerWidget({
         "(prefers-reduced-motion: reduce)"
       ).matches;
 
-      if (!prefersReducedMotion) {
+      // Only rotate in collapsed desktop view
+      if (!prefersReducedMotion && isDesktop && !isExpanded) {
         rotationTweenRef.current = gsap.to(albumCoverRef.current, {
           rotation: 360,
           duration: 3,
@@ -467,12 +478,47 @@ export default function MusicPlayerWidget({
           ease: "none",
           transformOrigin: "center center",
         });
+      } else {
+        // Reset rotation for expanded, mobile, or reduced motion
+        gsap.set(albumCoverRef.current, { rotation: 0 });
       }
     } else {
       // Stop rotation and reset to 0 degrees
       gsap.set(albumCoverRef.current, { rotation: 0 });
     }
-  }, [isPlaying, isLoading]);
+  }, [isPlaying, isLoading, isDesktop, isExpanded]);
+
+
+  // Local progress ticker for smooth slider
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (isPlaying && !isLoading && !isDraggingSlider.current) {
+      interval = setInterval(() => {
+        const now = Date.now();
+        const elapsed = now - lastUpdateRef.current;
+
+        if (elapsed > 1000) { // Sync drift fallback
+          // Optionally resync here if we had access to player state, 
+          // but relying on player_state_changed is usually enough.
+          // We'll just update the local progress based on estimated time.
+        }
+
+        if (spDurationMs > 0) {
+          setSpPositionMs((prev) => {
+            const nextPos = prev + 100; // increment by interval time
+            const nextPct = (nextPos / spDurationMs) * 100;
+            if (!isDraggingSlider.current) {
+              setProgress(Math.min(nextPct, 100));
+            }
+            return Math.min(nextPos, spDurationMs);
+          });
+        }
+      }, 100);
+    }
+
+    return () => clearInterval(interval);
+  }, [isPlaying, isLoading, spDurationMs]);
 
   // Update rotation whenever playing state changes
   useEffect(() => {
@@ -542,6 +588,7 @@ export default function MusicPlayerWidget({
 
     // Player entrance
     if (playerRef.current) {
+      gsap.killTweensOf(playerRef.current);
       gsap.fromTo(
         playerRef.current,
         { opacity: 0, scale: prefersReducedMotion ? 1 : 0.8 },
@@ -557,6 +604,7 @@ export default function MusicPlayerWidget({
     // Button entrances
     buttonsRef.current.forEach((button, index) => {
       if (button) {
+        gsap.killTweensOf(button);
         gsap.fromTo(
           button,
           { opacity: 0, scale: prefersReducedMotion ? 1 : 0 },
@@ -576,9 +624,12 @@ export default function MusicPlayerWidget({
 
     // Cleanup
     return () => {
-      // Don't kill all tweens - just specific ones if needed
+      if (playerRef.current) gsap.killTweensOf(playerRef.current);
+      buttonsRef.current.forEach(button => {
+        if (button) gsap.killTweensOf(button);
+      });
     };
-  }, []);
+  }, { dependencies: [musicPlayerStyleId, isDesktop, isExpanded], revertOnUpdate: true });
 
   useEffect(() => {
     const playAudio = async () => {
@@ -715,6 +766,12 @@ export default function MusicPlayerWidget({
     playClickSound();
   };
 
+  const handleSeekWrapped = useCallback((value: number[]) => {
+    isDraggingSlider.current = true;
+    handleSeek(value);
+    setTimeout(() => { isDraggingSlider.current = false; }, 200);
+  }, [handleSeek]);
+
   const handleDesktopClose = () => {
     setIsExpanded(false);
     setShowPlaylist(false);
@@ -754,24 +811,24 @@ export default function MusicPlayerWidget({
   }, []);
 
   if (isDesktop && !isExpanded) {
-      return (
-          <ThemedMusicPlayer
-              playerType="collapsed"
-              embedded={embedded}
-              playerRef={playerRef}
-              buttonsRef={buttonsRef}
-              handleExpandClick={handleExpandClick}
-              handleButtonClick={handleButtonClick}
-              handleButtonHover={handleButtonHover}
-              handleButtonLeave={handleButtonLeave}
-              isLoading={isLoading}
-              albumCoverRef={albumCoverRef}
-              useSpotify={useSpotify}
-              spotifyCurrentTrack={spotifyCurrentTrack}
-              currentTrack={currentTrack}
-              musicPlayerStyleId={musicPlayerStyleId}
-          />
-      );
+    return (
+      <ThemedMusicPlayer
+        playerType="collapsed"
+        embedded={embedded}
+        playerRef={playerRef}
+        buttonsRef={buttonsRef}
+        handleExpandClick={handleExpandClick}
+        handleButtonClick={handleButtonClick}
+        handleButtonHover={handleButtonHover}
+        handleButtonLeave={handleButtonLeave}
+        isLoading={isLoading}
+        albumCoverRef={albumCoverRef}
+        useSpotify={useSpotify}
+        spotifyCurrentTrack={spotifyCurrentTrack}
+        currentTrack={currentTrack}
+        musicPlayerStyleId={musicPlayerStyleId}
+      />
+    );
   }
 
   // Desktop expanded panel - Spotify embed fallback when SDK fails
@@ -788,8 +845,8 @@ export default function MusicPlayerWidget({
         className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 ${embedded ? "z-10" : "z-50"
           } backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 overflow-hidden bg-cover bg-center`}
         style={{
-          width: "380px",
-          height: "300px",
+          width: "min(380px, 90vw)",
+          height: "min(300px, 60vh)",
           backgroundImage: `url(${MusicWallpaper.src})`,
         }}
       >
@@ -811,76 +868,79 @@ export default function MusicPlayerWidget({
 
   // Desktop expanded panel
   if (isDesktop && isExpanded) {
-      return (
-          <ThemedMusicPlayer
-              playerType="expanded"
-              embedded={embedded}
-              playerRef={playerRef}
-              showPlaylist={showPlaylist}
-              setShowPlaylist={setShowPlaylist}
-              buttonsRef={buttonsRef}
-              handleButtonHover={handleButtonHover}
-              handleButtonLeave={handleButtonLeave}
-              handleButtonClick={handleButtonClick}
-              handleDesktopClose={handleDesktopClose}
-              handlePlaylistToggle={handlePlaylistToggle}
-              albumCoverRef={albumCoverRef}
-              useSpotify={useSpotify}
-              spotifyCurrentTrack={spotifyCurrentTrack}
-              currentTrack={currentTrack}
-              progress={progress}
-              handleSeek={handleSeek}
-              isLoading={isLoading}
-              formatTime={formatTime}
-              spDurationMs={spDurationMs}
-              isPlaying={isPlaying}
-              onPlayPause={handlePlayPause}
-              onNext={handleNext}
-              onPrevious={handlePrevious}
-              volume={volume}
-              setVolume={setVolume}
-              spotifyPlayerRef={spotifyPlayerRef}
-              playClickSound={playClickSound}
-              playlistRef={playlistRef}
-              spotifyPlaylistTracks={spotifyPlaylistTracks}
-              playlist={playlist}
-              changeTrack={changeTrack}
-              formatDuration={formatDuration}
-              musicPlayerStyleId={musicPlayerStyleId}
-          />
-      );
+    return (
+      <ThemedMusicPlayer
+        playerType="expanded"
+        embedded={embedded}
+        playerRef={playerRef}
+        showPlaylist={showPlaylist}
+        setShowPlaylist={setShowPlaylist}
+        buttonsRef={buttonsRef}
+        handleButtonHover={handleButtonHover}
+        handleButtonLeave={handleButtonLeave}
+        handleButtonClick={handleButtonClick}
+        handleDesktopClose={handleDesktopClose}
+        handlePlaylistToggle={handlePlaylistToggle}
+        albumCoverRef={albumCoverRef}
+        useSpotify={useSpotify}
+        spotifyCurrentTrack={spotifyCurrentTrack}
+        currentTrack={currentTrack}
+        progress={progress}
+        handleSeek={handleSeekWrapped}
+        isLoading={isLoading}
+        formatTime={formatTime}
+        spDurationMs={spDurationMs}
+        isPlaying={isPlaying}
+        onPlayPause={handlePlayPause}
+        onNext={handleNext}
+        onPrevious={handlePrevious}
+        volume={volume}
+        setVolume={setVolume}
+        spotifyPlayerRef={spotifyPlayerRef}
+        playClickSound={playClickSound}
+        playlistRef={playlistRef}
+        spotifyPlaylistTracks={spotifyPlaylistTracks}
+        playlist={playlist}
+        changeTrack={changeTrack}
+        formatDuration={formatDuration}
+        musicPlayerStyleId={musicPlayerStyleId}
+      />
+    );
   }
 
   // Mobile/Widget version with horizontal scrolling playlist
   return (
-      <ThemedMusicPlayer
-          playerType="mobile"
-          playerRef={playerRef}
-          showPlaylist={showPlaylist}
-          setShowPlaylist={setShowPlaylist}
-          albumCoverRef={albumCoverRef}
-          isLoading={isLoading}
-          useSpotify={useSpotify}
-          spotifyCurrentTrack={spotifyCurrentTrack}
-          currentTrack={currentTrack}
-          buttonsRef={buttonsRef}
-          onPrevious={handlePrevious}
-          playClickSound={playClickSound}
-          handleButtonClick={handleButtonClick}
-          handleButtonHover={handleButtonHover}
-          handleButtonLeave={handleButtonLeave}
-          onPlayPause={handlePlayPause}
-          isPlaying={isPlaying}
-          onNext={handleNext}
-          handlePlaylistToggle={handlePlaylistToggle}
-          progress={progress}
-          handleSeek={handleSeek}
-          formatTime={formatTime}
-          spotifyPlaylistTracks={spotifyPlaylistTracks}
-          playlist={playlist}
-          changeTrack={changeTrack}
-          formatDuration={formatDuration}
-          musicPlayerStyleId={musicPlayerStyleId}
-      />
+    <ThemedMusicPlayer
+      playerType="mobile"
+      playerRef={playerRef}
+      showPlaylist={showPlaylist}
+      setShowPlaylist={setShowPlaylist}
+      albumCoverRef={albumCoverRef}
+      isLoading={isLoading}
+      useSpotify={useSpotify}
+      spotifyCurrentTrack={spotifyCurrentTrack}
+      currentTrack={currentTrack}
+      buttonsRef={buttonsRef}
+      onPrevious={handlePrevious}
+      playClickSound={playClickSound}
+      handleButtonClick={handleButtonClick}
+      handleButtonHover={handleButtonHover}
+      handleButtonLeave={handleButtonLeave}
+      onPlayPause={handlePlayPause}
+      isPlaying={isPlaying}
+      onNext={handleNext}
+      handlePlaylistToggle={handlePlaylistToggle}
+      progress={progress}
+      handleSeek={handleSeekWrapped}
+      formatTime={formatTime}
+      spotifyPlaylistTracks={spotifyPlaylistTracks}
+      playlist={playlist}
+      changeTrack={changeTrack}
+      formatDuration={formatDuration}
+      musicPlayerStyleId={musicPlayerStyleId}
+      key={`${musicPlayerStyleId}-mobile`}
+    />
   );
-}
+});
+
+export default MusicPlayerWidget;

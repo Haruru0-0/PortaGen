@@ -71,6 +71,13 @@
       "when": 1765460292382,
       "tag": "0009_flashy_warstar",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1767890560792,
+      "tag": "0010_cynical_marvel_zombies",
+      "breakpoints": true
     }
   ]
 }

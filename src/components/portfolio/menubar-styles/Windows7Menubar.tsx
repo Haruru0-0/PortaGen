@@ -5,7 +5,7 @@ import HalloGif from "@/assets/hallo.gif"
 import Image from "next/image"
 import { MenubarStyleProps } from "./types"
 
-export function Windows7Menubar({ embedded, previewMode, currentTime }: MenubarStyleProps) {
+export function Windows7Menubar({ embedded, previewMode, currentTime, menubarIcon, menubarText }: MenubarStyleProps) {
     return (
         <div className={embedded ? "absolute top-0 left-0 right-0 z-50" : "fixed top-0 left-0 right-0 z-50"}>
             <div
@@ -18,8 +18,15 @@ export function Windows7Menubar({ embedded, previewMode, currentTime }: MenubarS
             >
                 <div className="flex items-center gap-4">
                     <div className="font-semibold flex items-center">
-                        <Image src={HalloGif} alt="Logo" className="h-5 w-6 mr-2" />
-                        <span className="drop-shadow-sm">Ahmad kanaan</span>
+                        <div className="relative h-5 w-6 mr-2">
+                            <Image
+                                src={menubarIcon || HalloGif}
+                                alt="Logo"
+                                fill
+                                className="object-contain"
+                            />
+                        </div>
+                        <span className="drop-shadow-sm">{menubarText || "Ahmad kanaan"}</span>
                     </div>
                 </div>
                 <div className="flex items-center gap-3">

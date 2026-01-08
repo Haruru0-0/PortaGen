@@ -14,8 +14,7 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
         return (
             <div
                 ref={playerRef}
-                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 ${embedded ? "z-10" : "z-50"}
-                music-player`}
+                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 z-99 music-player`}
             >
                 <button
                     ref={(el) => { if (el) buttonsRef.current[0] = el }}
@@ -55,8 +54,7 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
         return (
             <div
                 ref={playerRef}
-                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 ${embedded ? "z-10" : "z-50"
-                    } bg-[#ece9d8] border-[3px] border-[#245edb] rounded-t-lg shadow-2xl overflow-hidden transition-all duration-300 font-['Tahoma']`}
+                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 z-99 bg-[#ece9d8] border-[3px] border-[#245edb] rounded-t-lg shadow-2xl overflow-hidden transition-all duration-300 font-['Tahoma']`}
                 style={{ width: "min(380px, 90vw)", height: "min(400px, 80vh)" }}
             >
                 {/* XP Title Bar */}
@@ -216,11 +214,11 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
         const displayTracks = useSpotify ? mobileProps.spotifyPlaylistTracks : mobileProps.playlist;
 
         return (
-            <div className="flex flex-col items-center justify-center w-full px-4 font-['Tahoma']">
+            <div className="flex flex-col items-center justify-center w-full px-1 font-['Tahoma']">
                 <div
                     ref={playerRef}
                     className="w-full bg-[#ece9d8] border-[3px] border-[#245edb] rounded-lg shadow-xl overflow-hidden transition-all duration-300"
-                    style={{ height: "220px" }}
+                    style={{ minHeight: "220px" }}
                 >
                     <div className="flex flex-col h-full">
                         {/* Mobile XP Title */}

@@ -31,6 +31,7 @@ const Contact = React.lazy(() => import("./contact"));
 
 import { useWindowsContext } from "@/contexts/windowsContext";
 import { useThemeStore } from "@/lib/stores/theme-store";
+import { useTheme } from "@/contexts/theme-context";
 
 export default function Desktop({ preview = false, previewMode }: { preview?: boolean; previewMode?: "desktop" | "mobile" }) {
   type WindowData = {
@@ -46,6 +47,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
   const { icons, getAllIcons, displayIcons } = useIconContext();
   const { windows: fetchedWindows, fetchWindows, displayWindows } = useWindowsContext();
   const musicPlayerStyleId = useThemeStore((state) => state.musicPlayerStyleId);
+  const { getThemeData, displayThemeData } = useTheme()
 
   useEffect(() => {
     if (currentPortfolioId && !data) {
@@ -63,7 +65,9 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
         wallpaper: data.wallpaperUrl || '',
         desktopGif: data.desktopGifUrl || '',
         mobileWidget1: data.widget1Url || '',
-        mobileWidget2: data.widget2Url || ''
+        mobileWidget2: data.widget2Url || '',
+        menubarIcon: data.menubarIconUrl || '',
+        menubarText: data.menubarText || ''
       })
     }
   }, [data, setDesktopState])
@@ -73,10 +77,11 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
       if (preview) {
         void getAllIcons(currentPortfolioId)
         void fetchWindows(currentPortfolioId)
+        void getThemeData(currentPortfolioId)
       } else {
-        console.log("we're here")
         void displayIcons(params.username, currentPortfolioId)
         void displayWindows(params.username, currentPortfolioId)
+        void displayThemeData(params.username, currentPortfolioId)
       }
     }
   }, [])
@@ -471,7 +476,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
                   <MobileSettingsBar previewMode={previewMode} embedded={preview} />
                 </div>
               </div>
-              <MusicPlayerWidget isDesktop={false} embedded={preview} musicPlayerStyleId={musicPlayerStyleId} />
+              <MusicPlayerWidget isDesktop={false} embedded={preview} musicPlayerStyleId={musicPlayerStyleId} spotifyPlaylistUrl={data?.spotifyPlaylistUrl} />
             </div>
             <Taskbar
               apps={icons.map(icon => ({ id: String(icon.id), label: icon.name, icon: icon.icon }))}

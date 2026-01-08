@@ -14,8 +14,7 @@ export function LiquidGlassMusicPlayer(props: MusicPlayerStyleProps) {
         return (
             <div
                 ref={playerRef}
-                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 ${embedded ? "z-10" : "z-50"}
-                music-player`}
+                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 z-99 music-player`}
             >
                 <button
                     ref={(el) => { if (el) buttonsRef.current[0] = el }}
@@ -53,8 +52,7 @@ export function LiquidGlassMusicPlayer(props: MusicPlayerStyleProps) {
         return (
             <div
                 ref={playerRef}
-                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 ${embedded ? "z-10" : "z-50"
-                    } glass-morphism backdrop-blur-xl bg-white/10 border border-white/20 rounded-[2rem] shadow-2xl overflow-hidden transition-all duration-500`}
+                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 z-99 glass-morphism backdrop-blur-xl bg-white/10 border border-white/20 rounded-[2rem] shadow-2xl overflow-hidden transition-all duration-500`}
                 style={{ width: "min(380px, 90vw)", height: "min(400px, 80vh)" }}
             >
                 <div className="flex flex-col h-full w-full p-6 text-white">
@@ -200,11 +198,11 @@ export function LiquidGlassMusicPlayer(props: MusicPlayerStyleProps) {
         const displayTracks = useSpotify ? mobileProps.spotifyPlaylistTracks : mobileProps.playlist;
 
         return (
-            <div className="flex flex-col items-center justify-center w-full px-4">
+            <div className="flex flex-col items-center justify-center w-full px-1">
                 <div
                     ref={playerRef}
                     className="w-full glass-morphism backdrop-blur-xl bg-white/10 border border-white/20 rounded-[2rem] shadow-2xl p-4 overflow-hidden transition-all duration-300"
-                    style={{ height: "220px" }}
+                    style={{ minHeight: "220px" }}
                 >
                     <div className="flex flex-col h-full text-white">
                         {mobileProps.showPlaylist ? (

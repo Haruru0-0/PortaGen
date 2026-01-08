@@ -5,7 +5,7 @@ import HalloGif from "@/assets/hallo.gif"
 import Image from "next/image"
 import { MenubarStyleProps } from "./types"
 
-export function WindowsXPMenubar({ embedded, previewMode, currentTime }: MenubarStyleProps) {
+export function WindowsXPMenubar({ embedded, previewMode, currentTime, menubarIcon, menubarText }: MenubarStyleProps) {
     return (
         <div
             className={embedded ? "absolute top-0 left-0 right-0 z-50 flex justify-between items-center pl-2 h-[30px]" : "fixed top-0 left-0 right-0 z-50 flex justify-between items-center pl-2 h-[30px]"}
@@ -15,8 +15,15 @@ export function WindowsXPMenubar({ embedded, previewMode, currentTime }: Menubar
         >
             <div className="flex items-center gap-4">
                 <div className="font-bold flex items-center">
-                    <Image src={HalloGif} alt="Logo" className="h-5 w-6 mr-2" />
-                    <span style={{ textShadow: "1px 1px 1px rgba(0,0,0,0.5)" }} className="text-white text-xs">Ahmad kanaan</span>
+                    <div className="relative h-5 w-6 mr-2">
+                        <Image
+                            src={menubarIcon || HalloGif}
+                            alt="Logo"
+                            fill
+                            className="object-contain"
+                        />
+                    </div>
+                    <span style={{ textShadow: "1px 1px 1px rgba(0,0,0,0.5)" }} className="text-white text-xs">{menubarText || "Ahmad kanaan"}</span>
                 </div>
             </div>
             <div

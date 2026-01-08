@@ -40,8 +40,11 @@ export interface MusicPlayerStyleProps {
     spDurationMs?: number
     isPlaying?: boolean
     onPlayPause?: () => void
+    handlePlayPause?: () => void
     onNext?: () => void
+    handleNext?: () => void
     onPrevious?: () => void
+    handlePrevious?: () => void
     volume?: number
     setVolume?: (volume: number) => void
     spotifyPlayerRef?: React.MutableRefObject<unknown>

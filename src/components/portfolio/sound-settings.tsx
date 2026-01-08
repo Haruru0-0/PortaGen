@@ -27,16 +27,18 @@ const STYLE_CONFIGS = {
     subtext: "text-slate-700",
     button: "text-slate-900 border-white/20 bg-sky-500/20 hover:bg-sky-500/30 hover:text-slate-900",
     icon: "text-blue-600",
-    hasGlassLayers: true
+    hasGlassLayers: true,
+    trigger: "relative flex items-center justify-center w-10 h-10 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 transition-colors"
   },
-  "retro": {
+  "windows-98": {
     wrapper: "bg-[#c0c0c0] border-2 border-l-white border-t-white border-r-black border-b-black shadow-md",
     content: "p-4",
     text: "text-black",
     subtext: "text-gray-700",
     button: "text-black border-2 border-l-white border-t-white border-r-black border-b-black bg-[#c0c0c0] hover:bg-[#d0d0d0]",
     icon: "text-black",
-    hasGlassLayers: false
+    hasGlassLayers: false,
+    trigger: "flex items-center justify-center w-8 h-8 bg-[#c0c0c0] border-2 border-l-white border-t-white border-r-black border-b-black active:border-l-black active:border-t-black active:border-r-white active:border-b-white text-black"
   },
   "windows-xp": {
     wrapper: "border border-[#1a3a8a] shadow-lg bg-gradient-to-b from-[#3168d5] to-[#2252b7]",
@@ -45,7 +47,8 @@ const STYLE_CONFIGS = {
     subtext: "text-white/70",
     button: "text-white border-white/30 bg-[#3d86e5] hover:bg-[#4a90e8]",
     icon: "text-white",
-    hasGlassLayers: false
+    hasGlassLayers: false,
+    trigger: "flex items-center justify-center w-8 h-8 rounded-sm hover:bg-white/10 text-white"
   },
   "windows-7": {
     wrapper: "backdrop-blur-md border border-white/20 rounded-lg shadow-xl bg-gradient-to-b from-[rgba(80,120,180,0.9)] to-[rgba(40,70,130,0.95)]",
@@ -54,7 +57,8 @@ const STYLE_CONFIGS = {
     subtext: "text-white/60",
     button: "text-white/90 border-white/20 bg-white/10 hover:bg-white/20",
     icon: "text-white/70",
-    hasGlassLayers: false
+    hasGlassLayers: false,
+    trigger: "flex items-center justify-center w-8 h-8 rounded-md hover:bg-white/20 text-white shadow-[inset_0_1px_rgba(255,255,255,0.4)]"
   },
   "pixel": {
     wrapper: "bg-[#0f380f] border-4 border-[#8bac0f]",
@@ -63,7 +67,8 @@ const STYLE_CONFIGS = {
     subtext: "text-[#8bac0f]",
     button: "text-[#9bbc0f] border-2 border-[#8bac0f] bg-[#306230] hover:bg-[#0f380f]",
     icon: "text-[#9bbc0f]",
-    hasGlassLayers: false
+    hasGlassLayers: false,
+    trigger: "flex items-center justify-center w-10 h-10 border-4 border-[#8bac0f] bg-[#0f380f] active:bg-[#306230] text-[#9bbc0f] font-pixel"
   },
   "window": {
     wrapper: "bg-black/60 backdrop-blur-xl border border-white/10 rounded-lg",
@@ -72,7 +77,8 @@ const STYLE_CONFIGS = {
     subtext: "text-white/60",
     button: "text-white/90 border-white/20 bg-white/10 hover:bg-white/20",
     icon: "text-white/70",
-    hasGlassLayers: false
+    hasGlassLayers: false,
+    trigger: "flex items-center justify-center w-9 h-9 rounded-lg border border-white/10 hover:bg-white/10 text-white/90"
   }
 };
 
@@ -202,7 +208,7 @@ export function SoundSettings({ previewMode, embedded = false }: { previewMode?:
     <Button
       variant="ghost"
       size="icon"
-      className="relative flex items-center justify-center w-10 h-10 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 transition-colors"
+      className={styleConfig.trigger}
     >
       {isSoundEnabled ? (
         <Volume2 className="h-5 w-5" />

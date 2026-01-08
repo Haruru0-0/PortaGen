@@ -5,7 +5,7 @@ import HalloGif from "@/assets/hallo.gif"
 import Image from "next/image"
 import { MenubarStyleProps } from "./types"
 
-export function LiquidGlassMenubar({ embedded, previewMode, currentTime }: MenubarStyleProps) {
+export function LiquidGlassMenubar({ embedded, previewMode, currentTime, menubarIcon, menubarText }: MenubarStyleProps) {
     return (
         <div className={embedded ? "absolute top-0 left-0 right-0 z-50" : "fixed top-0 left-0 right-0 z-50"}>
             <div className="liquidGlass-wrapper menubar h-12 flex items-center justify-between px-4 text-lg font-medium transition-none">
@@ -15,8 +15,15 @@ export function LiquidGlassMenubar({ embedded, previewMode, currentTime }: Menub
                 <div className="liquidGlass-content w-full flex items-center justify-between" style={{ color: "var(--cute-text)" }}>
                     <div className="flex items-center gap-4">
                         <div className="font-bold flex items-center">
-                            <Image src={HalloGif} alt="Logo" className="h-7 w-8 mr-2" />
-                            <p>Ahmad kanaan</p>
+                            <div className="relative h-7 w-8 mr-2">
+                                <Image
+                                    src={menubarIcon || HalloGif}
+                                    alt="Logo"
+                                    fill
+                                    className="object-contain" // Use object-contain to preserve aspect ratio
+                                />
+                            </div>
+                            <p>{menubarText || "Ahmad kanaan"}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">

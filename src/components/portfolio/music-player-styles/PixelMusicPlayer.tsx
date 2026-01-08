@@ -16,8 +16,7 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
         return (
             <div
                 ref={playerRef}
-                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 ${embedded ? "z-10" : "z-50"}
-                music-player`}
+                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 z-99 music-player`}
             >
                 <button
                     ref={(el) => { if (el) buttonsRef.current[0] = el }}
@@ -67,8 +66,7 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
         return (
             <div
                 ref={playerRef}
-                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 ${embedded ? "z-10" : "z-50"
-                    } shadow-[8px_8px_0px_rgba(0,0,0,0.4)] transition-all duration-300`}
+                className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 z-99 shadow-[8px_8px_0px_rgba(0,0,0,0.4)] transition-all duration-300`}
                 style={{
                     width: "min(380px, 90vw)",
                     height: "min(420px, 80vh)",
@@ -220,11 +218,11 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
         const displayTracks = useSpotify ? mobileProps.spotifyPlaylistTracks : mobileProps.playlist;
 
         return (
-            <div className="flex flex-col items-center justify-center w-full px-4">
+            <div className="flex flex-col items-center justify-center w-full px-1">
                 <div
                     ref={playerRef}
                     className="w-full bg-black border-4 border-white p-4 shadow-[8px_8px_0px_rgba(0,0,0,0.4)] transition-all duration-300 overflow-hidden"
-                    style={{ height: "220px" }}
+                    style={{ minHeight: "220px" }}
                 >
                     <div className="pixel-content relative flex flex-col h-full gap-3 text-white">
                         {mobileProps.showPlaylist ? (
