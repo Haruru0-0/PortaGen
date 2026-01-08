@@ -6,6 +6,7 @@ import { THEME_PRESETS, type PortfolioTheme } from "@/lib/portfolio-theme"
 import { Check } from "lucide-react"
 import { PixelButton } from "@/components/pixel-button"
 import { TASKBAR_TEMPLATES, MENUBAR_TEMPLATES, WINDOW_TEMPLATES, MUSIC_PLAYER_TEMPLATES } from "@/lib/constants/theme-templates"
+import { PORTFOLIO_FONTS } from "@/lib/fonts"
 import { useThemeStore } from "@/lib/stores/theme-store"
 import { useTheme } from "@/contexts/theme-context"
 import { useParams } from "next/navigation"
@@ -156,12 +157,15 @@ export function ThemeEditor() {
           onChange={(e) => handleFontChange(e.target.value)}
           className="w-full px-3 py-2 text-[10px] bg-input border-2 border-border focus:outline-none focus:ring-2 focus:ring-ring"
         >
-          <option value="Press Start 2P">Press Start 2P</option>
-          <option value="Orbitron">Orbitron</option>
-          <option value="Inter">Inter</option>
-          <option value="Poppins">Poppins</option>
-          <option value="Space Grotesk">Space Grotesk</option>
-          <option value="Rajdhani">Rajdhani</option>
+          {PORTFOLIO_FONTS.map((font) => (
+            <option
+              key={font.name}
+              value={font.name}
+              style={{ fontFamily: font.fontFamily }}
+            >
+              {font.name}
+            </option>
+          ))}
         </select>
       </div>
 

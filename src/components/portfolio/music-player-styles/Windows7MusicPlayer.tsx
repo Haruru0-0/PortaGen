@@ -25,7 +25,7 @@ export function Windows7MusicPlayer(props: MusicPlayerStyleProps) {
                     onMouseLeave={() => handleButtonLeave(0)}
                     disabled={isLoading}
                 >
-                    <div className="w-12 h-12 rounded-lg overflow-hidden border border-black/20">
+                    <div className="w-12 h-12 rounded-lg overflow-hidden border border-black/20 relative">
                         <Image
                             src={(useSpotify && spotifyCurrentTrack?.album?.images?.[0]?.url) || currentTrack.cover || "/placeholder.svg"}
                             alt={(useSpotify && spotifyCurrentTrack?.name) || currentTrack.title}
@@ -127,7 +127,7 @@ export function Windows7MusicPlayer(props: MusicPlayerStyleProps) {
                             </div>
                         ) : (
                             <div className="flex flex-col items-center justify-center flex-1 space-y-6">
-                                <div ref={albumCoverRef} className="w-40 h-40 md:w-48 md:h-48 rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-4 border-white/10 relative">
+                                <div ref={albumCoverRef} className="w-40 h-40 md:w-48 md:h-48 rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-4 border-white/10 relative shrink-0">
                                     <Image
                                         src={(useSpotify && spotifyCurrentTrack?.album?.images?.[0]?.url) || currentTrack.cover || "/placeholder.svg"}
                                         alt={(useSpotify && spotifyCurrentTrack?.name) || currentTrack.title}
@@ -228,7 +228,7 @@ export function Windows7MusicPlayer(props: MusicPlayerStyleProps) {
                 <div
                     ref={playerRef}
                     className="w-full bg-gradient-to-b from-blue-500/30 to-blue-900/50 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-4 overflow-hidden transition-all duration-300"
-                    style={{ height: mobileProps.showPlaylist ? "300px" : "180px" }}
+                    style={{ height: "220px" }}
                 >
                     <div className="flex flex-col h-full text-white">
                         {mobileProps.showPlaylist ? (

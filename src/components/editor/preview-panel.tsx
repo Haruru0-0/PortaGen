@@ -7,6 +7,8 @@ import { CuteSuspenseFallback } from "@/components/portfolio/suspense-fallback"
 import { useResizeObserver } from "@/hooks/use-resize-observer"
 import { useEditorUIStore } from "@/lib/stores/ui-store"
 import { useLockScreenStore } from "@/lib/stores/lock-screen-store"
+import { useThemeStore } from "@/lib/stores/theme-store"
+import { PORTFOLIO_FONTS } from "@/lib/fonts"
 
 
 export function PreviewPanel() {
@@ -21,6 +23,12 @@ export function PreviewPanel() {
         isLocked,
         setIsLocked
     } = useLockScreenStore()
+    const font = useThemeStore((state) => state.font)
+
+    // Get the font class based on the selected font name
+    const selectedFont = PORTFOLIO_FONTS.find((f) => f.name === font)
+    const fontClass = selectedFont?.className || ""
+
     return (
         <PixelCard className="">
             <div className="space-y-4 h-full flex flex-col">
@@ -86,7 +94,7 @@ export function PreviewPanel() {
                 </div>
 
                 <div className="flex-1 border-4 border-border relative bg-muted overflow-hidden" style={{ zIndex: 1 }}>
-                    <div ref={stageContainerRef} className="w-full h-full">
+                    <div ref={stageContainerRef} className={`w-full h-full ${fontClass}`}>
                         {previewMode === "mobile" ? (
                             <div className="mx-auto max-w-[375px] h-[800px]">
                                 <Suspense fallback={<CuteSuspenseFallback />}>

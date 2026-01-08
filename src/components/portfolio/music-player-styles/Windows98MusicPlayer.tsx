@@ -224,7 +224,7 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
                 <div
                     ref={playerRef}
                     className="w-full bg-[#c0c0c0] border-t-2 border-l-2 border-white border-b-2 border-r-2 border-[#808080] shadow-[1px_1px_0_0_#000] p-1 overflow-hidden transition-all duration-300"
-                    style={{ height: mobileProps.showPlaylist ? "300px" : "185px" }}
+                    style={{ height: "220px" }}
                 >
                     <div className="flex flex-col h-full">
                         {/* Mobile Title */}

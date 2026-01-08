@@ -224,7 +224,7 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
                 <div
                     ref={playerRef}
                     className="w-full bg-black border-4 border-white p-4 shadow-[8px_8px_0px_rgba(0,0,0,0.4)] transition-all duration-300 overflow-hidden"
-                    style={{ height: mobileProps.showPlaylist ? "300px" : "180px" }}
+                    style={{ height: "220px" }}
                 >
                     <div className="pixel-content relative flex flex-col h-full gap-3 text-white">
                         {mobileProps.showPlaylist ? (

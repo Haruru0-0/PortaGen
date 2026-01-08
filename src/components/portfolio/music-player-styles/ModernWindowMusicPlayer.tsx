@@ -218,7 +218,7 @@ export function ModernWindowMusicPlayer(props: MusicPlayerStyleProps) {
                 <div
                     ref={playerRef}
                     className="w-full bg-white dark:bg-zinc-900 rounded-2xl shadow-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 transition-all duration-300"
-                    style={{ height: mobileProps.showPlaylist ? "300px" : "180px" }}
+                    style={{ height: "220px" }}
                 >
                     <div className="flex flex-col h-full overflow-hidden">
                         {mobileProps.showPlaylist ? (

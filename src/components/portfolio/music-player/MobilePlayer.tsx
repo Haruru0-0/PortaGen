@@ -72,8 +72,8 @@ export const MobilePlayer: React.FC<MobilePlayerProps> = ({
         <div className="flex flex-col items-center justify-center">
             <div
                 ref={playerRef}
-                className="w-full h-[170px] rounded-3xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl bg-cover bg-center"
-                style={{ backgroundImage: `url(${MusicWallpaper.src})` }}
+                className="w-full h-[220px] rounded-3xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl bg-cover bg-center"
+                style={{ backgroundImage: `url(${MusicWallpaper.src})`, height: "220px" }}
             >
                 {!showPlaylist ? (
                     <div className="p-4 gap-4 flex flex-row items-center h-full">

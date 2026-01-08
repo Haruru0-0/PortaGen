@@ -25,7 +25,7 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
                     onMouseLeave={() => handleButtonLeave(0)}
                     disabled={isLoading}
                 >
-                    <div className="w-8 h-8 rounded border border-white/40 overflow-hidden bg-black">
+                    <div className="w-8 h-8 rounded border border-white/40 overflow-hidden bg-black relative">
                         <Image
                             src={(useSpotify && spotifyCurrentTrack?.album?.images?.[0]?.url) || currentTrack.cover || "/placeholder.svg"}
                             alt={(useSpotify && spotifyCurrentTrack?.name) || currentTrack.title}
@@ -220,7 +220,7 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
                 <div
                     ref={playerRef}
                     className="w-full bg-[#ece9d8] border-[3px] border-[#245edb] rounded-lg shadow-xl overflow-hidden transition-all duration-300"
-                    style={{ height: mobileProps.showPlaylist ? "300px" : "180px" }}
+                    style={{ height: "220px" }}
                 >
                     <div className="flex flex-col h-full">
                         {/* Mobile XP Title */}

@@ -19,7 +19,7 @@ export function LiquidGlassMusicPlayer(props: MusicPlayerStyleProps) {
             >
                 <button
                     ref={(el) => { if (el) buttonsRef.current[0] = el }}
-                    className="w-16 h-16 rounded-full glass-morphism flex items-center justify-center p-0 backdrop-blur-md border border-white/30 shadow-xl overflow-hidden active:scale-95 transition-transform"
+                    className="w-16 h-16 rounded-full glass-morphism relative flex items-center justify-center p-0 backdrop-blur-md border border-white/30 shadow-xl overflow-hidden active:scale-95 transition-transform"
                     onClick={() => { handleExpandClick(); handleButtonClick(0) }}
                     onMouseEnter={() => handleButtonHover(0)}
                     onMouseLeave={() => handleButtonLeave(0)}
@@ -204,7 +204,7 @@ export function LiquidGlassMusicPlayer(props: MusicPlayerStyleProps) {
                 <div
                     ref={playerRef}
                     className="w-full glass-morphism backdrop-blur-xl bg-white/10 border border-white/20 rounded-[2rem] shadow-2xl p-4 overflow-hidden transition-all duration-300"
-                    style={{ height: mobileProps.showPlaylist ? "300px" : "180px" }}
+                    style={{ height: "220px" }}
                 >
                     <div className="flex flex-col h-full text-white">
                         {mobileProps.showPlaylist ? (
