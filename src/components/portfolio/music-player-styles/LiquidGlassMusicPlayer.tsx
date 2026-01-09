@@ -79,109 +79,126 @@ export function LiquidGlassMusicPlayer(props: MusicPlayerStyleProps) {
                     </div>
 
                     <div className="relative flex-1 min-h-0 overflow-hidden">
-                        {expandedProps.showPlaylist ? (
-                            <div ref={expandedProps.playlistRef} className="w-full h-full flex flex-col min-h-0">
-                                <h4 className="text-[10px] font-bold mb-4 uppercase tracking-widest opacity-50">Queue</h4>
-                                <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar scrollbar-thin scrollbar-thumb-white/20">
-                                    {displayTracks.map((track: any) => {
-                                        const isCurrent = (useSpotify ? spotifyCurrentTrack?.id : currentTrack.id) === track.id;
-                                        return (
-                                            <div
-                                                key={track.id}
-                                                className={`flex items-center gap-4 p-3 rounded-2xl transition-all cursor-pointer group ${isCurrent ? 'bg-white/20 border border-white/10' : 'hover:bg-white/5 border border-transparent'}`}
-                                                onClick={() => !useSpotify && expandedProps.changeTrack(track)}
-                                            >
-                                                <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/10">
-                                                    <Image
-                                                        src={(useSpotify ? track.album?.images?.[0]?.url : track.cover) || "/placeholder.svg"}
-                                                        alt={useSpotify ? track.name : track.title}
-                                                        width={40}
-                                                        height={40}
-                                                        className="object-cover w-full h-full opacity-80"
-                                                    />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <p className={`text-xs font-medium truncate ${isCurrent ? 'text-white' : 'text-white/70'}`}>
-                                                        {useSpotify ? track.name : track.title}
-                                                    </p>
-                                                    <p className="text-[10px] text-white/40 truncate">
-                                                        {useSpotify ? track.artists?.map((a: any) => a.name).join(", ") : track.artist}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                        {props.isSpotifyFallback && props.spotifyEmbedUrl ? (
+                            <div className="w-full h-full rounded-[2rem] overflow-hidden border border-white/10">
+                                <iframe
+                                    src={props.spotifyEmbedUrl}
+                                    width="100%"
+                                    height="100%"
+                                    frameBorder={0}
+                                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                    loading="lazy"
+                                />
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center justify-center h-full space-y-8">
-                                <div ref={albumCoverRef} className="w-48 h-48 md:w-56 md:h-56 rounded-[3rem] overflow-hidden shadow-2xl border border-white/20 relative group">
-                                    <Image
-                                        src={(useSpotify && spotifyCurrentTrack?.album?.images?.[0]?.url) || currentTrack.cover || "/placeholder.svg"}
-                                        alt={(useSpotify && spotifyCurrentTrack?.name) || currentTrack.title}
-                                        className="w-full h-full object-cover"
-                                        fill
-                                        sizes="(max-width: 768px) 192px, 224px"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-60" />
+                            expandedProps.showPlaylist ? (
+                                <div ref={expandedProps.playlistRef} className="w-full h-full flex flex-col min-h-0">
+                                    <h4 className="text-[10px] font-bold mb-4 uppercase tracking-widest opacity-50">Queue</h4>
+                                    <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar scrollbar-thin scrollbar-thumb-white/20">
+                                        {displayTracks.map((track: any) => {
+                                            const isCurrent = (useSpotify ? spotifyCurrentTrack?.id : currentTrack.id) === track.id;
+                                            return (
+                                                <div
+                                                    key={track.id}
+                                                    className={`flex items-center gap-4 p-3 rounded-2xl transition-all cursor-pointer group ${isCurrent ? 'bg-white/20 border border-white/10' : 'hover:bg-white/5 border border-transparent'}`}
+                                                    onClick={() => !useSpotify && expandedProps.changeTrack(track)}
+                                                >
+                                                    <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/10">
+                                                        <Image
+                                                            src={(useSpotify ? track.album?.images?.[0]?.url : track.cover) || "/placeholder.svg"}
+                                                            alt={useSpotify ? track.name : track.title}
+                                                            width={40}
+                                                            height={40}
+                                                            className="object-cover w-full h-full opacity-80"
+                                                        />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className={`text-xs font-medium truncate ${isCurrent ? 'text-white' : 'text-white/70'}`}>
+                                                            {useSpotify ? track.name : track.title}
+                                                        </p>
+                                                        <p className="text-[10px] text-white/40 truncate">
+                                                            {useSpotify ? track.artists?.map((a: any) => a.name).join(", ") : track.artist}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                                <div className="text-center space-y-2 w-full">
-                                    <h4 className="font-bold text-xl md:text-2xl truncate px-4 tracking-tight">
-                                        {(useSpotify && spotifyCurrentTrack?.name) || currentTrack.title}
-                                    </h4>
-                                    <p className="text-white/50 text-xs tracking-wide uppercase font-medium">
-                                        {(useSpotify && spotifyCurrentTrack?.artists?.map((a) => a.name).join(", ")) || currentTrack.artist}
-                                    </p>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center h-full space-y-8">
+                                    <div ref={albumCoverRef} className="w-48 h-48 md:w-56 md:h-56 rounded-[3rem] overflow-hidden shadow-2xl border border-white/20 relative group">
+                                        <Image
+                                            src={(useSpotify && spotifyCurrentTrack?.album?.images?.[0]?.url) || currentTrack.cover || "/placeholder.svg"}
+                                            alt={(useSpotify && spotifyCurrentTrack?.name) || currentTrack.title}
+                                            className="w-full h-full object-cover"
+                                            fill
+                                            sizes="(max-width: 768px) 192px, 224px"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-60" />
+                                    </div>
+                                    <div className="text-center space-y-2 w-full">
+                                        <h4 className="font-bold text-xl md:text-2xl truncate px-4 tracking-tight">
+                                            {(useSpotify && spotifyCurrentTrack?.name) || currentTrack.title}
+                                        </h4>
+                                        <p className="text-white/50 text-xs tracking-wide uppercase font-medium">
+                                            {(useSpotify && spotifyCurrentTrack?.artists?.map((a) => a.name).join(", ")) || currentTrack.artist}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
+                            )
                         )}
                     </div>
 
                     {/* Progress */}
-                    <div className="mt-8 space-y-3 shrink-0">
-                        <Slider
-                            value={[expandedProps.progress]}
-                            max={100}
-                            step={0.1}
-                            onValueChange={expandedProps.handleSeek}
-                            disabled={isLoading}
-                            trackClassName="bg-white/10 h-1.5 rounded-full"
-                            rangeClassName="bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full shadow-[0_0_15px_rgba(96,165,250,0.5)]"
-                            thumbClassName="h-4 w-4 bg-white shadow-xl ring-4 ring-white/10 cursor-pointer active:scale-125 transition-transform"
-                        />
-                        <div className="flex justify-between text-[10px] font-bold text-white/30 tracking-widest tabular-nums uppercase">
-                            <span>{expandedProps.formatTime(expandedProps.progress)}</span>
-                            <span>{currentTrack.duration}</span>
+                    {!props.isSpotifyFallback && (
+                        <div className="mt-8 space-y-3 shrink-0">
+                            <Slider
+                                value={[expandedProps.progress]}
+                                max={100}
+                                step={0.1}
+                                onValueChange={expandedProps.handleSeek}
+                                disabled={isLoading}
+                                trackClassName="bg-white/10 h-1.5 rounded-full"
+                                rangeClassName="bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full shadow-[0_0_15px_rgba(96,165,250,0.5)]"
+                                thumbClassName="h-4 w-4 bg-white shadow-xl ring-4 ring-white/10 cursor-pointer active:scale-125 transition-transform"
+                            />
+                            <div className="flex justify-between text-[10px] font-bold text-white/30 tracking-widest tabular-nums uppercase">
+                                <span>{expandedProps.formatTime(expandedProps.progress)}</span>
+                                <span>{currentTrack.duration}</span>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Controls */}
-                    <div className="flex justify-between items-center mt-6 shrink-0 px-2">
-                        <button
-                            className="w-12 h-12 rounded-full border border-white/10 hover:bg-white/5 flex items-center justify-center transition-all active:scale-90"
-                            onClick={expandedProps.onPrevious}
-                        >
-                            <SkipBack className="w-5 h-5 opacity-80" />
-                        </button>
-                        <button
-                            className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center shadow-2xl active:scale-90 transition-all"
-                            onClick={expandedProps.onPlayPause}
-                        >
-                            {isLoading ? (
-                                <Loader2 className="w-8 h-8 animate-spin" />
-                            ) : expandedProps.isPlaying ? (
-                                <Pause className="w-8 h-8 fill-current" />
-                            ) : (
-                                <Play className="w-8 h-8 fill-current ml-1" />
-                            )}
-                        </button>
-                        <button
-                            className="w-12 h-12 rounded-full border border-white/10 hover:bg-white/5 flex items-center justify-center transition-all active:scale-90"
-                            onClick={expandedProps.onNext}
-                        >
-                            <SkipForward className="w-5 h-5 opacity-80" />
-                        </button>
-                    </div>
+                    {!props.isSpotifyFallback && (
+                        <div className="flex justify-between items-center mt-6 shrink-0 px-2">
+                            <button
+                                className="w-12 h-12 rounded-full border border-white/10 hover:bg-white/5 flex items-center justify-center transition-all active:scale-90"
+                                onClick={expandedProps.onPrevious}
+                            >
+                                <SkipBack className="w-5 h-5 opacity-80" />
+                            </button>
+                            <button
+                                className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center shadow-2xl active:scale-90 transition-all"
+                                onClick={expandedProps.onPlayPause}
+                            >
+                                {isLoading ? (
+                                    <Loader2 className="w-8 h-8 animate-spin" />
+                                ) : expandedProps.isPlaying ? (
+                                    <Pause className="w-8 h-8 fill-current" />
+                                ) : (
+                                    <Play className="w-8 h-8 fill-current ml-1" />
+                                )}
+                            </button>
+                            <button
+                                className="w-12 h-12 rounded-full border border-white/10 hover:bg-white/5 flex items-center justify-center transition-all active:scale-90"
+                                onClick={expandedProps.onNext}
+                            >
+                                <SkipForward className="w-5 h-5 opacity-80" />
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         )

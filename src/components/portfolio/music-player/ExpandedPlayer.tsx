@@ -45,6 +45,8 @@ interface ExpandedPlayerProps {
     playlist: Track[];
     changeTrack: (track: Track) => void;
     formatDuration: (ms: number) => string;
+    isSpotifyFallback?: boolean;
+    spotifyEmbedUrl?: string;
 }
 
 export const ExpandedPlayer: React.FC<ExpandedPlayerProps> = ({
@@ -80,6 +82,8 @@ export const ExpandedPlayer: React.FC<ExpandedPlayerProps> = ({
     playlist,
     changeTrack,
     formatDuration,
+    isSpotifyFallback,
+    spotifyEmbedUrl,
 }) => {
 
     // Playlist animation
@@ -118,34 +122,10 @@ export const ExpandedPlayer: React.FC<ExpandedPlayerProps> = ({
             }}
         >
             <div className="relative flex h-full w-full overflow-hidden">
-                {/* Main Player */}
-                <div
-                    className={`p-6 flex flex-col transition-all duration-300 ${showPlaylist ? "w-full" : "flex-1"
-                        }`}
-                >
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-bold text-gray-800 dark:text-white">
-                            Now Playing
-                        </h3>
-                        <div className="flex gap-2">
-                            <button
-                                ref={(el) => {
-                                    if (el) buttonsRef.current[1] = el;
-                                }}
-                                className="w-12 relative text-center cursor-pointer p-0 hover:bg-transparent dark:hover:bg-transparent"
-                                onClick={() => {
-                                    handlePlaylistToggle();
-                                    handleButtonClick(1);
-                                }}
-                                onMouseEnter={() => handleButtonHover(1)}
-                                onMouseLeave={() => handleButtonLeave(1)}
-                            >
-                                <Image src={PlaylistIcon} alt="Playlist Icon" />
-                                <div className="absolute top-[21%] left-[30%] transform -translate-x-1/2 -translate-y-1/2 text-[#74cef7]">
-                                    <List className="h-4 w-4" />
-                                </div>
-                            </button>
-                            <button
+                {isSpotifyFallback && spotifyEmbedUrl ? (
+                    <div className="flex flex-col h-full w-full">
+                        <div className="flex justify-end p-2">
+                             <button
                                 ref={(el) => {
                                     if (el) buttonsRef.current[2] = el;
                                 }}
@@ -163,69 +143,130 @@ export const ExpandedPlayer: React.FC<ExpandedPlayerProps> = ({
                                 </div>
                             </button>
                         </div>
+                        <div className="flex-1 px-4 pb-4">
+                            <iframe
+                                src={spotifyEmbedUrl}
+                                width="100%"
+                                height="100%"
+                                frameBorder={0}
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                loading="lazy"
+                                className="rounded-xl"
+                            />
+                        </div>
                     </div>
+                ) : (
+                    <>
+                        {/* Main Player */}
+                        <div
+                            className={`p-6 flex flex-col transition-all duration-300 ${showPlaylist ? "w-full" : "flex-1"
+                                }`}
+                        >
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-lg font-bold text-gray-800 dark:text-white">
+                                    Now Playing
+                                </h3>
+                                <div className="flex gap-2">
+                                    <button
+                                        ref={(el) => {
+                                            if (el) buttonsRef.current[1] = el;
+                                        }}
+                                        className="w-12 relative text-center cursor-pointer p-0 hover:bg-transparent dark:hover:bg-transparent"
+                                        onClick={() => {
+                                            handlePlaylistToggle();
+                                            handleButtonClick(1);
+                                        }}
+                                        onMouseEnter={() => handleButtonHover(1)}
+                                        onMouseLeave={() => handleButtonLeave(1)}
+                                    >
+                                        <Image src={PlaylistIcon} alt="Playlist Icon" />
+                                        <div className="absolute top-[21%] left-[30%] transform -translate-x-1/2 -translate-y-1/2 text-[#74cef7]">
+                                            <List className="h-4 w-4" />
+                                        </div>
+                                    </button>
+                                    <button
+                                        ref={(el) => {
+                                            if (el) buttonsRef.current[2] = el;
+                                        }}
+                                        className="w-10 relative text-center cursor-pointer p-0 hover:bg-transparent dark:hover:bg-transparent"
+                                        onClick={() => {
+                                            handleDesktopClose();
+                                            handleButtonClick(2);
+                                        }}
+                                        onMouseEnter={() => handleButtonHover(2)}
+                                        onMouseLeave={() => handleButtonLeave(2)}
+                                    >
+                                        <Image src={CinamonExit} alt="Cinamon Exit" />
+                                        <div className="absolute top-[55%] left-[46%] transform -translate-x-1/2 -translate-y-1/2 text-[#74cef7]">
+                                            <X className="h-4 w-4" />
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
 
-                    <SongInfo
-                        track={currentTrack}
-                        useSpotify={useSpotify}
-                        spotifyTrack={spotifyCurrentTrack}
-                        albumCoverRef={albumCoverRef}
-                    />
+                            <SongInfo
+                                track={currentTrack}
+                                useSpotify={useSpotify}
+                                spotifyTrack={spotifyCurrentTrack}
+                                albumCoverRef={albumCoverRef}
+                            />
 
-                    <ProgressBar
-                        progress={progress}
-                        duration={currentTrack.duration}
-                        durationMs={useSpotify ? spDurationMs : undefined}
-                        onSeek={handleSeek}
-                        formatTime={formatTime}
-                        isLoading={isLoading}
-                    />
+                            <ProgressBar
+                                progress={progress}
+                                duration={currentTrack.duration}
+                                durationMs={useSpotify ? spDurationMs : undefined}
+                                onSeek={handleSeek}
+                                formatTime={formatTime}
+                                isLoading={isLoading}
+                            />
 
-                    <PlayerControls
-                        isPlaying={isPlaying}
-                        isLoading={isLoading}
-                        onPlayPause={onPlayPause}
-                        onNext={onNext}
-                        onPrevious={onPrevious}
-                        buttonsRef={buttonsRef}
-                        handleButtonHover={handleButtonHover}
-                        handleButtonLeave={handleButtonLeave}
-                        handleButtonClick={handleButtonClick}
-                    />
+                            <PlayerControls
+                                isPlaying={isPlaying}
+                                isLoading={isLoading}
+                                onPlayPause={onPlayPause}
+                                onNext={onNext}
+                                onPrevious={onPrevious}
+                                buttonsRef={buttonsRef}
+                                handleButtonHover={handleButtonHover}
+                                handleButtonLeave={handleButtonLeave}
+                                handleButtonClick={handleButtonClick}
+                            />
 
-                    <VolumeControl
-                        volume={volume}
-                        onVolumeChange={(value) => {
-                            const v = value[0];
-                            setVolume(v);
-                            if (useSpotify && spotifyPlayerRef.current) {
-                                const vol = Math.min(1, Math.max(0, v / 100));
-                                spotifyPlayerRef.current.setVolume(vol);
-                            }
-                            playClickSound();
-                        }}
-                        isLoading={isLoading}
-                    />
-                </div>
+                            <VolumeControl
+                                volume={volume}
+                                onVolumeChange={(value) => {
+                                    const v = value[0];
+                                    setVolume(v);
+                                    if (useSpotify && spotifyPlayerRef.current) {
+                                        const vol = Math.min(1, Math.max(0, v / 100));
+                                        spotifyPlayerRef.current.setVolume(vol);
+                                    }
+                                    playClickSound();
+                                }}
+                                isLoading={isLoading}
+                            />
+                        </div>
 
-                {/* Playlist Panel */}
-                {showPlaylist && (
-                    <div ref={playlistRef} className="absolute inset-0 z-20">
-                        <Playlist
-                            tracks={playlist}
-                            currentTrackId={currentTrack.id}
-                            onTrackSelect={changeTrack}
-                            useSpotify={useSpotify}
-                            spotifyPlaylistTracks={spotifyPlaylistTracks}
-                            spotifyCurrentTrack={spotifyCurrentTrack}
-                            formatDuration={formatDuration}
-                            onClose={() => setShowPlaylist(false)}
-                            buttonsRef={buttonsRef}
-                            handleButtonHover={handleButtonHover}
-                            handleButtonLeave={handleButtonLeave}
-                            handleButtonClick={handleButtonClick}
-                        />
-                    </div>
+                        {/* Playlist Panel */}
+                        {showPlaylist && (
+                            <div ref={playlistRef} className="absolute inset-0 z-20">
+                                <Playlist
+                                    tracks={playlist}
+                                    currentTrackId={currentTrack.id}
+                                    onTrackSelect={changeTrack}
+                                    useSpotify={useSpotify}
+                                    spotifyPlaylistTracks={spotifyPlaylistTracks}
+                                    spotifyCurrentTrack={spotifyCurrentTrack}
+                                    formatDuration={formatDuration}
+                                    onClose={() => setShowPlaylist(false)}
+                                    buttonsRef={buttonsRef}
+                                    handleButtonHover={handleButtonHover}
+                                    handleButtonLeave={handleButtonLeave}
+                                    handleButtonClick={handleButtonClick}
+                                />
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

@@ -103,105 +103,120 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
                 </div>
 
                 <div className="relative flex flex-col h-[calc(100%-48px)] w-full p-2 gap-4">
-                    <div className="flex flex-col flex-1 min-h-0">
-                        {expandedProps.showPlaylist ? (
-                            <div ref={expandedProps.playlistRef} className="w-full h-full flex flex-col min-h-0">
-                                <h4 className="text-[#00ffff] font-pixel text-[10px] mb-2 uppercase tracking-widest pl-1">TRACK LIST</h4>
-                                <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar scrollbar-pixel">
-                                    {displayTracks.map((track: any) => {
-                                        const isCurrent = (useSpotify ? spotifyCurrentTrack?.id : currentTrack.id) === track.id;
-                                        return (
-                                            <div
-                                                key={track.id}
-                                                className={`flex items-center gap-3 p-2 border-2 transition-all cursor-pointer ${isCurrent ? 'bg-[#00ff00] border-white' : 'bg-zinc-900 border-transparent hover:border-[#ff00ff]'}`}
-                                                onClick={() => !useSpotify && expandedProps.changeTrack(track)}
-                                            >
-                                                <div className="w-8 h-8 border-2 border-white flex-shrink-0">
-                                                    <Image
-                                                        src={(useSpotify ? track.album?.images?.[0]?.url : track.cover) || "/placeholder.svg"}
-                                                        alt={useSpotify ? track.name : track.title}
-                                                        width={32}
-                                                        height={32}
-                                                        className="object-cover w-full h-full pixelated"
-                                                    />
-                                                </div>
-                                                <p className={`text-[10px] font-pixel truncate flex-1 ${isCurrent ? 'text-black' : 'text-white'}`}>
-                                                    {useSpotify ? track.name : track.title}
-                                                </p>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col flex-1 h-full min-h-0 items-center justify-center gap-4">
-                                <div ref={albumCoverRef} className="w-32 h-32 md:w-40 md:h-40 border-4 border-white overflow-hidden bg-zinc-900 flex items-center justify-center relative shadow-[4px_4px_0px_#444] shrink-0">
-                                    <Image
-                                        src={(useSpotify && spotifyCurrentTrack?.album?.images?.[0]?.url) || currentTrack.cover || "/placeholder.svg"}
-                                        alt={(useSpotify && spotifyCurrentTrack?.name) || currentTrack.title}
-                                        className="w-full h-full object-cover pixelated"
-                                        width={160}
-                                        height={160}
-                                    />
-                                </div>
-                                <div className="flex flex-col items-center text-center w-full gap-2 min-w-0">
-                                    <h4 className="font-bold text-sm truncate max-w-full text-[#00ff00] font-pixel uppercase tracking-wider">
-                                        {(useSpotify && spotifyCurrentTrack?.name) || currentTrack.title}
-                                    </h4>
-                                    <p className="text-[10px] truncate max-w-full text-[#00ffff] font-pixel">
-                                        {(useSpotify && spotifyCurrentTrack?.artists?.map((a) => a.name).join(", ")) || currentTrack.artist}
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Pixel Progress Area */}
-                    <div className="space-y-1 shrink-0">
-                        <Slider
-                            value={[expandedProps.progress]}
-                            max={100}
-                            step={0.1}
-                            className="flex-1"
-                            onValueChange={expandedProps.handleSeek}
-                            disabled={isLoading}
-                            trackClassName="bg-zinc-800 h-4 border-2 border-white rounded-none"
-                            rangeClassName="bg-[#ffff00]"
-                            thumbClassName="h-6 w-3 bg-white border-2 border-black rounded-none shadow-none ring-0 focus:ring-0"
-                        />
-                        <div className="flex justify-between text-[8px] text-white font-pixel px-1 uppercase mt-1">
-                            <span>{expandedProps.formatTime(expandedProps.progress)}</span>
-                            <span>{currentTrack.duration}</span>
+                    {props.isSpotifyFallback && props.spotifyEmbedUrl ? (
+                        <div className="w-full h-full border-4 border-white bg-zinc-900">
+                            <iframe
+                                src={props.spotifyEmbedUrl}
+                                width="100%"
+                                height="100%"
+                                frameBorder={0}
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                loading="lazy"
+                            />
                         </div>
-                    </div>
+                    ) : (
+                        <>
+                            <div className="flex flex-col flex-1 min-h-0">
+                                {expandedProps.showPlaylist ? (
+                                    <div ref={expandedProps.playlistRef} className="w-full h-full flex flex-col min-h-0">
+                                        <h4 className="text-[#00ffff] font-pixel text-[10px] mb-2 uppercase tracking-widest pl-1">TRACK LIST</h4>
+                                        <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar scrollbar-pixel">
+                                            {displayTracks.map((track: any) => {
+                                                const isCurrent = (useSpotify ? spotifyCurrentTrack?.id : currentTrack.id) === track.id;
+                                                return (
+                                                    <div
+                                                        key={track.id}
+                                                        className={`flex items-center gap-3 p-2 border-2 transition-all cursor-pointer ${isCurrent ? 'bg-[#00ff00] border-white' : 'bg-zinc-900 border-transparent hover:border-[#ff00ff]'}`}
+                                                        onClick={() => !useSpotify && expandedProps.changeTrack(track)}
+                                                    >
+                                                        <div className="w-8 h-8 border-2 border-white flex-shrink-0">
+                                                            <Image
+                                                                src={(useSpotify ? track.album?.images?.[0]?.url : track.cover) || "/placeholder.svg"}
+                                                                alt={useSpotify ? track.name : track.title}
+                                                                width={32}
+                                                                height={32}
+                                                                className="object-cover w-full h-full pixelated"
+                                                            />
+                                                        </div>
+                                                        <p className={`text-[10px] font-pixel truncate flex-1 ${isCurrent ? 'text-black' : 'text-white'}`}>
+                                                            {useSpotify ? track.name : track.title}
+                                                        </p>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col flex-1 h-full min-h-0 items-center justify-center gap-4">
+                                        <div ref={albumCoverRef} className="w-32 h-32 md:w-40 md:h-40 border-4 border-white overflow-hidden bg-zinc-900 flex items-center justify-center relative shadow-[4px_4px_0px_#444] shrink-0">
+                                            <Image
+                                                src={(useSpotify && spotifyCurrentTrack?.album?.images?.[0]?.url) || currentTrack.cover || "/placeholder.svg"}
+                                                alt={(useSpotify && spotifyCurrentTrack?.name) || currentTrack.title}
+                                                className="w-full h-full object-cover pixelated"
+                                                width={160}
+                                                height={160}
+                                            />
+                                        </div>
+                                        <div className="flex flex-col items-center text-center w-full gap-2 min-w-0">
+                                            <h4 className="font-bold text-sm truncate max-w-full text-[#00ff00] font-pixel uppercase tracking-wider">
+                                                {(useSpotify && spotifyCurrentTrack?.name) || currentTrack.title}
+                                            </h4>
+                                            <p className="text-[10px] truncate max-w-full text-[#00ffff] font-pixel">
+                                                {(useSpotify && spotifyCurrentTrack?.artists?.map((a) => a.name).join(", ")) || currentTrack.artist}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
 
-                    {/* Pixel Controls */}
-                    <div className="flex justify-center items-center gap-4 mt-auto shrink-0 pb-1">
-                        <button
-                            className="w-10 h-10 flex items-center justify-center bg-white border-2 border-black active:translate-y-1 active:shadow-none shadow-[2px_2px_0px_#444]"
-                            onClick={expandedProps.onPrevious}
-                        >
-                            <SkipBack className="w-5 h-5 text-black fill-black" />
-                        </button>
-                        <button
-                            className="w-14 h-14 flex items-center justify-center bg-[#00ff00] border-4 border-white active:translate-y-1 active:shadow-none shadow-[4px_4px_0px_rgba(0,255,0,0.3)]"
-                            onClick={expandedProps.onPlayPause}
-                        >
-                            {isLoading ? (
-                                <Loader2 className="w-7 h-7 text-black animate-spin" />
-                            ) : expandedProps.isPlaying ? (
-                                <Pause className="w-7 h-7 text-black fill-black" />
-                            ) : (
-                                <Play className="w-7 h-7 text-black fill-black ml-1" />
-                            )}
-                        </button>
-                        <button
-                            className="w-10 h-10 flex items-center justify-center bg-white border-2 border-black active:translate-y-1 active:shadow-none shadow-[2px_2px_0px_#444]"
-                            onClick={expandedProps.onNext}
-                        >
-                            <SkipForward className="w-5 h-5 text-black fill-black" />
-                        </button>
-                    </div>
+                            {/* Pixel Progress Area */}
+                            <div className="space-y-1 shrink-0">
+                                <Slider
+                                    value={[expandedProps.progress]}
+                                    max={100}
+                                    step={0.1}
+                                    className="flex-1"
+                                    onValueChange={expandedProps.handleSeek}
+                                    disabled={isLoading}
+                                    trackClassName="bg-zinc-800 h-4 border-2 border-white rounded-none"
+                                    rangeClassName="bg-[#ffff00]"
+                                    thumbClassName="h-6 w-3 bg-white border-2 border-black rounded-none shadow-none ring-0 focus:ring-0"
+                                />
+                                <div className="flex justify-between text-[8px] text-white font-pixel px-1 uppercase mt-1">
+                                    <span>{expandedProps.formatTime(expandedProps.progress)}</span>
+                                    <span>{currentTrack.duration}</span>
+                                </div>
+                            </div>
+
+                            {/* Pixel Controls */}
+                            <div className="flex justify-center items-center gap-4 mt-auto shrink-0 pb-1">
+                                <button
+                                    className="w-10 h-10 flex items-center justify-center bg-white border-2 border-black active:translate-y-1 active:shadow-none shadow-[2px_2px_0px_#444]"
+                                    onClick={expandedProps.onPrevious}
+                                >
+                                    <SkipBack className="w-5 h-5 text-black fill-black" />
+                                </button>
+                                <button
+                                    className="w-14 h-14 flex items-center justify-center bg-[#00ff00] border-4 border-white active:translate-y-1 active:shadow-none shadow-[4px_4px_0px_rgba(0,255,0,0.3)]"
+                                    onClick={expandedProps.onPlayPause}
+                                >
+                                    {isLoading ? (
+                                        <Loader2 className="w-7 h-7 text-black animate-spin" />
+                                    ) : expandedProps.isPlaying ? (
+                                        <Pause className="w-7 h-7 text-black fill-black" />
+                                    ) : (
+                                        <Play className="w-7 h-7 text-black fill-black ml-1" />
+                                    )}
+                                </button>
+                                <button
+                                    className="w-10 h-10 flex items-center justify-center bg-white border-2 border-black active:translate-y-1 active:shadow-none shadow-[2px_2px_0px_#444]"
+                                    onClick={expandedProps.onNext}
+                                >
+                                    <SkipForward className="w-5 h-5 text-black fill-black" />
+                                </button>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         )

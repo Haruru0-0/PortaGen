@@ -135,6 +135,8 @@ function ThemedMusicPlayer(props: ThemedMusicPlayerProps) {
     handleNext: restProps.onNext || (() => { }),
     handlePrevious: restProps.onPrevious || (() => { }),
     previewMode: restProps.previewMode || "desktop",
+    isSpotifyFallback: restProps.isSpotifyFallback || false,
+    spotifyEmbedUrl: restProps.spotifyEmbedUrl || "",
   };
 
   return getMusicPlayerJSX(musicPlayerStyleId, musicPlayerProps);
@@ -847,41 +849,6 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
     );
   }
 
-  // Desktop expanded panel - Spotify embed fallback when SDK fails
-  if (
-    isDesktop &&
-    isExpanded &&
-    spotifyEmbedUrl &&
-    useSpotify &&
-    spotifyFailed
-  ) {
-    return (
-      <div
-        ref={playerRef}
-        className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 ${embedded ? "z-10" : "z-50"
-          } backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 overflow-hidden bg-cover bg-center`}
-        style={{
-          width: "min(380px, 90vw)",
-          height: "min(300px, 60vh)",
-          backgroundImage: `url(${MusicWallpaper.src})`,
-        }}
-      >
-        <div className="flex h-full w-full">
-          <div className="flex-1 p-4">
-            <iframe
-              src={spotifyEmbedUrl}
-              width="100%"
-              height="100%"
-              frameBorder={0}
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-              loading="lazy"
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // Desktop expanded panel
   if (isDesktop && isExpanded) {
     return (
@@ -920,6 +887,8 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
         changeTrack={changeTrack}
         formatDuration={formatDuration}
         musicPlayerStyleId={musicPlayerStyleId}
+        isSpotifyFallback={useSpotify && spotifyFailed}
+        spotifyEmbedUrl={spotifyEmbedUrl}
       />
     );
   }

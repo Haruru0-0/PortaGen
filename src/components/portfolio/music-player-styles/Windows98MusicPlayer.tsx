@@ -79,129 +79,144 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
                 </div>
 
                 <div className="flex-1 min-h-0 flex flex-col p-1 gap-2">
-                    <div className="flex-1 min-h-0 flex flex-col border-t-2 border-l-2 border-[#808080] border-b-2 border-r-2 border-white bg-black relative overflow-hidden">
-                        {expandedProps.showPlaylist ? (
-                            <div ref={expandedProps.playlistRef} className="w-full h-full flex flex-col min-h-0 bg-white p-2">
-                                <div className="flex justify-between items-center mb-1 pb-1 border-b border-black">
-                                    <span className="text-[9px] font-bold text-black uppercase">Playlist</span>
+                    {props.isSpotifyFallback && props.spotifyEmbedUrl ? (
+                        <div className="flex-1 min-h-0 border-t-2 border-l-2 border-[#808080] border-b-2 border-r-2 border-white bg-black relative overflow-hidden">
+                            <iframe
+                                src={props.spotifyEmbedUrl}
+                                width="100%"
+                                height="100%"
+                                frameBorder={0}
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                loading="lazy"
+                            />
+                        </div>
+                    ) : (
+                        <>
+                            <div className="flex-1 min-h-0 flex flex-col border-t-2 border-l-2 border-[#808080] border-b-2 border-r-2 border-white bg-black relative overflow-hidden">
+                                {expandedProps.showPlaylist ? (
+                                    <div ref={expandedProps.playlistRef} className="w-full h-full flex flex-col min-h-0 bg-white p-2">
+                                        <div className="flex justify-between items-center mb-1 pb-1 border-b border-black">
+                                            <span className="text-[9px] font-bold text-black uppercase">Playlist</span>
+                                            <button
+                                                className="w-4 h-3.5 bg-[#c0c0c0] border-t border-l border-white border-b border-r border-[#808080] flex items-center justify-center"
+                                                onClick={expandedProps.handlePlaylistToggle}
+                                            >
+                                                <X className="w-2 h-2 text-black" />
+                                            </button>
+                                        </div>
+                                        <div className="flex-1 overflow-y-auto pr-1 space-y-0.5 custom-scrollbar scrollbar-win98">
+                                            {displayTracks.map((track: any) => {
+                                                const isCurrent = (useSpotify ? spotifyCurrentTrack?.id : currentTrack.id) === track.id;
+                                                return (
+                                                    <div
+                                                        key={track.id}
+                                                        className={`flex items-center gap-2 p-1 transition-all cursor-pointer ${isCurrent ? 'bg-[#000080] text-white' : 'text-black hover:bg-[#c0c0c0]'}`}
+                                                        onClick={() => !useSpotify && expandedProps.changeTrack(track)}
+                                                    >
+                                                        <div className="w-6 h-6 shrink-0 border border-[#808080]">
+                                                            <Image
+                                                                src={(useSpotify ? track.album?.images?.[0]?.url : track.cover) || "/placeholder.svg"}
+                                                                alt={useSpotify ? track.name : track.title}
+                                                                width={24}
+                                                                height={24}
+                                                                className="object-cover w-full h-full pixelated"
+                                                            />
+                                                        </div>
+                                                        <p className="text-[10px] truncate leading-tight">
+                                                            {useSpotify ? track.name : track.title}
+                                                        </p>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center h-full gap-4">
+                                        <div ref={albumCoverRef} className="w-36 h-36 border-t font-bold border-l-2 border-[#808080] border-b-2 border-r-2 border-[#c0c0c0] relative shadow-[inset_1px_1px_0_0_#000,inset_-1px_-1px_0_0_#fff]">
+                                            <Image
+                                                src={(useSpotify && spotifyCurrentTrack?.album?.images?.[0]?.url) || currentTrack.cover || "/placeholder.svg"}
+                                                alt={(useSpotify && spotifyCurrentTrack?.name) || currentTrack.title}
+                                                className="w-full h-full object-cover pixelated"
+                                                fill
+                                                sizes="144px"
+                                            />
+                                        </div>
+                                        <div className="text-center px-4 w-full">
+                                            <p className="text-[#00ff00] text-xs font-bold font-mono tracking-tighter truncate leading-none mb-1 uppercase">
+                                                {(useSpotify && spotifyCurrentTrack?.name) || currentTrack.title}
+                                            </p>
+                                            <p className="text-[#00ff00] text-[10px] font-mono leading-none truncate opacity-80">
+                                                {(useSpotify && spotifyCurrentTrack?.artists?.map((a) => a.name).join(", ")) || currentTrack.artist}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Win98 Controls Bar */}
+                            <div className="flex flex-col gap-2 p-2 border-t border-white border-l border-white border-b border-[#808080] border-r border-[#808080]">
+                                <div className="flex items-center gap-2">
+                                    <div className="flex-1 h-4 bg-white border-t-2 border-l-2 border-[#808080] border-b border-white border-r border-white relative">
+                                        <div
+                                            className="h-full bg-[#000080]"
+                                            style={{ width: `${expandedProps.progress}%` }}
+                                        />
+                                        <Slider
+                                            value={[expandedProps.progress]}
+                                            max={100}
+                                            step={0.1}
+                                            onValueChange={expandedProps.handleSeek}
+                                            disabled={isLoading}
+                                            className="absolute inset-0 opacity-0 cursor-pointer h-full z-10"
+                                        />
+                                    </div>
+                                    <div className="bg-black border border-[#808080] px-1 h-4 flex items-center">
+                                        <span className="text-[9px] font-mono text-[#00ff00] leading-none tabular-nums">
+                                            {expandedProps.formatTime(expandedProps.progress)}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-between items-center">
                                     <button
-                                        className="w-4 h-3.5 bg-[#c0c0c0] border-t border-l border-white border-b border-r border-[#808080] flex items-center justify-center"
+                                        className="h-6 px-2 bg-[#c0c0c0] border-t-2 border-l-2 border-white border-b-2 border-r-2 border-[#808080] shadow-[1px_1px_0_0_#000] flex items-center justify-center active:border-t-[#808080] active:border-l-[#808080] active:border-b-white active:border-r-white active:shadow-[-0.5px_-0.5px_0_0_#000]"
                                         onClick={expandedProps.handlePlaylistToggle}
                                     >
-                                        <X className="w-2 h-2 text-black" />
+                                        <List className="w-3.5 h-3.5 text-black" />
                                     </button>
-                                </div>
-                                <div className="flex-1 overflow-y-auto pr-1 space-y-0.5 custom-scrollbar scrollbar-win98">
-                                    {displayTracks.map((track: any) => {
-                                        const isCurrent = (useSpotify ? spotifyCurrentTrack?.id : currentTrack.id) === track.id;
-                                        return (
-                                            <div
-                                                key={track.id}
-                                                className={`flex items-center gap-2 p-1 transition-all cursor-pointer ${isCurrent ? 'bg-[#000080] text-white' : 'text-black hover:bg-[#c0c0c0]'}`}
-                                                onClick={() => !useSpotify && expandedProps.changeTrack(track)}
-                                            >
-                                                <div className="w-6 h-6 shrink-0 border border-[#808080]">
-                                                    <Image
-                                                        src={(useSpotify ? track.album?.images?.[0]?.url : track.cover) || "/placeholder.svg"}
-                                                        alt={useSpotify ? track.name : track.title}
-                                                        width={24}
-                                                        height={24}
-                                                        className="object-cover w-full h-full pixelated"
-                                                    />
-                                                </div>
-                                                <p className="text-[10px] truncate leading-tight">
-                                                    {useSpotify ? track.name : track.title}
-                                                </p>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col items-center justify-center h-full gap-4">
-                                <div ref={albumCoverRef} className="w-36 h-36 border-t font-bold border-l-2 border-[#808080] border-b-2 border-r-2 border-[#c0c0c0] relative shadow-[inset_1px_1px_0_0_#000,inset_-1px_-1px_0_0_#fff]">
-                                    <Image
-                                        src={(useSpotify && spotifyCurrentTrack?.album?.images?.[0]?.url) || currentTrack.cover || "/placeholder.svg"}
-                                        alt={(useSpotify && spotifyCurrentTrack?.name) || currentTrack.title}
-                                        className="w-full h-full object-cover pixelated"
-                                        fill
-                                        sizes="144px"
-                                    />
-                                </div>
-                                <div className="text-center px-4 w-full">
-                                    <p className="text-[#00ff00] text-xs font-bold font-mono tracking-tighter truncate leading-none mb-1 uppercase">
-                                        {(useSpotify && spotifyCurrentTrack?.name) || currentTrack.title}
-                                    </p>
-                                    <p className="text-[#00ff00] text-[10px] font-mono leading-none truncate opacity-80">
-                                        {(useSpotify && spotifyCurrentTrack?.artists?.map((a) => a.name).join(", ")) || currentTrack.artist}
-                                    </p>
+
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            className="w-8 h-7 bg-[#c0c0c0] border-t-2 border-l-2 border-white border-b-2 border-r-2 border-[#808080] shadow-[1px_1px_0_0_#000] flex items-center justify-center active:border-t-[#808080] active:border-l-[#808080] active:border-b-white active:border-r-white"
+                                            onClick={expandedProps.onPrevious}
+                                        >
+                                            <SkipBack className="w-3.5 h-3.5 text-black fill-black" />
+                                        </button>
+                                        <button
+                                            className="w-10 h-8 bg-[#c0c0c0] border-t-2 border-l-2 border-white border-b-2 border-r-2 border-[#808080] shadow-[1px_1px_0_0_#000] flex items-center justify-center active:border-t-[#808080] active:border-l-[#808080] active:border-b-white active:border-r-white"
+                                            onClick={expandedProps.onPlayPause}
+                                        >
+                                            {isLoading ? (
+                                                <Loader2 className="w-4 h-4 text-black animate-spin" />
+                                            ) : expandedProps.isPlaying ? (
+                                                <Pause className="w-4 h-4 text-black fill-black" />
+                                            ) : (
+                                                <Play className="w-4 h-4 text-black fill-black ml-0.5" />
+                                            )}
+                                        </button>
+                                        <button
+                                            className="w-8 h-7 bg-[#c0c0c0] border-t-2 border-l-2 border-white border-b-2 border-r-2 border-[#808080] shadow-[1px_1px_0_0_#000] flex items-center justify-center active:border-t-[#808080] active:border-l-[#808080] active:border-b-white active:border-r-white"
+                                            onClick={expandedProps.onNext}
+                                        >
+                                            <SkipForward className="w-3.5 h-3.5 text-black fill-black" />
+                                        </button>
+                                    </div>
+
+                                    <div className="w-8" />
                                 </div>
                             </div>
-                        )}
-                    </div>
-
-                    {/* Win98 Controls Bar */}
-                    <div className="flex flex-col gap-2 p-2 border-t border-white border-l border-white border-b border-[#808080] border-r border-[#808080]">
-                        <div className="flex items-center gap-2">
-                            <div className="flex-1 h-4 bg-white border-t-2 border-l-2 border-[#808080] border-b border-white border-r border-white relative">
-                                <div
-                                    className="h-full bg-[#000080]"
-                                    style={{ width: `${expandedProps.progress}%` }}
-                                />
-                                <Slider
-                                    value={[expandedProps.progress]}
-                                    max={100}
-                                    step={0.1}
-                                    onValueChange={expandedProps.handleSeek}
-                                    disabled={isLoading}
-                                    className="absolute inset-0 opacity-0 cursor-pointer h-full z-10"
-                                />
-                            </div>
-                            <div className="bg-black border border-[#808080] px-1 h-4 flex items-center">
-                                <span className="text-[9px] font-mono text-[#00ff00] leading-none tabular-nums">
-                                    {expandedProps.formatTime(expandedProps.progress)}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="flex justify-between items-center">
-                            <button
-                                className="h-6 px-2 bg-[#c0c0c0] border-t-2 border-l-2 border-white border-b-2 border-r-2 border-[#808080] shadow-[1px_1px_0_0_#000] flex items-center justify-center active:border-t-[#808080] active:border-l-[#808080] active:border-b-white active:border-r-white active:shadow-[-0.5px_-0.5px_0_0_#000]"
-                                onClick={expandedProps.handlePlaylistToggle}
-                            >
-                                <List className="w-3.5 h-3.5 text-black" />
-                            </button>
-
-                            <div className="flex items-center gap-1">
-                                <button
-                                    className="w-8 h-7 bg-[#c0c0c0] border-t-2 border-l-2 border-white border-b-2 border-r-2 border-[#808080] shadow-[1px_1px_0_0_#000] flex items-center justify-center active:border-t-[#808080] active:border-l-[#808080] active:border-b-white active:border-r-white"
-                                    onClick={expandedProps.onPrevious}
-                                >
-                                    <SkipBack className="w-3.5 h-3.5 text-black fill-black" />
-                                </button>
-                                <button
-                                    className="w-10 h-8 bg-[#c0c0c0] border-t-2 border-l-2 border-white border-b-2 border-r-2 border-[#808080] shadow-[1px_1px_0_0_#000] flex items-center justify-center active:border-t-[#808080] active:border-l-[#808080] active:border-b-white active:border-r-white"
-                                    onClick={expandedProps.onPlayPause}
-                                >
-                                    {isLoading ? (
-                                        <Loader2 className="w-4 h-4 text-black animate-spin" />
-                                    ) : expandedProps.isPlaying ? (
-                                        <Pause className="w-4 h-4 text-black fill-black" />
-                                    ) : (
-                                        <Play className="w-4 h-4 text-black fill-black ml-0.5" />
-                                    )}
-                                </button>
-                                <button
-                                    className="w-8 h-7 bg-[#c0c0c0] border-t-2 border-l-2 border-white border-b-2 border-r-2 border-[#808080] shadow-[1px_1px_0_0_#000] flex items-center justify-center active:border-t-[#808080] active:border-l-[#808080] active:border-b-white active:border-r-white"
-                                    onClick={expandedProps.onNext}
-                                >
-                                    <SkipForward className="w-3.5 h-3.5 text-black fill-black" />
-                                </button>
-                            </div>
-
-                            <div className="w-8" />
-                        </div>
-                    </div>
+                        </>
+                    )}
                 </div>
             </div>
         )

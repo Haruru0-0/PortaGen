@@ -56,4 +56,6 @@ export interface MusicPlayerStyleProps {
     formatDuration?: (ms: number) => string
     previewMode?: "desktop" | "mobile"
     playerType: "collapsed" | "expanded" | "mobile"
+    isSpotifyFallback?: boolean
+    spotifyEmbedUrl?: string
 }

@@ -66,6 +66,8 @@ export function DefaultMusicPlayer(props: MusicPlayerStyleProps) {
             playlist: restProps.playlist,
             changeTrack: restProps.changeTrack,
             formatDuration: restProps.formatDuration,
+            isSpotifyFallback: restProps.isSpotifyFallback,
+            spotifyEmbedUrl: restProps.spotifyEmbedUrl,
         }
         return <ExpandedPlayer {...expandedProps} />
     }
