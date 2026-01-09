@@ -41,6 +41,7 @@ export const portfolios = pgTable('portfolios', {
 
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
+    views: integer('views').default(0).notNull(),
 }, (table) => ({
     userIdIdx: index('portfolio_user_id_idx').on(table.userId),
 }))
@@ -211,6 +212,36 @@ export const desktopSettings = pgTable('desktop_settings', {
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
+
+// ============================================
+// ANALYTICS & ACTIVITY TABLES
+// ============================================
+
+export const userActivities = pgTable('user_activities', {
+    id: serial('id').primaryKey(),
+    userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+
+    actionType: varchar('action_type', { length: 50 }).notNull(), // 'CREATED', 'UPLOADED', 'PUBLISHED', 'UPDATED'
+    description: text('description').notNull(),
+
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+    userIdIdx: index('activities_user_id_idx').on(table.userId),
+}))
+
+export const userChecklistItems = pgTable('user_checklist_items', {
+    id: serial('id').primaryKey(),
+    userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+
+    taskId: varchar('task_id', { length: 50 }).notNull(), // 'CREATE_PORTFOLIO', 'UPLOAD_WALLPAPER', 'ADD_ICONS', 'EMBED_MUSIC', 'PUBLISH_PORTFOLIO'
+    isDone: boolean('is_done').default(false).notNull(),
+
+    completedAt: timestamp('completed_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+    uniqueUserTask: unique('unique_user_task').on(table.userId, table.taskId),
+    userIdIdx: index('checklist_user_id_idx').on(table.userId),
+}))
 
 // ============================================
 // RELATIONS

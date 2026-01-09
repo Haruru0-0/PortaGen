@@ -86,7 +86,12 @@ function getStyleConfig(styleId: string) {
   return STYLE_CONFIGS[styleId as keyof typeof STYLE_CONFIGS] || STYLE_CONFIGS["liquid-glass"];
 }
 
-function SoundContent({ styleConfig, customBg }: { styleConfig: typeof STYLE_CONFIGS["liquid-glass"]; customBg?: string }) {
+function SoundContent({ styleConfig, customBg, colors, menubarStyleId }: {
+  styleConfig: typeof STYLE_CONFIGS["liquid-glass"];
+  customBg?: string;
+  colors: any;
+  menubarStyleId: string;
+}) {
   const {
     isSoundEnabled,
     setSoundEnabled,
@@ -118,7 +123,13 @@ function SoundContent({ styleConfig, customBg }: { styleConfig: typeof STYLE_CON
   return (
     <div
       className={styleConfig.wrapper}
-      style={customBg ? { background: customBg } : undefined}
+      style={{
+        ...(customBg ? { background: customBg } : {}),
+        ...(menubarStyleId === "pixel" ? {
+          borderColor: colors.accent,
+          backgroundColor: colors.background
+        } : {})
+      }}
     >
       {styleConfig.hasGlassLayers && (
         <>
@@ -130,17 +141,37 @@ function SoundContent({ styleConfig, customBg }: { styleConfig: typeof STYLE_CON
       <div className={styleConfig.content}>
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-3">
-            <Gamepad2 className={`h-4 w-4 ${styleConfig.icon}`} />
-            <span className={`text-sm font-medium ${styleConfig.text}`}>8-Bit Sound Effects</span>
+            <Gamepad2
+              className={`h-4 w-4 ${styleConfig.icon}`}
+              style={menubarStyleId === "pixel" ? { color: colors.text } : {}}
+            />
+            <span
+              className={`text-sm font-medium ${styleConfig.text}`}
+              style={menubarStyleId === "pixel" ? { color: colors.text } : {}}
+            >
+              8-Bit Sound Effects
+            </span>
           </div>
 
           <div className="flex items-center justify-between">
-            <span className={`text-sm ${styleConfig.text}`}>Retro Audio</span>
+            <span
+              className={`text-sm ${styleConfig.text}`}
+              style={menubarStyleId === "pixel" ? { color: colors.text } : {}}
+            >
+              Retro Audio
+            </span>
             <Button
               variant="outline"
               size="sm"
               onClick={handleToggleSound}
               className={`h-8 ${styleConfig.button}`}
+              style={menubarStyleId === "pixel" ? {
+                color: colors.text,
+                borderColor: colors.accent,
+                backgroundColor: `${colors.accent}40`
+              } : {}}
+              onMouseEnter={(e) => menubarStyleId === "pixel" && (e.currentTarget.style.backgroundColor = colors.background)}
+              onMouseLeave={(e) => menubarStyleId === "pixel" && (e.currentTarget.style.backgroundColor = `${colors.accent}40`)}
             >
               {isSoundEnabled ? 'On' : 'Off'}
             </Button>
@@ -197,18 +228,43 @@ function SoundContent({ styleConfig, customBg }: { styleConfig: typeof STYLE_CON
 export function SoundSettings({ previewMode, embedded = false }: { previewMode?: "desktop" | "mobile"; embedded?: boolean }) {
   const { isSoundEnabled } = useAppSound()
   const menubarStyleId = useThemeStore((state) => (state as any).menubarStyleId)
+  const { colors } = useThemeStore()
   const [open, setOpen] = useState(false)
   const mqDesktop = useMediaQuery("(min-width: 768px)")
   const isDesktop = previewMode ? previewMode === "desktop" : mqDesktop
 
   const shouldShowDrawer = (previewMode === "mobile" && embedded) || (!previewMode && !isDesktop)
-  const styleConfig = getStyleConfig(menubarStyleId || "liquid-glass") as typeof STYLE_CONFIGS["liquid-glass"] & { customBg?: string }
+  let styleConfig = getStyleConfig(menubarStyleId || "liquid-glass") as typeof STYLE_CONFIGS["liquid-glass"] & { customBg?: string }
+
+  // Override pixel style with theme colors
+  if (menubarStyleId === "pixel") {
+    styleConfig = {
+      ...styleConfig,
+      wrapper: "border-4",
+      content: "p-4 font-pixel",
+      text: "",
+      subtext: "",
+      button: "",
+      icon: "",
+      hasGlassLayers: false,
+      trigger: "flex items-center justify-center w-10 h-10 border-4 font-pixel",
+      customBg: colors.background
+    };
+  }
 
   const TriggerButton = (
     <Button
       variant="ghost"
       size="icon"
       className={styleConfig.trigger}
+      style={menubarStyleId === "pixel" ? {
+        borderColor: colors.accent,
+        backgroundColor: colors.background,
+        color: colors.text
+      } : {}}
+      onMouseDown={(e) => menubarStyleId === "pixel" && (e.currentTarget.style.backgroundColor = `${colors.accent}40`)}
+      onMouseUp={(e) => menubarStyleId === "pixel" && (e.currentTarget.style.backgroundColor = colors.background)}
+      onMouseLeave={(e) => menubarStyleId === "pixel" && (e.currentTarget.style.backgroundColor = colors.background)}
     >
       {isSoundEnabled ? (
         <Volume2 className="h-5 w-5" />
@@ -227,7 +283,7 @@ export function SoundSettings({ previewMode, embedded = false }: { previewMode?:
         </DrawerTrigger>
         <DrawerContent className="bg-transparent border-none shadow-none">
           <div className="mx-auto w-full max-w-sm p-4">
-            <SoundContent styleConfig={styleConfig} customBg={styleConfig.customBg} />
+            <SoundContent styleConfig={styleConfig} customBg={styleConfig.customBg} colors={colors} menubarStyleId={menubarStyleId} />
           </div>
         </DrawerContent>
       </Drawer>
@@ -243,7 +299,7 @@ export function SoundSettings({ previewMode, embedded = false }: { previewMode?:
         align="end"
         className="w-72 p-0 bg-transparent border-none shadow-none z-50"
       >
-        <SoundContent styleConfig={styleConfig} customBg={styleConfig.customBg} />
+        <SoundContent styleConfig={styleConfig} customBg={styleConfig.customBg} colors={colors} menubarStyleId={menubarStyleId} />
       </DropdownMenuContent>
     </DropdownMenu>
   )

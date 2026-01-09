@@ -9,6 +9,7 @@ import { useDesktopStore } from "@/lib/stores/desktop-store"
 import { useEffect, useState } from "react"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { useParams } from "next/navigation";
+import { AssetPicker } from "@/components/common/asset-picker"
 
 export function DesktopWallpaperTab() {
   const params = useParams<{ id: string }>()
@@ -28,6 +29,8 @@ export function DesktopWallpaperTab() {
   const [menubarIconPreview, setMenubarIconPreview] = useState<string | null>(null)
 
   const { updateMenubar } = useDesktopContext()
+  const [assetPickerOpen, setAssetPickerOpen] = useState(false)
+  const [assetPickerType, setAssetPickerType] = useState<"wallpaper" | "icon">("wallpaper")
 
   useEffect(() => {
     if (currentPortfolioId) void getDesktopData(currentPortfolioId)
@@ -72,6 +75,30 @@ export function DesktopWallpaperTab() {
     setMenubarIcon(url)
     // Save immediately or wait? Let's save on button click for consistency or add a save button
     // We'll reuse the pattern: show preview and have a "SAVE SETTINGS" button later or per section
+  }
+
+  const handleAssetSelect = async (asset: { id: number; url: string; thumbnailUrl?: string }) => {
+    if (!currentPortfolioId) return
+
+    if (assetPickerType === "wallpaper") {
+      // For wallpaper, we update directly
+      await updateWallpaper(currentPortfolioId, asset.id)
+      setWallpaper(asset.thumbnailUrl || asset.url)
+      setPendingWallpaperFile(null)
+      setPreviewUrl(null)
+    } else {
+      // For menu bar, we update directly too for consistency with "library selection" flow
+      // But we need the current menu text to not overwrite it
+      await updateMenubar(currentPortfolioId, asset.id, menubarText)
+      setMenubarIcon(asset.thumbnailUrl || asset.url)
+      setPendingMenubarIconFile(null)
+      setMenubarIconPreview(null)
+    }
+  }
+
+  const openAssetPicker = (type: "wallpaper" | "icon") => {
+    setAssetPickerType(type)
+    setAssetPickerOpen(true)
   }
 
   const handleSaveWallpaper = () => {
@@ -121,13 +148,23 @@ export function DesktopWallpaperTab() {
         {/* WALLPAPER SECTION */}
         <div className="space-y-4">
           <h3 className="text-sm dashboard-pixel-text-shadow">DESKTOP WALLPAPER</h3>
-          <FileUpload
-            accept="image/*"
-            onFileSelect={onUploadWallpaper}
-            preview={previewUrl || data?.wallpaperUrl || ''}
-            label=""
-            maxSize={10}
-          />
+          <div className="space-y-2">
+            <FileUpload
+              accept="image/*"
+              onFileSelect={onUploadWallpaper}
+              preview={previewUrl || data?.wallpaperUrl || ''}
+              label=""
+              maxSize={10}
+            />
+            <PixelButton
+              variant="secondary"
+              className="w-full text-[10px] flex items-center justify-center gap-2"
+              onClick={() => openAssetPicker("wallpaper")}
+            >
+              <Library className="w-3 h-3" />
+              SELECT FROM LIBRARY
+            </PixelButton>
+          </div>
           {pendingWallpaperFile && (
             <PixelButton
               className="w-full text-[10px]"
@@ -146,13 +183,23 @@ export function DesktopWallpaperTab() {
 
           <div className="space-y-2">
             <p className="text-[10px] text-muted-foreground uppercase">Menu Bar Icon</p>
-            <FileUpload
-              accept="image/*"
-              onFileSelect={onUploadMenubarIcon}
-              preview={menubarIconPreview || data?.menubarIconUrl || ''}
-              label=""
-              maxSize={2}
-            />
+            <div className="space-y-2">
+              <FileUpload
+                accept="image/*"
+                onFileSelect={onUploadMenubarIcon}
+                preview={menubarIconPreview || data?.menubarIconUrl || ''}
+                label=""
+                maxSize={2}
+              />
+              <PixelButton
+                variant="secondary"
+                className="w-full text-[10px] flex items-center justify-center gap-2"
+                onClick={() => openAssetPicker("icon")}
+              >
+                <Library className="w-3 h-3" />
+                SELECT FROM LIBRARY
+              </PixelButton>
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -185,6 +232,13 @@ export function DesktopWallpaperTab() {
           </div>
         </div>
       </PixelModal>
+
+      <AssetPicker
+        isOpen={assetPickerOpen}
+        onClose={() => setAssetPickerOpen(false)}
+        onSelect={handleAssetSelect}
+        type={assetPickerType}
+      />
     </PixelCard>
   )
 }

@@ -5,6 +5,7 @@ import { db } from '@/lib/db'
 import { icons, portfolios, portfolioAssets, windows } from '@/lib/db/schema'
 import { and, eq } from 'drizzle-orm'
 import { getUserByClerkId } from '@/lib/db/helpers'
+import { completeChecklistTask } from '@/lib/activity'
 
 async function formatIconResponse(id: number) {
   const row = await db.query.icons.findFirst({
@@ -85,6 +86,9 @@ export async function POST(req: NextRequest) {
         await db.insert(windows).values({ portfolioId, name: name || 'New Window', iconId: created.id })
       } catch { }
     }
+
+    // Mark task done
+    await completeChecklistTask(user.id, "ADD_DESKTOP_ICONS");
 
     const formatted = await formatIconResponse(created.id)
     return NextResponse.json(formatted)

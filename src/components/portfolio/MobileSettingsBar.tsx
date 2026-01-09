@@ -37,11 +37,18 @@ function getStyleConfig(styleId: string) {
 
 export function MobileSettingsBar({ previewMode, embedded = false }: { previewMode?: "desktop" | "mobile"; embedded?: boolean }) {
     const menubarStyleId = useThemeStore((state) => (state as any).menubarStyleId);
+    const { colors } = useThemeStore();
     const styleConfig = getStyleConfig(menubarStyleId || "liquid-glass");
 
     return (
         <div className="flex items-center justify-center h-full">
-            <div className={styleConfig.wrapper}>
+            <div
+                className={menubarStyleId === "pixel" ? "border-4 rounded-none" : styleConfig.wrapper}
+                style={menubarStyleId === "pixel" ? {
+                    backgroundColor: colors.background,
+                    borderColor: colors.accent
+                } : {}}
+            >
                 {styleConfig.hasGlassLayers && (
                     <>
                         <div className="liquidGlass-effect"></div>
@@ -50,9 +57,18 @@ export function MobileSettingsBar({ previewMode, embedded = false }: { previewMo
                     </>
                 )}
                 <div className="liquidGlass-content relative z-10">
-                    <div className="flex items-center gap-3 p-4">
+                    <div
+                        className="flex items-center gap-3 p-4"
+                        style={menubarStyleId === "pixel" ? { color: colors.text } : {}}
+                    >
                         <SoundSettings previewMode={previewMode} embedded={embedded} />
-                        <div className={`w-px h-8 ${menubarStyleId === "windows-98" ? "bg-black/20" : "bg-white/30"}`} /> {/* Divider */}
+                        <div
+                            className={`w-px h-8 ${menubarStyleId === "pixel" ? "" : menubarStyleId === "windows-98" ? "bg-black/20" : "bg-white/30"}`}
+                            style={menubarStyleId === "pixel" ? {
+                                backgroundColor: colors.accent,
+                                width: "4px"
+                            } : {}}
+                        /> {/* Divider */}
                         <ModeToggle previewMode={previewMode} embedded={embedded} />
                     </div>
                 </div>

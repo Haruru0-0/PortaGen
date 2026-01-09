@@ -8,11 +8,11 @@ export const AudioContext = createContext({
   progress: 0,
   volume: 70,
   isLoading: false,
-  setCurrentTrack: (track: Track) => {},
-  setIsPlaying: (playing: boolean) => {},
-  setProgress: (progress: number) => {},
-  setVolume: (volume: number) => {},
-  setIsLoading: (loading: boolean) => {},
+  setCurrentTrack: (track: Track) => { },
+  setIsPlaying: (playing: boolean) => { },
+  setProgress: (progress: number) => { },
+  setVolume: (volume: number) => { },
+  setIsLoading: (loading: boolean) => { },
 });
 
 export function AudioProvider({ children }: { children: React.ReactNode }) {
@@ -32,7 +32,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
       // Save current time when switching views
       const currentTime = audio.currentTime;
-      
+
       const updateProgress = () => {
         if (!audio.duration) return;
         const newProgress = (audio.currentTime / audio.duration) * 100;
@@ -64,16 +64,20 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   // Handle track changes
   useEffect(() => {
     const playAudio = async () => {
-      if (!audioRef.current) return;
+      // Resolve source
+      const src = typeof currentTrack.src === 'string' ? currentTrack.src : currentTrack.src?.sources?.[0]?.src;
+
+      if (!audioRef.current || !src) return;
 
       try {
         setIsLoading(true);
+
         const wasPlaying = isPlaying;
-        audioRef.current.src = currentTrack.src;
+        audioRef.current.src = src;
         audioRef.current.volume = volume / 100;
 
         await audioRef.current.load();
-        
+
         if (wasPlaying) {
           await audioRef.current.play().catch(e => {
             console.log("Autoplay prevented:", e);

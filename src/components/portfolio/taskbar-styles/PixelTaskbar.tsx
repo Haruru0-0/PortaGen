@@ -4,9 +4,11 @@ import { gsap } from "gsap"
 import { useGSAP } from "@gsap/react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { TaskbarStyleProps } from "./types"
+import { useThemeStore } from "@/lib/stores/theme-store"
 
 export function PixelTaskbar({ apps, openWindows, onAppClick, handleMouseEnter, className = "", embedded = false }: TaskbarStyleProps) {
     const taskbarRef = useRef<HTMLDivElement>(null)
+    const { colors } = useThemeStore()
 
     useGSAP(() => {
         const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -23,7 +25,13 @@ export function PixelTaskbar({ apps, openWindows, onAppClick, handleMouseEnter, 
             ref={taskbarRef}
             className={embedded ? `absolute bottom-4 left-4 right-4 z-[60] ${className}` : `fixed bottom-4 left-4 right-4 z-[60] ${className}`}
         >
-            <div className="bg-[#0f380f] border-4 border-[#8bac0f] p-2 flex justify-center">
+            <div
+                className="border-4 p-2 flex justify-center"
+                style={{
+                    backgroundColor: colors.background,
+                    borderColor: colors.accent
+                }}
+            >
                 <div className="flex gap-4">
                     <TooltipProvider>
                         {apps.map((app) => {
@@ -34,10 +42,11 @@ export function PixelTaskbar({ apps, openWindows, onAppClick, handleMouseEnter, 
                                 <Tooltip key={app.id}>
                                     <TooltipTrigger asChild>
                                         <button
-                                            className={`
-                                                relative p-2 border-2 transition-transform hover:-translate-y-1
-                                                ${isRunning ? 'border-[#9bbc0f] bg-[#306230]' : 'border-[#0f380f] hover:border-[#8bac0f]'}
-                                            `}
+                                            className="relative p-2 border-2 transition-transform hover:-translate-y-1"
+                                            style={{
+                                                borderColor: isRunning ? colors.text : colors.background,
+                                                backgroundColor: isRunning ? `${colors.accent}40` : 'transparent'
+                                            }}
                                             onClick={() => onAppClick(app.label)}
                                             onMouseEnter={handleMouseEnter}
                                         >
@@ -52,7 +61,15 @@ export function PixelTaskbar({ apps, openWindows, onAppClick, handleMouseEnter, 
                                             </div>
                                         </button>
                                     </TooltipTrigger>
-                                    <TooltipContent side="top" className="font-pixel text-xs bg-[#0f380f] text-[#9bbc0f] border-2 border-[#8bac0f]">
+                                    <TooltipContent
+                                        side="top"
+                                        className="font-pixel text-xs border-2"
+                                        style={{
+                                            backgroundColor: colors.background,
+                                            color: colors.text,
+                                            borderColor: colors.accent
+                                        }}
+                                    >
                                         <p>{app.label}</p>
                                     </TooltipContent>
                                 </Tooltip>

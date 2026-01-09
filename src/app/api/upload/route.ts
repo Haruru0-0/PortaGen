@@ -6,6 +6,7 @@ import { uploadToUserDrive, decryptToken, refreshAccessToken, encryptToken } fro
 import { db } from '@/lib/db'
 import { users, uploadedAssets } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
+import { logActivity, completeChecklistTask } from '@/lib/activity'
 
 export async function POST(req: NextRequest) {
     try {
@@ -104,6 +105,19 @@ export async function POST(req: NextRequest) {
                 fileSize: uploadResult.fileSize,
             })
             .returning()
+
+        // Log upload activity
+        await logActivity(user.id, "UPLOADED", `Uploaded ${assetType}: ${finalFileName}`);
+
+        // Check off wallpaper task if applicable
+        if (assetType === 'wallpaper' || assetType === 'image') {
+            // If user uploads an image, they might be using it for wallpaper.
+            // Ideally we check if they actually SET it as wallpaper, but uploading is a good proxy for "started"
+            // or check assetType specifically if the frontend sends 'wallpaper'
+            if (assetType === 'wallpaper') {
+                await completeChecklistTask(user.id, "UPLOAD_WALLPAPER");
+            }
+        }
 
         return NextResponse.json({
             success: true,

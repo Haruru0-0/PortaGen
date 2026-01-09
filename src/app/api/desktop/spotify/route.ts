@@ -5,6 +5,7 @@ import { db } from '@/lib/db'
 import { desktopSettings, portfolios } from '@/lib/db/schema'
 import { and, eq } from 'drizzle-orm'
 import { getUserByClerkId } from '@/lib/db/helpers'
+import { completeChecklistTask } from '@/lib/activity'
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,6 +28,10 @@ export async function POST(req: NextRequest) {
       .set({ spotifyPlaylistUrl: spotifyPlaylistUrl ?? null, updatedAt: new Date() })
       .where(eq(desktopSettings.portfolioId, portfolioId))
       .returning()
+
+    if (spotifyPlaylistUrl) {
+      await completeChecklistTask(user.id, "EMBED_MUSIC");
+    }
 
     return NextResponse.json(updated)
   } catch (e) {

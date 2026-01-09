@@ -8,6 +8,8 @@ import { PixelModal } from "@/components/pixel-modal"
 import { PixelInput } from "@/components/pixel-input"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { useParams } from "next/navigation";
+import { AssetPicker } from "@/components/common/asset-picker"
+import { Library } from "lucide-react"
 
 export function MobileWidgetsTab() {
     const params = useParams<{ id: string }>()
@@ -22,6 +24,8 @@ export function MobileWidgetsTab() {
     const [customName2, setCustomName2] = useState("")
     const [previewUrl1, setPreviewUrl1] = useState<string | null>(null)
     const [previewUrl2, setPreviewUrl2] = useState<string | null>(null)
+    const [assetPickerOpen, setAssetPickerOpen] = useState(false)
+    const [assetPickerWidget, setAssetPickerWidget] = useState<1 | 2>(1)
 
     useEffect(() => {
         if (currentPortfolioId) void getDesktopData(currentPortfolioId)
@@ -96,6 +100,25 @@ export function MobileWidgetsTab() {
         }
     }
 
+    const handleAssetSelect = async (asset: { id: number; url: string; thumbnailUrl?: string }) => {
+        if (!currentPortfolioId) return
+        await updateWidget(currentPortfolioId, assetPickerWidget, asset.id)
+        if (assetPickerWidget === 1) {
+            setMobileWidget1(asset.thumbnailUrl || asset.url)
+            setPendingWidget1File(null)
+            setPreviewUrl1(null)
+        } else {
+            setMobileWidget2(asset.thumbnailUrl || asset.url)
+            setPendingWidget2File(null)
+            setPreviewUrl2(null)
+        }
+    }
+
+    const openAssetPicker = (widgetNum: 1 | 2) => {
+        setAssetPickerWidget(widgetNum)
+        setAssetPickerOpen(true)
+    }
+
     return (
         <PixelCard>
             <div className="space-y-4">
@@ -103,6 +126,14 @@ export function MobileWidgetsTab() {
                 <div className="space-y-2">
                     <FileUpload accept="image/*" onFileSelect={onUploadWidget1} label="WIDGET 1"
                         preview={previewUrl1 || data?.widget1Url || ''} maxSize={5} />
+                    <PixelButton
+                        variant="secondary"
+                        className="w-full text-[10px] flex items-center justify-center gap-2"
+                        onClick={() => openAssetPicker(1)}
+                    >
+                        <Library className="w-3 h-3" />
+                        SELECT FROM LIBRARY
+                    </PixelButton>
                     {pendingWidget1File && (
                         <PixelButton
                             className="w-full text-[10px]"
@@ -115,6 +146,14 @@ export function MobileWidgetsTab() {
                 <div className="space-y-2">
                     <FileUpload accept="image/*" onFileSelect={onUploadWidget2} label="WIDGET 2"
                         preview={previewUrl2 || data?.widget2Url || ''} maxSize={5} />
+                    <PixelButton
+                        variant="secondary"
+                        className="w-full text-[10px] flex items-center justify-center gap-2"
+                        onClick={() => openAssetPicker(2)}
+                    >
+                        <Library className="w-3 h-3" />
+                        SELECT FROM LIBRARY
+                    </PixelButton>
                     {pendingWidget2File && (
                         <PixelButton
                             className="w-full text-[10px]"
@@ -181,6 +220,12 @@ export function MobileWidgetsTab() {
                     </div>
                 </div>
             </PixelModal>
+            <AssetPicker
+                isOpen={assetPickerOpen}
+                onClose={() => setAssetPickerOpen(false)}
+                onSelect={handleAssetSelect}
+                type="image"
+            />
         </PixelCard>
     )
 }

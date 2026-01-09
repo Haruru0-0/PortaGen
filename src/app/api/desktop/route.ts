@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
       musicPlayerIconAssetId: row.musicPlayerIconAssetId ?? undefined,
       musicPlayerIconUrl: row.musicPlayerIconAsset?.displayUrl || '',
       menubarIconAssetId: row.menubarIconAssetId ?? undefined,
-      menubarIconUrl: row.menubarIconAsset?.displayUrl || '',
+      menubarIconUrl: row.menubarIconAsset?.thumbnailUrl || '',
       menubarText: row.menubarText || '',
     })
   } catch (e) {

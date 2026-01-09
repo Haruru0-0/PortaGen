@@ -9,6 +9,7 @@ import { useDesktopStore } from "@/lib/stores/desktop-store"
 import { useEffect, useState } from "react"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { useParams } from "next/navigation";
+import { AssetPicker } from "@/components/common/asset-picker"
 
 export function DesktopWidgetTab() {
   const params = useParams<{ id: string }>()
@@ -19,6 +20,7 @@ export function DesktopWidgetTab() {
   const [renameOpen, setRenameOpen] = useState(false)
   const [customName, setCustomName] = useState("")
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [assetPickerOpen, setAssetPickerOpen] = useState(false)
 
   useEffect(() => {
     if (currentPortfolioId) void getDesktopData(currentPortfolioId)
@@ -72,18 +74,36 @@ export function DesktopWidgetTab() {
     }
   }
 
+  const handleAssetSelect = async (asset: { id: number; url: string; thumbnailUrl?: string }) => {
+    if (!currentPortfolioId) return
+    await updateGif(currentPortfolioId, asset.id)
+    setDesktopGif(asset.thumbnailUrl || asset.url)
+    setPendingGifFile(null)
+    setPreviewUrl(null)
+  }
+
   return (
     <PixelCard>
       <div className="space-y-4">
         <h3 className="text-sm pixel-text-shadow">DESKTOP Gif</h3>
 
-        <FileUpload
-          accept="image/gif,image/*"
-          onFileSelect={onUploadGif}
-          preview={previewUrl || data?.desktopGifUrl || ''}
-          label=""
-          maxSize={10}
-        />
+        <div className="space-y-2">
+          <FileUpload
+            accept="image/gif,image/*"
+            onFileSelect={onUploadGif}
+            preview={previewUrl || data?.desktopGifUrl || ''}
+            label=""
+            maxSize={10}
+          />
+          <PixelButton
+            variant="secondary"
+            className="w-full text-[10px] flex items-center justify-center gap-2"
+            onClick={() => setAssetPickerOpen(true)}
+          >
+            <Library className="w-3 h-3" />
+            SELECT FROM LIBRARY
+          </PixelButton>
+        </div>
 
         {pendingGifFile && (
           <PixelButton
@@ -104,6 +124,12 @@ export function DesktopWidgetTab() {
           </div>
         </div>
       </PixelModal>
+      <AssetPicker
+        isOpen={assetPickerOpen}
+        onClose={() => setAssetPickerOpen(false)}
+        onSelect={handleAssetSelect}
+        type="image"
+      />
     </PixelCard>
   )
 }

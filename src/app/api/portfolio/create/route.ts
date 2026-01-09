@@ -2,7 +2,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
-import { portfolios, lockScreenSettings, desktopSettings, themeSettings, soundEffects } from '@/lib/db/schema'
+import { portfolios, users, lockScreenSettings, desktopSettings, themeSettings, soundEffects } from '@/lib/db/schema'
+import { eq } from 'drizzle-orm'
+import { logActivity, completeChecklistTask } from '@/lib/activity'
 import { getUserByClerkId } from '@/lib/db/helpers'
 
 export async function POST(req: NextRequest) {
@@ -17,17 +19,24 @@ export async function POST(req: NextRequest) {
     const name: string = body?.portfolioName || 'MY PORTFOLIO'
     const bio: string = body?.bio || ''
 
-    const [created] = await db.insert(portfolios).values({
+    const [portfolio] = await db.insert(portfolios).values({
       userId: user.id,
       portfolioName: name,
       bio,
     }).returning()
 
+    // Log activity and checklist
+    await logActivity(user.id, "CREATED", `Created portfolio: ${name}`);
+    await completeChecklistTask(user.id, "CREATE_PORTFOLIO");
+    // Also mark PUBLISH_PORTFOLIO as done when created? No, that's probably separate.
+    // The checklist says "PUBLISH YOUR PORTFOLIO". Usually that implies a separate action.
+    // But for now, let's just do CREATE_PORTFOLIO.
+
     // initialize defaults for settings to keep editor happy
-    await db.insert(lockScreenSettings).values({ portfolioId: created.id })
-    await db.insert(desktopSettings).values({ portfolioId: created.id })
+    await db.insert(lockScreenSettings).values({ portfolioId: portfolio.id })
+    await db.insert(desktopSettings).values({ portfolioId: portfolio.id })
     await db.insert(themeSettings).values({
-      portfolioId: created.id,
+      portfolioId: portfolio.id,
       theme: {
         name: 'Default',
         colors: {
@@ -45,14 +54,13 @@ export async function POST(req: NextRequest) {
 
     // Initialize sound effects with default preset
     await db.insert(soundEffects).values({
-      portfolioId: created.id,
+      portfolioId: portfolio.id,
       presetId: 'arcade',
     } as any)
 
-    return NextResponse.json(created)
+    return NextResponse.json(portfolio)
   } catch (error) {
     console.error('Portfolio create error:', error)
     return NextResponse.json({ error: 'Failed to create portfolio' }, { status: 500 })
   }
 }
-

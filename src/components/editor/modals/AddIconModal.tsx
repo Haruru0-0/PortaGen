@@ -13,6 +13,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useParams } from "next/navigation";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import Image from "next/image";
+import { AssetPicker } from "@/components/common/asset-picker";
 
 interface AddIconModalProps {
   isOpen: boolean;
@@ -45,6 +46,7 @@ export function AddIconModal({ isOpen, onClose, onCreated }: AddIconModalProps) 
 
   const { uploadFile, uploading } = useFileUpload()
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [assetPickerOpen, setAssetPickerOpen] = useState(false)
 
   const handleUpload = (file: File) => {
     setSelectedFile(file)
@@ -67,7 +69,7 @@ export function AddIconModal({ isOpen, onClose, onCreated }: AddIconModalProps) 
         return
       }
       payload = { ...payload, fileId: res.data.id }
-      if (res.data.url) setPreview(res.data.url)
+      if (res.data.displayUrl) setPreview(res.data.displayUrl)
     }
     const created = await addIcon(currentPortfolioId, {
       name: payload.name,
@@ -78,6 +80,12 @@ export function AddIconModal({ isOpen, onClose, onCreated }: AddIconModalProps) 
     onCreated(created)
     form.reset({ name: "", linkType: "window", url: "", fileId: undefined })
     setPreview("")
+    setSelectedFile(null)
+  }
+
+  const handleAssetSelect = async (asset: { id: number; url: string; thumbnailUrl?: string }) => {
+    form.setValue("fileId", asset.id)
+    setPreview(asset.thumbnailUrl || asset.url)
     setSelectedFile(null)
   }
 
@@ -102,31 +110,36 @@ export function AddIconModal({ isOpen, onClose, onCreated }: AddIconModalProps) 
               </div>
             )}
             <FileUpload accept="image/*" onFileSelect={handleUpload} maxSize={1} label={preview && "REPLACE IMAGE"} />
-            <PixelButton variant="secondary" className="w-full text-[10px] flex items-center justify-center gap-2" disabled>
+            <PixelButton
+              variant="secondary"
+              className="w-full text-[10px] flex items-center justify-center gap-2"
+              onClick={() => setAssetPickerOpen(true)}
+              type="button"
+            >
               <Library className="w-4 h-4" /> CHOOSE FROM LIBRARY
             </PixelButton>
           </div>
           <FormField name="linkType" control={form.control} render={({ field }) => (
-              <FormItem>
-                <FormLabel>LINK TYPE</FormLabel>
-                <FormControl>
-                  <RadioGroup
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      className="grid grid-cols-2 gap-2 p-2 border-2 border-border bg-card"
-                  >
-                    <label className="flex items-center gap-2 px-2 py-1 text-[10px] border-2 border-border bg-muted cursor-pointer">
-                      <RadioGroupItem value="window" className="border-2 border-border" />
-                      Link to Window
-                    </label>
-                    <label className="flex items-center gap-2 px-2 py-1 text-[10px] border-2 border-border bg-muted cursor-pointer">
-                      <RadioGroupItem value="url" className="border-2 border-border" />
-                      Link to URL
-                    </label>
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+            <FormItem>
+              <FormLabel>LINK TYPE</FormLabel>
+              <FormControl>
+                <RadioGroup
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  className="grid grid-cols-2 gap-2 p-2 border-2 border-border bg-card"
+                >
+                  <label className="flex items-center gap-2 px-2 py-1 text-[10px] border-2 border-border bg-muted cursor-pointer">
+                    <RadioGroupItem value="window" className="border-2 border-border" />
+                    Link to Window
+                  </label>
+                  <label className="flex items-center gap-2 px-2 py-1 text-[10px] border-2 border-border bg-muted cursor-pointer">
+                    <RadioGroupItem value="url" className="border-2 border-border" />
+                    Link to URL
+                  </label>
+                </RadioGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )} />
           {form.watch('linkType') === 'url' && (
             <FormField name="url" control={form.control} render={({ field }) => (
@@ -150,7 +163,12 @@ export function AddIconModal({ isOpen, onClose, onCreated }: AddIconModalProps) 
           </div>
         </form>
       </Form>
-
+      <AssetPicker
+        isOpen={assetPickerOpen}
+        onClose={() => setAssetPickerOpen(false)}
+        onSelect={handleAssetSelect}
+        type="image"
+      />
     </PixelModal>
   )
 }

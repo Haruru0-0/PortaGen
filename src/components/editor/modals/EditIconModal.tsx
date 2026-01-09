@@ -13,6 +13,7 @@ import { Icon, useIconContext } from "@/contexts/iconContext";
 import { useParams } from "next/navigation";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import Image from "next/image";
+import { AssetPicker } from "@/components/common/asset-picker";
 
 interface EditIconModalProps {
   isOpen: boolean;
@@ -26,7 +27,7 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
   const schema = z
     .object({
       name: z.string().min(1, 'Name is required'),
-      linkType: z.enum(['window','url']).default('window'),
+      linkType: z.enum(['window', 'url']).default('window'),
       url: z.string().url('Invalid URL').optional().or(z.literal('')),
       fileId: z.union([z.string(), z.number()]).optional(),
     })
@@ -41,6 +42,7 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
   const params = useParams<{ id: string }>()
   const currentPortfolioId = Number(params?.id)
   const { uploadFile, uploading } = useFileUpload()
+  const [assetPickerOpen, setAssetPickerOpen] = useState(false)
 
   useEffect(() => {
     if (icon) {
@@ -56,7 +58,7 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
     try {
       const objectUrl = URL.createObjectURL(file)
       setPreview(objectUrl)
-    } catch {}
+    } catch { }
   }
 
   const handleUpdate = async () => {
@@ -70,10 +72,16 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
         return
       }
       values = { ...values, fileId: res.data.id }
-      if (res.data.url) setPreview(res.data.url)
+      if (res.data.displayUrl) setPreview(res.data.displayUrl)
     }
     const updated = await updateIcon(currentPortfolioId, { id: icon.id, ...values })
     onUpdated(updated)
+  }
+
+  const handleAssetSelect = async (asset: { id: number; url: string; thumbnailUrl?: string }) => {
+    form.setValue("fileId", asset.id)
+    setPreview(asset.thumbnailUrl || asset.url)
+    setSelectedFile(null)
   }
 
   return (
@@ -89,62 +97,73 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
               <FormMessage />
             </FormItem>
           )} />
-        <FormField name="linkType" control={form.control} render={({ field }) => (
-          <FormItem>
-            <FormLabel>LINK TYPE</FormLabel>
-            <FormControl>
-              <RadioGroup
-                value={field.value}
-                onValueChange={field.onChange}
-                className="grid grid-cols-2 gap-2 p-2 border-2 border-border bg-card"
-              >
-                <label className="flex items-center gap-2 px-2 py-1 text-[10px] border-2 border-border bg-muted cursor-pointer">
-                  <RadioGroupItem value="window" className="border-2 border-border" />
-                  Link to Window
-                </label>
-                <label className="flex items-center gap-2 px-2 py-1 text-[10px] border-2 border-border bg-muted cursor-pointer">
-                  <RadioGroupItem value="url" className="border-2 border-border" />
-                  Link to URL
-                </label>
-              </RadioGroup>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )} />
-
-        <div className="space-y-2">
-          <label className="block text-xs uppercase tracking-wider">ICON IMAGE</label>
-          {preview && (
-            <div className="flex justify-center mb-3">
-              <Image src={preview} width={64} height={64} alt="Icon preview" className="border-4 border-border object-cover" />
-            </div>
-          )}
-          <FileUpload accept="image/*" onFileSelect={handleUpload} maxSize={1} label={preview ? "REPLACE IMAGE" : "UPLOAD IMAGE"} />
-          <PixelButton variant="secondary" className="w-full text-[10px] flex items-center justify-center gap-2" disabled>
-            <Library className="w-4 h-4" /> CHOOSE FROM LIBRARY
-          </PixelButton>
-        </div>
-        {form.watch('linkType') === 'url' && (
-          <FormField name="url" control={form.control} render={({ field }) => (
+          <FormField name="linkType" control={form.control} render={({ field }) => (
             <FormItem>
-              <FormLabel>LINK URL</FormLabel>
+              <FormLabel>LINK TYPE</FormLabel>
               <FormControl>
-                <PixelInput placeholder="https://..." {...field} />
+                <RadioGroup
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  className="grid grid-cols-2 gap-2 p-2 border-2 border-border bg-card"
+                >
+                  <label className="flex items-center gap-2 px-2 py-1 text-[10px] border-2 border-border bg-muted cursor-pointer">
+                    <RadioGroupItem value="window" className="border-2 border-border" />
+                    Link to Window
+                  </label>
+                  <label className="flex items-center gap-2 px-2 py-1 text-[10px] border-2 border-border bg-muted cursor-pointer">
+                    <RadioGroupItem value="url" className="border-2 border-border" />
+                    Link to URL
+                  </label>
+                </RadioGroup>
               </FormControl>
               <FormMessage />
             </FormItem>
           )} />
-        )}
-        <div className="flex gap-3 pt-2">
-          <PixelButton type="button" variant="secondary" className="flex-1 text-[10px]" onClick={onClose} disabled={loading || uploading}>
-            CANCEL
-          </PixelButton>
-          <PixelButton type="submit" variant="primary" className="flex-1 text-[10px]" disabled={loading || uploading}>
-            {loading || uploading ? 'UPDATING…' : 'UPDATE'}
-          </PixelButton>
-        </div>
+
+          <div className="space-y-2">
+            <label className="block text-xs uppercase tracking-wider">ICON IMAGE</label>
+            {preview && (
+              <div className="flex justify-center mb-3">
+                <Image src={preview} width={64} height={64} alt="Icon preview" className="border-4 border-border object-cover" />
+              </div>
+            )}
+            <FileUpload accept="image/*" onFileSelect={handleUpload} maxSize={1} label={preview ? "REPLACE IMAGE" : "UPLOAD IMAGE"} />
+            <PixelButton
+              variant="secondary"
+              className="w-full text-[10px] flex items-center justify-center gap-2"
+              onClick={() => setAssetPickerOpen(true)}
+              type="button"
+            >
+              <Library className="w-4 h-4" /> CHOOSE FROM LIBRARY
+            </PixelButton>
+          </div>
+          {form.watch('linkType') === 'url' && (
+            <FormField name="url" control={form.control} render={({ field }) => (
+              <FormItem>
+                <FormLabel>LINK URL</FormLabel>
+                <FormControl>
+                  <PixelInput placeholder="https://..." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+          )}
+          <div className="flex gap-3 pt-2">
+            <PixelButton type="button" variant="secondary" className="flex-1 text-[10px]" onClick={onClose} disabled={loading || uploading}>
+              CANCEL
+            </PixelButton>
+            <PixelButton type="submit" variant="primary" className="flex-1 text-[10px]" disabled={loading || uploading}>
+              {loading || uploading ? 'UPDATING…' : 'UPDATE'}
+            </PixelButton>
+          </div>
         </form>
       </Form>
+      <AssetPicker
+        isOpen={assetPickerOpen}
+        onClose={() => setAssetPickerOpen(false)}
+        onSelect={handleAssetSelect}
+        type="image"
+      />
     </PixelModal>
   )
 }

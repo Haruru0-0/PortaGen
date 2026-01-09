@@ -298,6 +298,22 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
         }
         spotifyAccessTokenRef.current = accessToken;
 
+        // Check premium status before initializing SDK
+        try {
+          const profileRes = await fetch("https://api.spotify.com/v1/me", {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          const profile = await profileRes.json();
+          if (profile.product !== "premium") {
+            console.warn("Spotify user is not premium:", profile.product);
+            setSpotifyFailed(true);
+            // Don't initialize SDK for non-premium users to avoid account_error
+            return;
+          }
+        } catch (e) {
+          console.error("Failed to fetch Spotify profile:", e);
+        }
+
         (window as Window & { onSpotifyWebPlaybackSDKReady?: () => void }).onSpotifyWebPlaybackSDKReady = () => {
           if (cancelled) return;
           const player = new (window as Window & { Spotify?: { Player: new (config: SpotifyPlayerConfig) => SpotifyPlayer } }).Spotify!.Player({
@@ -324,7 +340,7 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
           });
 
           player.addListener("account_error", (error: unknown) => {
-            console.error("Spotify account_error:", error);
+            console.error("Spotify SDK account_error (likely non-premium or auth mismatch):", error);
             setSpotifyFailed(true);
           });
 

@@ -76,17 +76,38 @@ function getStyleConfig(styleId: string) {
 export function ModeToggle({ previewMode, embedded = false }: { previewMode?: "desktop" | "mobile"; embedded?: boolean }) {
   const { theme, setTheme } = useTheme();
   const menubarStyleId = useThemeStore((state) => (state as any).menubarStyleId);
+  const { colors } = useThemeStore();
   const [open, setOpen] = useState(false);
   const mqDesktop = useMediaQuery("(min-width: 768px)");
   const isDesktop = previewMode ? previewMode === "desktop" : mqDesktop;
 
   const shouldShowDrawer = (previewMode === "mobile" && embedded) || (!previewMode && !isDesktop);
-  const styleConfig = getStyleConfig(menubarStyleId || "liquid-glass") as typeof STYLE_CONFIGS["liquid-glass"] & { customBg?: string };
+  let styleConfig = getStyleConfig(menubarStyleId || "liquid-glass") as typeof STYLE_CONFIGS["liquid-glass"] & { customBg?: string };
+
+  // Override pixel style with theme colors
+  if (menubarStyleId === "pixel") {
+    styleConfig = {
+      ...styleConfig,
+      wrapper: "border-4",
+      content: "p-2 w-full font-pixel",
+      item: "w-full cursor-pointer",
+      icon: "",
+      hasGlassLayers: false,
+      trigger: "flex items-center justify-center w-10 h-10 border-4 font-pixel",
+      customBg: colors.background
+    };
+  }
 
   const ModeContent = (
     <div
       className={styleConfig.wrapper}
-      style={styleConfig.customBg ? { background: styleConfig.customBg } : undefined}
+      style={{
+        ...(styleConfig.customBg ? { background: styleConfig.customBg } : {}),
+        ...(menubarStyleId === "pixel" ? {
+          borderColor: colors.accent,
+          color: colors.text
+        } : {})
+      }}
     >
       {styleConfig.hasGlassLayers && (
         <>
@@ -99,27 +120,55 @@ export function ModeToggle({ previewMode, embedded = false }: { previewMode?: "d
         <div
           onClick={() => setTheme("light")}
           className={`${styleConfig.item} flex items-center p-2 rounded-sm`}
+          style={menubarStyleId === "pixel" ? {
+            backgroundColor: 'transparent',
+            color: colors.text
+          } : {}}
+          onMouseEnter={(e) => menubarStyleId === "pixel" && (e.currentTarget.style.backgroundColor = `${colors.accent}40`)}
+          onMouseLeave={(e) => menubarStyleId === "pixel" && (e.currentTarget.style.backgroundColor = 'transparent')}
         >
-          <Sun className={`h-[1.2rem] w-[1.2rem] mr-2 ${styleConfig.icon}`} /> Light
+          <Sun className={`h-[1.2rem] w-[1.2rem] mr-2 ${styleConfig.icon}`} style={menubarStyleId === "pixel" ? { color: colors.text } : {}} /> Light
         </div>
         <div
           onClick={() => setTheme("dark")}
           className={`${styleConfig.item} flex items-center p-2 rounded-sm`}
+          style={menubarStyleId === "pixel" ? {
+            backgroundColor: 'transparent',
+            color: colors.text
+          } : {}}
+          onMouseEnter={(e) => menubarStyleId === "pixel" && (e.currentTarget.style.backgroundColor = `${colors.accent}40`)}
+          onMouseLeave={(e) => menubarStyleId === "pixel" && (e.currentTarget.style.backgroundColor = 'transparent')}
         >
-          <Moon className={`h-[1.2rem] w-[1.2rem] mr-2 ${styleConfig.icon}`} /> Dark
+          <Moon className={`h-[1.2rem] w-[1.2rem] mr-2 ${styleConfig.icon}`} style={menubarStyleId === "pixel" ? { color: colors.text } : {}} /> Dark
         </div>
         <div
           onClick={() => setTheme("system")}
           className={`${styleConfig.item} flex items-center p-2 rounded-sm`}
+          style={menubarStyleId === "pixel" ? {
+            backgroundColor: 'transparent',
+            color: colors.text
+          } : {}}
+          onMouseEnter={(e) => menubarStyleId === "pixel" && (e.currentTarget.style.backgroundColor = `${colors.accent}40`)}
+          onMouseLeave={(e) => menubarStyleId === "pixel" && (e.currentTarget.style.backgroundColor = 'transparent')}
         >
-          <Monitor className={`h-[1.2rem] w-[1.2rem] mr-2 ${styleConfig.icon}`} /> System
+          <Monitor className={`h-[1.2rem] w-[1.2rem] mr-2 ${styleConfig.icon}`} style={menubarStyleId === "pixel" ? { color: colors.text } : {}} /> System
         </div>
       </div>
     </div>
   );
 
   const TriggerButton = (
-    <button className={styleConfig.trigger}>
+    <button
+      className={styleConfig.trigger}
+      style={menubarStyleId === "pixel" ? {
+        borderColor: colors.accent,
+        backgroundColor: colors.background,
+        color: colors.text
+      } : {}}
+      onMouseDown={(e) => menubarStyleId === "pixel" && (e.currentTarget.style.backgroundColor = `${colors.accent}40`)}
+      onMouseUp={(e) => menubarStyleId === "pixel" && (e.currentTarget.style.backgroundColor = colors.background)}
+      onMouseLeave={(e) => menubarStyleId === "pixel" && (e.currentTarget.style.backgroundColor = colors.background)}
+    >
       <Sun
         className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 data-[theme=system]:rotate-90 data-[theme=system]:scale-0"
         data-theme={theme}

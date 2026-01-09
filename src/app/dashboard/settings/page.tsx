@@ -132,12 +132,6 @@ export default function SettingsPage() {
               <h2 className="text-lg pixel-text-shadow mb-2">SETTINGS</h2>
               <p className="text-[10px] text-muted-foreground">MANAGE YOUR ACCOUNT</p>
             </div>
-            <Link href="/portfolio/preview">
-              <PixelButton variant="primary" className="w-full flex items-center">
-                <Eye className="w-4 h-4 mr-2" />
-                PREVIEW PORTFOLIO
-              </PixelButton>
-            </Link>
           </div>
           {message && (
               <div className={`p-3 border-2 text-[10px] text-center ${
@@ -198,15 +192,6 @@ export default function SettingsPage() {
                   <p className="text-[8px] text-muted-foreground">
                     EMAIL CANNOT BE CHANGED HERE. CONTACT SUPPORT.
                   </p>
-                  <div className="space-y-2">
-                    <label className="block text-xs uppercase tracking-wider">BIO</label>
-                    <textarea
-                        className="w-full px-4 py-3 text-xs bg-input border-4 border-border focus:outline-none focus:ring-2 focus:ring-ring"
-                        rows={3}
-                        value={profile.bio}
-                        onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                    />
-                  </div>
                 </div>
               </div>
 
