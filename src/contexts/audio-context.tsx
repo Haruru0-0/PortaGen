@@ -7,6 +7,7 @@ export const AudioContext = createContext({
   isPlaying: false,
   progress: 0,
   volume: 70,
+  duration: 0,
   isLoading: false,
   setCurrentTrack: (track: Track) => { },
   setIsPlaying: (playing: boolean) => { },
@@ -20,6 +21,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [volume, setVolume] = useState(70);
+  const [duration, setDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -39,6 +41,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         setProgress(isNaN(newProgress) ? 0 : newProgress);
       };
 
+      const handleDurationChange = () => {
+        setDuration(audio.duration || 0);
+      };
+
       const handleEnded = () => {
         const currentIndex = playlist.findIndex(t => t.id === currentTrack.id);
         const nextIndex = (currentIndex + 1) % playlist.length;
@@ -47,6 +53,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
       audio.addEventListener('timeupdate', updateProgress);
       audio.addEventListener('ended', handleEnded);
+      audio.addEventListener('durationchange', handleDurationChange);
+      audio.addEventListener('loadedmetadata', handleDurationChange);
 
       // Restore playback state if it was playing
       if (isPlaying) {
@@ -56,6 +64,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       return () => {
         audio.removeEventListener('timeupdate', updateProgress);
         audio.removeEventListener('ended', handleEnded);
+        audio.removeEventListener('durationchange', handleDurationChange);
+        audio.removeEventListener('loadedmetadata', handleDurationChange);
         // Don't remove the audio element - we want it to persist
       };
     }
@@ -110,6 +120,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         isPlaying,
         progress,
         volume,
+        duration,
         isLoading,
         setCurrentTrack,
         setIsPlaying,

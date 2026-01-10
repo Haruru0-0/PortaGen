@@ -39,7 +39,12 @@ export function Windows7MusicPlayer(props: MusicPlayerStyleProps) {
     }
 
     if (playerType === "expanded") {
-        const expandedProps = props as unknown as MusicPlayerStyleProps & {
+        const {
+            showPlaylist, setShowPlaylist, handleDesktopClose, handlePlaylistToggle,
+            progress, handleSeek, formatTime, spDurationMs, isPlaying, onPlayPause,
+            onNext, onPrevious, volume, setVolume, playClickSound, playlistRef,
+            spotifyPlaylistTracks, playlist, changeTrack, formatDuration
+        } = props as unknown as MusicPlayerStyleProps & {
             showPlaylist: boolean, setShowPlaylist: (show: boolean) => void, handleDesktopClose: () => void,
             handlePlaylistToggle: () => void, progress: number, handleSeek: (value: number[]) => void,
             formatTime: (progress: number) => string, spDurationMs: number, isPlaying: boolean,
@@ -48,7 +53,7 @@ export function Windows7MusicPlayer(props: MusicPlayerStyleProps) {
             spotifyPlaylistTracks: SpotifyTrack[], playlist: Track[], changeTrack: (track: Track) => void, formatDuration: (ms: number) => string
         }
 
-        const displayTracks = useSpotify ? expandedProps.spotifyPlaylistTracks : expandedProps.playlist;
+        const displayTracks = useSpotify ? spotifyPlaylistTracks : playlist;
 
         return (
             <div
@@ -76,7 +81,7 @@ export function Windows7MusicPlayer(props: MusicPlayerStyleProps) {
                             </button>
                             <button
                                 className="w-10 h-6 flex items-center justify-center hover:bg-red-500 transition-colors bg-red-500/10"
-                                onClick={expandedProps.handleDesktopClose}
+                                onClick={handleDesktopClose}
                             >
                                 <X className="w-3.5 h-3.5 text-white" />
                             </button>
@@ -96,13 +101,13 @@ export function Windows7MusicPlayer(props: MusicPlayerStyleProps) {
                                 />
                             </div>
                         ) : (
-                            expandedProps.showPlaylist ? (
-                                <div ref={expandedProps.playlistRef} className="w-full h-full flex flex-col min-h-0 bg-black/20 rounded-lg p-2 border border-white/5">
+                            showPlaylist ? (
+                                <div ref={playlistRef} className="w-full h-full flex flex-col min-h-0 bg-black/20 rounded-lg p-2 border border-white/5">
                                     <div className="flex justify-between items-center mb-3 px-2">
                                         <span className="text-[10px] uppercase font-bold text-blue-200/50 tracking-wider">Now Playing List</span>
                                         <button
                                             className="p-1 hover:bg-white/10 rounded"
-                                            onClick={expandedProps.handlePlaylistToggle}
+                                            onClick={handlePlaylistToggle}
                                         >
                                             <X className="w-3 h-3 text-white/50" />
                                         </button>
@@ -114,7 +119,7 @@ export function Windows7MusicPlayer(props: MusicPlayerStyleProps) {
                                                 <div
                                                     key={track.id}
                                                     className={`flex items-center gap-3 p-2 rounded transition-all cursor-pointer group ${isCurrent ? 'bg-blue-500/30 border border-blue-400/30' : 'hover:bg-white/5 border border-transparent'}`}
-                                                    onClick={() => !useSpotify && expandedProps.changeTrack(track)}
+                                                    onClick={() => !useSpotify && changeTrack(track)}
                                                 >
                                                     <div className="w-8 h-8 rounded shrink-0 border border-white/10 overflow-hidden">
                                                         <Image
@@ -165,17 +170,17 @@ export function Windows7MusicPlayer(props: MusicPlayerStyleProps) {
                         <div className="bg-blue-900/40 backdrop-blur-md p-6 border-t border-white/10">
                             <div className="space-y-2 mb-6">
                                 <Slider
-                                    value={[expandedProps.progress]}
+                                    value={[progress]}
                                     max={100}
                                     step={0.1}
-                                    onValueChange={expandedProps.handleSeek}
+                                    onValueChange={handleSeek}
                                     disabled={isLoading}
                                     trackClassName="bg-black/30 h-1.5 rounded-full border border-white/5"
                                     rangeClassName="bg-gradient-to-r from-blue-400 to-blue-300 rounded-full"
                                     thumbClassName="h-4 w-4 bg-gradient-to-b from-white to-zinc-300 border border-black/20 shadow-lg cursor-pointer transition-transform active:scale-125"
                                 />
                                 <div className="flex justify-between text-[9px] font-bold text-blue-200/40 tabular-nums uppercase tracking-tighter">
-                                    <span>{expandedProps.formatTime(expandedProps.progress)}</span>
+                                    <span>{formatTime(progress)}</span>
                                     <span>{currentTrack.duration}</span>
                                 </div>
                             </div>
@@ -183,7 +188,7 @@ export function Windows7MusicPlayer(props: MusicPlayerStyleProps) {
                             <div className="flex justify-between items-center px-4">
                                 <button
                                     className="w-10 h-10 rounded-full bg-gradient-to-b from-blue-400/20 to-blue-600/20 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all active:scale-90"
-                                    onClick={expandedProps.handlePlaylistToggle}
+                                    onClick={handlePlaylistToggle}
                                 >
                                     <List className="w-4 h-4 text-white/60" />
                                 </button>
@@ -191,18 +196,18 @@ export function Windows7MusicPlayer(props: MusicPlayerStyleProps) {
                                 <div className="flex items-center gap-4">
                                     <button
                                         className="w-10 h-10 rounded-full bg-gradient-to-b from-blue-400/20 to-blue-600/20 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all active:scale-90"
-                                        onClick={expandedProps.onPrevious}
+                                        onClick={onPrevious}
                                     >
                                         <SkipBack className="w-5 h-5 text-white/80 fill-current" />
                                     </button>
                                     <button
                                         className="w-14 h-14 rounded-full bg-gradient-to-b from-blue-500 to-blue-700 p-[2px] shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
-                                        onClick={expandedProps.onPlayPause}
+                                        onClick={onPlayPause}
                                     >
                                         <div className="w-full h-full rounded-full bg-gradient-to-b from-white/20 to-transparent flex items-center justify-center border border-white/10">
                                             {isLoading ? (
                                                 <Loader2 className="w-7 h-7 text-white animate-spin" />
-                                            ) : expandedProps.isPlaying ? (
+                                            ) : isPlaying ? (
                                                 <Pause className="w-7 h-7 text-white fill-current" />
                                             ) : (
                                                 <Play className="w-7 h-7 text-white fill-current ml-1" />
@@ -211,7 +216,7 @@ export function Windows7MusicPlayer(props: MusicPlayerStyleProps) {
                                     </button>
                                     <button
                                         className="w-10 h-10 rounded-full bg-gradient-to-b from-blue-400/20 to-blue-600/20 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all active:scale-90"
-                                        onClick={expandedProps.onNext}
+                                        onClick={onNext}
                                     >
                                         <SkipForward className="w-5 h-5 text-white/80 fill-current" />
                                     </button>

@@ -154,6 +154,7 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
     isPlaying,
     progress,
     volume,
+    duration,
     isLoading,
     setCurrentTrack,
     setIsPlaying,
@@ -172,6 +173,7 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
 
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+
   const spotifyEmbedUrl = (() => {
     if (!spotifyPlaylistUrl) return "";
     try {
@@ -746,9 +748,10 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
       const seconds = totalSeconds % 60;
       return `${minutes}:${seconds.toString().padStart(2, "0")}`;
     }
-    if (!audioRef.current || isNaN(audioRef.current.duration)) return "0:00";
+    
+    if (!duration) return "0:00";
     const totalSeconds = Math.floor(
-      (audioRef.current.duration * progress) / 100
+      (duration * progress) / 100
     );
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;

@@ -40,7 +40,12 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
     }
 
     if (playerType === "expanded") {
-        const expandedProps = props as unknown as MusicPlayerStyleProps & {
+        const {
+            showPlaylist, setShowPlaylist, handleDesktopClose, handlePlaylistToggle,
+            progress, handleSeek, formatTime, spDurationMs, isPlaying, onPlayPause,
+            onNext, onPrevious, volume, setVolume, playClickSound, playlistRef,
+            spotifyPlaylistTracks, playlist, changeTrack, formatDuration
+        } = props as unknown as MusicPlayerStyleProps & {
             showPlaylist: boolean, setShowPlaylist: (show: boolean) => void, handleDesktopClose: () => void,
             handlePlaylistToggle: () => void, progress: number, handleSeek: (value: number[]) => void,
             formatTime: (progress: number) => string, spDurationMs: number, isPlaying: boolean,
@@ -49,7 +54,7 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
             spotifyPlaylistTracks: SpotifyTrack[], playlist: Track[], changeTrack: (track: Track) => void, formatDuration: (ms: number) => string
         }
 
-        const displayTracks = useSpotify ? expandedProps.spotifyPlaylistTracks : expandedProps.playlist;
+        const displayTracks = useSpotify ? spotifyPlaylistTracks : playlist;
 
         return (
             <div
@@ -71,7 +76,7 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
                         </button>
                         <button
                             className="w-4 h-3.5 bg-[#c0c0c0] border-t-2 border-l-2 border-white border-b-2 border-r-2 border-[#808080] shadow-[0.5px_0.5px_0_0_#000] flex items-center justify-center active:border-t-[#808080] active:border-l-[#808080] active:border-b-white active:border-r-white"
-                            onClick={expandedProps.handleDesktopClose}
+                            onClick={handleDesktopClose}
                         >
                             <X className="w-2.5 h-2.5 text-black" strokeWidth={4} />
                         </button>
@@ -93,13 +98,13 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
                     ) : (
                         <>
                             <div className="flex-1 min-h-0 flex flex-col border-t-2 border-l-2 border-[#808080] border-b-2 border-r-2 border-white bg-black relative overflow-hidden">
-                                {expandedProps.showPlaylist ? (
-                                    <div ref={expandedProps.playlistRef} className="w-full h-full flex flex-col min-h-0 bg-white p-2">
+                                {showPlaylist ? (
+                                    <div ref={playlistRef} className="w-full h-full flex flex-col min-h-0 bg-white p-2">
                                         <div className="flex justify-between items-center mb-1 pb-1 border-b border-black">
                                             <span className="text-[9px] font-bold text-black uppercase">Playlist</span>
                                             <button
                                                 className="w-4 h-3.5 bg-[#c0c0c0] border-t border-l border-white border-b border-r border-[#808080] flex items-center justify-center"
-                                                onClick={expandedProps.handlePlaylistToggle}
+                                                onClick={handlePlaylistToggle}
                                             >
                                                 <X className="w-2 h-2 text-black" />
                                             </button>
@@ -111,7 +116,7 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
                                                     <div
                                                         key={track.id}
                                                         className={`flex items-center gap-2 p-1 transition-all cursor-pointer ${isCurrent ? 'bg-[#000080] text-white' : 'text-black hover:bg-[#c0c0c0]'}`}
-                                                        onClick={() => !useSpotify && expandedProps.changeTrack(track)}
+                                                        onClick={() => !useSpotify && changeTrack(track)}
                                                     >
                                                         <div className="w-6 h-6 shrink-0 border border-[#808080]">
                                                             <Image
@@ -159,20 +164,20 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
                                     <div className="flex-1 h-4 bg-white border-t-2 border-l-2 border-[#808080] border-b border-white border-r border-white relative">
                                         <div
                                             className="h-full bg-[#000080]"
-                                            style={{ width: `${expandedProps.progress}%` }}
+                                            style={{ width: `${progress}%` }}
                                         />
                                         <Slider
-                                            value={[expandedProps.progress]}
+                                            value={[progress]}
                                             max={100}
                                             step={0.1}
-                                            onValueChange={expandedProps.handleSeek}
+                                            onValueChange={handleSeek}
                                             disabled={isLoading}
                                             className="absolute inset-0 opacity-0 cursor-pointer h-full z-10"
                                         />
                                     </div>
                                     <div className="bg-black border border-[#808080] px-1 h-4 flex items-center">
                                         <span className="text-[9px] font-mono text-[#00ff00] leading-none tabular-nums">
-                                            {expandedProps.formatTime(expandedProps.progress)}
+                                            {formatTime(progress)}
                                         </span>
                                     </div>
                                 </div>
@@ -180,7 +185,7 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
                                 <div className="flex justify-between items-center">
                                     <button
                                         className="h-6 px-2 bg-[#c0c0c0] border-t-2 border-l-2 border-white border-b-2 border-r-2 border-[#808080] shadow-[1px_1px_0_0_#000] flex items-center justify-center active:border-t-[#808080] active:border-l-[#808080] active:border-b-white active:border-r-white active:shadow-[-0.5px_-0.5px_0_0_#000]"
-                                        onClick={expandedProps.handlePlaylistToggle}
+                                        onClick={handlePlaylistToggle}
                                     >
                                         <List className="w-3.5 h-3.5 text-black" />
                                     </button>
@@ -188,17 +193,17 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
                                     <div className="flex items-center gap-1">
                                         <button
                                             className="w-8 h-7 bg-[#c0c0c0] border-t-2 border-l-2 border-white border-b-2 border-r-2 border-[#808080] shadow-[1px_1px_0_0_#000] flex items-center justify-center active:border-t-[#808080] active:border-l-[#808080] active:border-b-white active:border-r-white"
-                                            onClick={expandedProps.onPrevious}
+                                            onClick={onPrevious}
                                         >
                                             <SkipBack className="w-3.5 h-3.5 text-black fill-black" />
                                         </button>
                                         <button
                                             className="w-10 h-8 bg-[#c0c0c0] border-t-2 border-l-2 border-white border-b-2 border-r-2 border-[#808080] shadow-[1px_1px_0_0_#000] flex items-center justify-center active:border-t-[#808080] active:border-l-[#808080] active:border-b-white active:border-r-white"
-                                            onClick={expandedProps.onPlayPause}
+                                            onClick={onPlayPause}
                                         >
                                             {isLoading ? (
                                                 <Loader2 className="w-4 h-4 text-black animate-spin" />
-                                            ) : expandedProps.isPlaying ? (
+                                            ) : isPlaying ? (
                                                 <Pause className="w-4 h-4 text-black fill-black" />
                                             ) : (
                                                 <Play className="w-4 h-4 text-black fill-black ml-0.5" />
@@ -206,7 +211,7 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
                                         </button>
                                         <button
                                             className="w-8 h-7 bg-[#c0c0c0] border-t-2 border-l-2 border-white border-b-2 border-r-2 border-[#808080] shadow-[1px_1px_0_0_#000] flex items-center justify-center active:border-t-[#808080] active:border-l-[#808080] active:border-b-white active:border-r-white"
-                                            onClick={expandedProps.onNext}
+                                            onClick={onNext}
                                         >
                                             <SkipForward className="w-3.5 h-3.5 text-black fill-black" />
                                         </button>
@@ -223,14 +228,18 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
     }
 
     if (playerType === "mobile") {
-        const mobileProps = props as unknown as MusicPlayerStyleProps & {
+        const {
+            showPlaylist, setShowPlaylist, handlePlaylistToggle, handlePrevious, playClickSound,
+            handlePlayPause, isPlaying, handleNext, progress, handleSeek, formatTime,
+            spotifyPlaylistTracks, playlist, changeTrack, formatDuration
+        } = props as unknown as MusicPlayerStyleProps & {
             showPlaylist: boolean, setShowPlaylist: (show: boolean) => void, handlePlaylistToggle: () => void,
             handlePrevious: () => void, playClickSound: () => void, handlePlayPause: () => void, isPlaying: boolean,
             handleNext: () => void, progress: number, handleSeek: (value: number[]) => void, formatTime: (progress: number) => string,
             spotifyPlaylistTracks: SpotifyTrack[], playlist: Track[], changeTrack: (track: Track) => void, formatDuration: (ms: number) => string
         }
 
-        const displayTracks = useSpotify ? mobileProps.spotifyPlaylistTracks : mobileProps.playlist;
+        const displayTracks = useSpotify ? spotifyPlaylistTracks : playlist;
 
         return (
             <div className="flex flex-col items-center justify-center w-full px-1 font-['MS_Sans_Serif',sans-serif]">
@@ -243,12 +252,12 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
                         {/* Mobile Title */}
                         <div className="bg-[#000080] h-5 px-1 flex items-center justify-between mb-1 shrink-0">
                             <span className="text-[9px] font-bold text-white uppercase">Mobile Media Player</span>
-                            <button onClick={mobileProps.handlePlaylistToggle}>
+                            <button onClick={handlePlaylistToggle}>
                                 <List className="w-3.5 h-3.5 text-white" />
                             </button>
                         </div>
 
-                        {mobileProps.showPlaylist ? (
+                        {showPlaylist ? (
                             <div className="flex flex-col h-full min-h-0 bg-white border-t border-l border-[#808080] p-1">
                                 <div className="flex-1 overflow-hidden">
                                     <div
@@ -262,7 +271,7 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
                                                     key={track.id}
                                                     style={{ scrollSnapAlign: 'start' }}
                                                     className={`flex flex-col items-center gap-1 min-w-[90px] max-w-[90px] transition-all ${isCurrent ? 'scale-105' : 'opacity-60 active:scale-95'}`}
-                                                    onClick={() => !useSpotify && mobileProps.changeTrack(track)}
+                                                    onClick={() => !useSpotify && changeTrack(track)}
                                                 >
                                                     <div className={`w-16 h-16 border-2 transition-all ${isCurrent ? 'border-[#000080]' : 'border-transparent'}`}>
                                                         <Image
@@ -306,17 +315,17 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
                                         <div className="flex items-center gap-1.5">
                                             <button
                                                 className="w-8 h-7 bg-[#c0c0c0] border-t border-l border-white border-b border-r border-[#808080] shadow-[0.5px_0.5px_0_0_#000] flex items-center justify-center active:border-t-[#808080] active:border-l-[#808080]"
-                                                onClick={() => { mobileProps.handlePrevious(); mobileProps.playClickSound(); handleButtonClick(6) }}
+                                                onClick={() => { handlePrevious(); playClickSound(); handleButtonClick(6) }}
                                             >
                                                 <SkipBack className="w-3.5 h-3.5 text-black fill-black" />
                                             </button>
                                             <button
                                                 className="w-10 h-8 bg-[#c0c0c0] border-t border-l border-white border-b border-r border-[#808080] shadow-[0.5px_0.5px_0_0_#000] flex items-center justify-center active:border-t-[#808080] active:border-l-[#808080]"
-                                                onClick={() => { mobileProps.handlePlayPause(); handleButtonClick(7) }}
+                                                onClick={() => { handlePlayPause(); handleButtonClick(7) }}
                                             >
                                                 {isLoading ? (
                                                     <Loader2 className="w-4 h-4 text-black animate-spin" />
-                                                ) : mobileProps.isPlaying ? (
+                                                ) : isPlaying ? (
                                                     <Pause className="w-4 h-4 text-black fill-black" />
                                                 ) : (
                                                     <Play className="w-4 h-4 text-black fill-black ml-0.5" />
@@ -324,7 +333,7 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
                                             </button>
                                             <button
                                                 className="w-8 h-7 bg-[#c0c0c0] border-t border-l border-white border-b border-r border-[#808080] shadow-[0.5px_0.5px_0_0_#000] flex items-center justify-center active:border-t-[#808080] active:border-l-[#808080]"
-                                                onClick={() => { mobileProps.handleNext(); mobileProps.playClickSound(); handleButtonClick(8) }}
+                                                onClick={() => { handleNext(); playClickSound(); handleButtonClick(8) }}
                                             >
                                                 <SkipForward className="w-3.5 h-3.5 text-black fill-black" />
                                             </button>
@@ -337,20 +346,20 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
                                         <div className="flex-1 h-3 bg-white border-t border-l border-[#808080] overflow-hidden relative">
                                             <div
                                                 className="h-full bg-[#000080]"
-                                                style={{ width: `${mobileProps.progress}%` }}
+                                                style={{ width: `${progress}%` }}
                                             />
                                             <Slider
-                                                value={[mobileProps.progress]}
+                                                value={[progress]}
                                                 max={100}
                                                 step={0.1}
-                                                onValueChange={mobileProps.handleSeek}
+                                                onValueChange={handleSeek}
                                                 disabled={isLoading}
                                                 className="absolute inset-0 opacity-0 h-full cursor-pointer z-10"
                                             />
                                         </div>
                                         <div className="bg-black px-1">
                                             <span className="text-[8px] font-mono text-[#00ff00] tabular-nums whitespace-nowrap">
-                                                {mobileProps.formatTime(mobileProps.progress)}
+                                                {formatTime(progress)}
                                             </span>
                                         </div>
                                     </div>

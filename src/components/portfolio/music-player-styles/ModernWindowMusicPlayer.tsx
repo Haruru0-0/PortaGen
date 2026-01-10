@@ -46,7 +46,12 @@ export function ModernWindowMusicPlayer(props: MusicPlayerStyleProps) {
     }
 
     if (playerType === "expanded") {
-        const expandedProps = props as unknown as MusicPlayerStyleProps & {
+        const {
+            showPlaylist, setShowPlaylist, handleDesktopClose, handlePlaylistToggle,
+            progress, handleSeek, formatTime, spDurationMs, isPlaying, onPlayPause,
+            onNext, onPrevious, volume, setVolume, playClickSound, playlistRef,
+            spotifyPlaylistTracks, playlist, changeTrack, formatDuration
+        } = props as unknown as MusicPlayerStyleProps & {
             showPlaylist: boolean, setShowPlaylist: (show: boolean) => void, handleDesktopClose: () => void,
             handlePlaylistToggle: () => void, progress: number, handleSeek: (value: number[]) => void,
             formatTime: (progress: number) => string, spDurationMs: number, isPlaying: boolean,
@@ -55,7 +60,7 @@ export function ModernWindowMusicPlayer(props: MusicPlayerStyleProps) {
             spotifyPlaylistTracks: SpotifyTrack[], playlist: Track[], changeTrack: (track: Track) => void, formatDuration: (ms: number) => string
         }
 
-        const displayTracks = useSpotify ? expandedProps.spotifyPlaylistTracks : expandedProps.playlist;
+        const displayTracks = useSpotify ? spotifyPlaylistTracks : playlist;
 
         return (
             <div
@@ -74,14 +79,14 @@ export function ModernWindowMusicPlayer(props: MusicPlayerStyleProps) {
                         </div>
                         <div className="flex gap-1.5">
                             <button
-                                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${expandedProps.showPlaylist ? 'bg-zinc-100 dark:bg-zinc-800' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}`}
-                                onClick={expandedProps.handlePlaylistToggle}
+                                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${showPlaylist ? 'bg-zinc-100 dark:bg-zinc-800' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}`}
+                                onClick={handlePlaylistToggle}
                             >
                                 <List className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
                             </button>
                             <button
                                 className="w-8 h-8 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center justify-center transition-all group"
-                                onClick={expandedProps.handleDesktopClose}
+                                onClick={handleDesktopClose}
                             >
                                 <X className="w-4 h-4 text-zinc-400 group-hover:text-red-500 transition-colors" />
                             </button>
@@ -101,8 +106,8 @@ export function ModernWindowMusicPlayer(props: MusicPlayerStyleProps) {
                                 />
                             </div>
                         ) : (
-                            expandedProps.showPlaylist ? (
-                                <div ref={expandedProps.playlistRef} className="w-full h-full flex flex-col min-h-0">
+                            showPlaylist ? (
+                                <div ref={playlistRef} className="w-full h-full flex flex-col min-h-0">
                                     <h4 className="text-zinc-400 text-[10px] font-bold mb-3 uppercase tracking-widest">Up Next</h4>
                                     <div className="flex-1 overflow-y-auto pr-1 space-y-1.5 custom-scrollbar">
                                         {displayTracks.map((track: any) => {
@@ -111,7 +116,7 @@ export function ModernWindowMusicPlayer(props: MusicPlayerStyleProps) {
                                                 <div
                                                     key={track.id}
                                                     className={`flex items-center gap-3 p-2.5 rounded-xl transition-all cursor-pointer group ${isCurrent ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}`}
-                                                    onClick={() => !useSpotify && expandedProps.changeTrack(track)}
+                                                    onClick={() => !useSpotify && changeTrack(track)}
                                                 >
                                                     <div className="w-10 h-10 rounded-lg overflow-hidden border border-zinc-100 dark:border-zinc-800 flex-shrink-0 shadow-sm">
                                                         <Image
@@ -131,7 +136,7 @@ export function ModernWindowMusicPlayer(props: MusicPlayerStyleProps) {
                                                         </p>
                                                     </div>
                                                     <span className="text-[10px] text-zinc-400">
-                                                        {useSpotify ? expandedProps.formatDuration(track.duration_ms) : track.duration}
+                                                        {useSpotify ? formatDuration(track.duration_ms) : track.duration}
                                                     </span>
                                                 </div>
                                             );
@@ -168,18 +173,18 @@ export function ModernWindowMusicPlayer(props: MusicPlayerStyleProps) {
                         <div className="px-6 pb-6 pt-2 shrink-0 space-y-4">
                             <div className="space-y-1.5">
                                 <Slider
-                                    value={[expandedProps.progress]}
+                                    value={[progress]}
                                     max={100}
                                     step={0.1}
                                     className="flex-1"
-                                    onValueChange={expandedProps.handleSeek}
+                                    onValueChange={handleSeek}
                                     disabled={isLoading}
                                     trackClassName="bg-zinc-100 dark:bg-zinc-800 h-1.5 rounded-full"
                                     rangeClassName="bg-blue-500 rounded-full"
                                     thumbClassName="h-3.5 w-3.5 bg-white dark:bg-zinc-100 border-2 border-blue-500 shadow-lg cursor-pointer transition-transform active:scale-125"
                                 />
                                 <div className="flex justify-between text-[10px] text-zinc-400 dark:text-zinc-500 font-semibold tabular-nums">
-                                    <span>{expandedProps.formatTime(expandedProps.progress)}</span>
+                                    <span>{formatTime(progress)}</span>
                                     <span>{currentTrack.duration}</span>
                                 </div>
                             </div>
@@ -187,17 +192,17 @@ export function ModernWindowMusicPlayer(props: MusicPlayerStyleProps) {
                             <div className="flex justify-center items-center gap-6">
                                 <button
                                     className="w-10 h-10 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center transition-all text-zinc-700 dark:text-zinc-300 active:scale-95"
-                                    onClick={expandedProps.onPrevious}
+                                    onClick={onPrevious}
                                 >
                                     <SkipBack className="w-5 h-5 fill-current" />
                                 </button>
                                 <button
                                     className="w-14 h-14 rounded-2xl bg-blue-500 hover:bg-blue-600 flex items-center justify-center transition-all text-white shadow-lg shadow-blue-500/25 active:scale-90"
-                                    onClick={expandedProps.onPlayPause}
+                                    onClick={onPlayPause}
                                 >
                                     {isLoading ? (
                                         <Loader2 className="w-7 h-7 animate-spin" />
-                                    ) : expandedProps.isPlaying ? (
+                                    ) : isPlaying ? (
                                         <Pause className="w-7 h-7 fill-current" />
                                     ) : (
                                         <Play className="w-7 h-7 fill-current ml-1" />
@@ -205,7 +210,7 @@ export function ModernWindowMusicPlayer(props: MusicPlayerStyleProps) {
                                 </button>
                                 <button
                                     className="w-10 h-10 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center transition-all text-zinc-700 dark:text-zinc-300 active:scale-95"
-                                    onClick={expandedProps.onNext}
+                                    onClick={onNext}
                                 >
                                     <SkipForward className="w-5 h-5 fill-current" />
                                 </button>

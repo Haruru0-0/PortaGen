@@ -38,7 +38,12 @@ export function LiquidGlassMusicPlayer(props: MusicPlayerStyleProps) {
     }
 
     if (playerType === "expanded") {
-        const expandedProps = props as unknown as MusicPlayerStyleProps & {
+        const {
+            showPlaylist, setShowPlaylist, handleDesktopClose, handlePlaylistToggle,
+            progress, handleSeek, formatTime, spDurationMs, isPlaying, onPlayPause,
+            onNext, onPrevious, volume, setVolume, playClickSound, playlistRef,
+            spotifyPlaylistTracks, playlist, changeTrack, formatDuration
+        } = props as unknown as MusicPlayerStyleProps & {
             showPlaylist: boolean, setShowPlaylist: (show: boolean) => void, handleDesktopClose: () => void,
             handlePlaylistToggle: () => void, progress: number, handleSeek: (value: number[]) => void,
             formatTime: (progress: number) => string, spDurationMs: number, isPlaying: boolean,
@@ -47,7 +52,7 @@ export function LiquidGlassMusicPlayer(props: MusicPlayerStyleProps) {
             spotifyPlaylistTracks: SpotifyTrack[], playlist: Track[], changeTrack: (track: Track) => void, formatDuration: (ms: number) => string
         }
 
-        const displayTracks = useSpotify ? expandedProps.spotifyPlaylistTracks : expandedProps.playlist;
+        const displayTracks = useSpotify ? spotifyPlaylistTracks : playlist;
 
         return (
             <div
@@ -64,14 +69,14 @@ export function LiquidGlassMusicPlayer(props: MusicPlayerStyleProps) {
                         </div>
                         <div className="flex gap-2">
                             <button
-                                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${expandedProps.showPlaylist ? 'bg-white/20' : 'hover:bg-white/10'}`}
-                                onClick={expandedProps.handlePlaylistToggle}
+                                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${showPlaylist ? 'bg-white/20' : 'hover:bg-white/10'}`}
+                                onClick={handlePlaylistToggle}
                             >
                                 <List className="w-4 h-4 opacity-80" />
                             </button>
                             <button
                                 className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition-all"
-                                onClick={expandedProps.handleDesktopClose}
+                                onClick={handleDesktopClose}
                             >
                                 <X className="w-4 h-4 opacity-80" />
                             </button>
@@ -91,8 +96,8 @@ export function LiquidGlassMusicPlayer(props: MusicPlayerStyleProps) {
                                 />
                             </div>
                         ) : (
-                            expandedProps.showPlaylist ? (
-                                <div ref={expandedProps.playlistRef} className="w-full h-full flex flex-col min-h-0">
+                            showPlaylist ? (
+                                <div ref={playlistRef} className="w-full h-full flex flex-col min-h-0">
                                     <h4 className="text-[10px] font-bold mb-4 uppercase tracking-widest opacity-50">Queue</h4>
                                     <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar scrollbar-thin scrollbar-thumb-white/20">
                                         {displayTracks.map((track: any) => {
@@ -101,7 +106,7 @@ export function LiquidGlassMusicPlayer(props: MusicPlayerStyleProps) {
                                                 <div
                                                     key={track.id}
                                                     className={`flex items-center gap-4 p-3 rounded-2xl transition-all cursor-pointer group ${isCurrent ? 'bg-white/20 border border-white/10' : 'hover:bg-white/5 border border-transparent'}`}
-                                                    onClick={() => !useSpotify && expandedProps.changeTrack(track)}
+                                                    onClick={() => !useSpotify && changeTrack(track)}
                                                 >
                                                     <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/10">
                                                         <Image
@@ -154,17 +159,17 @@ export function LiquidGlassMusicPlayer(props: MusicPlayerStyleProps) {
                     {!props.isSpotifyFallback && (
                         <div className="mt-8 space-y-3 shrink-0">
                             <Slider
-                                value={[expandedProps.progress]}
+                                value={[progress]}
                                 max={100}
                                 step={0.1}
-                                onValueChange={expandedProps.handleSeek}
+                                onValueChange={handleSeek}
                                 disabled={isLoading}
                                 trackClassName="bg-white/10 h-1.5 rounded-full"
                                 rangeClassName="bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full shadow-[0_0_15px_rgba(96,165,250,0.5)]"
                                 thumbClassName="h-4 w-4 bg-white shadow-xl ring-4 ring-white/10 cursor-pointer active:scale-125 transition-transform"
                             />
                             <div className="flex justify-between text-[10px] font-bold text-white/30 tracking-widest tabular-nums uppercase">
-                                <span>{expandedProps.formatTime(expandedProps.progress)}</span>
+                                <span>{formatTime(progress)}</span>
                                 <span>{currentTrack.duration}</span>
                             </div>
                         </div>
@@ -175,17 +180,17 @@ export function LiquidGlassMusicPlayer(props: MusicPlayerStyleProps) {
                         <div className="flex justify-between items-center mt-6 shrink-0 px-2">
                             <button
                                 className="w-12 h-12 rounded-full border border-white/10 hover:bg-white/5 flex items-center justify-center transition-all active:scale-90"
-                                onClick={expandedProps.onPrevious}
+                                onClick={onPrevious}
                             >
                                 <SkipBack className="w-5 h-5 opacity-80" />
                             </button>
                             <button
                                 className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center shadow-2xl active:scale-90 transition-all"
-                                onClick={expandedProps.onPlayPause}
+                                onClick={onPlayPause}
                             >
                                 {isLoading ? (
                                     <Loader2 className="w-8 h-8 animate-spin" />
-                                ) : expandedProps.isPlaying ? (
+                                ) : isPlaying ? (
                                     <Pause className="w-8 h-8 fill-current" />
                                 ) : (
                                     <Play className="w-8 h-8 fill-current ml-1" />
@@ -193,7 +198,7 @@ export function LiquidGlassMusicPlayer(props: MusicPlayerStyleProps) {
                             </button>
                             <button
                                 className="w-12 h-12 rounded-full border border-white/10 hover:bg-white/5 flex items-center justify-center transition-all active:scale-90"
-                                onClick={expandedProps.onNext}
+                                onClick={onNext}
                             >
                                 <SkipForward className="w-5 h-5 opacity-80" />
                             </button>

@@ -2,15 +2,14 @@ import React from "react"
 import Image from "next/image"
 import { MusicPlayerStyleProps, SpotifyTrack } from "./types"
 import { Track } from "@/lib/types"
-import MusicPlayerImage from "@/assets/MusicPlayerImage.png"
-import MusicWallpaper from "@/assets/MusicWallPaper.gif"
 import { Loader2, Pause, Play, SkipBack, SkipForward, List, X } from "lucide-react"
 import { Slider } from "@/components/ui/slider"
 
 export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
     const { playerType, embedded, playerRef, buttonsRef, handleExpandClick, handleButtonClick,
         handleButtonHover, handleButtonLeave, isLoading, albumCoverRef, useSpotify,
-        spotifyCurrentTrack, currentTrack } = props
+        spotifyCurrentTrack, currentTrack, progress = 0, formatTime = (p: number) => "0:00",
+        handleSeek = () => {} } = props
 
     if (playerType === "collapsed") {
         return (
@@ -52,7 +51,12 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
     }
 
     if (playerType === "expanded") {
-        const expandedProps = props as unknown as MusicPlayerStyleProps & {
+        const {
+            showPlaylist, setShowPlaylist, handleDesktopClose, handlePlaylistToggle,
+            progress, handleSeek, formatTime, spDurationMs, isPlaying, onPlayPause,
+            onNext, onPrevious, volume, setVolume, playClickSound, playlistRef,
+            spotifyPlaylistTracks, playlist, changeTrack, formatDuration
+        } = props as unknown as MusicPlayerStyleProps & {
             showPlaylist: boolean, setShowPlaylist: (show: boolean) => void, handleDesktopClose: () => void,
             handlePlaylistToggle: () => void, progress: number, handleSeek: (value: number[]) => void,
             formatTime: (progress: number) => string, spDurationMs: number, isPlaying: boolean,
@@ -61,7 +65,7 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
             spotifyPlaylistTracks: SpotifyTrack[], playlist: Track[], changeTrack: (track: Track) => void, formatDuration: (ms: number) => string
         }
 
-        const displayTracks = useSpotify ? expandedProps.spotifyPlaylistTracks : expandedProps.playlist;
+        const displayTracks = useSpotify ? spotifyPlaylistTracks : playlist;
 
         return (
             <div
@@ -82,8 +86,8 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
                 >
                     <div className="flex items-center gap-2">
                         <button
-                            className={`w-6 h-6 flex items-center justify-center bg-white border-2 border-black active:translate-y-0.5 ${expandedProps.showPlaylist ? 'bg-[#ffff00]' : ''}`}
-                            onClick={expandedProps.handlePlaylistToggle}
+                            className={`w-6 h-6 flex items-center justify-center bg-white border-2 border-black active:translate-y-0.5 ${showPlaylist ? 'bg-[#ffff00]' : ''}`}
+                            onClick={handlePlaylistToggle}
                         >
                             <List className="w-4 h-4 text-black" />
                         </button>
@@ -93,7 +97,7 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
                         <button
                             ref={(el) => { if (el) buttonsRef.current[2] = el }}
                             className="w-6 h-6 flex items-center justify-center bg-white border-2 border-black active:translate-y-0.5"
-                            onClick={expandedProps.handleDesktopClose}
+                            onClick={handleDesktopClose}
                             onMouseEnter={() => handleButtonHover(2)}
                             onMouseLeave={() => handleButtonLeave(2)}
                         >
@@ -117,8 +121,8 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
                     ) : (
                         <>
                             <div className="flex flex-col flex-1 min-h-0">
-                                {expandedProps.showPlaylist ? (
-                                    <div ref={expandedProps.playlistRef} className="w-full h-full flex flex-col min-h-0">
+                                {showPlaylist ? (
+                                    <div ref={playlistRef} className="w-full h-full flex flex-col min-h-0">
                                         <h4 className="text-[#00ffff] font-pixel text-[10px] mb-2 uppercase tracking-widest pl-1">TRACK LIST</h4>
                                         <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar scrollbar-pixel">
                                             {displayTracks.map((track: any) => {
@@ -127,7 +131,7 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
                                                     <div
                                                         key={track.id}
                                                         className={`flex items-center gap-3 p-2 border-2 transition-all cursor-pointer ${isCurrent ? 'bg-[#00ff00] border-white' : 'bg-zinc-900 border-transparent hover:border-[#ff00ff]'}`}
-                                                        onClick={() => !useSpotify && expandedProps.changeTrack(track)}
+                                                        onClick={() => !useSpotify && changeTrack(track)}
                                                     >
                                                         <div className="w-8 h-8 border-2 border-white flex-shrink-0">
                                                             <Image
@@ -172,18 +176,18 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
                             {/* Pixel Progress Area */}
                             <div className="space-y-1 shrink-0">
                                 <Slider
-                                    value={[expandedProps.progress]}
+                                    value={[progress]}
                                     max={100}
                                     step={0.1}
                                     className="flex-1"
-                                    onValueChange={expandedProps.handleSeek}
+                                    onValueChange={handleSeek}
                                     disabled={isLoading}
                                     trackClassName="bg-zinc-800 h-4 border-2 border-white rounded-none"
                                     rangeClassName="bg-[#ffff00]"
                                     thumbClassName="h-6 w-3 bg-white border-2 border-black rounded-none shadow-none ring-0 focus:ring-0"
                                 />
                                 <div className="flex justify-between text-[8px] text-white font-pixel px-1 uppercase mt-1">
-                                    <span>{expandedProps.formatTime(expandedProps.progress)}</span>
+                                    <span>{formatTime(progress)}</span>
                                     <span>{currentTrack.duration}</span>
                                 </div>
                             </div>
@@ -192,17 +196,17 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
                             <div className="flex justify-center items-center gap-4 mt-auto shrink-0 pb-1">
                                 <button
                                     className="w-10 h-10 flex items-center justify-center bg-white border-2 border-black active:translate-y-1 active:shadow-none shadow-[2px_2px_0px_#444]"
-                                    onClick={expandedProps.onPrevious}
+                                    onClick={onPrevious}
                                 >
                                     <SkipBack className="w-5 h-5 text-black fill-black" />
                                 </button>
                                 <button
                                     className="w-14 h-14 flex items-center justify-center bg-[#00ff00] border-4 border-white active:translate-y-1 active:shadow-none shadow-[4px_4px_0px_rgba(0,255,0,0.3)]"
-                                    onClick={expandedProps.onPlayPause}
+                                    onClick={onPlayPause}
                                 >
                                     {isLoading ? (
                                         <Loader2 className="w-7 h-7 text-black animate-spin" />
-                                    ) : expandedProps.isPlaying ? (
+                                    ) : isPlaying ? (
                                         <Pause className="w-7 h-7 text-black fill-black" />
                                     ) : (
                                         <Play className="w-7 h-7 text-black fill-black ml-1" />
@@ -210,7 +214,7 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
                                 </button>
                                 <button
                                     className="w-10 h-10 flex items-center justify-center bg-white border-2 border-black active:translate-y-1 active:shadow-none shadow-[2px_2px_0px_#444]"
-                                    onClick={expandedProps.onNext}
+                                    onClick={onNext}
                                 >
                                     <SkipForward className="w-5 h-5 text-black fill-black" />
                                 </button>
@@ -223,14 +227,18 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
     }
 
     if (playerType === "mobile") {
-        const mobileProps = props as unknown as MusicPlayerStyleProps & {
+        const {
+            showPlaylist, setShowPlaylist, handlePlaylistToggle, handlePrevious, playClickSound,
+            handlePlayPause, isPlaying, handleNext, progress, handleSeek, formatTime,
+            spotifyPlaylistTracks, playlist, changeTrack, formatDuration
+        } = props as unknown as MusicPlayerStyleProps & {
             showPlaylist: boolean, setShowPlaylist: (show: boolean) => void, handlePlaylistToggle: () => void,
             handlePrevious: () => void, playClickSound: () => void, handlePlayPause: () => void, isPlaying: boolean,
             handleNext: () => void, progress: number, handleSeek: (value: number[]) => void, formatTime: (progress: number) => string,
             spotifyPlaylistTracks: SpotifyTrack[], playlist: Track[], changeTrack: (track: Track) => void, formatDuration: (ms: number) => string
         }
 
-        const displayTracks = useSpotify ? mobileProps.spotifyPlaylistTracks : mobileProps.playlist;
+        const displayTracks = useSpotify ? spotifyPlaylistTracks : playlist;
 
         return (
             <div className="flex flex-col items-center justify-center w-full px-1">
@@ -240,13 +248,13 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
                     style={{ minHeight: "220px" }}
                 >
                     <div className="pixel-content relative flex flex-col h-full gap-3 text-white">
-                        {mobileProps.showPlaylist ? (
+                        {showPlaylist ? (
                             <div className="flex flex-col h-full min-h-0">
                                 <div className="flex justify-between items-center mb-2">
                                     <h4 className="text-[10px] font-pixel text-[#00ffff] uppercase tracking-widest">TRACKS</h4>
                                     <button
                                         className="w-8 h-8 bg-[#ff00ff] border-2 border-black flex items-center justify-center active:translate-y-0.5"
-                                        onClick={mobileProps.handlePlaylistToggle}
+                                        onClick={handlePlaylistToggle}
                                     >
                                         <X className="w-4 h-4 text-black" />
                                     </button>
@@ -263,7 +271,7 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
                                                     key={track.id}
                                                     style={{ scrollSnapAlign: 'start' }}
                                                     className={`flex flex-col items-center gap-2 min-w-[100px] max-w-[100px] transition-all ${isCurrent ? 'scale-105' : 'opacity-80 active:scale-95'}`}
-                                                    onClick={() => !useSpotify && mobileProps.changeTrack(track)}
+                                                    onClick={() => !useSpotify && changeTrack(track)}
                                                 >
                                                     <div className={`w-20 h-20 border-2 transition-all ${isCurrent ? 'border-[#00ffcc] shadow-[0_0_10px_#00ffcc]' : 'border-[#333]'}`}>
                                                         <Image
@@ -310,17 +318,17 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
                                             <div className="flex items-center gap-1.5">
                                                 <button
                                                     className="w-9 h-9 bg-white border-2 border-black flex items-center justify-center active:translate-y-0.5"
-                                                    onClick={() => { mobileProps.handlePrevious(); mobileProps.playClickSound(); handleButtonClick(6) }}
+                                                    onClick={() => { handlePrevious(); playClickSound(); handleButtonClick(6) }}
                                                 >
                                                     <SkipBack className="w-4 h-4 text-black fill-black" />
                                                 </button>
                                                 <button
                                                     className="w-11 h-11 bg-[#00ff00] border-2 border-black flex items-center justify-center active:translate-y-0.5"
-                                                    onClick={() => { mobileProps.handlePlayPause(); handleButtonClick(7) }}
+                                                    onClick={() => { handlePlayPause(); handleButtonClick(7) }}
                                                 >
                                                     {isLoading ? (
                                                         <Loader2 className="w-5 h-5 text-black animate-spin" />
-                                                    ) : mobileProps.isPlaying ? (
+                                                    ) : isPlaying ? (
                                                         <Pause className="w-5 h-5 text-black fill-black" />
                                                     ) : (
                                                         <Play className="w-5 h-5 text-black fill-black ml-0.5" />
@@ -328,14 +336,14 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
                                                 </button>
                                                 <button
                                                     className="w-9 h-9 bg-white border-2 border-black flex items-center justify-center active:translate-y-0.5"
-                                                    onClick={() => { mobileProps.handleNext(); mobileProps.playClickSound(); handleButtonClick(8) }}
+                                                    onClick={() => { handleNext(); playClickSound(); handleButtonClick(8) }}
                                                 >
                                                     <SkipForward className="w-4 h-4 text-black fill-black" />
                                                 </button>
                                             </div>
                                             <button
                                                 className="w-9 h-9 bg-[#ffff00] border-2 border-black flex items-center justify-center active:translate-y-0.5"
-                                                onClick={() => { mobileProps.handlePlaylistToggle(); handleButtonClick(9) }}
+                                                onClick={() => { handlePlaylistToggle(); handleButtonClick(9) }}
                                             >
                                                 <List className="w-4 h-4 text-black" />
                                             </button>
@@ -345,18 +353,18 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
 
                                 <div className="w-full mt-2">
                                     <Slider
-                                        value={[mobileProps.progress]}
+                                        value={[progress]}
                                         max={100}
                                         step={0.1}
                                         className="cursor-pointer h-3"
-                                        onValueChange={mobileProps.handleSeek}
+                                        onValueChange={handleSeek}
                                         disabled={isLoading}
                                         trackClassName="bg-zinc-800 h-3 border border-white rounded-none"
                                         rangeClassName="bg-[#ffff00]"
                                         thumbClassName="h-4 w-2 bg-white border border-black rounded-none"
                                     />
                                     <div className="flex justify-between text-[8px] mt-1 font-pixel text-white px-1 uppercase">
-                                        <span>{mobileProps.formatTime(mobileProps.progress)}</span>
+                                        <span>{formatTime(progress)}</span>
                                         <span>{currentTrack.duration}</span>
                                     </div>
                                 </div>

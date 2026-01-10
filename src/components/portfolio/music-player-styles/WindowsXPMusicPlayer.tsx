@@ -40,7 +40,12 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
     }
 
     if (playerType === "expanded") {
-        const expandedProps = props as unknown as MusicPlayerStyleProps & {
+        const {
+            showPlaylist, setShowPlaylist, handleDesktopClose, handlePlaylistToggle,
+            progress, handleSeek, formatTime, spDurationMs, isPlaying, onPlayPause,
+            onNext, onPrevious, volume, setVolume, playClickSound, playlistRef,
+            spotifyPlaylistTracks, playlist, changeTrack, formatDuration
+        } = props as unknown as MusicPlayerStyleProps & {
             showPlaylist: boolean, setShowPlaylist: (show: boolean) => void, handleDesktopClose: () => void,
             handlePlaylistToggle: () => void, progress: number, handleSeek: (value: number[]) => void,
             formatTime: (progress: number) => string, spDurationMs: number, isPlaying: boolean,
@@ -49,7 +54,7 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
             spotifyPlaylistTracks: SpotifyTrack[], playlist: Track[], changeTrack: (track: Track) => void, formatDuration: (ms: number) => string
         }
 
-        const displayTracks = useSpotify ? expandedProps.spotifyPlaylistTracks : expandedProps.playlist;
+        const displayTracks = useSpotify ? spotifyPlaylistTracks : playlist;
 
         return (
             <div
@@ -71,7 +76,7 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
                         </button>
                         <button
                             className="w-[21px] h-[21px] bg-[#e31212] border border-white/40 rounded-[2px] flex items-center justify-center hover:bg-[#ff4d4d] shadow-[inset_-1px_-1px_1px_rgba(0,0,0,0.3)]"
-                            onClick={expandedProps.handleDesktopClose}
+                            onClick={handleDesktopClose}
                         >
                             <X className="w-3 h-3 text-white" strokeWidth={3} />
                         </button>
@@ -93,11 +98,11 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
                     ) : (
                         <>
                             <div className="flex-1 min-h-0 flex flex-col bg-black rounded-sm border border-[#7ca6ff] relative overflow-hidden">
-                                {expandedProps.showPlaylist ? (
-                                    <div ref={expandedProps.playlistRef} className="w-full h-full flex flex-col min-h-0 bg-[#001c5a] p-3">
+                                {showPlaylist ? (
+                                    <div ref={playlistRef} className="w-full h-full flex flex-col min-h-0 bg-[#001c5a] p-3">
                                         <h4 className="text-[10px] font-bold text-[#7ca6ff] mb-3 uppercase flex justify-between">
                                             <span>Now Playing</span>
-                                            <button onClick={expandedProps.handlePlaylistToggle} className="text-white hover:text-red-400">
+                                            <button onClick={handlePlaylistToggle} className="text-white hover:text-red-400">
                                                 <X className="w-3 h-3" strokeWidth={3} />
                                             </button>
                                         </h4>
@@ -108,7 +113,7 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
                                                     <div
                                                         key={track.id}
                                                         className={`flex items-center gap-3 p-2 transition-all cursor-pointer group ${isCurrent ? 'bg-[#ff9c00] text-black' : 'text-[#7ca6ff] hover:bg-[#003bc3] hover:text-white'}`}
-                                                        onClick={() => !useSpotify && expandedProps.changeTrack(track)}
+                                                        onClick={() => !useSpotify && changeTrack(track)}
                                                     >
                                                         <div className="w-8 h-8 shrink-0 border border-white/20">
                                                             <Image
@@ -159,24 +164,24 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
                                     <div className="flex-1 h-3 bg-black border border-[#003bc3] rounded-full relative overflow-hidden group">
                                         <div
                                             className="h-full bg-gradient-to-b from-[#ff9c00] to-[#e68a00] transition-all duration-300"
-                                            style={{ width: `${expandedProps.progress}%` }}
+                                            style={{ width: `${progress}%` }}
                                         />
                                         <Slider
-                                            value={[expandedProps.progress]}
+                                            value={[progress]}
                                             max={100}
                                             step={0.1}
-                                            onValueChange={expandedProps.handleSeek}
+                                            onValueChange={handleSeek}
                                             disabled={isLoading}
                                             className="absolute inset-x-0 -top-1 opacity-0 cursor-pointer h-5 z-10"
                                         />
                                     </div>
-                                    <span className="text-[9px] font-bold text-white min-w-[30px]">{expandedProps.formatTime(expandedProps.progress)}</span>
+                                    <span className="text-[9px] font-bold text-white min-w-[30px]">{formatTime(progress)}</span>
                                 </div>
 
                                 <div className="flex justify-between items-center px-2">
                                     <button
                                         className="w-8 h-8 bg-gradient-to-b from-[#3a81f1] to-[#245edb] border border-white/20 rounded-lg flex items-center justify-center shadow-lg hover:brightness-110 active:shadow-inner"
-                                        onClick={expandedProps.handlePlaylistToggle}
+                                        onClick={handlePlaylistToggle}
                                     >
                                         <List className="w-4 h-4 text-white" />
                                     </button>
@@ -184,17 +189,17 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
                                     <div className="flex items-center gap-2">
                                         <button
                                             className="w-10 h-10 bg-gradient-to-b from-[#3a81f1] to-[#245edb] border-2 border-white/40 rounded-full flex items-center justify-center shadow-lg hover:brightness-110 active:brightness-90"
-                                            onClick={expandedProps.onPrevious}
+                                            onClick={onPrevious}
                                         >
                                             <SkipBack className="w-5 h-5 text-white fill-current" />
                                         </button>
                                         <button
                                             className="w-12 h-12 bg-gradient-to-b from-[#4bc500] to-[#2e7d00] border-2 border-white/60 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(75,197,0,0.5)] hover:brightness-110 active:brightness-90"
-                                            onClick={expandedProps.onPlayPause}
+                                            onClick={onPlayPause}
                                         >
                                             {isLoading ? (
                                                 <Loader2 className="w-6 h-6 text-white animate-spin" />
-                                            ) : expandedProps.isPlaying ? (
+                                            ) : isPlaying ? (
                                                 <Pause className="w-7 h-7 text-white fill-current" />
                                             ) : (
                                                 <Play className="w-7 h-7 text-white fill-current ml-1" />
@@ -202,7 +207,7 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
                                         </button>
                                         <button
                                             className="w-10 h-10 bg-gradient-to-b from-[#3a81f1] to-[#245edb] border-2 border-white/40 rounded-full flex items-center justify-center shadow-lg hover:brightness-110 active:brightness-90"
-                                            onClick={expandedProps.onNext}
+                                            onClick={onNext}
                                         >
                                             <SkipForward className="w-5 h-5 text-white fill-current" />
                                         </button>
@@ -219,14 +224,18 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
     }
 
     if (playerType === "mobile") {
-        const mobileProps = props as unknown as MusicPlayerStyleProps & {
+        const {
+            showPlaylist, setShowPlaylist, handlePlaylistToggle, handlePrevious, playClickSound,
+            handlePlayPause, isPlaying, handleNext, progress, handleSeek, formatTime,
+            spotifyPlaylistTracks, playlist, changeTrack, formatDuration
+        } = props as unknown as MusicPlayerStyleProps & {
             showPlaylist: boolean, setShowPlaylist: (show: boolean) => void, handlePlaylistToggle: () => void,
             handlePrevious: () => void, playClickSound: () => void, handlePlayPause: () => void, isPlaying: boolean,
             handleNext: () => void, progress: number, handleSeek: (value: number[]) => void, formatTime: (progress: number) => string,
             spotifyPlaylistTracks: SpotifyTrack[], playlist: Track[], changeTrack: (track: Track) => void, formatDuration: (ms: number) => string
         }
 
-        const displayTracks = useSpotify ? mobileProps.spotifyPlaylistTracks : mobileProps.playlist;
+        const displayTracks = useSpotify ? spotifyPlaylistTracks : playlist;
 
         return (
             <div className="flex flex-col items-center justify-center w-full px-1 font-['Tahoma']">
@@ -239,13 +248,13 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
                         {/* Mobile XP Title */}
                         <div className="flex justify-between items-center h-7 px-2 bg-gradient-to-r from-[#245edb] to-[#3a81f1] shrink-0">
                             <span className="text-[10px] font-bold text-white">Media Player Mobile</span>
-                            <button className="text-white opacity-60 hover:opacity-100" onClick={mobileProps.handlePlaylistToggle}>
+                            <button className="text-white opacity-60 hover:opacity-100" onClick={handlePlaylistToggle}>
                                 <List className="w-3.5 h-3.5" />
                             </button>
                         </div>
 
                         <div className="p-3 flex flex-col h-full">
-                            {mobileProps.showPlaylist ? (
+                            {showPlaylist ? (
                                 <div className="flex flex-col h-full min-h-0 bg-white border border-[#003bc3] p-1">
                                     <div className="flex-1 overflow-hidden">
                                         <div
@@ -259,7 +268,7 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
                                                         key={track.id}
                                                         style={{ scrollSnapAlign: 'start' }}
                                                         className={`flex flex-col items-center gap-2 min-w-[100px] max-w-[100px] transition-all ${isCurrent ? 'scale-105' : 'opacity-60 active:scale-95'}`}
-                                                        onClick={() => !useSpotify && mobileProps.changeTrack(track)}
+                                                        onClick={() => !useSpotify && changeTrack(track)}
                                                     >
                                                         <div className={`w-16 h-16 rounded border-2 transition-all ${isCurrent ? 'border-[#ff9c00] shadow-md' : 'border-[#245edb]/20'}`}>
                                                             <Image
@@ -303,17 +312,17 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
                                             <div className="flex items-center gap-2">
                                                 <button
                                                     className="w-10 h-10 rounded-full bg-gradient-to-b from-[#3a81f1] to-[#245edb] border border-white/40 flex items-center justify-center shadow active:scale-90"
-                                                    onClick={() => { mobileProps.handlePrevious(); mobileProps.playClickSound(); handleButtonClick(6) }}
+                                                    onClick={() => { handlePrevious(); playClickSound(); handleButtonClick(6) }}
                                                 >
                                                     <SkipBack className="w-4 h-4 text-white fill-current" />
                                                 </button>
                                                 <button
                                                     className="w-12 h-12 rounded-full bg-gradient-to-b from-[#4bc500] to-[#2e7d00] border border-white/60 flex items-center justify-center shadow-lg active:scale-90"
-                                                    onClick={() => { mobileProps.handlePlayPause(); handleButtonClick(7) }}
+                                                    onClick={() => { handlePlayPause(); handleButtonClick(7) }}
                                                 >
                                                     {isLoading ? (
                                                         <Loader2 className="w-5 h-5 text-white animate-spin" />
-                                                    ) : mobileProps.isPlaying ? (
+                                                    ) : isPlaying ? (
                                                         <Pause className="w-6 h-6 text-white fill-current" />
                                                     ) : (
                                                         <Play className="w-6 h-6 text-white fill-current ml-0.5" />
@@ -321,7 +330,7 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
                                                 </button>
                                                 <button
                                                     className="w-10 h-10 rounded-full bg-gradient-to-b from-[#3a81f1] to-[#245edb] border border-white/40 flex items-center justify-center shadow active:scale-90"
-                                                    onClick={() => { mobileProps.handleNext(); mobileProps.playClickSound(); handleButtonClick(8) }}
+                                                    onClick={() => { handleNext(); playClickSound(); handleButtonClick(8) }}
                                                 >
                                                     <SkipForward className="w-4 h-4 text-white fill-current" />
                                                 </button>
@@ -334,18 +343,18 @@ export function WindowsXPMusicPlayer(props: MusicPlayerStyleProps) {
                                             <div className="flex-1 h-2.5 bg-white border border-[#245edb] rounded-full overflow-hidden relative">
                                                 <div
                                                     className="h-full bg-[#ff9c00]"
-                                                    style={{ width: `${mobileProps.progress}%` }}
+                                                    style={{ width: `${progress}%` }}
                                                 />
                                                 <Slider
-                                                    value={[mobileProps.progress]}
+                                                    value={[progress]}
                                                     max={100}
                                                     step={0.1}
-                                                    onValueChange={mobileProps.handleSeek}
+                                                    onValueChange={handleSeek}
                                                     disabled={isLoading}
                                                     className="absolute inset-x-0 -top-1 opacity-0 h-4 cursor-pointer z-10"
                                                 />
                                             </div>
-                                            <span className="text-[8px] font-bold text-[#245edb] tabular-nums">{mobileProps.formatTime(mobileProps.progress)}</span>
+                                            <span className="text-[8px] font-bold text-[#245edb] tabular-nums">{formatTime(progress)}</span>
                                         </div>
                                     </div>
                                 </div>
