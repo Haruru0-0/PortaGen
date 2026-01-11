@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import {useEffect, useState} from "react"
+import {useEffect, useState, Suspense} from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -34,7 +34,7 @@ const passwordSchema = z.object({
 
 type PasswordFormValues = z.infer<typeof passwordSchema>
 
-export default function SettingsPage() {
+function SettingsContent() {
   const { user } = useUser()
   const [profile, setProfile] = useState({
     username: user?.username || "PLAYER_ONE",
@@ -382,5 +382,17 @@ export default function SettingsPage() {
             message="THIS ACTION CANNOT BE UNDONE. ALL YOUR DATA WILL BE PERMANENTLY DELETED."
         />
       </>
+  )
+}
+
+export default function SettingsPage() {
+  return (
+      <Suspense fallback={
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-[10px] animate-pulse">LOADING SETTINGS...</div>
+        </div>
+      }>
+        <SettingsContent />
+      </Suspense>
   )
 }

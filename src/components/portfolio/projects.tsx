@@ -22,11 +22,21 @@ import { AnimatedSection, AnimatedItem } from "@/components/portfolio/animated-s
 import facilify from "@/assets/Facilify.png";
 import awqafRashaya from "@/assets/AwqadRashaya.png";
 
+interface Project {
+  id: number;
+  title: string;
+  description: string;
+  image: any;
+  tags: string[];
+  demoUrl: string;
+  githubUrl: string | { frontend: string; backend: string };
+}
+
 export default function Projects({ data }: { data?: any }) {
   const [activeProject, setActiveProject] = useState(0)
   const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null)
 
-  const projects = data?.projects || [
+  const projects: Project[] = data?.projects || [
     {
       id: 1,
       title: "Facilify",
@@ -83,7 +93,7 @@ export default function Projects({ data }: { data?: any }) {
           }}
         >
           <CarouselContent>
-            {projects.map((project) => (
+            {projects.map((project: Project) => (
               <CarouselItem key={project.id}>
                 <Card className="pixel-card border-0 shadow-lg overflow-hidden">
                   <div
@@ -105,7 +115,7 @@ export default function Projects({ data }: { data?: any }) {
                       <h2 className="text-2xl font-bold mb-2 pixel-title">{project.title}</h2>
                       <p className="text-muted-foreground mb-4 opacity-80">{project.description}</p>
                       <div className="flex flex-wrap gap-2 mb-6">
-                        {project.tags.map((tag, index) => (
+                        {project.tags.map((tag: string, index: number) => (
                           <Badge key={index} variant="secondary" className="pixel-badge hover:bg-[var(--cute-highlight)]">
                             {tag}
                           </Badge>
@@ -132,12 +142,12 @@ export default function Projects({ data }: { data?: any }) {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="z-[9999] border-2 border-[var(--cute-text)] bg-[var(--card-bg)] rounded-none">
                               <DropdownMenuItem asChild className="rounded-none focus:bg-[var(--cute-highlight)] cursor-pointer">
-                                <a href={project.githubUrl.frontend} target="_blank" rel="noopener noreferrer">
+                                <a href={(project.githubUrl as { frontend: string }).frontend} target="_blank" rel="noopener noreferrer">
                                   Frontend
                                 </a>
                               </DropdownMenuItem>
                               <DropdownMenuItem asChild className="rounded-none focus:bg-[var(--cute-highlight)] cursor-pointer">
-                                <a href={project.githubUrl.backend} target="_blank" rel="noopener noreferrer">
+                                <a href={(project.githubUrl as { backend: string }).backend} target="_blank" rel="noopener noreferrer">
                                   Backend
                                 </a>
                               </DropdownMenuItem>
@@ -156,7 +166,7 @@ export default function Projects({ data }: { data?: any }) {
         </Carousel>
 
         <div className="flex justify-center mt-4 gap-2">
-          {projects.map((_, index) => (
+          {projects.map((_: Project, index: number) => (
             <button
               key={index}
               className={`w-3 h-3 border border-[var(--cute-text)] ${index === activeProject ? "bg-[var(--cute-text)]" : "bg-transparent"}`}
@@ -168,7 +178,7 @@ export default function Projects({ data }: { data?: any }) {
 
       <AnimatedSection variant="stagger" delay={0.2} staggerChildren={0.1} threshold={0.1}>
         <div className="grid gap-6 mt-8" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
-          {projects.map((project) => (
+          {projects.map((project: Project) => (
             <AnimatedItem key={project.id}>
               <Card className="h-full flex flex-col hover:shadow-md transition-shadow border-0 pixel-card">
                 <div className="aspect-video overflow-hidden border-b-2 border-[var(--cute-text)] relative">
@@ -183,7 +193,7 @@ export default function Projects({ data }: { data?: any }) {
                   <h3 className="text-xl font-bold mb-2 pixel-title">{project.title}</h3>
                   <p className="text-sm opacity-70 mb-4 line-clamp-3">{project.description}</p>
                   <div className="flex flex-wrap gap-1 mb-2">
-                    {project.tags.map((tag, index) => (
+                    {project.tags.map((tag: string, index: number) => (
                       <Badge key={index} variant="secondary" className="text-xs pixel-badge hover:bg-[var(--cute-highlight)]">
                         {tag}
                       </Badge>
@@ -207,12 +217,12 @@ export default function Projects({ data }: { data?: any }) {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="z-[9999] border-2 border-[var(--cute-text)] bg-[var(--card-bg)] rounded-none">
                           <DropdownMenuItem asChild className="rounded-none focus:bg-[var(--cute-highlight)] cursor-pointer">
-                            <a href={project.githubUrl.frontend} target="_blank" rel="noopener noreferrer">
+                            <a href={(project.githubUrl as { frontend: string }).frontend} target="_blank" rel="noopener noreferrer">
                               Frontend
                             </a>
                           </DropdownMenuItem>
                           <DropdownMenuItem asChild className="rounded-none focus:bg-[var(--cute-highlight)] cursor-pointer">
-                            <a href={project.githubUrl.backend} target="_blank" rel="noopener noreferrer">
+                            <a href={(project.githubUrl as { backend: string }).backend} target="_blank" rel="noopener noreferrer">
                               Backend
                             </a>
                           </DropdownMenuItem>

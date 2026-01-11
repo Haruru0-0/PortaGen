@@ -4,8 +4,8 @@
 import { useState, useEffect } from "react"
 import { PixelModal } from "./pixel-modal"
 import { PixelButton } from "./pixel-button"
-import { Play, Pause, Cloud, Image, Music, Zap } from "lucide-react"
-import NextImage from "next/image"
+import { Play, Pause, Cloud, Image as ImageIcon, Music, Zap } from "lucide-react"
+import Image from "next/image"
 
 interface Asset {
   id: string
@@ -149,11 +149,11 @@ export function AssetLibraryModal({
 
   const getTypeIcon = () => {
     switch (type) {
-      case "wallpaper": return <Image className="w-4 h-4" />
+      case "wallpaper": return <ImageIcon className="w-4 h-4" />
       case "icon": return <Zap className="w-4 h-4" />
       case "music": return <Music className="w-4 h-4" />
       case "sound": return <Zap className="w-4 h-4" />
-      default: return <Image className="w-4 h-4" />
+      default: return <ImageIcon className="w-4 h-4" />
     }
   }
 

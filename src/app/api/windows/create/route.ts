@@ -25,7 +25,6 @@ export async function POST(req: NextRequest) {
       .values({
         portfolioId: Number(portfolioId),
         name,
-        enabled: true,
         content: {
           type: 'blank',
           template: 'blank',

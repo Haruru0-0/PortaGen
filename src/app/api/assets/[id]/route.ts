@@ -8,7 +8,7 @@ import { getUserByClerkId } from '@/lib/db/helpers'
 
 export async function PUT(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const { userId } = await auth()
@@ -21,6 +21,7 @@ export async function PUT(
             return NextResponse.json({ error: 'User not found' }, { status: 404 })
         }
 
+        const { id } = await params
         const { name } = await req.json()
 
         if (!name || name.trim().length === 0) {
@@ -36,7 +37,7 @@ export async function PUT(
             })
             .where(
                 and(
-                    eq(uploadedAssets.id, parseInt(params.id)),
+                    eq(uploadedAssets.id, parseInt(id)),
                     eq(uploadedAssets.userId, user.id)
                 )
             )

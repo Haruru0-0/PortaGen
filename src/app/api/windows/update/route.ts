@@ -22,8 +22,6 @@ export async function POST(req: NextRequest) {
 
     const payload: Partial<typeof windows.$inferInsert> = {
       name,
-      enabled: typeof enabled === 'boolean' ? enabled : undefined,
-      position: typeof position === 'number' ? position : undefined,
       content: content,
       updatedAt: new Date(),
     }

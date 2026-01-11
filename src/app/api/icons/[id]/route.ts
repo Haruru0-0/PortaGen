@@ -19,14 +19,15 @@ function format(row: any) {
   }
 }
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { userId } = await auth()
     if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     const user = await getUserByClerkId(userId)
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
-    const id = Number(params.id)
+    const { id: paramId } = await params
+    const id = Number(paramId)
     if (!id) return NextResponse.json({ error: 'Icon ID required' }, { status: 400 })
 
     const row = await db.query.icons.findFirst({

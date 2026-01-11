@@ -9,7 +9,7 @@ import { eq, and } from 'drizzle-orm'
 
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: { fileId: string } }
+    { params }: { params: Promise<{ fileId: string }> }
 ) {
     try {
         const { userId } = await auth()

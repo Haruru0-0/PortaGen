@@ -40,7 +40,6 @@ export async function getUserWithPortfolio(clerkUserId: string) {
                     lockScreenSettings: true,
                     desktopSettings: true,
                     icons: true,
-                    musicTracks: true,
                     windowContents: true,
                     themeSettings: true,
                     soundEffects: true,
