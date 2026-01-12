@@ -32,9 +32,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       audioRef.current = audio;
       document.body.appendChild(audio);
 
-      // Save current time when switching views
-      const currentTime = audio.currentTime;
-
       const updateProgress = () => {
         if (!audio.duration) return;
         const newProgress = (audio.currentTime / audio.duration) * 100;
