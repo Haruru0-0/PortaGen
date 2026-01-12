@@ -15,7 +15,7 @@ export function MobileNav() {
   ]
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-card border-t-4 border-border z-40 md:hidden">
+    <div className="fixed bottom-0 left-0 right-0 bg-card border-t-4 border-border z-40 md:hidden pb-[env(safe-area-inset-bottom)]">
       <div className="grid grid-cols-4 gap-1 p-2">
         {navItems.map((item) => {
           const Icon = item.icon
@@ -25,12 +25,12 @@ export function MobileNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-1 py-2 px-3 transition-colors ${
-                isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+              className={`flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-sm transition-colors w-full ${
+                isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted text-muted-foreground"
               }`}
             >
               <Icon className="w-5 h-5" />
-              <span className="text-[8px]">{item.label}</span>
+              <span className="text-[9px] font-medium tracking-wide scale-90 sm:scale-100">{item.label}</span>
             </Link>
           )
         })}

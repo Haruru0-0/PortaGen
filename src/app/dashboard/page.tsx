@@ -1,5 +1,3 @@
-import Link from "next/link"
-import { PixelButton } from "@/components/pixel-button"
 import { PixelCard } from "@/components/pixel-card"
 import { PixelCharacter } from "@/components/pixel-character"
 import { auth } from "@clerk/nextjs/server"
@@ -31,15 +29,15 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="p-4 sm:p-6 space-y-8">
       {/* Welcome Section */}
       <PixelCard>
-        <div className="flex items-center justify-between">
-          <div className="space-y-3">
-            <h2 className="text-lg pixel-text-shadow">WELCOME BACK, {user.username?.toUpperCase() || 'PLAYER'}!</h2>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="space-y-3 flex-1">
+            <h2 className="text-lg pixel-text-shadow break-words">WELCOME BACK, {user.username?.toUpperCase() || 'PLAYER'}!</h2>
             <p className="text-[10px] text-muted-foreground leading-relaxed">READY TO BUILD SOMETHING AWESOME TODAY?</p>
           </div>
-          <PixelCharacter color="#8B5CF6" size={60} animate />
+          <PixelCharacter color="#8B5CF6" size={40} animate />
         </div>
       </PixelCard>
 
@@ -74,7 +72,7 @@ export default async function DashboardPage() {
                 >
                   {item.done && <span className="text-[8px]">✓</span>}
                 </div>
-                <span className={`text-[10px] ${item.done ? "line-through text-muted-foreground" : ""}`}>
+                <span className={`text-[10px] break-words ${item.done ? "line-through text-muted-foreground" : ""}`}>
                   {item.task}
                 </span>
               </div>
@@ -90,14 +88,14 @@ export default async function DashboardPage() {
           <div className="space-y-3">
             {recentActivity.length > 0 ? (
               recentActivity.map((activity, i) => (
-                <div key={i} className="flex items-center justify-between py-2 border-b-2 border-border last:border-0">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-primary" />
-                    <span className="text-[10px]">
+                <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-b-2 border-border last:border-0 gap-1">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="w-2 h-2 bg-primary shrink-0" />
+                    <span className="text-[10px] break-words">
                       <span className="text-primary font-bold">{activity.actionType}</span> {activity.description}
                     </span>
                   </div>
-                  <span className="text-[10px] text-muted-foreground uppercase">{formatDistanceToNow(activity.createdAt, { addSuffix: true })}</span>
+                  <span className="text-[10px] text-muted-foreground uppercase sm:text-right">{formatDistanceToNow(activity.createdAt, { addSuffix: true })}</span>
                 </div>
               ))
             ) : (

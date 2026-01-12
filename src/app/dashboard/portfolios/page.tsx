@@ -127,7 +127,7 @@ export default function PortfoliosPage() {
 
       <PixelModal isOpen={!!deleteTarget} onClose={() => setDeleteTarget(null)} title="DELETE PORTFOLIO">
         <div className="space-y-4">
-          <p className="text-[12px]">Are you sure you want to delete "{deleteTarget?.name}"? This action cannot be undone.</p>
+          <p className="text-[12px]">Are you sure you want to delete &quot;{deleteTarget?.name}&quot;? This action cannot be undone.</p>
           <div className="flex gap-2 justify-end pt-2">
             <PixelButton variant="secondary" className="text-[10px]" onClick={() => setDeleteTarget(null)}>CANCEL</PixelButton>
             <PixelButton className="text-[10px] bg-destructive border-destructive hover:bg-destructive/90 " onClick={() => deleteTarget && handleDelete(deleteTarget.id)} disabled={deleting}>

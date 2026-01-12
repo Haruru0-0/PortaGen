@@ -51,14 +51,21 @@ export default function AssetCard(props: {
             <div className="space-y-1">
                 {/* Asset Name with Rename Button */}
                 <div className="flex items-center justify-between gap-1 group">
-                    <div className="text-xs">
-                        {props.asset.name}.{props.asset.mimeType ? props.asset.mimeType.split("/")[1] : "file"}
-                    </div>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <div className="text-xs overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer">
+                                {props.asset.name}.{props.asset.mimeType ? props.asset.mimeType.split("/")[1] : "file"}
+                            </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>{props.asset.name}.{props.asset.mimeType ? props.asset.mimeType.split("/")[1] : "file"}</p>
+                        </TooltipContent>
+                    </Tooltip>
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <button
                                 onClick={props.onRename}
-                                className="w-8 h-8 border-2 bg-card hover:bg-primary hover:text-primary-foreground transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100"
+                                className="w-8 h-8 border-2 bg-card hover:bg-primary hover:text-primary-foreground transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 shrink-0"
                             >
                                 <Image alt={"Edit button"} src={Edit}/>
                             </button>
