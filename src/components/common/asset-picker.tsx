@@ -6,7 +6,7 @@ import { PixelButton } from "@/components/pixel-button"
 import { PixelInput } from "@/components/pixel-input"
 import { Loader2, Music, Zap, FileImage } from "lucide-react"
 import Image from "next/image"
-import { Asset, AssetType } from "@/lib/types"
+import { Asset } from "@/lib/types"
 
 interface AssetPickerProps {
     isOpen: boolean
