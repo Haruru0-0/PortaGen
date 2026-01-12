@@ -1,7 +1,7 @@
 import { type HTMLAttributes, forwardRef } from "react"
 import { cn } from "@/lib/utils"
 
-interface PixelCardProps extends HTMLAttributes<HTMLDivElement> { }
+type PixelCardProps = HTMLAttributes<HTMLDivElement>
 
 export const PixelCard = forwardRef<HTMLDivElement, PixelCardProps>(({ className, children, ...props }, ref) => {
   return (

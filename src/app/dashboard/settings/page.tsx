@@ -207,7 +207,7 @@ function SettingsContent() {
             <div className="space-y-6">
               <h3 className="text-sm pixel-text-shadow">GOOGLE DRIVE INTEGRATION</h3>
 
-              <div className="flex items-center justify-between p-4 border-2 border-border bg-muted">
+              <div className="flex flex-col md:flex-row items-center justify-between p-4 border-2 border-border bg-muted gap-4 md:gap-2">
                 <div className="flex items-center gap-3">
                   <Cloud className="w-6 h-6" />
                   <div>
