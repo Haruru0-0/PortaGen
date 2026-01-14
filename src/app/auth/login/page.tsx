@@ -207,6 +207,11 @@ export default function LoginPage() {
               <Link href="/auth/signup" className="text-primary hover:underline">
                 CREATE ACCOUNT
               </Link>
+              <br />
+              Read our{" "}
+              <Link href="/privacy" className="text-primary hover:underline" target="_blank">
+                Privacy Policy
+              </Link>
             </p>
           </div>
         </PixelCard>

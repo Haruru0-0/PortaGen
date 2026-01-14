@@ -380,6 +380,13 @@ export default function SignUpPage() {
                   )}
                 </div>
               </div>
+              <div className="text-center text-[10px] text-muted-foreground leading-relaxed">
+                By creating an account, you agree to our{" "}
+                <Link href="/privacy" className="text-primary hover:underline" target="_blank">
+                  Privacy Policy
+                </Link>.
+              </div>
+              
               <PixelButton
                 type="submit"
                 variant="primary"
