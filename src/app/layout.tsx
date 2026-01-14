@@ -14,9 +14,8 @@ const pressStart2P = Press_Start_2P({
 })
 
 export const metadata: Metadata = {
-    title: "Aether Portfolio - Pixel Art Portfolio Generator",
+    title: "PortaGen - Pixel Art Portfolio Generator",
     description: "Create stunning desktop-style portfolios with pixel-art aesthetics",
-    generator: "v0.app",
 }
 
 export default function RootLayout({

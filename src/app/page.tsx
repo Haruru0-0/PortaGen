@@ -106,7 +106,7 @@ export default function LandingPage() {
                 <div className="container mx-auto px-4 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <PixelCharacter color="#8B5CF6" size={32}/>
-                        <h1 className="text-sm pixel-text-shadow">AETHER</h1>
+                        <h1 className="text-sm pixel-text-shadow">PortaGen</h1>
                     </div>
                     <div className="flex items-center gap-4">
                         <Link href="/auth/login">
