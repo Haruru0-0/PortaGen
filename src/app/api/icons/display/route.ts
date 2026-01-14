@@ -10,7 +10,7 @@ function format(row: any) {
         name: row.name,
         linkType: row.linkType || 'window',
         url: row.linkUrl || undefined,
-        icon: row.asset || '',
+        icon: row.asset,
     }
 }
 

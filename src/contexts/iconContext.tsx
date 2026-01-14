@@ -10,11 +10,12 @@ import {
     listIcons,
     updateIcon as updateIconAPI
 } from '@/lib/services/iconService'
+import type { Asset } from '@/lib/types'
 
 export type Icon = {
     id: number;
     name: string;
-    icon: string;
+    icon: Asset | null;
     url?: string;
     linkType?: 'window' | 'url';
     iconAssetId?: number;
