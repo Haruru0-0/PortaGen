@@ -10,12 +10,9 @@ function format(row: any) {
   return {
     id: row.id,
     name: row.name,
-    position: row.position,
     linkType: row.linkType || 'window',
     url: row.linkUrl || undefined,
-    isVisible: row.isVisible,
-    iconAssetId: row.iconAssetId || undefined,
-    icon: row.asset?.displayUrl || '',
+    icon: row.asset || '',
   }
 }
 
@@ -41,7 +38,6 @@ export async function GET(req: NextRequest) {
 
     const rows = await db.query.icons.findMany({
       where: eq(icons.portfolioId, portfolioId),
-      orderBy: (t, { asc }) => [asc(t.position)],
       with: { asset: true },
     })
 

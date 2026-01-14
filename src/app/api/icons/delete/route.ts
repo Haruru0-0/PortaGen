@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
-import { icons, portfolios, portfolioAssets } from '@/lib/db/schema'
+import { icons, portfolioAssets } from '@/lib/db/schema'
 import { and, eq } from 'drizzle-orm'
 import { getUserByClerkId } from '@/lib/db/helpers'
 

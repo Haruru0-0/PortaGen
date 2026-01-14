@@ -1,48 +1,55 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { useState } from "react"
-import Link from "next/link"
-import { useSignUp } from "@clerk/nextjs"
-import { useRouter } from "next/navigation"
-import { PixelButton } from "@/components/pixel-button"
-import { PixelCard } from "@/components/pixel-card"
-import { PixelInput } from "@/components/pixel-input"
-import { PixelClouds } from "@/components/pixel-clouds"
-import { PixelCharacter } from "@/components/pixel-character"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { useState } from "react";
+import Link from "next/link";
+import { useSignUp } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { PixelButton } from "@/components/pixel-button";
+import { PixelCard } from "@/components/pixel-card";
+import { PixelInput } from "@/components/pixel-input";
+import { PixelPasswordInput } from "@/components/pixel-password-input";
+import { PixelClouds } from "@/components/pixel-clouds";
+import { PixelCharacter } from "@/components/pixel-character";
 
 // Validation schema
-const signupSchema = z.object({
-  firstName: z.string().min(1, { message: "FIRST NAME REQUIRED" }),
-  lastName: z.string().min(1, { message: "LAST NAME REQUIRED" }),
-  username: z.string().min(3, { message: "USERNAME MUST BE 3+ CHARACTERS" })
-    .max(20, { message: "USERNAME MUST BE 20 OR FEWER CHARACTERS" })
-    .regex(/^[a-zA-Z0-9_]+$/, { message: "USERNAME CAN ONLY CONTAIN LETTERS, NUMBERS, AND UNDERSCORES" }),
-  email: z.string().email({ message: "INVALID EMAIL FORMAT" }),
-  password: z
-    .string()
-    .min(8, { message: "PASSWORD MUST BE 8+ CHARACTERS" })
-    .regex(/[a-z]/, { message: "PASSWORD NEEDS LOWERCASE LETTER" })
-    .regex(/[A-Z]/, { message: "PASSWORD NEEDS UPPERCASE LETTER" })
-    .regex(/[0-9]/, { message: "PASSWORD NEEDS NUMBER" }),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "PASSWORDS DO NOT MATCH",
-  path: ["confirmPassword"],
-})
+const signupSchema = z
+  .object({
+    firstName: z.string().min(1, { message: "FIRST NAME REQUIRED" }),
+    lastName: z.string().min(1, { message: "LAST NAME REQUIRED" }),
+    username: z
+      .string()
+      .min(3, { message: "USERNAME MUST BE 3+ CHARACTERS" })
+      .max(20, { message: "USERNAME MUST BE 20 OR FEWER CHARACTERS" })
+      .regex(/^[a-zA-Z0-9_]+$/, {
+        message: "USERNAME CAN ONLY CONTAIN LETTERS, NUMBERS, AND UNDERSCORES",
+      }),
+    email: z.string().email({ message: "INVALID EMAIL FORMAT" }),
+    password: z
+      .string()
+      .min(8, { message: "PASSWORD MUST BE 8+ CHARACTERS" })
+      .regex(/[a-z]/, { message: "PASSWORD NEEDS LOWERCASE LETTER" })
+      .regex(/[A-Z]/, { message: "PASSWORD NEEDS UPPERCASE LETTER" })
+      .regex(/[0-9]/, { message: "PASSWORD NEEDS NUMBER" }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "PASSWORDS DO NOT MATCH",
+    path: ["confirmPassword"],
+  });
 
-type SignupFormValues = z.infer<typeof signupSchema>
+type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function SignUpPage() {
-  const { signUp, setActive, isLoaded } = useSignUp()
-  const router = useRouter()
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [verifying, setVerifying] = useState(false)
-  const [code, setCode] = useState("")
-  const [passwordStrength, setPasswordStrength] = useState(0)
+  const { signUp, setActive, isLoaded } = useSignUp();
+  const router = useRouter();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [code, setCode] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState(0);
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -54,41 +61,41 @@ export default function SignUpPage() {
       password: "",
       confirmPassword: "",
     },
-  })
+  });
 
   const calculatePasswordStrength = (password: string) => {
-    let strength = 0
-    if (password.length >= 8) strength += 25
-    if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 25
-    if (password.match(/[0-9]/)) strength += 25
-    if (password.match(/[^a-zA-Z0-9]/)) strength += 25
-    return strength
-  }
+    let strength = 0;
+    if (password.length >= 8) strength += 25;
+    if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 25;
+    if (password.match(/[0-9]/)) strength += 25;
+    if (password.match(/[^a-zA-Z0-9]/)) strength += 25;
+    return strength;
+  };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    form.setValue("password", e.target.value)
-    setPasswordStrength(calculatePasswordStrength(e.target.value))
-  }
+    form.setValue("password", e.target.value);
+    setPasswordStrength(calculatePasswordStrength(e.target.value));
+  };
 
   const getStrengthColor = () => {
-    if (passwordStrength <= 25) return "bg-red-500"
-    if (passwordStrength <= 50) return "bg-yellow-500"
-    if (passwordStrength <= 75) return "bg-blue-500"
-    return "bg-green-500"
-  }
+    if (passwordStrength <= 25) return "bg-red-500";
+    if (passwordStrength <= 50) return "bg-yellow-500";
+    if (passwordStrength <= 75) return "bg-blue-500";
+    return "bg-green-500";
+  };
 
   const getStrengthText = () => {
-    if (passwordStrength <= 25) return "WEAK"
-    if (passwordStrength <= 50) return "FAIR"
-    if (passwordStrength <= 75) return "GOOD"
-    return "STRONG"
-  }
+    if (passwordStrength <= 25) return "WEAK";
+    if (passwordStrength <= 50) return "FAIR";
+    if (passwordStrength <= 75) return "GOOD";
+    return "STRONG";
+  };
 
   const onSubmit = async (data: SignupFormValues) => {
-    if (!isLoaded) return
+    if (!isLoaded) return;
 
-    setLoading(true)
-    setError("")
+    setLoading(true);
+    setError("");
 
     try {
       await signUp.create({
@@ -97,55 +104,57 @@ export default function SignUpPage() {
         username: data.username,
         emailAddress: data.email,
         password: data.password,
-      })
+      });
 
       // Send verification email
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" })
+      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
 
-      setVerifying(true)
+      setVerifying(true);
     } catch (err: any) {
-      setError(err.errors?.[0]?.message || "SIGNUP FAILED")
+      setError(err.errors?.[0]?.message || "SIGNUP FAILED");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleVerifyEmail = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!isLoaded) return
+    e.preventDefault();
+    if (!isLoaded) return;
 
-    setLoading(true)
-    setError("")
+    setLoading(true);
+    setError("");
 
     try {
       const completeSignUp = await signUp.attemptEmailAddressVerification({
         code,
-      })
+      });
 
       if (completeSignUp.status === "complete") {
-        await setActive({ session: completeSignUp.createdSessionId })
-        router.push("/dashboard")
+        await setActive({ session: completeSignUp.createdSessionId });
+        router.push("/dashboard");
       }
     } catch (err: any) {
-      setError(err.errors?.[0]?.message || "INVALID CODE")
+      setError(err.errors?.[0]?.message || "INVALID CODE");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handleOAuthSignUp = async (strategy: "oauth_google" | "oauth_github") => {
-    if (!isLoaded) return
+  const handleOAuthSignUp = async (
+    strategy: "oauth_google" | "oauth_github"
+  ) => {
+    if (!isLoaded) return;
 
     try {
       await signUp.authenticateWithRedirect({
         strategy,
         redirectUrl: "/sso-callback",
         redirectUrlComplete: "/dashboard",
-      })
+      });
     } catch (err: any) {
-      setError(err.errors?.[0]?.message || "OAUTH FAILED")
+      setError(err.errors?.[0]?.message || "OAUTH FAILED");
     }
-  }
+  };
 
   // OTP Verification View
   if (verifying) {
@@ -154,7 +163,7 @@ export default function SignUpPage() {
         <PixelClouds />
 
         <div className="fixed bottom-0 left-0 right-0 h-48 z-0">
-          <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-[#8B5CF6] to-[#EC4899]" />
+          <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-[#8B5CF6] to-[#EC4899]" />
           <div className="absolute bottom-0 w-full flex justify-around items-end">
             {[...Array(20)].map((_, i) => (
               <div
@@ -220,7 +229,7 @@ export default function SignUpPage() {
           </PixelCard>
         </div>
       </div>
-    )
+    );
   }
 
   // Signup Form View
@@ -229,7 +238,7 @@ export default function SignUpPage() {
       <PixelClouds />
 
       <div className="fixed bottom-0 left-0 right-0 h-48 z-0">
-        <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-[#8B5CF6] to-[#EC4899]" />
+        <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-[#8B5CF6] to-[#EC4899]" />
         <div className="absolute bottom-0 w-full flex justify-around items-end">
           {[...Array(20)].map((_, i) => (
             <div
@@ -325,9 +334,8 @@ export default function SignUpPage() {
 
               <div className={"flex justify-between items-start gap-3"}>
                 <div>
-                  <PixelInput
+                  <PixelPasswordInput
                     label="PASSWORD"
-                    type="password"
                     placeholder="********"
                     {...form.register("password")}
                     onChange={handlePasswordChange}
@@ -344,8 +352,11 @@ export default function SignUpPage() {
                         {[...Array(4)].map((_, i) => (
                           <div
                             key={i}
-                            className={`h-2 flex-1 border-2 border-border ${i < passwordStrength / 25 ? getStrengthColor() : "bg-muted"
-                              }`}
+                            className={`h-2 flex-1 border-2 border-border ${
+                              i < passwordStrength / 25
+                                ? getStrengthColor()
+                                : "bg-muted"
+                            }`}
                           />
                         ))}
                       </div>
@@ -357,9 +368,8 @@ export default function SignUpPage() {
                 </div>
 
                 <div>
-                  <PixelInput
+                  <PixelPasswordInput
                     label="CONFIRM PASSWORD"
-                    type="password"
                     placeholder="********"
                     {...form.register("confirmPassword")}
                   />
@@ -424,5 +434,5 @@ export default function SignUpPage() {
         </PixelCard>
       </div>
     </div>
-  )
+  );
 }

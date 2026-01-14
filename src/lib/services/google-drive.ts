@@ -79,35 +79,10 @@ export async function uploadToUserDrive(
         })
 
         const fileId = response.data.id!
-        const isImage = mimeType.startsWith('image/')
-        const isAudio = mimeType.startsWith('audio/')
-
-        // Generate proper URLs
-        let displayUrl = ''
-        let thumbnailUrl = ''
-        let downloadUrl = ''
-
-        if (isImage) {
-            // For images: use the thumbnail for display, direct link for download
-            displayUrl = `https://drive.google.com/uc?id=${fileId}`
-            thumbnailUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w300-h300` // Fixed size thumbnail
-            downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
-        } else if (isAudio) {
-            // For audio: use direct link for playback and download
-            displayUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
-            downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
-        } else {
-            // For other files
-            displayUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
-            downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
-        }
 
         return {
             fileId,
             fileName: response.data.name!,
-            displayUrl,
-            thumbnailUrl,
-            downloadUrl,
             fileSize: response.data.size ? parseInt(response.data.size) : 0,
         }
     } catch (error: any) {

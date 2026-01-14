@@ -10,12 +10,9 @@ function format(row: any) {
   return {
     id: row.id,
     name: row.name,
-    position: row.position,
     url: row.linkUrl || undefined,
     windowId: row.windowId || undefined,
-    isVisible: row.isVisible,
-    iconAssetId: row.iconAssetId || undefined,
-    icon: row.asset?.thumbnailUrl || '',
+    icon: row.asset || '',
   }
 }
 

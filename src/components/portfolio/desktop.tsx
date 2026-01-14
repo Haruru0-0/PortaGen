@@ -62,11 +62,11 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
   useEffect(() => {
     if (data) {
       setDesktopState({
-        wallpaper: data.wallpaperUrl || '',
-        desktopGif: data.desktopGifUrl || '',
-        mobileWidget1: data.widget1Url || '',
-        mobileWidget2: data.widget2Url || '',
-        menubarIcon: data.menubarIconUrl || '',
+        wallpaper: `https://drive.google.com/uc?id=${data.wallpaperAsset?.fileId}` || '',
+        desktopGif: `https://drive.google.com/uc?id=${data.desktopGifAsset?.fileId}` || '',
+        mobileWidget1: `https://drive.google.com/uc?id=${data.widget1Asset?.fileId}` || '',
+        mobileWidget2: `https://drive.google.com/uc?id=${data.widget2Asset?.fileId}` || '',
+        menubarIcon: `https://drive.google.com/uc?id=${data.menubarIconAsset?.fileId}` || '',
         menubarText: data.menubarText || ''
       })
     }
@@ -348,9 +348,15 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
   return (
     <DndContext>
       <div
-        className={`${preview ? 'w-full h-full' : 'w-screen h-screen'} relative overflow-hidden bg-cover bg-center`}
-        style={{ backgroundImage: `url(${effectiveWallpaper})` }}
+        className={`${preview ? 'w-full h-full' : 'w-screen h-screen'} relative overflow-hidden`}
       >
+        <Image
+          src={effectiveWallpaper}
+          alt="Desktop Wallpaper"
+          fill
+          className="object-cover object-center"
+          priority
+        />
         {isDesktop && <MenuBar embedded={preview} previewMode={previewMode} />}
 
         {isDesktop && (
@@ -391,7 +397,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
                   <DesktopIcon
                     id={String(app.id)}
                     label={app.name}
-                    icon={app.icon}
+                    icon={`https://drive.google.com/uc?id=${app.icon?.fileId}`}
                     onDoubleClick={() => openWindow(String(app.id))}
                   />
                 </div>
@@ -399,7 +405,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
             </div>
             <MusicPlayerWidget isDesktop={true} embedded={preview} spotifyPlaylistUrl={data?.spotifyPlaylistUrl} musicPlayerStyleId={musicPlayerStyleId} />
             <Taskbar
-              apps={icons.map(icon => ({ id: String(icon.id), label: icon.name, icon: icon.icon }))}
+              apps={icons.map(icon => ({ id: String(icon.id), label: icon.name, icon: `https://drive.google.com/uc?id=${icon.icon?.fileId}` }))}
               openWindows={openWindows}
               onAppClick={handleAppClick}
               className="mt-auto"
@@ -421,7 +427,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
                       <MobileIcon
                         id={String(app.id)}
                         label={app.name}
-                        icon={app.icon}
+                        icon={`https://drive.google.com/uc?id=${app.icon?.fileId}`}
                         onClick={() => openWindow(String(app.id))}
                       />
                     </div>
@@ -467,7 +473,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
                         <MobileIcon
                           id={String(app.id)}
                           label={app.name}
-                          icon={app.icon}
+                          icon={`https://drive.google.com/uc?id=${app.icon?.fileId}`}
                           onClick={() => openWindow(String(app.id))}
                         />
                       </div>
@@ -479,7 +485,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
               <MusicPlayerWidget isDesktop={false} embedded={preview} musicPlayerStyleId={musicPlayerStyleId} spotifyPlaylistUrl={data?.spotifyPlaylistUrl} />
             </div>
             <Taskbar
-              apps={icons.map(icon => ({ id: String(icon.id), label: icon.name, icon: icon.icon }))}
+              apps={icons.map(icon => ({ id: String(icon.id), label: icon.name, icon: `https://drive.google.com/uc?id=${icon.icon?.fileId}` }))}
               openWindows={openWindows}
               onAppClick={handleAppClick}
               className="mt-auto"

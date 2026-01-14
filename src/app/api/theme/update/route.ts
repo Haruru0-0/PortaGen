@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
-import { portfolios, themeSettings } from '@/lib/db/schema'
+import { themeSettings } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 

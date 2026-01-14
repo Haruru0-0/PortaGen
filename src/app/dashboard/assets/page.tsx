@@ -322,9 +322,7 @@ export default function AssetsPage() {
       ? `${asset.name}.${extension}`
       : asset.name;
 
-    const downloadUrl = asset.url.includes("export=download")
-      ? asset.url
-      : `https://drive.google.com/uc?export=download&id=${asset.fileId}`;
+    const downloadUrl = `https://drive.google.com/uc?export=download&id=${asset.fileId}`;
 
     const link = document.createElement("a");
     link.href = downloadUrl;
@@ -711,23 +709,23 @@ export default function AssetsPage() {
           <div className="space-y-4">
             {(viewingAsset.type === "wallpaper" ||
               viewingAsset.type === "icon") &&
-            viewingAsset.url ? (
+            viewingAsset.fileId ? (
               <div className="border-2 border-border bg-muted relative w-full h-96">
                 <Image
-                  src={viewingAsset.url.replace("/thumbnail", "/uc")}
+                  src={`https://drive.google.com/uc?id=${viewingAsset.fileId}`}
                   alt={viewingAsset.name}
                   fill
                   sizes="(max-width: 768px) 100vw, 800px"
                   className="object-contain"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = viewingAsset.thumbnailUrl || viewingAsset.url;
+                    target.src = `https://drive.google.com/thumbnail?id=${viewingAsset.fileId}` || `https://drive.google.com/uc?id=${viewingAsset.fileId}`;
                   }}
                 />
               </div>
             ) : viewingAsset.type === "music" ||
               viewingAsset.type === "sound" ? (
-              <audio controls className="w-full" src={viewingAsset.url} />
+              <audio controls className="w-full" src={`https://drive.google.com/uc?id=${viewingAsset.fileId}`} />
             ) : (
               <div className="aspect-video bg-muted border-2 border-border flex items-center justify-center text-4xl">
                 {getAssetIcon(viewingAsset.type)}

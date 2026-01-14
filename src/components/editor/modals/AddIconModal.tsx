@@ -14,6 +14,7 @@ import { useParams } from "next/navigation";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import Image from "next/image";
 import { AssetPicker } from "@/components/common/asset-picker";
+import { Asset } from "@/lib/types";
 
 interface AddIconModalProps {
   isOpen: boolean;
@@ -69,7 +70,7 @@ export function AddIconModal({ isOpen, onClose, onCreated }: AddIconModalProps) 
         return
       }
       payload = { ...payload, fileId: res.data.id }
-      if (res.data.displayUrl) setPreview(res.data.displayUrl)
+      if (res.data.fileId) setPreview(`https://drive.google.com/uc?id=${res.data.fileId}`)
     }
     const created = await addIcon(currentPortfolioId, {
       name: payload.name,
@@ -83,9 +84,9 @@ export function AddIconModal({ isOpen, onClose, onCreated }: AddIconModalProps) 
     setSelectedFile(null)
   }
 
-  const handleAssetSelect = async (asset: { id: number; url: string; thumbnailUrl?: string }) => {
+  const handleAssetSelect = async (asset: Asset) => {
     form.setValue("fileId", asset.id)
-    setPreview(asset.thumbnailUrl || asset.url)
+    setPreview(`https://drive.google.com/thumbnail?id=${asset.fileId}` || `https://drive.google.com/uc?id=${asset.fileId}`)
     setSelectedFile(null)
   }
 

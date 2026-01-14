@@ -10,12 +10,13 @@ import { useEffect, useState } from "react"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { useParams } from "next/navigation";
 import { AssetPicker } from "@/components/common/asset-picker"
+import { Asset } from "@/lib/types"
 
 export function DesktopWidgetTab() {
   const params = useParams<{ id: string }>()
   const currentPortfolioId = Number(params?.id)
   const { data, getDesktopData, updateGif } = useDesktopContext()
-  const { desktopGif, setDesktopGif, pendingGifFile, setPendingGifFile } = useDesktopStore()
+  const { setDesktopGif, pendingGifFile, setPendingGifFile } = useDesktopStore()
   const { uploadFile, uploading } = useFileUpload()
   const [renameOpen, setRenameOpen] = useState(false)
   const [customName, setCustomName] = useState("")
@@ -74,10 +75,10 @@ export function DesktopWidgetTab() {
     }
   }
 
-  const handleAssetSelect = async (asset: { id: number; url: string; thumbnailUrl?: string }) => {
+  const handleAssetSelect = async (asset: Asset) => {
     if (!currentPortfolioId) return
     await updateGif(currentPortfolioId, asset.id)
-    setDesktopGif(asset.thumbnailUrl || asset.url)
+    setDesktopGif(`https://drive.google.com/thumbnail?id=${asset.fileId}` || `https://drive.google.com/uc?id=${asset.fileId}`)
     setPendingGifFile(null)
     setPreviewUrl(null)
   }
@@ -91,7 +92,7 @@ export function DesktopWidgetTab() {
           <FileUpload
             accept="image/gif,image/*"
             onFileSelect={onUploadGif}
-            preview={previewUrl || data?.desktopGifUrl || ''}
+            preview={previewUrl || `https://drive.google.com/uc?id=${data?.desktopGifAsset?.fileId}` || ''}
             label=""
             maxSize={10}
           />

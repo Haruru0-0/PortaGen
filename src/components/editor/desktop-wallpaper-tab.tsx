@@ -10,14 +10,15 @@ import { useEffect, useState } from "react"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { useParams } from "next/navigation";
 import { AssetPicker } from "@/components/common/asset-picker"
+import { Asset } from "@/lib/types"
 
 export function DesktopWallpaperTab() {
   const params = useParams<{ id: string }>()
   const currentPortfolioId = Number(params?.id)
   const { data, getDesktopData, updateWallpaper } = useDesktopContext()
   const {
-    wallpaper, setWallpaper, pendingWallpaperFile, setPendingWallpaperFile,
-    menubarIcon, setMenubarIcon, pendingMenubarIconFile, setPendingMenubarIconFile,
+    setWallpaper, pendingWallpaperFile, setPendingWallpaperFile,
+    setMenubarIcon, pendingMenubarIconFile, setPendingMenubarIconFile,
     menubarText, setMenubarText
   } = useDesktopStore()
   const { uploadFile, uploading } = useFileUpload()
@@ -77,20 +78,20 @@ export function DesktopWallpaperTab() {
     // We'll reuse the pattern: show preview and have a "SAVE SETTINGS" button later or per section
   }
 
-  const handleAssetSelect = async (asset: { id: number; url: string; thumbnailUrl?: string }) => {
+  const handleAssetSelect = async (asset: Asset) => {
     if (!currentPortfolioId) return
 
     if (assetPickerType === "wallpaper") {
       // For wallpaper, we update directly
       await updateWallpaper(currentPortfolioId, asset.id)
-      setWallpaper(asset.thumbnailUrl || asset.url)
+      setWallpaper(`https://drive.google.com/thumbnail?id=${asset.fileId}` || `https://drive.google.com/uc?id=${asset.fileId}`)
       setPendingWallpaperFile(null)
       setPreviewUrl(null)
     } else {
       // For menu bar, we update directly too for consistency with "library selection" flow
       // But we need the current menu text to not overwrite it
       await updateMenubar(currentPortfolioId, asset.id, menubarText)
-      setMenubarIcon(asset.thumbnailUrl || asset.url)
+      setMenubarIcon(`https://drive.google.com/thumbnail?id=${asset.fileId}` || `https://drive.google.com/uc?id=${asset.fileId}`)
       setPendingMenubarIconFile(null)
       setMenubarIconPreview(null)
     }
@@ -111,7 +112,7 @@ export function DesktopWallpaperTab() {
   const handleSaveMenubar = async () => {
     if (!currentPortfolioId) return
 
-    let assetId = data?.menubarIconAssetId || null
+    let assetId = data?.menubarIconAsset?.id || null
 
     if (pendingMenubarIconFile) {
       const result = await uploadFile(pendingMenubarIconFile, 'icon', 'menubar-icon')
@@ -152,7 +153,7 @@ export function DesktopWallpaperTab() {
             <FileUpload
               accept="image/*"
               onFileSelect={onUploadWallpaper}
-              preview={previewUrl || data?.wallpaperUrl || ''}
+              preview={previewUrl || `https://drive.google.com/uc?id=${data?.wallpaperAsset?.fileId}` || ''}
               label=""
               maxSize={10}
             />
@@ -187,7 +188,7 @@ export function DesktopWallpaperTab() {
               <FileUpload
                 accept="image/*"
                 onFileSelect={onUploadMenubarIcon}
-                preview={menubarIconPreview || data?.menubarIconUrl || ''}
+                preview={menubarIconPreview || `https://drive.google.com/uc?id=${data?.menubarIconAsset?.fileId}` || ''}
                 label=""
                 maxSize={2}
               />

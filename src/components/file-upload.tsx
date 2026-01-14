@@ -5,6 +5,7 @@ import type React from "react"
 import { useRef, useState } from "react"
 import { Upload } from "lucide-react"
 import { PixelButton } from "./pixel-button"
+import Image from "next/image"
 
 interface FileUploadProps {
   accept?: string
@@ -110,10 +111,12 @@ export function FileUpload({ accept, onFileSelect, preview, label, maxSize = 5, 
         {preview ? (
           <div className="space-y-3">
             {accept?.includes("image") ? (
-              <img
+              <Image
                 src={preview || "/placeholder.svg"}
                 alt="Preview"
-                className="max-h-32 mx-auto border-2 border-border"
+                className="mx-auto border-2 border-border"
+                width={200}
+                height={100}
               />
             ) : accept?.includes("audio") ? (
               <div className="flex items-center justify-center gap-2">

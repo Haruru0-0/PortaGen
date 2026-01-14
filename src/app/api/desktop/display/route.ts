@@ -36,17 +36,11 @@ export async function GET(req: NextRequest) {
             portfolioId: row.portfolioId,
             spotifyPlaylistUrl: row.spotifyPlaylistUrl || '',
             wallpaperAssetId: row.wallpaperAssetId ?? undefined,
-            wallpaperUrl: row.wallpaperAsset?.thumbnailUrl || '',
             desktopGifAssetId: row.desktopGifAssetId ?? undefined,
-            desktopGifUrl: row.desktopGifAsset?.thumbnailUrl || '',
             widget1AssetId: row.widget1AssetId ?? undefined,
-            widget1Url: row.widget1Asset?.thumbnailUrl || '',
             widget2AssetId: row.widget2AssetId ?? undefined,
-            widget2Url: row.widget2Asset?.thumbnailUrl || '',
             musicPlayerIconAssetId: row.musicPlayerIconAssetId ?? undefined,
-            musicPlayerIconUrl: row.musicPlayerIconAsset?.displayUrl || '',
             menubarIconAssetId: row.menubarIconAssetId ?? undefined,
-            menubarIconUrl: row.menubarIconAsset?.displayUrl || '',
             menubarText: row.menubarText || '',
         })
     } catch (e) {

@@ -1,18 +1,14 @@
+import { Asset } from "../types"
+
 export interface DesktopData {
   portfolioId: number
   spotifyPlaylistUrl: string
-  wallpaperAssetId?: number
-  wallpaperUrl?: string
-  desktopGifAssetId?: number
-  desktopGifUrl?: string
-  widget1AssetId?: number
-  widget1Url?: string
-  widget2AssetId?: number
-  widget2Url?: string
-  musicPlayerIconAssetId?: number
-  musicPlayerIconUrl?: string
-  menubarIconAssetId?: number
-  menubarIconUrl?: string
+  wallpaperAsset?: Asset
+  desktopGifAsset?: Asset
+  widget1Asset?: Asset
+  widget2Asset?: Asset
+  musicPlayerIconAsset?: Asset
+  menubarIconAsset?: Asset
   menubarText?: string
 }
 

@@ -10,12 +10,13 @@ import { useFileUpload } from "@/hooks/use-file-upload"
 import { useParams } from "next/navigation";
 import { AssetPicker } from "@/components/common/asset-picker"
 import { Library } from "lucide-react"
+import { Asset } from "@/lib/types"
 
 export function MobileWidgetsTab() {
     const params = useParams<{ id: string }>()
     const currentPortfolioId = Number(params?.id)
     const { data, getDesktopData, updateWidget } = useDesktopContext()
-    const { mobileWidget1, mobileWidget2, setMobileWidget1, setMobileWidget2, pendingWidget1File, setPendingWidget1File, pendingWidget2File, setPendingWidget2File } = useDesktopStore()
+    const { setMobileWidget1, setMobileWidget2, pendingWidget1File, setPendingWidget1File, pendingWidget2File, setPendingWidget2File } = useDesktopStore()
     const { uploadFile, uploading } = useFileUpload()
 
     const [renameOpen1, setRenameOpen1] = useState(false)
@@ -100,15 +101,15 @@ export function MobileWidgetsTab() {
         }
     }
 
-    const handleAssetSelect = async (asset: { id: number; url: string; thumbnailUrl?: string }) => {
+    const handleAssetSelect = async (asset: Asset) => {
         if (!currentPortfolioId) return
         await updateWidget(currentPortfolioId, assetPickerWidget, asset.id)
         if (assetPickerWidget === 1) {
-            setMobileWidget1(asset.thumbnailUrl || asset.url)
+            setMobileWidget1(`https://drive.google.com/thumbnail?id=${asset.fileId}` || `https://drive.google.com/uc?id=${asset.fileId}`)
             setPendingWidget1File(null)
             setPreviewUrl1(null)
         } else {
-            setMobileWidget2(asset.thumbnailUrl || asset.url)
+            setMobileWidget2(`https://drive.google.com/thumbnail?id=${asset.fileId}` || `https://drive.google.com/uc?id=${asset.fileId}`)
             setPendingWidget2File(null)
             setPreviewUrl2(null)
         }
@@ -125,7 +126,7 @@ export function MobileWidgetsTab() {
                 <h3 className="text-sm dashboard-pixel-text-shadow">MOBILE WIDGETS</h3>
                 <div className="space-y-2">
                     <FileUpload accept="image/*" onFileSelect={onUploadWidget1} label="WIDGET 1"
-                        preview={previewUrl1 || data?.widget1Url || ''} maxSize={5} />
+                        preview={previewUrl1 || `https://drive.google.com/uc?id=${data?.widget1Asset?.fileId}` || ''} maxSize={5} />
                     <PixelButton
                         variant="secondary"
                         className="w-full text-[10px] flex items-center justify-center gap-2"
@@ -145,7 +146,7 @@ export function MobileWidgetsTab() {
                 </div>
                 <div className="space-y-2">
                     <FileUpload accept="image/*" onFileSelect={onUploadWidget2} label="WIDGET 2"
-                        preview={previewUrl2 || data?.widget2Url || ''} maxSize={5} />
+                        preview={previewUrl2 || `https://drive.google.com/uc?id=${data?.widget2Asset?.fileId}` || ''} maxSize={5} />
                     <PixelButton
                         variant="secondary"
                         className="w-full text-[10px] flex items-center justify-center gap-2"

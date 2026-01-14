@@ -98,9 +98,6 @@ export async function POST(req: NextRequest) {
                 assetType,
                 fileId: uploadResult.fileId,
                 fileName: finalFileName, // Save without extension
-                displayUrl: uploadResult.displayUrl,
-                thumbnailUrl: uploadResult.thumbnailUrl,
-                downloadUrl: uploadResult.downloadUrl,
                 mimeType: file.type, // MIME type tells us the file type
                 fileSize: uploadResult.fileSize,
             })
@@ -128,8 +125,6 @@ export async function POST(req: NextRequest) {
                 type: assetType,
                 fileSize: uploadResult.fileSize,
                 date: asset.uploadedAt.toISOString(),
-                url: uploadResult.displayUrl,
-                thumbnailUrl: uploadResult.thumbnailUrl,
             },
         })
     } catch (error: any) {

@@ -97,7 +97,7 @@ export function AssetPicker({ isOpen, onClose, onSelect, type = "all" }: AssetPi
     return (
         <PixelModal isOpen={isOpen} onClose={onClose} title="SELECT ASSET">
             <div className="space-y-4 h-[60vh] flex flex-col">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                     <PixelInput
                         placeholder="SEARCH ASSETS..."
                         value={searchQuery}
@@ -133,7 +133,7 @@ export function AssetPicker({ isOpen, onClose, onSelect, type = "all" }: AssetPi
                                         <div className="aspect-square relative bg-muted border border-border overflow-hidden">
                                             {isImage ? (
                                                 <Image
-                                                    src={asset.thumbnailUrl || asset.url}
+                                                    src={`https://drive.google.com/thumbnail?id=${asset.fileId}` || `https://drive.google.com/uc?id=${asset.fileId}`}
                                                     alt={asset.name}
                                                     fill
                                                     className="object-cover"
@@ -164,7 +164,7 @@ export function AssetPicker({ isOpen, onClose, onSelect, type = "all" }: AssetPi
                     )}
                 </div>
 
-                <div className="flex-shrink-0 pt-2 flex gap-3">
+                <div className="shrink-0 pt-2 flex gap-3">
                     <PixelButton
                         variant="secondary"
                         className="flex-1 text-[10px]"

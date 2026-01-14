@@ -1,10 +1,11 @@
+import { Asset } from "../types"
+
 export interface LockScreenData {
   portfolioId: number
   enabled: boolean
   password: string | null
   hint: string | null
-  wallpaperAssetId?: number
-  wallpaperUrl?: string
+  wallpaperAsset?: Asset
 }
 
 export async function getLockScreen(portfolioId: number): Promise<LockScreenData | undefined> {

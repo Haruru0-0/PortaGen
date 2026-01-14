@@ -35,9 +35,9 @@ export default function AssetCard(props: {
 
             <div
                 className="aspect-square bg-muted border-2 border-border flex items-center justify-center text-4xl overflow-hidden relative">
-                {props.asset.url && props.asset.type !== "music" && props.asset.type !== "sound" ? (
+                {props.asset.fileId && props.asset.type !== "music" && props.asset.type !== "sound" ? (
                     <Image
-                        src={props.asset.thumbnailUrl || props.asset.url}
+                        src={`https://drive.google.com/uc?id=${props.asset.fileId}`}
                         alt={props.asset.name}
                         fill
                         sizes="200px"

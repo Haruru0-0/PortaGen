@@ -10,10 +10,11 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation";
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { AssetPicker } from "@/components/common/asset-picker"
+import { Asset } from "@/lib/types"
 
 export function LockScreenWallpaperTab() {
-  const { data, updateWallpaper, getLockScreenData, loading } = useLockScreenContext()
-  const { wallpaper, setWallpaper, pendingWallpaperFile, setPendingWallpaperFile } = useLockScreenStore()
+  const { data, updateWallpaper, getLockScreenData } = useLockScreenContext()
+  const { setWallpaper, pendingWallpaperFile, setPendingWallpaperFile } = useLockScreenStore()
   const params = useParams<{ id: string }>()
   const currentPortfolioId = Number(params?.id)
   const { uploadFile, uploading } = useFileUpload()
@@ -69,10 +70,10 @@ export function LockScreenWallpaperTab() {
     }
   }
 
-  const handleAssetSelect = async (asset: { id: number; url: string; thumbnailUrl?: string }) => {
+  const handleAssetSelect = async (asset: Asset) => {
     if (!currentPortfolioId) return
     await updateWallpaper(currentPortfolioId, asset.id)
-    setWallpaper(asset.thumbnailUrl || asset.url)
+    setWallpaper(`https://drive.google.com/uc?id=${asset.fileId}`)
     setPendingWallpaperFile(null)
     setPreviewUrl(null)
   }
@@ -86,7 +87,7 @@ export function LockScreenWallpaperTab() {
           <FileUpload
             accept="image/*"
             onFileSelect={onUpload}
-            preview={previewUrl || data?.wallpaperUrl || ''}
+            preview={previewUrl || `https://drive.google.com/uc?id=${data?.wallpaperAsset?.fileId}` || ''}
             label="LOCK SCREEN IMAGE"
             maxSize={5}
           />

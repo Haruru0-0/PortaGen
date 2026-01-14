@@ -1,4 +1,3 @@
-import { DEFAULT_THEME } from '../constants/theme-templates'
 
 export interface ThemeColors {
     primary: string

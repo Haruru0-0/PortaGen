@@ -343,7 +343,7 @@ export function AssetLibraryModal({
                 {type === "wallpaper" && selectedAsset && (
                     <div className="mt-2 aspect-video border-2 border-border overflow-hidden relative">
                       <Image
-                          src={getOptimizedImageUrl(selectedAsset)}
+                          src={getFullImageUrl(selectedAsset)}
                           alt={selectedAsset.name}
                           fill
                           sizes="300px"

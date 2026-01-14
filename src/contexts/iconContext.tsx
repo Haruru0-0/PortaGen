@@ -18,8 +18,6 @@ export type Icon = {
     url?: string;
     linkType?: 'window' | 'url';
     iconAssetId?: number;
-    position?: number;
-    isVisible?: boolean
 }
 
 interface IconContextType {

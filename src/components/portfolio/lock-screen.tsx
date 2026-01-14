@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
+import Image from "next/image"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -56,8 +57,7 @@ export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
         enabled: data.enabled,
         password: data.password || '1234',
         hint: data.hint || '',
-        wallpaper: data.wallpaperUrl || '',
-        wallpaperFileId: data.wallpaperAssetId?.toString() || null
+        wallpaper: `https://drive.google.com/uc?id=${data.wallpaperAsset?.fileId}` || '',
       })
     }
   }, [data, setLockScreenState])
@@ -225,11 +225,17 @@ export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
 
   return (
     <div
-      className={`${preview ? 'w-full h-full' : 'w-screen h-screen'} relative flex flex-col items-center justify-center overflow-hidden bg-cover bg-center`}
-      style={{ backgroundImage: `url(${effectiveWallpaper})` }}
+      className={`${preview ? 'w-full h-full' : 'w-screen h-screen'} relative flex flex-col items-center justify-center overflow-hidden`}
       onClick={handleScreenClick}
     >
-      <div className="flex flex-col items-center">
+      <Image
+        src={effectiveWallpaper}
+        alt="Lock Screen Wallpaper"
+        fill
+        className="object-cover object-center"
+        priority
+      />
+      <div className="flex flex-col items-center relative z-10">
         <h1 ref={timeRef} className="text-6xl font-bold text-blue-800 mb-2">
           {formatTime(currentTime)}
         </h1>
@@ -279,7 +285,7 @@ export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
                   <span className="sr-only">Unlock</span>
                 </Button>
               </div>
-              {effectivePassword && <p className="text-xs text-blue-600/80 text-center">Hint: The password is '{effectivePassword}'</p>}
+              {effectivePassword && <p className="text-xs text-blue-600/80 text-center">Hint: The password is &apos;{effectivePassword}&apos;</p>}
             </form>
           </div>
 

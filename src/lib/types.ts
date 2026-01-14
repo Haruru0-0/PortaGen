@@ -217,8 +217,6 @@ export interface Asset {
     size: string
     fileSize: number
     date: string
-    url: string
-    thumbnailUrl?: string
     portfolioId: number
     mimeType?: string
 }

@@ -15,12 +15,9 @@ async function formatIconResponse(id: number) {
   return {
     id: row.id,
     name: row.name,
-    position: row.position,
     linkType: row.linkType || 'window',
     url: row.linkUrl || undefined,
-    isVisible: row.isVisible,
     iconAssetId: row.iconAssetId || undefined,
-    icon: row.asset?.displayUrl || '',
   }
 }
 
@@ -33,7 +30,7 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
     const body = await req.json().catch(() => ({}))
-    const { id, portfolioId, name, url, fileId, position, linkType, isVisible } = body || {}
+    const { id, portfolioId, name, url, fileId, linkType } = body || {}
 
     if (!id) return NextResponse.json({ error: 'Icon ID required' }, { status: 400 })
     if (!portfolioId) return NextResponse.json({ error: 'Portfolio ID required' }, { status: 400 })
@@ -48,9 +45,7 @@ export async function POST(req: NextRequest) {
       name,
       linkType: (linkType === 'url' || linkType === 'window') ? linkType : undefined,
       linkUrl: linkType === 'url' ? url : (linkType === 'window' ? '' : undefined),
-      isVisible: typeof isVisible === 'boolean' ? isVisible : undefined,
       iconAssetId: fileId != null && fileId !== '' ? Number(fileId) : undefined,
-      position: typeof position === 'number' ? position : undefined,
       updatedAt: new Date(),
     }
 

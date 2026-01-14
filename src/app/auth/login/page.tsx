@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation"
 import { PixelButton } from "@/components/pixel-button"
 import { PixelCard } from "@/components/pixel-card"
 import { PixelInput } from "@/components/pixel-input"
+import { PixelPasswordInput } from "@/components/pixel-password-input"
 import { PixelClouds } from "@/components/pixel-clouds"
 import { PixelCharacter } from "@/components/pixel-character"
 import { useState } from "react"
@@ -134,9 +135,8 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <PixelInput
+                <PixelPasswordInput
                   label="PASSWORD"
-                  type="password"
                   placeholder="********"
                   {...form.register("password")}
                 />

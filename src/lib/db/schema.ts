@@ -81,15 +81,12 @@ export const icons = pgTable('icons', {
     portfolioId: integer('portfolio_id').notNull().references(() => portfolios.id, { onDelete: 'cascade' }),
 
     name: varchar('name', { length: 255 }).notNull(),
-    position: integer('position').notNull().default(0),
 
     iconAssetId: integer('icon_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
 
     // Link/Window
     linkType: varchar('link_type', { length: 20 }).default('window'),
     linkUrl: text('link_url'),
-
-    isVisible: boolean('is_visible').default(true),
 
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -108,11 +105,6 @@ export const uploadedAssets = pgTable('uploaded_assets', {
     // Google Drive file info
     fileId: varchar('file_id', { length: 255 }).notNull().unique(),
     fileName: text('file_name').notNull(),
-
-    // THREE SEPARATE URLS FOR DIFFERENT USE CASES:
-    downloadUrl: text('download_url'),        // For actual file downloads
-    displayUrl: text('display_url'),          // For image display in img tags
-    thumbnailUrl: text('thumbnail_url'),      // For thumbnails in lists/grids
 
     mimeType: varchar('mime_type', { length: 100 }),
     fileSize: integer('file_size'), // in bytes

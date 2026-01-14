@@ -34,7 +34,7 @@ export function IconsTab() {
         setOpenEdit(true)
     }
     const handleDelete = (id: number) => setDeleteTarget(id)
-
+console.log(icons)
     return (
         <PixelCard>
             <div className="space-y-4">
@@ -48,7 +48,7 @@ export function IconsTab() {
                         >
                             <div className="flex items-center gap-3">
                                 <Image
-                                    src={icon.icon || Placeholder}
+                                    src={`https://drive.google.com/uc?id=${icon.icon?.fileId}` || Placeholder}
                                     alt={icon.name}
                                     width={32}
                                     height={32}

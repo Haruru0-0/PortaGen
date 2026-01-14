@@ -14,6 +14,7 @@ import { useParams } from "next/navigation";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import Image from "next/image";
 import { AssetPicker } from "@/components/common/asset-picker";
+import { Asset } from "@/lib/types";
 
 interface EditIconModalProps {
   isOpen: boolean;
@@ -46,8 +47,8 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
 
   useEffect(() => {
     if (icon) {
-      form.reset({ name: icon.name || '', linkType: (icon as any).linkType || 'window', url: icon.url || '', fileId: icon.iconAssetId })
-      setPreview(icon.icon || '')
+      form.reset({ name: icon.name || '', linkType: icon.linkType || 'window', url: icon.url || '', fileId: icon.iconAssetId })
+      setPreview(`https://drive.google.com/uc?id=${icon.icon?.fileId}` || '')
       setSelectedFile(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -72,15 +73,15 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
         return
       }
       values = { ...values, fileId: res.data.id }
-      if (res.data.displayUrl) setPreview(res.data.displayUrl)
+      if (res.data.fileId) setPreview(`https://drive.google.com/uc?id=${res.data.fileId}`)
     }
     const updated = await updateIcon(currentPortfolioId, { id: icon.id, ...values })
     onUpdated(updated)
   }
 
-  const handleAssetSelect = async (asset: { id: number; url: string; thumbnailUrl?: string }) => {
+  const handleAssetSelect = async (asset: Asset) => {
     form.setValue("fileId", asset.id)
-    setPreview(asset.thumbnailUrl || asset.url)
+    setPreview(`https://drive.google.com/thumbnail?id=${asset.fileId}` || `https://drive.google.com/uc?id=${asset.fileId}`)
     setSelectedFile(null)
   }
 

@@ -38,8 +38,6 @@ export async function GET(req: NextRequest) {
             size: formatFileSize(asset.fileSize || 0),
             fileSize: asset.fileSize || 0,
             date: asset.uploadedAt.toISOString(),
-            url: asset.displayUrl,
-            thumbnailUrl: asset.thumbnailUrl,
             mimeType: asset.mimeType
         }))
 

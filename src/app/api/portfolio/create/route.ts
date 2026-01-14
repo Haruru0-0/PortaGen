@@ -2,8 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
-import { portfolios, users, lockScreenSettings, desktopSettings, themeSettings, soundEffects } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { portfolios, lockScreenSettings, desktopSettings, themeSettings, soundEffects } from '@/lib/db/schema'
 import { logActivity, completeChecklistTask } from '@/lib/activity'
 import { getUserByClerkId } from '@/lib/db/helpers'
 

@@ -16,12 +16,9 @@ async function formatIconResponse(id: number) {
   return {
     id: row.id,
     name: row.name,
-    position: row.position,
-    linkType: (row as any).linkType || 'window',
+    linkType: row.linkType || 'window',
     url: row.linkUrl || undefined,
-    isVisible: row.isVisible,
     iconAssetId: row.iconAssetId || undefined,
-    icon: row.asset?.displayUrl || '',
   }
 }
 
@@ -34,7 +31,7 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
     const body = await req.json().catch(() => ({}))
-    const { portfolioId, name, url, fileId, position, linkType, isVisible } = body || {}
+    const { portfolioId, name, url, fileId, linkType } = body || {}
 
     if (!portfolioId) {
       return NextResponse.json({ error: 'Portfolio ID required' }, { status: 400 })
@@ -46,22 +43,13 @@ export async function POST(req: NextRequest) {
     })
     if (!owned) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-    // Determine next position if not provided
-    let nextPosition: number | undefined = typeof position === 'number' ? position : undefined
-    if (typeof nextPosition !== 'number') {
-      const existing = await db.query.icons.findMany({ where: eq(icons.portfolioId, portfolioId) })
-      nextPosition = (existing.reduce((max, r) => Math.max(max, r.position || 0), -1) || -1) + 1
-    }
-
     const [created] = await db
       .insert(icons)
       .values({
         portfolioId,
         name: name || 'NEW ICON',
-        position: nextPosition || 0,
         linkType: (linkType === 'url' || linkType === 'window') ? linkType : 'window',
         linkUrl: linkType === 'url' ? url : undefined,
-        isVisible: typeof isVisible === 'boolean' ? isVisible : true,
         iconAssetId: fileId != null && fileId !== '' ? Number(fileId) : undefined,
       })
       .returning()
@@ -70,13 +58,12 @@ export async function POST(req: NextRequest) {
     if (fileId != null && fileId !== '') {
       try {
         // Ignore if mapping already exists
-        // @ts-ignore drizzle types for onConflictDoNothing
         await db
           .insert(portfolioAssets)
           .values({ portfolioId, assetId: Number(fileId) })
           .onConflictDoNothing({ target: [portfolioAssets.portfolioId, portfolioAssets.assetId] })
       } catch (e) {
-        // noop if unique conflict or unsupported op in driver
+        console.error('Failed to link icon asset to portfolio assets:', e)
       }
     }
 
