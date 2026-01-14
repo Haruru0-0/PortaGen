@@ -35,12 +35,12 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({
             portfolioId: row.portfolioId,
             spotifyPlaylistUrl: row.spotifyPlaylistUrl || '',
-            wallpaperAssetId: row.wallpaperAssetId ?? undefined,
-            desktopGifAssetId: row.desktopGifAssetId ?? undefined,
-            widget1AssetId: row.widget1AssetId ?? undefined,
-            widget2AssetId: row.widget2AssetId ?? undefined,
-            musicPlayerIconAssetId: row.musicPlayerIconAssetId ?? undefined,
-            menubarIconAssetId: row.menubarIconAssetId ?? undefined,
+            wallpaperAsset: row.wallpaperAsset ?? undefined,
+            desktopGifAsset: row.desktopGifAsset ?? undefined,
+            widget1Asset: row.widget1Asset ?? undefined,
+            widget2Asset: row.widget2Asset ?? undefined,
+            musicPlayerIconAsset: row.musicPlayerIconAsset ?? undefined,
+            menubarIconAsset: row.menubarIconAsset ?? undefined,
             menubarText: row.menubarText || '',
         })
     } catch (e) {
