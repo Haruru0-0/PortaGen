@@ -19,7 +19,7 @@ import { Asset } from "@/lib/types";
 interface AddIconModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreated: (icon?: { id: number; name: string; icon: string; url?: string; linkType?: 'window' | 'url' }) => void;
+  onCreated: (icon?: { id: number; name: string; icon: Asset | null; url?: string; linkType?: 'window' | 'url' }) => void;
 }
 
 const schema = z
