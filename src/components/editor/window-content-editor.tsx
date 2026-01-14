@@ -145,7 +145,7 @@ export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }:
             for (const [path, file] of filesToUpload.entries()) {
                 const asset = await uploadFile(file, portfolioId)
                 if (asset) {
-                    uploadedUrls.set(path, asset.url)
+                    uploadedUrls.set(path, `https://drive.google.com/uc?id=${asset.fileId}`)
                 }
             }
 
