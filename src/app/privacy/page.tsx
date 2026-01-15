@@ -1,10 +1,11 @@
 "use client"
 
+import {Suspense} from "react"
 import {PixelCard} from "@/components/pixel-card"
 import {PixelClouds} from "@/components/pixel-clouds"
 import {useRouter, useSearchParams} from "next/navigation"
 
-export default function PrivacyPolicyPage() {
+function PrivacyPolicyContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const from = searchParams.get("from")
@@ -125,5 +126,13 @@ export default function PrivacyPolicyPage() {
                 </PixelCard>
             </div>
         </div>
+    )
+}
+
+export default function PrivacyPolicyPage() {
+    return (
+        <Suspense fallback={<div>Loading privacy policy...</div>}>
+            <PrivacyPolicyContent/>
+        </Suspense>
     )
 }
