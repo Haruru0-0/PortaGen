@@ -209,7 +209,7 @@ export default function LoginPage() {
               </Link>
               <br />
               Read our{" "}
-              <Link href="/privacy" className="text-primary hover:underline" target="_blank">
+              <Link href="/privacy?from=Login" className="text-primary hover:underline">
                 Privacy Policy
               </Link>
             </p>

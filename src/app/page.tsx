@@ -384,6 +384,11 @@ export default function LandingPage() {
                                         FEATURES
                                     </Link>
                                 </div>
+                                <div>
+                                    <Link href="/privacy?from=Home" className="text-primary hover:underline">
+                                        PRIVACY
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                         <div className="space-y-3">

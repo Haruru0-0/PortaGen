@@ -382,7 +382,7 @@ export default function SignUpPage() {
               </div>
               <div className="text-center text-[10px] text-muted-foreground leading-relaxed">
                 By creating an account, you agree to our{" "}
-                <Link href="/privacy" className="text-primary hover:underline" target="_blank">
+                <Link href="/privacy?from=Signup" className="text-primary hover:underline">
                   Privacy Policy
                 </Link>.
               </div>
