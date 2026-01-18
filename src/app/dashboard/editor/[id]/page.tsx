@@ -20,32 +20,30 @@ export default function EditorPage() {
             <PortfolioUrlShare />
 
             {!driveLoading && !connected && (
-                <div className="mt-8">
-                    <PixelCard className="border-yellow-500">
-                        <div className="flex flex-col md:flex-row items-center justify-between p-4 gap-4 md:gap-2">
-                            <div className="flex items-center gap-3 text-left">
-                                <XCircle className="w-6 h-6 text-yellow-500 shrink-0" />
-                                <div>
-                                    <p className="text-[10px] font-bold">
-                                        GOOGLE DRIVE NOT CONNECTED
-                                    </p>
-                                    <p className="text-[8px] text-muted-foreground whitespace-nowrap">
-                                        CONNECT DRIVE TO UPLOAD AND MANAGE YOUR PORTFOLIO ASSETS
-                                    </p>
-                                </div>
+                <PixelCard className="border-yellow-500 mt-8">
+                    <div className="flex flex-col md:flex-row items-center justify-between p-4 gap-4 md:gap-2">
+                        <div className="flex items-center gap-3">
+                            <XCircle className="w-6 h-6 text-yellow-500" />
+                            <div>
+                                <p className="text-[10px] font-bold">
+                                    GOOGLE DRIVE NOT CONNECTED
+                                </p>
+                                <p className="text-[8px] text-muted-foreground">
+                                    Connect your Google Drive to upload and manage assets
+                                </p>
                             </div>
-                            <PixelButton
-                                variant="primary"
-                                className="text-[10px] flex items-center gap-2 w-full md:w-auto"
-                                onClick={connectDrive}
-                                disabled={driveLoading}
-                            >
-                                <Cloud className="w-4 h-4" />
-                                {driveLoading ? "CONNECTING..." : "CONNECT NOW"}
-                            </PixelButton>
                         </div>
-                    </PixelCard>
-                </div>
+                        <PixelButton
+                            variant="primary"
+                            className="text-[10px] flex items-center gap-2"
+                            onClick={connectDrive}
+                            disabled={driveLoading}
+                        >
+                            <Cloud className="w-4 h-4" />
+                            {driveLoading ? "CONNECTING..." : "CONNECT NOW"}
+                        </PixelButton>
+                    </div>
+                </PixelCard>
             )}
 
             <div className={`min-h-[calc(100vh-180px)] flex flex-col ${!driveLoading && !connected ? 'mt-4' : 'mt-8'}`}>

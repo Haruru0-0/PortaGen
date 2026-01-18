@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from "react"
 import { LogOut, Settings, User } from "lucide-react"
 import { PixelCharacter } from "./pixel-character"
 import Link from "next/link"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils"
 import { gsap } from "gsap"
 import { createClient } from "@/utils/supabase/client"
 import { useRouter } from "next/navigation"
@@ -87,9 +89,20 @@ export function UserDropdown() {
         ) : (
           <PixelCharacter color="#8B5CF6" size={32} />
         )}
-        <div className="text-left hidden md:block">
-          <p className="text-[10px] font-bold">{displayName.toUpperCase()}</p>
-          <p className="text-[8px] text-muted-foreground">{displayEmail}</p>
+        <div className="text-left hidden md:block max-w-[120px]">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <p className="text-[10px] font-bold truncate cursor-help">{displayName.toUpperCase()}</p>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">{displayName.toUpperCase()}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <p className="text-[8px] text-muted-foreground truncate cursor-help">{displayEmail}</p>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">{displayEmail}</TooltipContent>
+          </Tooltip>
         </div>
       </button>
 
@@ -104,9 +117,20 @@ export function UserDropdown() {
             ) : (
               <PixelCharacter color="#8B5CF6" size={32} />
             )}
-            <div>
-              <p className="text-[10px] font-bold">{displayName.toUpperCase()}</p>
-              <p className="text-[8px] text-muted-foreground truncate">{displayEmail}</p>
+            <div className="min-w-0">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <p className="text-[10px] font-bold truncate cursor-help">{displayName.toUpperCase()}</p>
+                </TooltipTrigger>
+                <TooltipContent side="right">{displayName.toUpperCase()}</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <p className="text-[8px] text-muted-foreground truncate cursor-help">{displayEmail}</p>
+                </TooltipTrigger>
+                <TooltipContent side="right">{displayEmail}</TooltipContent>
+              </Tooltip>
             </div>
           </div>
 
