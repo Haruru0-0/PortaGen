@@ -10,13 +10,13 @@ export default async function DashboardPage() {
   const { userId: clerkUserId } = await auth();
 
   if (!clerkUserId) {
-    redirect("/sign-in");
+    redirect("/auth/login");
   }
 
   const user = await getUserByClerkId(clerkUserId);
   if (!user) {
     // Handle edge case where clerk user exists but db user doesn't (sync issue)
-    redirect("/sign-in");
+    redirect("/auth/login");
   }
 
   const { checklist, recentActivity, stats } = await getDashboardStats(user.id);

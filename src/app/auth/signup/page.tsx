@@ -131,7 +131,7 @@ export default function SignUpPage() {
 
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
-        router.push("/dashboard");
+        router.push("/auth/login");
       }
     } catch (err: any) {
       setError(err.errors?.[0]?.message || "INVALID CODE");
