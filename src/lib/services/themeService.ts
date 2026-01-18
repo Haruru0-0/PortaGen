@@ -16,10 +16,10 @@ export interface Theme {
     name: string
     colors: ThemeColors
     font: string
-    taskbarStyleId?: string
-    menubarStyleId?: string
-    windowStyleId?: string
-    musicPlayerStyleId?: string
+    taskbarStyleId: string
+    menubarStyleId: string
+    windowStyleId: string
+    musicPlayerStyleId: string
 }
 
 export interface ThemeSettingsData {
