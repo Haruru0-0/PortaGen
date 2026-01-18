@@ -1,9 +1,35 @@
 import { PixelCard } from "@/components/pixel-card"
 import { PixelCharacter } from "@/components/pixel-character"
+import { createClient } from "@/utils/supabase/server"
+import { getUserBySupabaseId, getOrCreateUser } from "@/lib/db/helpers"
 import { getDashboardStats } from "@/lib/activity"
 import { formatDistanceToNow } from "date-fns"
+import { redirect } from "next/navigation"
 
 export default async function DashboardPage() {
+  const supabase = await createClient()
+  const { data: { user: supabaseUser } } = await supabase.auth.getUser()
+
+  if (!supabaseUser) {
+    redirect("/auth/login");
+  }
+
+  // Ensure user exists in our database
+  // Sign up metadata might contain the chosen username
+  const username = supabaseUser.user_metadata.username ||
+    supabaseUser.user_metadata.full_name ||
+    supabaseUser.email?.split('@')[0] ||
+    'PLAYER';
+
+  const user = await getOrCreateUser(
+    supabaseUser.id,
+    supabaseUser.email!,
+    username
+  );
+
+  if (!user) {
+    redirect("/auth/login");
+  }
 
   const { checklist, recentActivity, stats } = await getDashboardStats(user.id);
 

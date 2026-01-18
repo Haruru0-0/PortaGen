@@ -7,6 +7,8 @@ CREATE TABLE "desktop_settings" (
 	"widget2_asset_id" integer,
 	"music_player_icon_asset_id" integer,
 	"spotify_playlist_url" text,
+	"menubar_icon_asset_id" integer,
+	"menubar_text" varchar(100),
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "desktop_settings_portfolio_id_unique" UNIQUE("portfolio_id")
@@ -16,11 +18,9 @@ CREATE TABLE "icons" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"portfolio_id" integer NOT NULL,
 	"name" varchar(255) NOT NULL,
-	"position" integer DEFAULT 0 NOT NULL,
 	"icon_asset_id" integer,
+	"link_type" varchar(20) DEFAULT 'window',
 	"link_url" text,
-	"window_id" varchar(100),
-	"is_visible" boolean DEFAULT true,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
@@ -30,24 +30,10 @@ CREATE TABLE "lock_screen_settings" (
 	"portfolio_id" integer NOT NULL,
 	"enabled" boolean DEFAULT true,
 	"password" varchar(255),
-	"hint" text,
 	"wallpaper_asset_id" integer,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "lock_screen_settings_portfolio_id_unique" UNIQUE("portfolio_id")
-);
---> statement-breakpoint
-CREATE TABLE "music_tracks" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"portfolio_id" integer NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"position" integer DEFAULT 0 NOT NULL,
-	"audio_asset_id" integer,
-	"type" varchar(50) DEFAULT 'upload' NOT NULL,
-	"duration" integer,
-	"is_visible" boolean DEFAULT true,
-	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "portfolio_assets" (
@@ -61,28 +47,19 @@ CREATE TABLE "portfolios" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"user_id" integer NOT NULL,
 	"portfolio_name" text DEFAULT 'MY PORTFOLIO' NOT NULL,
-	"username" varchar(100) NOT NULL,
-	"slug" varchar(100) NOT NULL,
 	"bio" text,
-	"is_public" boolean DEFAULT true,
-	"is_published" boolean DEFAULT false,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "portfolios_username_unique" UNIQUE("username"),
-	CONSTRAINT "portfolios_slug_unique" UNIQUE("slug")
+	"views" integer DEFAULT 0 NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "sound_effects" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"portfolio_id" integer NOT NULL,
-	"effect_id" varchar(100) NOT NULL,
-	"name" varchar(255) NOT NULL,
-	"audio_asset_id" integer,
-	"volume" integer DEFAULT 50,
-	"enabled" boolean DEFAULT true,
+	"preset_id" varchar(50) DEFAULT 'arcade' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "portfolio_effect_unique" UNIQUE("portfolio_id","effect_id")
+	CONSTRAINT "sound_effects_portfolio_id_unique" UNIQUE("portfolio_id")
 );
 --> statement-breakpoint
 CREATE TABLE "theme_settings" (
@@ -100,13 +77,28 @@ CREATE TABLE "uploaded_assets" (
 	"asset_type" varchar(50) NOT NULL,
 	"file_id" varchar(255) NOT NULL,
 	"file_name" text NOT NULL,
-	"download_url" text,
-	"display_url" text,
-	"thumbnail_url" text,
 	"mime_type" varchar(100),
 	"file_size" integer,
 	"uploaded_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "uploaded_assets_file_id_unique" UNIQUE("file_id")
+);
+--> statement-breakpoint
+CREATE TABLE "user_activities" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" integer NOT NULL,
+	"action_type" varchar(50) NOT NULL,
+	"description" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "user_checklist_items" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" integer NOT NULL,
+	"task_id" varchar(50) NOT NULL,
+	"is_done" boolean DEFAULT false NOT NULL,
+	"completed_at" timestamp,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "unique_user_task" UNIQUE("user_id","task_id")
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
@@ -128,17 +120,14 @@ CREATE TABLE "users" (
 	CONSTRAINT "users_username_unique" UNIQUE("username")
 );
 --> statement-breakpoint
-CREATE TABLE "window_contents" (
+CREATE TABLE "windows" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"portfolio_id" integer NOT NULL,
-	"window_id" varchar(100) NOT NULL,
 	"name" varchar(255) NOT NULL,
-	"enabled" boolean DEFAULT true,
-	"position" integer DEFAULT 0 NOT NULL,
+	"icon_id" integer,
 	"content" jsonb,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "portfolio_window_unique" UNIQUE("portfolio_id","window_id")
+	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 ALTER TABLE "desktop_settings" ADD CONSTRAINT "desktop_settings_portfolio_id_portfolios_id_fk" FOREIGN KEY ("portfolio_id") REFERENCES "public"."portfolios"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -147,25 +136,28 @@ ALTER TABLE "desktop_settings" ADD CONSTRAINT "desktop_settings_desktop_gif_asse
 ALTER TABLE "desktop_settings" ADD CONSTRAINT "desktop_settings_widget1_asset_id_uploaded_assets_id_fk" FOREIGN KEY ("widget1_asset_id") REFERENCES "public"."uploaded_assets"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "desktop_settings" ADD CONSTRAINT "desktop_settings_widget2_asset_id_uploaded_assets_id_fk" FOREIGN KEY ("widget2_asset_id") REFERENCES "public"."uploaded_assets"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "desktop_settings" ADD CONSTRAINT "desktop_settings_music_player_icon_asset_id_uploaded_assets_id_fk" FOREIGN KEY ("music_player_icon_asset_id") REFERENCES "public"."uploaded_assets"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "desktop_settings" ADD CONSTRAINT "desktop_settings_menubar_icon_asset_id_uploaded_assets_id_fk" FOREIGN KEY ("menubar_icon_asset_id") REFERENCES "public"."uploaded_assets"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "icons" ADD CONSTRAINT "icons_portfolio_id_portfolios_id_fk" FOREIGN KEY ("portfolio_id") REFERENCES "public"."portfolios"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "icons" ADD CONSTRAINT "icons_icon_asset_id_uploaded_assets_id_fk" FOREIGN KEY ("icon_asset_id") REFERENCES "public"."uploaded_assets"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "lock_screen_settings" ADD CONSTRAINT "lock_screen_settings_portfolio_id_portfolios_id_fk" FOREIGN KEY ("portfolio_id") REFERENCES "public"."portfolios"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "lock_screen_settings" ADD CONSTRAINT "lock_screen_settings_wallpaper_asset_id_uploaded_assets_id_fk" FOREIGN KEY ("wallpaper_asset_id") REFERENCES "public"."uploaded_assets"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "music_tracks" ADD CONSTRAINT "music_tracks_portfolio_id_portfolios_id_fk" FOREIGN KEY ("portfolio_id") REFERENCES "public"."portfolios"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "music_tracks" ADD CONSTRAINT "music_tracks_audio_asset_id_uploaded_assets_id_fk" FOREIGN KEY ("audio_asset_id") REFERENCES "public"."uploaded_assets"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "portfolio_assets" ADD CONSTRAINT "portfolio_assets_portfolio_id_portfolios_id_fk" FOREIGN KEY ("portfolio_id") REFERENCES "public"."portfolios"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "portfolio_assets" ADD CONSTRAINT "portfolio_assets_asset_id_uploaded_assets_id_fk" FOREIGN KEY ("asset_id") REFERENCES "public"."uploaded_assets"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "portfolios" ADD CONSTRAINT "portfolios_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "sound_effects" ADD CONSTRAINT "sound_effects_portfolio_id_portfolios_id_fk" FOREIGN KEY ("portfolio_id") REFERENCES "public"."portfolios"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "sound_effects" ADD CONSTRAINT "sound_effects_audio_asset_id_uploaded_assets_id_fk" FOREIGN KEY ("audio_asset_id") REFERENCES "public"."uploaded_assets"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "theme_settings" ADD CONSTRAINT "theme_settings_portfolio_id_portfolios_id_fk" FOREIGN KEY ("portfolio_id") REFERENCES "public"."portfolios"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "uploaded_assets" ADD CONSTRAINT "uploaded_assets_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "window_contents" ADD CONSTRAINT "window_contents_portfolio_id_portfolios_id_fk" FOREIGN KEY ("portfolio_id") REFERENCES "public"."portfolios"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "user_activities" ADD CONSTRAINT "user_activities_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "user_checklist_items" ADD CONSTRAINT "user_checklist_items_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "windows" ADD CONSTRAINT "windows_portfolio_id_portfolios_id_fk" FOREIGN KEY ("portfolio_id") REFERENCES "public"."portfolios"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "windows" ADD CONSTRAINT "windows_icon_id_icons_id_fk" FOREIGN KEY ("icon_id") REFERENCES "public"."icons"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "portfolio_assets_portfolio_id_idx" ON "portfolio_assets" USING btree ("portfolio_id");--> statement-breakpoint
 CREATE INDEX "portfolio_assets_asset_id_idx" ON "portfolio_assets" USING btree ("asset_id");--> statement-breakpoint
 CREATE INDEX "portfolio_user_id_idx" ON "portfolios" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX "portfolio_slug_idx" ON "portfolios" USING btree ("slug");--> statement-breakpoint
 CREATE INDEX "assets_user_id_idx" ON "uploaded_assets" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "assets_file_id_idx" ON "uploaded_assets" USING btree ("file_id");--> statement-breakpoint
+CREATE INDEX "activities_user_id_idx" ON "user_activities" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "checklist_user_id_idx" ON "user_checklist_items" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "clerk_user_id_idx" ON "users" USING btree ("clerk_user_id");--> statement-breakpoint
-CREATE INDEX "window_portfolio_id_idx" ON "window_contents" USING btree ("portfolio_id");
+CREATE INDEX "windows_portfolio_id_idx" ON "windows" USING btree ("portfolio_id");--> statement-breakpoint
+CREATE INDEX "windows_icon_id_idx" ON "windows" USING btree ("icon_id");

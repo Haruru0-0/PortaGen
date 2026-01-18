@@ -1,19 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { createClient } from '@/utils/supabase/server'
 import { db } from '@/lib/db'
 import { users } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 
 export async function GET(req: NextRequest) {
     try {
-        const { userId } = await auth()
+        const supabase = await createClient()
+        const { data: { user: supabaseUser } } = await supabase.auth.getUser()
+        const userId = supabaseUser?.id
 
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
         const user = await db.query.users.findFirst({
-            where: eq(users.clerkUserId, userId),
+            where: eq(users.supabaseUserId, userId),
             columns: {
                 googleDriveConnected: true,
                 googleTokenExpiry: true,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { createClient } from '@/utils/supabase/server'
 import { db } from '@/lib/db'
 import { users } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
@@ -7,7 +7,10 @@ import { encryptToken, getSpotifyTokens } from '@/lib/services/spotify'
 
 export async function GET(req: NextRequest) {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user: supabaseUser } } = await supabase.auth.getUser()
+    const userId = supabaseUser?.id
+
     if (!userId) {
       return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/auth/login`)
     }
@@ -51,7 +54,7 @@ export async function GET(req: NextRequest) {
         spotifyConnected: true,
         updatedAt: new Date(),
       })
-      .where(eq(users.clerkUserId, userId))
+      .where(eq(users.supabaseUserId, userId))
 
     return NextResponse.redirect(
       `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings?success=spotify_connected`

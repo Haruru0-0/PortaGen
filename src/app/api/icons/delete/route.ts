@@ -1,17 +1,18 @@
 // app/api/icons/delete/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { createClient } from '@/utils/supabase/server'
 import { db } from '@/lib/db'
 import { icons, portfolioAssets } from '@/lib/db/schema'
 import { and, eq } from 'drizzle-orm'
-import { getUserByClerkId } from '@/lib/db/helpers'
+import { getUserBySupabaseId } from '@/lib/db/helpers'
 
 export async function DELETE(req: NextRequest) {
   try {
-    const { userId } = await auth()
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const supabase = await createClient()
+    const { data: { user: supabaseUser } } = await supabase.auth.getUser()
+    if (!supabaseUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const user = await getUserByClerkId(userId)
+    const user = await getUserBySupabaseId(supabaseUser.id)
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
     const { searchParams } = new URL(req.url)
@@ -26,8 +27,8 @@ export async function DELETE(req: NextRequest) {
     if (!iconRow) return NextResponse.json({ error: 'Icon not found' }, { status: 404 })
     if (!iconRow.portfolio || iconRow.portfolio.userId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-    // We cannot resolve Clerk user to internal user id here without extra query,
-    // but portfolio.userId is internal id set at creation time, and clerk auth
+    // We cannot resolve Supabase user to internal user id here without extra query,
+    // but portfolio.userId is internal id set at creation time, and supabase auth
     // is enforced for data access elsewhere. The portfolio relation comes from
     // the same db.query that enforces ownership in other endpoints.
 

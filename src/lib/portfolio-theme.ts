@@ -8,10 +8,10 @@ export interface PortfolioTheme {
     text: string
   }
   font: string
-  taskbarStyleId?: string
-  menubarStyleId?: string
-  windowStyleId?: string
-  musicPlayerStyleId?: string
+  taskbarStyleId: string
+  menubarStyleId: string
+  windowStyleId: string
+  musicPlayerStyleId: string
 }
 
 export const THEME_PRESETS: PortfolioTheme[] = [
@@ -25,8 +25,9 @@ export const THEME_PRESETS: PortfolioTheme[] = [
       text: "#ffffff",
     },
     font: "Press Start 2P",
-    taskbarStyleId: "classic",
-    menubarStyleId: "classic",
+    taskbarStyleId: "pixel",
+    menubarStyleId: "pixel",
+    windowStyleId: "pixel",
     musicPlayerStyleId: "pixel",
   },
   {
@@ -39,8 +40,9 @@ export const THEME_PRESETS: PortfolioTheme[] = [
       text: "#00F5FF",
     },
     font: "Orbitron",
-    taskbarStyleId: "modern",
-    menubarStyleId: "modern",
+    taskbarStyleId: "liquid-glass",
+    menubarStyleId: "liquid-glass",
+    windowStyleId: "liquid-glass",
     musicPlayerStyleId: "liquid-glass",
   },
   {
@@ -53,9 +55,10 @@ export const THEME_PRESETS: PortfolioTheme[] = [
       text: "#000000",
     },
     font: "Inter",
-    taskbarStyleId: "minimal",
-    menubarStyleId: "minimal",
-    musicPlayerStyleId: "window",
+    taskbarStyleId: "liquid-glass",
+    menubarStyleId: "liquid-glass",
+    windowStyleId: "liquid-glass",
+    musicPlayerStyleId: "liquid-glass",
   },
   {
     name: "Glass Effect",
@@ -67,8 +70,9 @@ export const THEME_PRESETS: PortfolioTheme[] = [
       text: "#ffffff",
     },
     font: "Poppins",
-    taskbarStyleId: "modern",
-    menubarStyleId: "modern",
+    taskbarStyleId: "liquid-glass",
+    menubarStyleId: "liquid-glass",
+    windowStyleId: "liquid-glass",
     musicPlayerStyleId: "liquid-glass",
   },
   {
@@ -81,9 +85,10 @@ export const THEME_PRESETS: PortfolioTheme[] = [
       text: "#000000",
     },
     font: "Space Grotesk",
-    taskbarStyleId: "classic",
-    menubarStyleId: "classic",
-    musicPlayerStyleId: "windows-98",
+    taskbarStyleId: "pixel",
+    menubarStyleId: "pixel",
+    windowStyleId: "pixel",
+    musicPlayerStyleId: "pixel",
   },
 ]
 

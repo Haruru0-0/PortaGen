@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // app/api/upload/[fileId]/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { createClient } from '@/utils/supabase/server'
 import { deleteFromUserDrive, decryptToken } from '@/lib/services/google-drive'
 import { db } from '@/lib/db'
 import { users, uploadedAssets } from '@/lib/db/schema'
@@ -12,9 +12,10 @@ export async function DELETE(
     { params }: { params: Promise<{ fileId: string }> }
 ) {
     try {
-        const { userId } = await auth()
+        const supabase = await createClient()
+        const { data: { user: supabaseUser } } = await supabase.auth.getUser()
 
-        if (!userId) {
+        if (!supabaseUser) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
@@ -22,7 +23,7 @@ export async function DELETE(
 
         // Get user
         const user = await db.query.users.findFirst({
-            where: eq(users.clerkUserId, userId),
+            where: eq(users.supabaseUserId, supabaseUser.id),
         })
 
         if (!user || !user.googleAccessToken || !user.googleRefreshToken) {

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { createClient } from '@/utils/supabase/server'
 import { db } from '@/lib/db'
 import { users } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
@@ -7,11 +7,14 @@ import { decryptToken, encryptToken, refreshSpotifyToken } from '@/lib/services/
 
 export async function GET() {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user: supabaseUser } } = await supabase.auth.getUser()
+    const userId = supabaseUser?.id
+
     if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const user = await db.query.users.findFirst({
-      where: eq(users.clerkUserId, userId),
+      where: eq(users.supabaseUserId, userId),
       columns: {
         spotifyAccessToken: true,
         spotifyRefreshToken: true,
@@ -44,7 +47,7 @@ export async function GET() {
             : now,
           updatedAt: new Date(),
         })
-        .where(eq(users.clerkUserId, userId))
+        .where(eq(users.supabaseUserId, userId))
     }
 
     return NextResponse.json({ accessToken })
@@ -53,4 +56,3 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to obtain token' }, { status: 500 })
   }
 }
-

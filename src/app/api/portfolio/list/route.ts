@@ -1,19 +1,20 @@
 // app/api/portfolio/list/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { createClient } from '@/utils/supabase/server'
 import { db } from '@/lib/db'
 import { portfolios } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
-import { getUserByClerkId } from '@/lib/db/helpers'
+import { getUserBySupabaseId } from '@/lib/db/helpers'
 
 export async function GET(req: NextRequest) {
     try {
-        const { userId } = await auth()
-        if (!userId) {
+        const supabase = await createClient()
+        const { data: { user: supabaseUser } } = await supabase.auth.getUser()
+        if (!supabaseUser) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const user = await getUserByClerkId(userId)
+        const user = await getUserBySupabaseId(supabaseUser.id)
         if (!user) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 })
         }

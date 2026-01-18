@@ -1,17 +1,18 @@
 // app/api/desktop/spotify/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { createClient } from '@/utils/supabase/server'
 import { db } from '@/lib/db'
 import { desktopSettings, portfolios } from '@/lib/db/schema'
 import { and, eq } from 'drizzle-orm'
-import { getUserByClerkId } from '@/lib/db/helpers'
+import { getUserBySupabaseId } from '@/lib/db/helpers'
 import { completeChecklistTask } from '@/lib/activity'
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = await auth()
-    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    const user = await getUserByClerkId(userId)
+    const supabase = await createClient()
+    const { data: { user: supabaseUser } } = await supabase.auth.getUser()
+    if (!supabaseUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const user = await getUserBySupabaseId(supabaseUser.id)
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
     const body = await req.json().catch(() => ({}))

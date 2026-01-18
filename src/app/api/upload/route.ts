@@ -1,7 +1,7 @@
 // app/api/upload/route.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { createClient } from '@/utils/supabase/server'
 import { uploadToUserDrive, decryptToken, refreshAccessToken, encryptToken } from '@/lib/services/google-drive'
 import { db } from '@/lib/db'
 import { users, uploadedAssets } from '@/lib/db/schema'
@@ -10,15 +10,16 @@ import { logActivity, completeChecklistTask } from '@/lib/activity'
 
 export async function POST(req: NextRequest) {
     try {
-        const { userId } = await auth()
+        const supabase = await createClient()
+        const { data: { user: supabaseUser } } = await supabase.auth.getUser()
 
-        if (!userId) {
+        if (!supabaseUser) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
         // Get user from database
         const user = await db.query.users.findFirst({
-            where: eq(users.clerkUserId, userId),
+            where: eq(users.supabaseUserId, supabaseUser.id),
         })
 
         if (!user || !user.googleDriveConnected || !user.googleAccessToken || !user.googleRefreshToken) {

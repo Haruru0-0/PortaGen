@@ -235,17 +235,44 @@ export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
         className="object-cover object-center"
         priority
       />
-      <div className="flex flex-col items-center relative z-10">
-        <h1 ref={timeRef} className="text-6xl font-bold text-blue-800 mb-2">
-          {formatTime(currentTime)}
-        </h1>
-        <p ref={dateRef} className="text-lg text-blue-600 mb-6">
-          {formatDate(currentTime)}
-        </p>
-        <p ref={hintRef} className="text-sm text-blue-500/80">
-          Click anywhere to unlock
-        </p>
-      </div>
+      {!showLogin && (
+        <div className="flex flex-col items-center justify-center relative z-10 w-full px-4 text-center">
+          <h1
+            ref={timeRef}
+            className={cn(
+              "font-bold mb-2 tracking-tight transition-all duration-300",
+              preview
+                ? "text-3xl sm:text-4xl md:text-5xl"
+                : "text-4xl sm:text-5xl md:text-6xl lg:text-7xl"
+            )}
+            style={{ color: 'var(--theme-text)' }}
+          >
+            {formatTime(currentTime)}
+          </h1>
+          <p
+            ref={dateRef}
+            className={cn(
+              "font-medium transition-all duration-300 opacity-90",
+              preview
+                ? "text-xs mb-4"
+                : "text-sm sm:text-lg md:text-xl mb-8 sm:mb-12"
+            )}
+            style={{ color: 'var(--theme-text)' }}
+          >
+            {formatDate(currentTime)}
+          </p>
+          <p
+            ref={hintRef}
+            className={cn(
+              "uppercase tracking-widest animate-pulse font-bold opacity-80",
+              preview ? "text-[8px]" : "text-[10px] sm:text-xs"
+            )}
+            style={{ color: 'var(--theme-primary)' }}
+          >
+            CLICK ANYWHERE TO UNLOCK
+          </p>
+        </div>
+      )}
 
       {showLogin && (
         <div
@@ -257,9 +284,14 @@ export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
             ref={loginCardRef}
             className="w-64 p-6 bg-white/20 backdrop-blur-lg rounded-3xl shadow-lg border border-white/30 flex flex-col items-center"
           >
-            <Avatar className="w-20 h-20 mb-4 border-4 border-blue-200/50">
+            <Avatar className="w-20 h-20 mb-4 border-4" style={{ borderColor: 'var(--theme-primary)', opacity: 0.5 }}>
               <AvatarImage src="/placeholder.svg?height=80&width=80" alt="User" />
-              <AvatarFallback className="bg-blue-200 text-blue-700 text-xl">ME</AvatarFallback>
+              <AvatarFallback
+                className="text-xl"
+                style={{ backgroundColor: 'var(--theme-secondary)', color: 'var(--theme-text)' }}
+              >
+                ME
+              </AvatarFallback>
             </Avatar>
 
             <form onSubmit={handleSubmit} className="w-full flex flex-col justify-center space-y-4">
@@ -271,28 +303,41 @@ export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
                   value={inputPassword}
                   onChange={(e) => setInputPassword(e.target.value)}
                   className={cn(
-                    "pr-12 bg-white/30 border-blue-200/50 focus:border-blue-400 rounded-xl placeholder-blue-500/70",
+                    "pr-12 bg-white/30 rounded-xl",
                   )}
+                  style={{
+                    borderColor: 'var(--theme-primary)',
+                    color: 'var(--theme-text)'
+                  }}
                   autoFocus
                 />
                 <Button
                   type="submit"
                   size="icon"
-                  className="h-8 w-8 cursor-pointer bg-blue-500/80 hover:bg-blue-600 text-white rounded-lg"
+                  className="h-8 w-8 cursor-pointer text-white rounded-lg transition-colors"
+                  style={{ backgroundColor: 'var(--theme-primary)' }}
                   onClick={playClickSound}
                 >
                   <ArrowRight className="h-4 w-4" />
                   <span className="sr-only">Unlock</span>
                 </Button>
               </div>
-              {effectivePassword && <p className="text-xs text-blue-600/80 text-center">Hint: The password is &apos;{effectivePassword}&apos;</p>}
+              {effectivePassword && (
+                <p
+                  className="text-xs text-center opacity-80"
+                  style={{ color: 'var(--theme-text)' }}
+                >
+                  Hint: The password is &apos;{effectivePassword}&apos;
+                </p>
+              )}
             </form>
           </div>
 
           <Button
             variant="ghost"
             size="icon"
-            className="mt-4 cursor-pointer text-white bg-blue-500/30 hover:bg-blue-500/50 backdrop-blur-sm rounded-full"
+            className="mt-4 cursor-pointer text-white backdrop-blur-sm rounded-full transition-all"
+            style={{ backgroundColor: 'var(--theme-primary)', opacity: 0.3 }}
             onClick={handleCancel}
           >
             <X className="h-5 w-5" />

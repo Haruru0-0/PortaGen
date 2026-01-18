@@ -5,10 +5,10 @@ import { relations } from 'drizzle-orm'
 // CORE TABLES
 // ============================================
 
-// Users table - extends Clerk user data
+// Users table - extends Supabase user data
 export const users = pgTable('users', {
     id: serial('id').primaryKey(),
-    clerkUserId: varchar('clerk_user_id', { length: 255 }).notNull().unique(),
+    supabaseUserId: varchar('supabase_user_id', { length: 255 }).notNull().unique(),
     email: varchar('email', { length: 255 }).notNull(),
     username: varchar('username', { length: 100 }).unique(),
 
@@ -23,11 +23,12 @@ export const users = pgTable('users', {
     spotifyRefreshToken: text('spotify_refresh_token'),
     spotifyTokenExpiry: timestamp('spotify_token_expiry'),
     spotifyConnected: boolean('spotify_connected').default(false),
+    avatarUrl: text('avatar_url'),
 
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => ({
-    clerkUserIdIdx: index('clerk_user_id_idx').on(table.clerkUserId),
+    supabaseUserIdIdx: index('supabase_user_id_idx').on(table.supabaseUserId),
 }))
 
 // Portfolios table - main portfolio data

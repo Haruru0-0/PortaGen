@@ -1,3 +1,0 @@
-ALTER TABLE "desktop_settings" ADD COLUMN "menubar_icon_asset_id" integer;--> statement-breakpoint
-ALTER TABLE "desktop_settings" ADD COLUMN "menubar_text" varchar(100);--> statement-breakpoint
-ALTER TABLE "desktop_settings" ADD CONSTRAINT "desktop_settings_menubar_icon_asset_id_uploaded_assets_id_fk" FOREIGN KEY ("menubar_icon_asset_id") REFERENCES "public"."uploaded_assets"("id") ON DELETE set null ON UPDATE no action;

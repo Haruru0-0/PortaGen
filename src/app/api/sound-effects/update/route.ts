@@ -1,13 +1,14 @@
-import { auth } from '@clerk/nextjs/server'
+import { createClient } from '@/utils/supabase/server'
 import { db } from '@/lib/db'
-import { soundEffects } from '@/lib/db/schema'
+import { soundEffects, users } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
     try {
-        const { userId } = await auth()
-        if (!userId) return new NextResponse('Unauthorized', { status: 401 })
+        const supabase = await createClient()
+        const { data: { user: supabaseUser } } = await supabase.auth.getUser()
+        if (!supabaseUser) return new NextResponse('Unauthorized', { status: 401 })
 
         const body = await req.json()
         const { portfolioId, presetId } = body
@@ -18,7 +19,7 @@ export async function POST(req: Request) {
 
         // Verify ownership
         const user = await db.query.users.findFirst({
-            where: (users, { eq }) => eq(users.clerkUserId, userId),
+            where: eq(users.supabaseUserId, supabaseUser.id),
             with: {
                 portfolios: true
             }

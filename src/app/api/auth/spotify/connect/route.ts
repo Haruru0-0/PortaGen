@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@clerk/nextjs/server'
+import { createClient } from '@/utils/supabase/server'
 import { getSpotifyAuthUrl } from '@/lib/services/spotify'
 
 export async function GET() {
   try {
-    const { userId } = await auth()
+    const supabase = await createClient()
+    const { data: { user: supabaseUser } } = await supabase.auth.getUser()
+    const userId = supabaseUser?.id
+
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

@@ -5,14 +5,14 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useState } from "react";
 import Link from "next/link";
-import { useSignUp } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
-import { PixelButton } from "@/components/pixel-button";
-import { PixelCard } from "@/components/pixel-card";
-import { PixelInput } from "@/components/pixel-input";
-import { PixelPasswordInput } from "@/components/pixel-password-input";
-import { PixelClouds } from "@/components/pixel-clouds";
-import { PixelCharacter } from "@/components/pixel-character";
+import { createClient } from "@/utils/supabase/client"
+import { useRouter } from "next/navigation"
+import { PixelButton } from "@/components/pixel-button"
+import { PixelCard } from "@/components/pixel-card"
+import { PixelInput } from "@/components/pixel-input"
+import { PixelPasswordInput } from "@/components/pixel-password-input"
+import { PixelClouds } from "@/components/pixel-clouds"
+import { PixelCharacter } from "@/components/pixel-character"
 
 // Validation schema
 const signupSchema = z
@@ -43,7 +43,7 @@ const signupSchema = z
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function SignUpPage() {
-  const { signUp, setActive, isLoaded } = useSignUp();
+  const supabase = createClient();
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -92,26 +92,37 @@ export default function SignUpPage() {
   };
 
   const onSubmit = async (data: SignupFormValues) => {
-    if (!isLoaded) return;
-
     setLoading(true);
     setError("");
 
     try {
-      await signUp.create({
-        firstName: data.firstName,
-        lastName: data.lastName,
-        username: data.username,
-        emailAddress: data.email,
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: data.email,
         password: data.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: {
+            username: data.username,
+            full_name: `${data.firstName} ${data.lastName}`,
+            first_name: data.firstName,
+            last_name: data.lastName,
+          },
+        },
       });
 
-      // Send verification email
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      if (signUpError) throw signUpError;
 
-      setVerifying(true);
+      // Note: In a production app, you'd usually have a trigger to sync users 
+      // or redirect to a page that handles database insertion.
+      // For now, if the user is automatically signed in (or we have authData.user),
+      // we might want to try to create the user record via an API call or similar.
+      // However, Supabase's signUp might just return the user but require verification.
+
+      if (authData.user) {
+        setVerifying(true);
+      }
     } catch (err: any) {
-      setError(err.errors?.[0]?.message || "SIGNUP FAILED");
+      setError(err.message || "SIGNUP FAILED");
     } finally {
       setLoading(false);
     }
@@ -119,40 +130,39 @@ export default function SignUpPage() {
 
   const handleVerifyEmail = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoaded) return;
-
     setLoading(true);
     setError("");
 
     try {
-      const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code,
+      const { error } = await supabase.auth.verifyOtp({
+        email: form.getValues("email"),
+        token: code,
+        type: 'signup'
       });
 
-      if (completeSignUp.status === "complete") {
-        await setActive({ session: completeSignUp.createdSessionId });
-        router.push("/auth/login");
-      }
+      if (error) throw error;
+
+      router.push("/dashboard");
     } catch (err: any) {
-      setError(err.errors?.[0]?.message || "INVALID CODE");
+      setError(err.message || "INVALID CODE");
     } finally {
       setLoading(false);
     }
   };
 
   const handleOAuthSignUp = async (
-    strategy: "oauth_google" | "oauth_github"
+    provider: "google" | "github"
   ) => {
-    if (!isLoaded) return;
-
     try {
-      await signUp.authenticateWithRedirect({
-        strategy,
-        redirectUrl: "/sso-callback",
-        redirectUrlComplete: "/dashboard",
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/sso-callback`,
+        },
       });
+      if (error) throw error;
     } catch (err: any) {
-      setError(err.errors?.[0]?.message || "OAUTH FAILED");
+      setError(err.message || "OAUTH FAILED");
     }
   };
 
@@ -187,8 +197,8 @@ export default function SignUpPage() {
                   <PixelCharacter color="#8B5CF6" size={60} />
                 </div>
                 <h1 className="text-xl pixel-text-shadow">VERIFY EMAIL</h1>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  ENTER THE CODE SENT TO YOUR EMAIL
+                <p className="text-xs text-muted-foreground leading-relaxed uppercase">
+                  Check your email for a verification link or enter the 6-digit code below.
                 </p>
               </div>
 
@@ -198,33 +208,29 @@ export default function SignUpPage() {
                 </div>
               )}
 
-              <form onSubmit={handleVerifyEmail} className="space-y-4">
-                <PixelInput
-                  label="VERIFICATION CODE"
-                  type="text"
-                  placeholder="123456"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  maxLength={6}
-                />
+              <div className="space-y-6">
+                <div className="pixel-card bg-primary/20 border-2 border-primary p-6 text-center space-y-4">
+                  <p className="text-sm font-bold pixel-text-shadow">CHECK YOUR MAIL</p>
+                  <p className="text-[10px] leading-relaxed uppercase">
+                    We've sent a verification link to your email address.
+                    Please click the link to activate your account.
+                  </p>
+                </div>
 
-                <PixelButton
-                  type="submit"
-                  variant="primary"
-                  className="w-full"
-                  disabled={loading || code.length !== 6}
-                >
-                  {loading ? "VERIFYING..." : "VERIFY & CONTINUE"}
-                </PixelButton>
+                <div className="text-center space-y-4">
+                  <p className="text-[9px] text-muted-foreground uppercase">
+                    Didn't receive an email? Check your spam folder or try again later.
+                  </p>
 
-                <button
-                  type="button"
-                  onClick={() => setVerifying(false)}
-                  className="w-full text-[10px] text-muted-foreground hover:text-primary"
-                >
-                  ← BACK TO SIGNUP
-                </button>
-              </form>
+                  <button
+                    type="button"
+                    onClick={() => setVerifying(false)}
+                    className="w-full text-[10px] text-muted-foreground hover:text-primary"
+                  >
+                    ← BACK TO SIGNUP
+                  </button>
+                </div>
+              </div>
             </div>
           </PixelCard>
         </div>
@@ -352,11 +358,10 @@ export default function SignUpPage() {
                         {[...Array(4)].map((_, i) => (
                           <div
                             key={i}
-                            className={`h-2 flex-1 border-2 border-border ${
-                              i < passwordStrength / 25
-                                ? getStrengthColor()
-                                : "bg-muted"
-                            }`}
+                            className={`h-2 flex-1 border-2 border-border ${i < passwordStrength / 25
+                              ? getStrengthColor()
+                              : "bg-muted"
+                              }`}
                           />
                         ))}
                       </div>
@@ -386,12 +391,12 @@ export default function SignUpPage() {
                   Privacy Policy
                 </Link>.
               </div>
-              
+
               <PixelButton
                 type="submit"
                 variant="primary"
                 className="w-full"
-                disabled={loading || !isLoaded}
+                disabled={loading}
               >
                 {loading ? "CREATING..." : "CREATE ACCOUNT"}
               </PixelButton>
@@ -413,8 +418,8 @@ export default function SignUpPage() {
                 <PixelButton
                   variant="secondary"
                   className="w-full text-[10px]"
-                  onClick={() => handleOAuthSignUp("oauth_google")}
-                  disabled={!isLoaded}
+                  onClick={() => handleOAuthSignUp("google")}
+                  disabled={loading}
                   type="button"
                 >
                   GOOGLE
@@ -422,8 +427,8 @@ export default function SignUpPage() {
                 <PixelButton
                   variant="secondary"
                   className="w-full text-[10px]"
-                  onClick={() => handleOAuthSignUp("oauth_github")}
-                  disabled={!isLoaded}
+                  onClick={() => handleOAuthSignUp("github")}
+                  disabled={loading}
                   type="button"
                 >
                   GITHUB

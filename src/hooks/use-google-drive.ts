@@ -1,11 +1,20 @@
 import { useState, useEffect } from 'react'
-import { useUser } from '@clerk/nextjs'
+import { createClient } from '@/utils/supabase/client'
 
 export function useGoogleDrive() {
-    const { user } = useUser()
+    const supabase = createClient()
+    const [user, setUser] = useState<any>(null)
     const [connected, setConnected] = useState(false)
     const [loading, setLoading] = useState(true)
     const [connecting, setConnecting] = useState(false)
+
+    useEffect(() => {
+        const getUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser()
+            setUser(user)
+        }
+        getUser()
+    }, [supabase])
 
     useEffect(() => {
         if (user) {

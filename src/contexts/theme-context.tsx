@@ -59,7 +59,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [saving, setSaving] = useState(false);
   // We can store loaded Portfolio ID if needed, but for now we rely on the component passing it.
 
-  const activeThemeRef = useRef<Theme>({
+  const activeTheme: Theme = {
     name,
     colors,
     font,
@@ -67,33 +67,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     menubarStyleId,
     windowStyleId,
     musicPlayerStyleId,
-  });
-  const activeTheme = activeThemeRef.current;
-
-  useEffect(() => {
-    activeThemeRef.current = {
-      name,
-      colors,
-      font,
-      taskbarStyleId,
-      menubarStyleId,
-      windowStyleId,
-      musicPlayerStyleId,
-    };
-  }, [
-    name,
-    colors.primary,
-    colors.secondary,
-    colors.accent,
-    colors.background,
-    colors.text,
-    font,
-    taskbarStyleId,
-    menubarStyleId,
-    windowStyleId,
-    musicPlayerStyleId,
-    colors,
-  ]);
+  };
 
   // Auth mode fetch
   const getThemeData = useCallback(

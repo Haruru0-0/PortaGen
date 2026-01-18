@@ -2,10 +2,10 @@ import { db } from './index'
 import { users } from './schema'
 import { eq } from 'drizzle-orm'
 
-export async function getOrCreateUser(clerkUserId: string, email: string, username?: string) {
+export async function getOrCreateUser(supabaseUserId: string, email: string, username?: string) {
     // Try to find existing user
     let user = await db.query.users.findFirst({
-        where: eq(users.clerkUserId, clerkUserId),
+        where: eq(users.supabaseUserId, supabaseUserId),
     })
 
     // If user doesn't exist, create them
@@ -13,9 +13,9 @@ export async function getOrCreateUser(clerkUserId: string, email: string, userna
         const [newUser] = await db
             .insert(users)
             .values({
-                clerkUserId,
+                supabaseUserId,
                 email,
-                username: username || `user_${clerkUserId.slice(0, 8)}`,
+                username: username || `user_${supabaseUserId.slice(0, 8)}`,
             })
             .returning()
 
@@ -25,15 +25,15 @@ export async function getOrCreateUser(clerkUserId: string, email: string, userna
     return user
 }
 
-export async function getUserByClerkId(clerkUserId: string) {
+export async function getUserBySupabaseId(supabaseUserId: string) {
     return await db.query.users.findFirst({
-        where: eq(users.clerkUserId, clerkUserId),
+        where: eq(users.supabaseUserId, supabaseUserId),
     })
 }
 
-export async function getUserWithPortfolio(clerkUserId: string) {
+export async function getUserWithPortfolio(supabaseUserId: string) {
     return await db.query.users.findFirst({
-        where: eq(users.clerkUserId, clerkUserId),
+        where: eq(users.supabaseUserId, supabaseUserId),
         with: {
             portfolios: {
                 with: {

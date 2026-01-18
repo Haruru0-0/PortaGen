@@ -13,6 +13,7 @@ import { Cloud, FileImage, Loader2, Music, XCircle, Zap } from "lucide-react";
 import Image from "next/image";
 import { Asset, AssetType } from "@/lib/types";
 import AssetCard from "@/components/asset-card";
+import { toast } from "sonner";
 
 // Available asset types for user selection
 const ASSET_TYPES = [
@@ -177,12 +178,12 @@ export default function AssetsPage() {
   // File upload handler
   const handleFileUpload = async () => {
     if (!connected) {
-      alert("Please connect your Google Drive first!");
+      toast.error("PLEASE CONNECT YOUR GOOGLE DRIVE FIRST!");
       return;
     }
 
     if (selectedFiles.length === 0) {
-      alert("Please select files to upload");
+      toast.error("PLEASE SELECT FILES TO UPLOAD");
       return;
     }
 
@@ -215,11 +216,11 @@ export default function AssetsPage() {
         .filter((r) => !r.success)
         .map((r) => r.file)
         .join(", ");
-      alert(
-        `Upload completed: ${successful} successful, ${failed} failed\nFailed: ${failedFiles}`
-      );
+      toast.error(`UPLOAD COMPLETED WITH ERRORS`, {
+        description: `${successful} SUCCESSFUL, ${failed} FAILED. FAILED: ${failedFiles}`
+      });
     } else {
-      alert(`Successfully uploaded ${successful} files!`);
+      toast.success(`SUCCESSFULLY UPLOADED ${successful} FILES!`);
     }
 
     // Refresh assets list
@@ -266,11 +267,11 @@ export default function AssetsPage() {
         setRenamingAsset(null);
         setNewAssetName("");
       } else {
-        alert("Failed to rename asset");
+        toast.error("FAILED TO RENAME ASSET");
       }
     } catch (error) {
       console.error("Rename error:", error);
-      alert("Failed to rename asset");
+      toast.error("FAILED TO RENAME ASSET");
     }
   };
 
@@ -433,11 +434,10 @@ export default function AssetsPage() {
                 <button
                   key={filter.id}
                   onClick={() => setActiveFilter(filter.id)}
-                  className={`px-4 py-2 text-[10px] border-2 border-border ${
-                    activeFilter === filter.id
+                  className={`px-4 py-2 text-[10px] border-2 border-border ${activeFilter === filter.id
                       ? "bg-primary text-primary-foreground"
                       : "bg-card hover:bg-muted"
-                  }`}
+                    }`}
                 >
                   {filter.label}
                 </button>
@@ -604,11 +604,10 @@ export default function AssetsPage() {
                   <button
                     key={type.id}
                     onClick={() => setSelectedAssetType(type.id)}
-                    className={`p-3 border-2 text-left transition-colors ${
-                      selectedAssetType === type.id
+                    className={`p-3 border-2 text-left transition-colors ${selectedAssetType === type.id
                         ? "border-primary bg-primary/10"
                         : "border-border bg-card hover:bg-muted"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <IconComponent className="w-4 h-4" />
@@ -709,7 +708,7 @@ export default function AssetsPage() {
           <div className="space-y-4">
             {(viewingAsset.type === "wallpaper" ||
               viewingAsset.type === "icon") &&
-            viewingAsset.fileId ? (
+              viewingAsset.fileId ? (
               <div className="border-2 border-border bg-muted relative w-full h-96">
                 <Image
                   src={`https://drive.google.com/uc?id=${viewingAsset.fileId}`}

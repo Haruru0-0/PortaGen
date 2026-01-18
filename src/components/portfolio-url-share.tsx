@@ -6,19 +6,29 @@ import { PixelButton } from "./pixel-button"
 import { gsap } from "gsap"
 import { useGSAP } from "@gsap/react"
 import { useRef } from "react"
-import { useUser } from "@clerk/nextjs"
+import { createClient } from "@/utils/supabase/client"
 import { useParams } from "next/navigation"
 
 export function PortfolioUrlShare() {
   const [copied, setCopied] = useState(false)
   const [portfolioUrl, setPortfolioUrl] = useState("/portfolio/preview")
   const containerRef = useRef<HTMLDivElement>(null)
-  const { user } = useUser()
+  const supabase = createClient()
+  const [user, setUser] = useState<any>(null)
   const params = useParams<{ id: string }>()
   const currentPortfolioId = Number(params?.id)
 
   useEffect(() => {
-    setPortfolioUrl(`${window.location.origin}/portfolio/${user?.username}/${currentPortfolioId}`)
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    }
+    getUser()
+  }, [supabase])
+
+  useEffect(() => {
+    const username = user?.user_metadata?.username || user?.email?.split('@')[0]
+    setPortfolioUrl(`${window.location.origin}/portfolio/${username}/${currentPortfolioId}`)
   }, [user, currentPortfolioId])
 
   useGSAP(() => {

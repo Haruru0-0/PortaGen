@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import Link from "next/link"
-import { useSignIn } from "@clerk/nextjs"
+import { createClient } from "@/utils/supabase/client"
 import { useRouter } from "next/navigation"
 import { PixelButton } from "@/components/pixel-button"
 import { PixelCard } from "@/components/pixel-card"
@@ -17,14 +17,14 @@ import { useState } from "react"
 
 // Validation schema
 const loginSchema = z.object({
-  identifier: z.string().min(1, { message: "EMAIL OR USERNAME REQUIRED" }),
+  identifier: z.string().min(1, { message: "IDENTIFIER IS REQUIRED" }),
   password: z.string().min(8, { message: "PASSWORD MUST BE 8+ CHARACTERS" }),
 })
 
 type LoginFormValues = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
-  const { signIn, setActive, isLoaded } = useSignIn()
+  const supabase = createClient()
   const router = useRouter()
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
@@ -39,39 +39,55 @@ export default function LoginPage() {
   })
 
   const onSubmit = async (data: LoginFormValues) => {
-    if (!isLoaded) return
-
     setLoading(true)
     setError("")
 
     try {
-      const result = await signIn.create({
-        identifier: data.identifier,
+      let email = data.identifier
+
+      // Check if identifier is an email. If not, treat as username and find email.
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.identifier)
+
+      if (!isEmail) {
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('email')
+          .eq('username', data.identifier)
+          .single()
+
+        if (userError || !userData) {
+          throw new Error("PLAYER NOT FOUND. CHECK YOUR USERNAME.")
+        }
+        email = userData.email
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email,
         password: data.password,
       })
 
-      if (result.status === "complete") {
-        await setActive({ session: result.createdSessionId })
-        router.push("/dashboard")
-      }
+      if (error) throw error
+
+      router.push("/dashboard")
+      router.refresh()
     } catch (err: any) {
-      setError(err.errors?.[0]?.message || "INVALID CREDENTIALS")
+      setError(err.message || "INVALID CREDENTIALS")
     } finally {
       setLoading(false)
     }
   }
 
-  const handleOAuthSignIn = async (strategy: "oauth_google" | "oauth_github") => {
-    if (!isLoaded) return
-
+  const handleOAuthSignIn = async (provider: "google" | "github") => {
     try {
-      await signIn.authenticateWithRedirect({
-        strategy,
-        redirectUrl: "/sso-callback",
-        redirectUrlComplete: "/dashboard",
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/sso-callback`,
+        },
       })
+      if (error) throw error
     } catch (err: any) {
-      setError(err.errors?.[0]?.message || "OAUTH FAILED")
+      setError(err.message || "OAUTH FAILED")
     }
   }
 
@@ -160,7 +176,7 @@ export default function LoginPage() {
                 type="submit"
                 variant="primary"
                 className="w-full"
-                disabled={loading || !isLoaded}
+                disabled={loading}
               >
                 {loading ? "LOADING..." : "START GAME"}
               </PixelButton>
@@ -183,8 +199,8 @@ export default function LoginPage() {
                 <PixelButton
                   variant="secondary"
                   className="w-full text-[10px]"
-                  onClick={() => handleOAuthSignIn("oauth_google")}
-                  disabled={!isLoaded}
+                  onClick={() => handleOAuthSignIn("google")}
+                  disabled={loading}
                   type="button"
                 >
                   GOOGLE
@@ -192,8 +208,8 @@ export default function LoginPage() {
                 <PixelButton
                   variant="secondary"
                   className="w-full text-[10px]"
-                  onClick={() => handleOAuthSignIn("oauth_github")}
-                  disabled={!isLoaded}
+                  onClick={() => handleOAuthSignIn("github")}
+                  disabled={loading}
                   type="button"
                 >
                   GITHUB
