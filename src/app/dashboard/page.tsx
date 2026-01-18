@@ -1,23 +1,9 @@
 import { PixelCard } from "@/components/pixel-card"
 import { PixelCharacter } from "@/components/pixel-character"
-import { auth } from "@clerk/nextjs/server"
-import { getUserByClerkId } from "@/lib/db/helpers"
 import { getDashboardStats } from "@/lib/activity"
 import { formatDistanceToNow } from "date-fns"
-import { redirect } from "next/navigation"
 
 export default async function DashboardPage() {
-  const { userId: clerkUserId } = await auth();
-
-  if (!clerkUserId) {
-    redirect("/auth/login");
-  }
-
-  const user = await getUserByClerkId(clerkUserId);
-  if (!user) {
-    // Handle edge case where clerk user exists but db user doesn't (sync issue)
-    redirect("/auth/login");
-  }
 
   const { checklist, recentActivity, stats } = await getDashboardStats(user.id);
 
