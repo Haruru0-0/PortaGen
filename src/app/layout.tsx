@@ -5,7 +5,6 @@ import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 import { Toaster } from "@/components/ui/sonner";
-import logo from "@/assets/logo.png";
 
 const pressStart2P = Press_Start_2P({
     weight: "400",
