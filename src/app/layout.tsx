@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 import { Toaster } from "@/components/ui/sonner";
+import logo from "@/assets/logo.png";
 
 const pressStart2P = Press_Start_2P({
     weight: "400",
@@ -15,6 +16,10 @@ const pressStart2P = Press_Start_2P({
 export const metadata: Metadata = {
     title: "PortaGen - Pixel Art Portfolio Generator",
     description: "Create stunning desktop-style portfolios with pixel-art aesthetics",
+    icons: {
+      icon: '/logo.png',
+      apple: '/logo.png',
+    },
 }
 
 export default function RootLayout({

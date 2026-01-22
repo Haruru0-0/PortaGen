@@ -8,6 +8,9 @@ import { PixelButton } from "@/components/pixel-button";
 import { PixelCard } from "@/components/pixel-card";
 import { PixelClouds } from "@/components/pixel-clouds";
 import { PixelCharacter } from "@/components/pixel-character";
+import Image from "next/image";
+import logo from "@/assets/logo.png";
+import logoWhite from "@/assets/Logo-white.png";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -93,7 +96,20 @@ export default function LandingPage() {
       <nav className="relative z-20 border-b-4 border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <PixelCharacter color="#8B5CF6" size={32} />
+            <Image
+              src={logo}
+              alt="PortaGen"
+              width={40}
+              height={40}
+              className="h-8 w-8 sm:h-10 sm:w-10 hidden dark:block"
+            />
+            <Image
+              src={logoWhite}
+              alt="PortaGen-white"
+              width={40}
+              height={40}
+              className="h-8 w-8 sm:h-10 sm:w-10 dark:hidden"
+            />
             <h1 className="text-sm pixel-text-shadow">PortaGen</h1>
           </div>
 
