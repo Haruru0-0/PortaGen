@@ -9,9 +9,11 @@ import type { BlogData } from "@/lib/types"
 interface BlogFormProps {
     initialData: BlogData
     onChange: (data: BlogData) => void
+    onFileSelect?: (path: string, file: File) => void
+    onUrlSelect?: (path: string, url: string) => void
 }
 
-export function BlogForm({ initialData, onChange }: BlogFormProps) {
+export function BlogForm({ initialData, onChange, onFileSelect, onUrlSelect }: BlogFormProps) {
     const [data, setData] = useState<BlogData>(initialData)
 
     useEffect(() => {

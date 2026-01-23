@@ -57,7 +57,7 @@ export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
         enabled: data.enabled,
         password: data.password || '1234',
         hint: data.hint || '',
-        wallpaper: `https://drive.google.com/uc?id=${data.wallpaperAsset?.fileId}` || '',
+        wallpaper: data.wallpaperUrl || (data.wallpaperAsset?.fileId ? `https://drive.google.com/uc?id=${data.wallpaperAsset.fileId}` : ''),
       })
     }
   }, [data, setLockScreenState])

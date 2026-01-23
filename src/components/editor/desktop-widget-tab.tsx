@@ -11,6 +11,7 @@ import { useFileUpload } from "@/hooks/use-file-upload"
 import { useParams } from "next/navigation";
 import { AssetPicker } from "@/components/common/asset-picker"
 import { Asset } from "@/lib/types"
+import Image from "next/image"
 
 export function DesktopWidgetTab() {
   const params = useParams<{ id: string }>()
@@ -21,11 +22,18 @@ export function DesktopWidgetTab() {
   const [renameOpen, setRenameOpen] = useState(false)
   const [customName, setCustomName] = useState("")
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [urlInput, setUrlInput] = useState("")
   const [assetPickerOpen, setAssetPickerOpen] = useState(false)
 
   useEffect(() => {
     if (currentPortfolioId) void getDesktopData(currentPortfolioId)
   }, [currentPortfolioId])
+
+  useEffect(() => {
+    if (data && data.desktopGifUrl) {
+      setUrlInput(data.desktopGifUrl)
+    }
+  }, [data])
 
   useEffect(() => {
     if (pendingGifFile) {
@@ -50,6 +58,18 @@ export function DesktopWidgetTab() {
     const url = URL.createObjectURL(file)
     setPreviewUrl(url)
     setDesktopGif(url) // Update store for immediate preview
+  }
+
+  const handleUrlInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUrlInput(e.target.value)
+    if (e.target.value) {
+      setPendingGifFile(null)
+    }
+  }
+
+  const handleSaveUrl = async () => {
+    if (!currentPortfolioId || !urlInput) return
+    await updateGif(currentPortfolioId, null, urlInput)
   }
 
   const handleSave = () => {
@@ -92,7 +112,7 @@ export function DesktopWidgetTab() {
           <FileUpload
             accept="image/gif,image/*"
             onFileSelect={onUploadGif}
-            preview={previewUrl || `https://drive.google.com/uc?id=${data?.desktopGifAsset?.fileId}` || ''}
+            preview={previewUrl || (data?.desktopGifAsset?.fileId ? `https://drive.google.com/uc?id=${data.desktopGifAsset.fileId}` : '')}
             label=""
             maxSize={10}
           />
@@ -104,6 +124,29 @@ export function DesktopWidgetTab() {
             <Library className="w-3 h-3" />
             SELECT FROM LIBRARY
           </PixelButton>
+
+          <div className="pt-2 space-y-2">
+            <p className="text-[10px] text-muted-foreground uppercase">OR IMAGE LINK</p>
+            <div className="flex gap-2">
+              <PixelInput
+                placeholder="https://..."
+                value={urlInput}
+                onChange={handleUrlInputChange}
+              />
+              <PixelButton className="text-[10px]" onClick={handleSaveUrl} disabled={!urlInput}>SAVE</PixelButton>
+            </div>
+            {urlInput && (
+              <div className="relative w-full h-32 border border-border rounded overflow-hidden">
+                <Image
+                  src={urlInput}
+                  alt="GIF Preview"
+                  fill
+                  className="object-cover"
+                  onError={() => setPreviewUrl(null)}
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         {pendingGifFile && (

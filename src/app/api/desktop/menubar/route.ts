@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json()
-        const { portfolioId, menubarIconAssetId, menubarText } = body
+        const { portfolioId, menubarIconAssetId, menubarText, menubarIconUrl } = body
 
         if (!portfolioId) {
             return NextResponse.json({ error: 'Portfolio ID required' }, { status: 400 })
@@ -39,12 +39,14 @@ export async function POST(req: NextRequest) {
             .values({
                 portfolioId,
                 menubarIconAssetId: menubarIconAssetId,
+                menubarIconUrl: menubarIconUrl,
                 menubarText: menubarText,
             })
             .onConflictDoUpdate({
                 target: desktopSettings.portfolioId,
                 set: {
                     menubarIconAssetId: menubarIconAssetId === undefined ? undefined : menubarIconAssetId,
+                    menubarIconUrl: menubarIconUrl === undefined ? undefined : menubarIconUrl,
                     menubarText: menubarText === undefined ? undefined : menubarText,
                     updatedAt: new Date(),
                 },

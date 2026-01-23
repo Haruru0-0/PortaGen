@@ -2,6 +2,7 @@
 
 import { PixelCard } from "@/components/pixel-card"
 import { PixelInput } from "@/components/pixel-input"
+import { PixelPasswordInput } from "@/components/pixel-password-input"
 import { PixelButton } from "@/components/pixel-button"
 import { Switch } from "@/components/ui/switch";
 import { useLockScreenContext } from "@/contexts/lockScreenContext";
@@ -76,11 +77,10 @@ export function LockScreenSettingsTab() {
                             <FormItem>
                                 <FormLabel>PASSWORD</FormLabel>
                                 <FormControl>
-                                    <PixelInput
-                                        type="password"
+                                    <PixelPasswordInput
                                         placeholder="Enter password"
                                         {...field}
-                                        onChange={(e) => {
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                             field.onChange(e)
                                             setPassword(e.target.value)
                                         }}

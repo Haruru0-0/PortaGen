@@ -10,11 +10,11 @@ interface DesktopContextType {
   fetching: boolean
   getDesktopData: (portfolioId: number) => Promise<void>
   displayDesktopData: (username: string, portfolioId: number) => Promise<void>
-  updateWallpaper: (portfolioId: number, assetId: number | null) => Promise<void>
-  updateGif: (portfolioId: number, assetId: number | null) => Promise<void>
-  updateWidget: (portfolioId: number, index: 1 | 2, assetId: number | null) => Promise<void>
+  updateWallpaper: (portfolioId: number, assetId: number | null, url?: string) => Promise<void>
+  updateGif: (portfolioId: number, assetId: number | null, url?: string) => Promise<void>
+  updateWidget: (portfolioId: number, index: 1 | 2, assetId: number | null, url?: string) => Promise<void>
   updateSpotify: (portfolioId: number, url: string) => Promise<void>
-  updateMenubar: (portfolioId: number, assetId: number | null, text: string) => Promise<void>
+  updateMenubar: (portfolioId: number, assetId: number | null, text: string, url?: string) => Promise<void>
 }
 
 const DesktopContext = createContext<DesktopContextType | undefined>(undefined)
@@ -34,10 +34,10 @@ export function DesktopProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const updateWallpaper = async (portfolioId: number, assetId: number | null) => {
+  const updateWallpaper = async (portfolioId: number, assetId: number | null, url?: string) => {
     setLoading(true)
     try {
-      await updateDesktopWallpaper(portfolioId, assetId)
+      await updateDesktopWallpaper(portfolioId, assetId, url)
       await getDesktopData(portfolioId)
       toast.success("Wallpaper updated successfully!")
     } catch (error) {
@@ -47,10 +47,10 @@ export function DesktopProvider({ children }: { children: React.ReactNode }) {
       setLoading(false)
     }
   }
-  const updateGif = async (portfolioId: number, assetId: number | null) => {
+  const updateGif = async (portfolioId: number, assetId: number | null, url?: string) => {
     setLoading(true)
     try {
-      await updateDesktopGif(portfolioId, assetId)
+      await updateDesktopGif(portfolioId, assetId, url)
       await getDesktopData(portfolioId)
       toast.success("GIF updated successfully!")
     } catch (error) {
@@ -60,10 +60,10 @@ export function DesktopProvider({ children }: { children: React.ReactNode }) {
       setLoading(false)
     }
   }
-  const updateWidget = async (portfolioId: number, index: 1 | 2, assetId: number | null) => {
+  const updateWidget = async (portfolioId: number, index: 1 | 2, assetId: number | null, url?: string) => {
     setLoading(true)
     try {
-      await updateDesktopWidget(portfolioId, index, assetId)
+      await updateDesktopWidget(portfolioId, index, assetId, url)
       await getDesktopData(portfolioId)
       toast.success(`Widget ${index} updated successfully!`)
     } catch (error) {
@@ -87,14 +87,14 @@ export function DesktopProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const updateMenubar = async (portfolioId: number, assetId: number | null, text: string) => {
+  const updateMenubar = async (portfolioId: number, assetId: number | null, text: string, url?: string) => {
     setLoading(true)
     try {
       // Lazy import to avoid circular dependency if possible, but Service is fine
       // We need to import updateDesktopMenubar from service above
       // But we can just use any type if not imported, or update import
       const { updateDesktopMenubar } = await import('@/lib/services/desktopService')
-      await updateDesktopMenubar(portfolioId, assetId, text)
+      await updateDesktopMenubar(portfolioId, assetId, text, url)
       await getDesktopData(portfolioId)
       toast.success("Menu bar updated successfully!")
     } catch (error) {

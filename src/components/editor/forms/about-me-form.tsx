@@ -13,17 +13,23 @@ import { AnimatedSection, AnimatedItem } from "@/components/portfolio/animated-s
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import type { AboutMeData, Testimonial, Hobby } from "@/lib/types"
+import { PixelInput } from "@/components/pixel-input"
 
 interface AboutMeFormProps {
     initialData: AboutMeData
     onChange: (data: AboutMeData) => void
     onFileSelect?: (path: string, file: File) => void
+    onUrlSelect?: (path: string, url: string) => void
 }
 
-export function AboutMeForm({ initialData, onChange, onFileSelect }: AboutMeFormProps) {
+export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }: AboutMeFormProps) {
     const [data, setData] = useState<AboutMeData>(initialData)
+    const [showAvatarDialog, setShowAvatarDialog] = useState(false)
+    const [tempAvatar, setTempAvatar] = useState<string>("")
+    const [tempFile, setTempFile] = useState<File | null>(null)
     const isDesktop = useMediaQuery("(min-width: 768px)")
 
     useEffect(() => {
@@ -97,32 +103,167 @@ export function AboutMeForm({ initialData, onChange, onFileSelect }: AboutMeForm
                     <Settings2 className="w-4 h-4 text-muted-foreground" />
                 </div>
 
-                <div className="relative inline-block group/avatar mb-4">
-                    <Avatar className="w-24 h-24 mx-auto border-2 border-[var(--cute-text)] rounded-none cursor-pointer">
-                        <AvatarImage src={data.profileImage || "/profile-photo.jpg"} alt="Profile" />
-                        <AvatarFallback className="rounded-none bg-[var(--cute-highlight)] text-[var(--cute-text)]">AK</AvatarFallback>
-                    </Avatar>
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity rounded-none">
-                        <input
-                            type="file"
-                            accept="image/*"
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                            onChange={(e) => {
-                                const file = e.target.files?.[0]
-                                if (file) {
-                                    if (file.size > 5 * 1024 * 1024) {
-                                        alert("File too large (max 5MB)")
-                                        return
-                                    }
-                                    const url = URL.createObjectURL(file)
-                                    updateData({ ...data, profileImage: url })
-                                    onFileSelect?.("profileImage", file)
-                                }
-                            }}
-                        />
-                        <span className="text-white text-xs font-bold pointer-events-none">CHANGE</span>
+                <div className="relative inline-block group/avatar mb-4 flex flex-col items-center gap-2">
+                    <div
+                        className="relative cursor-pointer"
+                        onClick={() => {
+                            setTempAvatar(data.profileImage || "")
+                            setTempFile(null)
+                            setShowAvatarDialog(true)
+                        }}
+                    >
+                        <Avatar className="w-24 h-24 mx-auto border-2 border-[var(--cute-text)] rounded-none">
+                            <AvatarImage src={data.profileImage || "/profile-photo.jpg"} alt="Profile" />
+                            <AvatarFallback className="rounded-none bg-[var(--cute-highlight)] text-[var(--cute-text)]">AK</AvatarFallback>
+                        </Avatar>
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity rounded-none">
+                            <span className="text-white text-xs font-bold pointer-events-none">CHANGE</span>
+                        </div>
                     </div>
                 </div>
+
+                {/* Avatar Selection Dialog/Drawer */}
+                {isDesktop ? (
+                    <Dialog open={showAvatarDialog} onOpenChange={setShowAvatarDialog}>
+                        <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+                            <DialogHeader className="bg-white dark:bg-zinc-950">
+                                <DialogTitle>Update Profile Picture</DialogTitle>
+                                <DialogDescription>
+                                    Choose how you want to update your profile picture.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <Tabs defaultValue="upload" className="w-full">
+                                <TabsList className="grid w-full grid-cols-2 gap-4 bg-transparent p-0 h-auto">
+                                    <TabsTrigger value="upload" className="rounded-none border-2 border-[var(--cute-text)] bg-white data-[state=active]:bg-[var(--cute-highlight)] data-[state=active]:text-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] data-[state=active]:shadow-none data-[state=active]:translate-x-[2px] data-[state=active]:translate-y-[2px] transition-all py-2 font-bold pixel-text">Upload</TabsTrigger>
+                                    <TabsTrigger value="link" className="rounded-none border-2 border-[var(--cute-text)] bg-white data-[state=active]:bg-[var(--cute-highlight)] data-[state=active]:text-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] data-[state=active]:shadow-none data-[state=active]:translate-x-[2px] data-[state=active]:translate-y-[2px] transition-all py-2 font-bold pixel-text">Image URL</TabsTrigger>
+                                </TabsList>
+                                <div className="py-4">
+                                    <div className="flex justify-center mb-4">
+                                        <Avatar className="w-24 h-24 border-2 border-[var(--cute-text)] rounded-none">
+                                            <AvatarImage src={tempAvatar || data.profileImage || "/profile-photo.jpg"} />
+                                            <AvatarFallback className="rounded-none bg-[var(--cute-highlight)] text-xs">Preview</AvatarFallback>
+                                        </Avatar>
+                                    </div>
+                                    <TabsContent value="upload" className="mt-0">
+                                        <FileUpload
+                                            accept="image/*"
+                                            onFileSelect={(file) => {
+                                                if (file.size > 5 * 1024 * 1024) {
+                                                    alert("File too large (max 5MB)")
+                                                    return
+                                                }
+                                                const url = URL.createObjectURL(file)
+                                                setTempAvatar(url)
+                                                setTempFile(file)
+                                            }}
+                                            label="Choose Image File"
+                                            maxSize={5}
+                                            className="w-full"
+                                        />
+                                    </TabsContent>
+                                    <TabsContent value="link" className="mt-0">
+                                        <div className="space-y-2">
+                                            <Label>Image URL</Label>
+                                            <PixelInput
+                                                placeholder="https://example.com/image.png"
+                                                value={tempAvatar}
+                                                onChange={(e) => {
+                                                    setTempAvatar(e.target.value)
+                                                    setTempFile(null)
+                                                }}
+                                            />
+                                        </div>
+                                    </TabsContent>
+                                </div>
+                            </Tabs>
+                            <DialogFooter className="bg-white dark:bg-zinc-950">
+                                <Button variant="outline" onClick={() => setShowAvatarDialog(false)} className="rounded-none border-2 border-[var(--cute-text)]">Cancel</Button>
+                                <Button
+                                    onClick={() => {
+                                        updateData({ ...data, profileImage: tempAvatar })
+                                        if (tempFile && onFileSelect) onFileSelect("profileImage", tempFile)
+                                        else if (onUrlSelect) onUrlSelect("profileImage", tempAvatar)
+                                        setShowAvatarDialog(false)
+                                    }}
+                                    className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]"
+                                >
+                                    Save Changes
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                ) : (
+                    <Drawer open={showAvatarDialog} onOpenChange={setShowAvatarDialog}>
+                        <DrawerContent className="rounded-t-none border-t-4 border-x-4 border-[var(--cute-text)] shadow-[0px_-4px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
+                            <DrawerHeader className="text-left bg-white dark:bg-zinc-950">
+                                <DrawerTitle>Update Profile Picture</DrawerTitle>
+                                <DrawerDescription>
+                                    Choose how you want to update your profile picture.
+                                </DrawerDescription>
+                            </DrawerHeader>
+                            <div className="p-4">
+                                <Tabs defaultValue="upload" className="w-full">
+                                    <TabsList className="grid w-full grid-cols-2 gap-4 bg-transparent p-0 h-auto">
+                                        <TabsTrigger value="upload" className="rounded-none border-2 border-[var(--cute-text)] bg-white data-[state=active]:bg-[var(--cute-highlight)] data-[state=active]:text-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] data-[state=active]:shadow-none data-[state=active]:translate-x-[2px] data-[state=active]:translate-y-[2px] transition-all py-2 font-bold pixel-text">Upload</TabsTrigger>
+                                        <TabsTrigger value="link" className="rounded-none border-2 border-[var(--cute-text)] bg-white data-[state=active]:bg-[var(--cute-highlight)] data-[state=active]:text-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] data-[state=active]:shadow-none data-[state=active]:translate-x-[2px] data-[state=active]:translate-y-[2px] transition-all py-2 font-bold pixel-text">Image URL</TabsTrigger>
+                                    </TabsList>
+                                    <div className="py-4">
+                                        <div className="flex justify-center mb-4">
+                                            <Avatar className="w-24 h-24 border-2 border-[var(--cute-text)] rounded-none">
+                                                <AvatarImage src={tempAvatar || data.profileImage || "/profile-photo.jpg"} />
+                                                <AvatarFallback className="rounded-none bg-[var(--cute-highlight)] text-[var(--cute-text)]">Preview</AvatarFallback>
+                                            </Avatar>
+                                        </div>
+                                        <TabsContent value="upload" className="mt-0">
+                                            <FileUpload
+                                                accept="image/*"
+                                                onFileSelect={(file) => {
+                                                    if (file.size > 5 * 1024 * 1024) {
+                                                        alert("File too large (max 5MB)")
+                                                        return
+                                                    }
+                                                    const url = URL.createObjectURL(file)
+                                                    setTempAvatar(url)
+                                                    setTempFile(file)
+                                                }}
+                                                label="Choose Image File"
+                                                maxSize={5}
+                                                className="w-full"
+                                            />
+                                        </TabsContent>
+                                        <TabsContent value="link" className="mt-0">
+                                            <div className="space-y-2">
+                                                <Label>Image URL</Label>
+                                                <PixelInput
+                                                    placeholder="https://example.com/image.png"
+                                                    value={tempAvatar}
+                                                    onChange={(e) => {
+                                                        setTempAvatar(e.target.value)
+                                                        setTempFile(null)
+                                                    }}
+                                                />
+                                            </div>
+                                        </TabsContent>
+                                    </div>
+                                </Tabs>
+                            </div>
+                            <DrawerFooter className="bg-white dark:bg-zinc-950">
+                                <Button
+                                    onClick={() => {
+                                        updateData({ ...data, profileImage: tempAvatar })
+                                        if (tempFile && onFileSelect) onFileSelect("profileImage", tempFile)
+                                        else if (onUrlSelect) onUrlSelect("profileImage", tempAvatar)
+                                        setShowAvatarDialog(false)
+                                    }}
+                                    className="w-full rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]"
+                                >
+                                    Save Changes
+                                </Button>
+                                <Button variant="outline" onClick={() => setShowAvatarDialog(false)} className="w-full rounded-none border-2 border-[var(--cute-text)]">Cancel</Button>
+                            </DrawerFooter>
+                        </DrawerContent>
+                    </Drawer>
+                )}
 
                 <Input
                     value={data.title || "Ahmad Kanaan"}
@@ -342,7 +483,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect }: AboutMeForm
                                                         </div>
                                                         <div className="grid grid-cols-4 items-center gap-4">
                                                             <Label className="text-right">Avatar</Label>
-                                                            <div className="col-span-3">
+                                                            <div className="col-span-3 space-y-2">
                                                                 <FileUpload
                                                                     accept="image/*"
                                                                     onFileSelect={(file) => {
@@ -354,6 +495,16 @@ export function AboutMeForm({ initialData, onChange, onFileSelect }: AboutMeForm
                                                                     maxSize={5}
                                                                     className="w-full"
                                                                 />
+                                                                <div className="flex gap-2">
+                                                                    <PixelInput
+                                                                        placeholder="Or image URL..."
+                                                                        className="h-8 text-xs"
+                                                                        onChange={(e) => {
+                                                                            updateTestimonial(index, "avatar", e.target.value)
+                                                                            onUrlSelect?.(`testimonials[${index}].avatar`, e.target.value)
+                                                                        }}
+                                                                    />
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -415,7 +566,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect }: AboutMeForm
                                                         </div>
                                                         <div className="grid grid-cols-4 items-center gap-4">
                                                             <Label className="text-right">Avatar</Label>
-                                                            <div className="col-span-3">
+                                                            <div className="col-span-3 space-y-2">
                                                                 <FileUpload
                                                                     accept="image/*"
                                                                     onFileSelect={(file) => {
@@ -426,6 +577,14 @@ export function AboutMeForm({ initialData, onChange, onFileSelect }: AboutMeForm
                                                                     label="Upload Avatar"
                                                                     maxSize={5}
                                                                     className="w-full"
+                                                                />
+                                                                <PixelInput
+                                                                    placeholder="Or image URL..."
+                                                                    className="h-8 text-xs"
+                                                                    onChange={(e) => {
+                                                                        updateTestimonial(index, "avatar", e.target.value)
+                                                                        onUrlSelect?.(`testimonials[${index}].avatar`, e.target.value)
+                                                                    }}
                                                                 />
                                                             </div>
                                                         </div>

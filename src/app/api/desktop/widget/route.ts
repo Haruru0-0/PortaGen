@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
     const body = await req.json().catch(() => ({}))
-    const { portfolioId, index, assetId } = body || {}
+    const { portfolioId, index, assetId, url } = body || {}
     if (!portfolioId) return NextResponse.json({ error: 'Portfolio ID required' }, { status: 400 })
     if (index !== 1 && index !== 2) return NextResponse.json({ error: 'index must be 1 or 2' }, { status: 400 })
 
@@ -26,7 +26,9 @@ export async function POST(req: NextRequest) {
 
     const [updated] = await db
       .update(desktopSettings)
-      .set(index === 1 ? { widget1AssetId: assetId ?? null, updatedAt: new Date() } : { widget2AssetId: assetId ?? null, updatedAt: new Date() })
+      .set(index === 1
+        ? { widget1AssetId: assetId ?? null, widget1Url: url ?? null, updatedAt: new Date() }
+        : { widget2AssetId: assetId ?? null, widget2Url: url ?? null, updatedAt: new Date() })
       .where(eq(desktopSettings.portfolioId, portfolioId))
       .returning()
 

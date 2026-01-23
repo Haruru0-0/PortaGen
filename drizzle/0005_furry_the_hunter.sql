@@ -1,0 +1,1 @@
+ALTER TABLE "desktop_settings" ADD COLUMN "menubar_icon_url" text;

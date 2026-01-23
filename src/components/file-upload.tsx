@@ -112,7 +112,7 @@ export function FileUpload({ accept, onFileSelect, preview, label, maxSize = 5, 
           <div className="space-y-3">
             {accept?.includes("image") ? (
               <Image
-                src={preview || "/placeholder.svg"}
+                src={preview}
                 alt="Preview"
                 className="mx-auto border-2 border-border"
                 width={200}

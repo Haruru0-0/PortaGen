@@ -28,6 +28,7 @@ const schema = z
     linkType: z.enum(["window", "url"]).default("window"),
     url: z.string().url("Invalid URL").optional().or(z.literal("")),
     fileId: z.union([z.string(), z.number()]).optional(),
+    iconImageUrl: z.string().url("Invalid Image URL").optional().or(z.literal("")),
   })
   .superRefine((val, ctx) => {
     if (val.linkType === "url" && !val.url) {
@@ -39,7 +40,7 @@ export function AddIconModal({ isOpen, onClose, onCreated }: AddIconModalProps) 
   const { addIcon, loading } = useIconContext()
   const form = useForm<z.input<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: { name: "", linkType: "window", url: "", fileId: undefined },
+    defaultValues: { name: "", linkType: "window", url: "", fileId: undefined, iconImageUrl: "" },
   })
   const [preview, setPreview] = useState<string>("")
   const params = useParams<{ id: string }>()
@@ -77,9 +78,10 @@ export function AddIconModal({ isOpen, onClose, onCreated }: AddIconModalProps) 
       fileId: payload.fileId,
       linkType: payload.linkType ?? 'window',
       url: payload.linkType === "url" ? payload.url : "",
+      iconImageUrl: payload.iconImageUrl
     })
     onCreated(created)
-    form.reset({ name: "", linkType: "window", url: "", fileId: undefined })
+    form.reset({ name: "", linkType: "window", url: "", fileId: undefined, iconImageUrl: "" })
     setPreview("")
     setSelectedFile(null)
   }
@@ -119,6 +121,22 @@ export function AddIconModal({ isOpen, onClose, onCreated }: AddIconModalProps) 
             >
               <Library className="w-4 h-4" /> CHOOSE FROM LIBRARY
             </PixelButton>
+
+            <FormField name="iconImageUrl" control={form.control} render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <PixelInput
+                    placeholder="OR IMAGE URL (e.g. Pinterest)"
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      if (e.target.value) setPreview(e.target.value);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
           </div>
           <FormField name="linkType" control={form.control} render={({ field }) => (
             <FormItem>

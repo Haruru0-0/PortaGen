@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
     const body = await req.json().catch(() => ({}))
-    const { portfolioId, wallpaperAssetId } = body || {}
+    const { portfolioId, wallpaperAssetId, wallpaperUrl } = body || {}
     if (!portfolioId) return NextResponse.json({ error: 'Portfolio ID required' }, { status: 400 })
 
     const owned = await db.query.portfolios.findFirst({
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
     const [updated] = await db
       .update(lockScreenSettings)
-      .set({ wallpaperAssetId: wallpaperAssetId ?? null, updatedAt: new Date() })
+      .set({ wallpaperAssetId: wallpaperAssetId ?? null, wallpaperUrl: wallpaperUrl ?? null, updatedAt: new Date() })
       .where(eq(lockScreenSettings.portfolioId, portfolioId))
       .returning()
 

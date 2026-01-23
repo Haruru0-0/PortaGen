@@ -84,6 +84,7 @@ export const icons = pgTable('icons', {
     name: varchar('name', { length: 255 }).notNull(),
 
     iconAssetId: integer('icon_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
+    iconImageUrl: text('icon_image_url'),
 
     // Link/Window
     linkType: varchar('link_type', { length: 20 }).default('window'),
@@ -179,6 +180,7 @@ export const lockScreenSettings = pgTable('lock_screen_settings', {
     password: varchar('password', { length: 255 }),
 
     wallpaperAssetId: integer('wallpaper_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
+    wallpaperUrl: text('wallpaper_url'),
 
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -190,16 +192,22 @@ export const desktopSettings = pgTable('desktop_settings', {
     portfolioId: integer('portfolio_id').notNull().references(() => portfolios.id, { onDelete: 'cascade' }).unique(),
 
     wallpaperAssetId: integer('wallpaper_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
+    wallpaperUrl: text('wallpaper_url'),
     desktopGifAssetId: integer('desktop_gif_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
+    desktopGifUrl: text('desktop_gif_url'),
     widget1AssetId: integer('widget1_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
+    widget1Url: text('widget1_url'),
     widget2AssetId: integer('widget2_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
+    widget2Url: text('widget2_url'),
     musicPlayerIconAssetId: integer('music_player_icon_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
 
     // Spotify playlist URL to drive the music player via Web Playback SDK
     spotifyPlaylistUrl: text('spotify_playlist_url'),
 
+    // Menu Bar Customization 
     // Menu Bar Customization
     menubarIconAssetId: integer('menubar_icon_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
+    menubarIconUrl: text('menubar_icon_url'),
     menubarText: varchar('menubar_text', { length: 100 }),
 
     createdAt: timestamp('created_at').defaultNow().notNull(),

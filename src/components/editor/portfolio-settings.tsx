@@ -3,6 +3,7 @@ import { PixelInput } from "@/components/pixel-input"
 import { usePortfolioContext } from "@/contexts/portfolioContext"
 import { useParams } from "next/navigation"
 import { useEffect } from "react"
+import { PixelButton } from "../pixel-button"
 
 export function PortfolioSettings() {
     const { portfolioInfo, fetchInfo, updateInfo, setPortfolioName, setBio, loading: portfolioLoading } = usePortfolioContext()
@@ -45,13 +46,12 @@ export function PortfolioSettings() {
                         />
                     </div>
                     <div className="flex items-end justify-end">
-                        <button
-                            className="px-4 py-2 text-[10px] border-2 border-border bg-primary text-primary-foreground disabled:opacity-50"
+                        <PixelButton
                             onClick={handleSavePortfolioInfo}
                             disabled={portfolioLoading}
                         >
                             {portfolioLoading ? "Saving..." : "Save Info"}
-                        </button>
+                        </PixelButton>
                     </div>
                 </div>
             </PixelCard>

@@ -19,6 +19,7 @@ export type Icon = {
     url?: string;
     linkType?: 'window' | 'url';
     iconAssetId?: number;
+    iconImageUrl?: string;
 }
 
 interface IconContextType {

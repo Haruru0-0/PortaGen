@@ -18,6 +18,7 @@ async function formatIconResponse(id: number) {
     linkType: row.linkType || 'window',
     url: row.linkUrl || undefined,
     iconAssetId: row.iconAssetId || undefined,
+    iconImageUrl: row.iconImageUrl || undefined,
   }
 }
 
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
     const body = await req.json().catch(() => ({}))
-    const { id, portfolioId, name, url, fileId, linkType } = body || {}
+    const { id, portfolioId, name, url, fileId, linkType, iconImageUrl } = body || {}
 
     if (!id) return NextResponse.json({ error: 'Icon ID required' }, { status: 400 })
     if (!portfolioId) return NextResponse.json({ error: 'Portfolio ID required' }, { status: 400 })
@@ -47,6 +48,7 @@ export async function POST(req: NextRequest) {
       linkType: (linkType === 'url' || linkType === 'window') ? linkType : undefined,
       linkUrl: linkType === 'url' ? url : (linkType === 'window' ? '' : undefined),
       iconAssetId: fileId != null && fileId !== '' ? Number(fileId) : undefined,
+      iconImageUrl: iconImageUrl || null,
       updatedAt: new Date(),
     }
 

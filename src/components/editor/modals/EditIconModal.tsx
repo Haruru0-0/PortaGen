@@ -31,6 +31,7 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
       linkType: z.enum(['window', 'url']).default('window'),
       url: z.string().url('Invalid URL').optional().or(z.literal('')),
       fileId: z.union([z.string(), z.number()]).optional(),
+      iconImageUrl: z.string().url("Invalid Image URL").optional().or(z.literal("")),
     })
     .superRefine((val, ctx) => {
       if (val.linkType === 'url' && !val.url) {
@@ -47,8 +48,8 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
 
   useEffect(() => {
     if (icon) {
-      form.reset({ name: icon.name || '', linkType: icon.linkType || 'window', url: icon.url || '', fileId: icon.iconAssetId })
-      setPreview(`https://drive.google.com/uc?id=${icon.icon?.fileId}` || '')
+      form.reset({ name: icon.name || '', linkType: icon.linkType || 'window', url: icon.url || '', fileId: icon.iconAssetId, iconImageUrl: icon.iconImageUrl || '' })
+      setPreview(icon.iconImageUrl || `https://drive.google.com/uc?id=${icon.icon?.fileId}` || '')
       setSelectedFile(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -137,6 +138,22 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
             >
               <Library className="w-4 h-4" /> CHOOSE FROM LIBRARY
             </PixelButton>
+
+            <FormField name="iconImageUrl" control={form.control} render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <PixelInput
+                    placeholder="OR IMAGE URL (e.g. Pinterest)"
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      if (e.target.value) setPreview(e.target.value);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
           </div>
           {form.watch('linkType') === 'url' && (
             <FormField name="url" control={form.control} render={({ field }) => (

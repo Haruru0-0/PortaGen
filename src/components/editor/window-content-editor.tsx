@@ -63,6 +63,21 @@ interface WindowContentEditorProps {
     onCancel: () => void
 }
 
+// Helper to set deep value
+const setDataDeep = (obj: any, path: string, value: any): any => {
+    const parts = path.replace(/\[(\d+)\]/g, '.$1').split('.')
+    const newObj = Array.isArray(obj) ? [...obj] : { ...obj }
+    let current = newObj
+    for (let i = 0; i < parts.length - 1; i++) {
+        const part = parts[i]
+        if (!current[part]) current[part] = {}
+        current[part] = Array.isArray(current[part]) ? [...current[part]] : { ...current[part] }
+        current = current[part]
+    }
+    current[parts[parts.length - 1]] = value
+    return newObj
+}
+
 export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }: WindowContentEditorProps) {
     const { windows, getWindow, loading: contextLoading } = useWindowsContext()
     const [name, setName] = useState("")
@@ -116,22 +131,16 @@ export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }:
         // Create temporary blob URL for preview
         const blobUrl = URL.createObjectURL(file)
 
-        // Helper to set deep value
-        const setDataDeep = (obj: any, path: string, value: any): any => {
-            const parts = path.replace(/\[(\d+)\]/g, '.$1').split('.')
-            const newObj = { ...obj }
-            let current = newObj
-            for (let i = 0; i < parts.length - 1; i++) {
-                const part = parts[i]
-                if (!current[part]) current[part] = {}
-                current[part] = Array.isArray(current[part]) ? [...current[part]] : { ...current[part] }
-                current = current[part]
-            }
-            current[parts[parts.length - 1]] = value
-            return newObj
-        }
-
         setContentData((prev: TemplateData) => setDataDeep(prev, path, blobUrl))
+    }
+
+    const handleUrlUpdate = (path: string, url: string) => {
+        setFilesToUpload(prev => {
+            const next = new Map(prev)
+            next.delete(path)
+            return next
+        })
+        setContentData((prev: TemplateData) => setDataDeep(prev, path, url))
     }
 
     const handleSave = async () => {
@@ -151,20 +160,6 @@ export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }:
 
             // Replace blob URLs with real URLs in contentData
             let finalContentData = { ...contentData }
-
-            const setDataDeep = (obj: any, path: string, value: any): any => {
-                const parts = path.replace(/\[(\d+)\]/g, '.$1').split('.')
-                const newObj = Array.isArray(obj) ? [...obj] : { ...obj }
-                let current = newObj
-                for (let i = 0; i < parts.length - 1; i++) {
-                    const part = parts[i]
-                    if (!current[part]) current[part] = {}
-                    current[part] = Array.isArray(current[part]) ? [...current[part]] : { ...current[part] }
-                    current = current[part]
-                }
-                current[parts[parts.length - 1]] = value
-                return newObj
-            }
 
             for (const [path, url] of uploadedUrls.entries()) {
                 finalContentData = setDataDeep(finalContentData, path, url)
@@ -193,15 +188,15 @@ export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }:
     const renderForm = () => {
         switch (selectedType) {
             case "about":
-                return <AboutMeForm initialData={contentData as AboutMeData} onChange={setContentData} onFileSelect={handleFileSelect} />
+                return <AboutMeForm initialData={contentData as AboutMeData} onChange={setContentData} onFileSelect={handleFileSelect} onUrlSelect={handleUrlUpdate} />
             case "projects":
-                return <ProjectsForm initialData={contentData as ProjectsData} onChange={setContentData} />
+                return <ProjectsForm initialData={contentData as ProjectsData} onChange={setContentData} onFileSelect={handleFileSelect} onUrlSelect={handleUrlUpdate} />
             case "contact":
                 return <ContactForm initialData={contentData as ContactData} onChange={setContentData} />
             case "resume":
                 return <ResumeForm initialData={contentData as ResumeData} onChange={setContentData} />
             case "blog":
-                return <BlogForm initialData={contentData as BlogData} onChange={setContentData} />
+                return <BlogForm initialData={contentData as BlogData} onChange={setContentData} onFileSelect={handleFileSelect} onUrlSelect={handleUrlUpdate} />
             case "links":
                 return <LinksForm initialData={contentData as LinksData} onChange={setContentData} />
             case "blank":

@@ -41,11 +41,16 @@ export async function GET(req: NextRequest) {
       portfolioId: row.portfolioId,
       spotifyPlaylistUrl: row.spotifyPlaylistUrl || '',
       wallpaperAsset: row.wallpaperAsset ?? undefined,
+      wallpaperUrl: row.wallpaperUrl || '',
       desktopGifAsset: row.desktopGifAsset ?? undefined,
+      desktopGifUrl: row.desktopGifUrl || '',
       widget1Asset: row.widget1Asset ?? undefined,
+      widget1Url: row.widget1Url || '',
       widget2Asset: row.widget2Asset ?? undefined,
+      widget2Url: row.widget2Url || '',
       musicPlayerIconAsset: row.musicPlayerIconAsset ?? undefined,
       menubarIconAsset: row.menubarIconAsset ?? undefined,
+      menubarIconUrl: row.menubarIconUrl || '',
       menubarText: row.menubarText || '',
     })
   } catch (e) {

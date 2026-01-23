@@ -22,6 +22,27 @@
       "when": 1768746164186,
       "tag": "0002_nasty_wilson_fisk",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1769171038514,
+      "tag": "0003_whole_komodo",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1769171502040,
+      "tag": "0004_tidy_bishop",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1769171856616,
+      "tag": "0005_furry_the_hunter",
+      "breakpoints": true
     }
   ]
 }

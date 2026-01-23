@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
     const body = await req.json().catch(() => ({}))
-    const { portfolioId, desktopGifAssetId } = body || {}
+    const { portfolioId, desktopGifAssetId, desktopGifUrl } = body || {}
     if (!portfolioId) return NextResponse.json({ error: 'Portfolio ID required' }, { status: 400 })
 
     const owned = await db.query.portfolios.findFirst({
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
     const [updated] = await db
       .update(desktopSettings)
-      .set({ desktopGifAssetId: desktopGifAssetId ?? null, updatedAt: new Date() })
+      .set({ desktopGifAssetId: desktopGifAssetId ?? null, desktopGifUrl: desktopGifUrl ?? null, updatedAt: new Date() })
       .where(eq(desktopSettings.portfolioId, portfolioId))
       .returning()
 

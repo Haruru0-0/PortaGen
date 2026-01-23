@@ -50,6 +50,8 @@ export default function SignUpPage() {
   const [verifying, setVerifying] = useState(false);
   const [code, setCode] = useState("");
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [resending, setResending] = useState(false);
+  const [resendMessage, setResendMessage] = useState("");
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -166,6 +168,24 @@ export default function SignUpPage() {
     }
   };
 
+  const handleResendEmail = async () => {
+    setResending(true);
+    setResendMessage("");
+    setError("");
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: form.getValues("email"),
+      });
+      if (error) throw error;
+      setResendMessage("EMAIL RESENT! CHECK YOUR INBOX.");
+    } catch (err: any) {
+      setError(err.message || "FAILED TO RESEND EMAIL");
+    } finally {
+      setResending(false);
+    }
+  };
+
   // OTP Verification View
   if (verifying) {
     return (
@@ -198,7 +218,7 @@ export default function SignUpPage() {
                 </div>
                 <h1 className="text-xl pixel-text-shadow">VERIFY EMAIL</h1>
                 <p className="text-xs text-muted-foreground leading-relaxed uppercase">
-                  Check your email for a verification link or enter the 6-digit code below.
+                  Check your email for a verification link.
                 </p>
               </div>
 
@@ -221,6 +241,19 @@ export default function SignUpPage() {
                   <p className="text-[9px] text-muted-foreground uppercase">
                     Didn't receive an email? Check your spam folder or try again later.
                   </p>
+
+                  {resendMessage && (
+                    <p className="text-[10px] text-green-500 font-bold animate-pulse">{resendMessage}</p>
+                  )}
+
+                  <PixelButton
+                    className="w-full text-[10px] mb-2"
+                    onClick={handleResendEmail}
+                    disabled={resending}
+                    variant="secondary"
+                  >
+                    {resending ? "SENDING..." : "RESEND EMAIL"}
+                  </PixelButton>
 
                   <button
                     type="button"

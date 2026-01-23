@@ -11,6 +11,7 @@ import { useParams } from "next/navigation";
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { AssetPicker } from "@/components/common/asset-picker"
 import { Asset } from "@/lib/types"
+import Image from "next/image"
 
 export function LockScreenWallpaperTab() {
   const { data, updateWallpaper, getLockScreenData } = useLockScreenContext()
@@ -23,13 +24,18 @@ export function LockScreenWallpaperTab() {
   const [customName, setCustomName] = useState("")
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [assetPickerOpen, setAssetPickerOpen] = useState(false)
+  const [urlInput, setUrlInput] = useState("")
 
   useEffect(() => {
     if (currentPortfolioId) {
       void getLockScreenData(currentPortfolioId)
     }
   }, [currentPortfolioId, getLockScreenData])
-
+  useEffect(() => {
+    if (data && data.wallpaperUrl) {
+      setUrlInput(data.wallpaperUrl)
+    }
+  }, [data])
 
   useEffect(() => {
     return () => {
@@ -46,6 +52,20 @@ export function LockScreenWallpaperTab() {
     const url = URL.createObjectURL(file)
     setPreviewUrl(url)
     setWallpaper(url) // Update store for immediate preview
+  }
+
+  const handleUrlInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUrlInput(e.target.value)
+    if (e.target.value) {
+      setWallpaper(e.target.value)
+      setPendingWallpaperFile(null)
+    }
+  }
+
+  const handleSaveUrl = async () => {
+    if (!currentPortfolioId || !urlInput) return
+    await updateWallpaper(currentPortfolioId, null, urlInput)
+    setUrlInput("")
   }
 
   const handleSave = () => {
@@ -87,7 +107,7 @@ export function LockScreenWallpaperTab() {
           <FileUpload
             accept="image/*"
             onFileSelect={onUpload}
-            preview={previewUrl || `https://drive.google.com/uc?id=${data?.wallpaperAsset?.fileId}` || ''}
+            preview={previewUrl || (data?.wallpaperAsset?.fileId ? `https://drive.google.com/uc?id=${data.wallpaperAsset.fileId}` : '')}
             label="LOCK SCREEN IMAGE"
             maxSize={5}
           />
@@ -99,6 +119,29 @@ export function LockScreenWallpaperTab() {
             <Library className="w-3 h-3" />
             SELECT FROM LIBRARY
           </PixelButton>
+
+          <div className="pt-2 space-y-2">
+            <p className="text-[10px] text-muted-foreground uppercase">OR IMAGE LINK (PINTEREST ETC)</p>
+            <div className="flex gap-2">
+              <PixelInput
+                placeholder="https://..."
+                value={urlInput}
+                onChange={handleUrlInputChange}
+              />
+              <PixelButton className="text-[10px]" onClick={handleSaveUrl} disabled={!urlInput}>SAVE</PixelButton>
+            </div>
+            {urlInput && (
+              <div className="relative w-full h-32 border border-border rounded overflow-hidden">
+                <Image
+                  src={urlInput}
+                  alt="Lock Screen Preview"
+                  fill
+                  className="object-cover"
+                  onError={() => {/* Handle error silently or show placeholder */ }}
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         {pendingWallpaperFile && (

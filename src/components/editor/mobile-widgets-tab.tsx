@@ -11,6 +11,7 @@ import { useParams } from "next/navigation";
 import { AssetPicker } from "@/components/common/asset-picker"
 import { Library } from "lucide-react"
 import { Asset } from "@/lib/types"
+import Image from "next/image"
 
 export function MobileWidgetsTab() {
     const params = useParams<{ id: string }>()
@@ -25,6 +26,8 @@ export function MobileWidgetsTab() {
     const [customName2, setCustomName2] = useState("")
     const [previewUrl1, setPreviewUrl1] = useState<string | null>(null)
     const [previewUrl2, setPreviewUrl2] = useState<string | null>(null)
+    const [urlInput1, setUrlInput1] = useState("")
+    const [urlInput2, setUrlInput2] = useState("")
     const [assetPickerOpen, setAssetPickerOpen] = useState(false)
     const [assetPickerWidget, setAssetPickerWidget] = useState<1 | 2>(1)
 
@@ -34,9 +37,20 @@ export function MobileWidgetsTab() {
 
 
     useEffect(() => {
+        if (data) {
+            if (data.widget1Url) {
+                setUrlInput1(data.widget1Url)
+            }
+            if (data.widget2Url) {
+                setUrlInput2(data.widget2Url)
+            }
+        }
+    }, [data])
+
+    useEffect(() => {
         return () => {
-            if (previewUrl1) URL.revokeObjectURL(previewUrl1)
-            if (previewUrl2) URL.revokeObjectURL(previewUrl2)
+            if (previewUrl1 && !previewUrl1.startsWith('http')) URL.revokeObjectURL(previewUrl1)
+            if (previewUrl2 && !previewUrl2.startsWith('http')) URL.revokeObjectURL(previewUrl2)
         }
     }, [previewUrl1, previewUrl2])
 
@@ -101,6 +115,34 @@ export function MobileWidgetsTab() {
         }
     }
 
+    const handleUrlInput1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setUrlInput1(e.target.value)
+        if (e.target.value) {
+            setMobileWidget1(e.target.value)
+            setPendingWidget1File(null)
+        }
+    }
+
+    const handleUrlInput2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setUrlInput2(e.target.value)
+        if (e.target.value) {
+            setMobileWidget2(e.target.value)
+            setPendingWidget2File(null)
+        }
+    }
+
+    const handleSaveUrl1 = async () => {
+        if (!currentPortfolioId || !urlInput1) return
+        await updateWidget(currentPortfolioId, 1, null, urlInput1)
+        // Keep input and preview to show saved state, or clear? 
+        // User asked for preview to show below it if fetched.
+    }
+
+    const handleSaveUrl2 = async () => {
+        if (!currentPortfolioId || !urlInput2) return
+        await updateWidget(currentPortfolioId, 2, null, urlInput2)
+    }
+
     const handleAssetSelect = async (asset: Asset) => {
         if (!currentPortfolioId) return
         await updateWidget(currentPortfolioId, assetPickerWidget, asset.id)
@@ -126,7 +168,7 @@ export function MobileWidgetsTab() {
                 <h3 className="text-sm dashboard-pixel-text-shadow">MOBILE WIDGETS</h3>
                 <div className="space-y-2">
                     <FileUpload accept="image/*" onFileSelect={onUploadWidget1} label="WIDGET 1"
-                        preview={previewUrl1 || `https://drive.google.com/uc?id=${data?.widget1Asset?.fileId}` || ''} maxSize={5} />
+                        preview={previewUrl1 || (data?.widget1Asset?.fileId ? `https://drive.google.com/uc?id=${data.widget1Asset.fileId}` : '')} maxSize={5} />
                     <PixelButton
                         variant="secondary"
                         className="w-full text-[10px] flex items-center justify-center gap-2"
@@ -143,10 +185,32 @@ export function MobileWidgetsTab() {
                             SAVE WIDGET 1
                         </PixelButton>
                     )}
+                    <div className="pt-2 space-y-2">
+                        <p className="text-[10px] text-muted-foreground uppercase">OR IMAGE LINK</p>
+                        <div className="flex gap-2">
+                            <PixelInput
+                                placeholder="https://..."
+                                value={urlInput1}
+                                onChange={handleUrlInput1Change}
+                            />
+                            <PixelButton className="text-[10px]" onClick={handleSaveUrl1} disabled={!urlInput1}>SAVE</PixelButton>
+                        </div>
+                        {urlInput1 && (
+                            <div className="relative w-20 h-20 border border-border rounded overflow-hidden">
+                                <Image
+                                    src={urlInput1}
+                                    alt="Widget 1 Preview"
+                                    fill
+                                    className="object-cover"
+                                    onError={() => setPreviewUrl1(null)} // fallback or handle error
+                                />
+                            </div>
+                        )}
+                    </div>
                 </div>
                 <div className="space-y-2">
                     <FileUpload accept="image/*" onFileSelect={onUploadWidget2} label="WIDGET 2"
-                        preview={previewUrl2 || `https://drive.google.com/uc?id=${data?.widget2Asset?.fileId}` || ''} maxSize={5} />
+                        preview={previewUrl2 || (data?.widget2Asset?.fileId ? `https://drive.google.com/uc?id=${data.widget2Asset.fileId}` : '')} maxSize={5} />
                     <PixelButton
                         variant="secondary"
                         className="w-full text-[10px] flex items-center justify-center gap-2"
@@ -163,6 +227,28 @@ export function MobileWidgetsTab() {
                             SAVE WIDGET 2
                         </PixelButton>
                     )}
+                    <div className="pt-2 space-y-2">
+                        <p className="text-[10px] text-muted-foreground uppercase">OR IMAGE LINK</p>
+                        <div className="flex gap-2">
+                            <PixelInput
+                                placeholder="https://..."
+                                value={urlInput2}
+                                onChange={handleUrlInput2Change}
+                            />
+                            <PixelButton className="text-[10px]" onClick={handleSaveUrl2} disabled={!urlInput2}>SAVE</PixelButton>
+                        </div>
+                        {urlInput2 && (
+                            <div className="relative w-20 h-20 border border-border rounded overflow-hidden">
+                                <Image
+                                    src={urlInput2}
+                                    alt="Widget 2 Preview"
+                                    fill
+                                    className="object-cover"
+                                    onError={() => setPreviewUrl2(null)}
+                                />
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 

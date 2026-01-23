@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { FileUpload } from "@/components/file-upload"
-import { Plus, Trash2, Settings2, X } from "lucide-react"
+import { Plus, Trash2, Settings2, X, Link } from "lucide-react"
+import { PixelInput } from "@/components/pixel-input"
 import { AnimatedSection } from "@/components/portfolio/animated-section"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel"
 import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
@@ -17,9 +18,11 @@ import type { ProjectsData, ProjectItem } from "@/lib/types"
 interface ProjectsFormProps {
     initialData: ProjectsData
     onChange: (data: ProjectsData) => void
+    onFileSelect?: (path: string, file: File) => void
+    onUrlSelect?: (path: string, url: string) => void
 }
 
-export function ProjectsForm({ initialData, onChange }: ProjectsFormProps) {
+export function ProjectsForm({ initialData, onChange, onFileSelect, onUrlSelect }: ProjectsFormProps) {
     const [data, setData] = useState<ProjectsData>(initialData)
     const [activeProject, setActiveProject] = useState(0)
     const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null)
@@ -230,7 +233,19 @@ export function ProjectsForm({ initialData, onChange }: ProjectsFormProps) {
                                                 <span className="text-white font-bold pointer-events-none">CHANGE IMAGE</span>
                                             </div>
                                         </div>
-                                        <div className="p-6 flex flex-col">
+                                        {/* URL Input for Project Image */}
+                                        <div className="mt-2 mb-2">
+                                            <PixelInput
+                                                placeholder="Or image URL..."
+                                                className="h-8 text-xs"
+                                                value={project.image || ""}
+                                                onChange={(e) => {
+                                                    updateProject(index, "image", e.target.value)
+                                                    onUrlSelect?.(`projects[${index}].image`, e.target.value)
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="p-6 flex flex-col pt-2">
                                             <Input
                                                 value={project.title}
                                                 onChange={(e) => updateProject(index, "title", e.target.value)}

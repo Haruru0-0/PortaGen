@@ -6,6 +6,7 @@ export interface LockScreenData {
   password: string | null
   hint: string | null
   wallpaperAsset?: Asset
+  wallpaperUrl?: string
 }
 
 export async function getLockScreen(portfolioId: number): Promise<LockScreenData | undefined> {
@@ -18,11 +19,11 @@ export async function getLockScreen(portfolioId: number): Promise<LockScreenData
   }
 }
 
-export async function updateLockScreenWallpaper(portfolioId: number, wallpaperAssetId: number | null) {
+export async function updateLockScreenWallpaper(portfolioId: number, wallpaperAssetId: number | null, wallpaperUrl?: string) {
   const res = await fetch('/api/lock-screen/wallpaper', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ portfolioId, wallpaperAssetId }),
+    body: JSON.stringify({ portfolioId, wallpaperAssetId, wallpaperUrl }),
   })
   if (!res.ok) throw new Error('Failed to update lock screen wallpaper')
   return res.json()

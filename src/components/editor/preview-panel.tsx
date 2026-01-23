@@ -1,6 +1,6 @@
-import { Suspense, useRef } from "react"
+import { Suspense, useRef, useState } from "react"
 import { PixelCard } from "@/components/pixel-card"
-import { Monitor, Smartphone, Lock, Unlock } from "lucide-react"
+import { Monitor, Smartphone, Lock, Unlock, Maximize2, Minimize2 } from "lucide-react"
 import { LockScreen } from "@/components/portfolio/lock-screen"
 import Desktop from "@/components/portfolio/desktop"
 import { CuteSuspenseFallback } from "@/components/portfolio/suspense-fallback"
@@ -12,6 +12,7 @@ import { PORTFOLIO_FONTS } from "@/lib/fonts"
 
 
 export function PreviewPanel() {
+    const [isFullScreen, setIsFullScreen] = useState(false)
     const stageContainerRef = useRef<HTMLDivElement>(null)
     const { width: containerWidth } = useResizeObserver(stageContainerRef)
     const isNarrow = (containerWidth || 0) < 738
@@ -30,7 +31,7 @@ export function PreviewPanel() {
     const fontClass = selectedFont?.className || ""
 
     return (
-        <PixelCard className="">
+        <PixelCard className={`transition-all duration-300 ${isFullScreen ? "fixed inset-0 z-50 m-0 rounded-none w-screen h-screen border-0" : ""}`}>
             <div className="space-y-4 h-full flex flex-col">
                 <div className="flex flex-col md:flex-row md:items-center justify-between flex-wrap gap-4">
                     <h3 className="text-sm dashboard-pixel-text-shadow">LIVE PREVIEW</h3>
@@ -89,6 +90,18 @@ export function PreviewPanel() {
                                     HOME
                                 </button>
                             </div>
+                        </div>
+
+                        {/* Full Screen Toggle */}
+                        <div className="flex items-center gap-1">
+                            <button
+                                onClick={() => setIsFullScreen(!isFullScreen)}
+                                className={`px-3 py-2 text-[10px] border-2 border-border flex items-center gap-1 bg-card hover:bg-muted`}
+                                title={isFullScreen ? "Exit Full Screen" : "Full Screen"}
+                            >
+                                {isFullScreen ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
+                                {isFullScreen ? "EXIT" : "MAXIMIZE"}
+                            </button>
                         </div>
                     </div>
                 </div>
