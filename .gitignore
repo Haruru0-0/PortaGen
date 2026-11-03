@@ -43,3 +43,5 @@ next-env.d.ts
 # next-video
 public/_next-video
 .env
+graphify-out
+.claude/.memory-state
