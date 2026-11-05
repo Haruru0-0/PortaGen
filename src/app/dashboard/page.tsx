@@ -56,7 +56,7 @@ export default async function DashboardPage() {
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {[
-          { label: "PORTFOLIOS", value: stats.portfolioCount.toString(), color: "bg-primary" },
+          { label: "PORTFOLIOS", value: stats.portfolioCount.toString(), color: "bg-primary text-primary-foreground" },
           { label: "TOTAL VIEWS", value: stats.totalViews.toString(), color: "bg-secondary" },
           { label: "ASSETS", value: stats.assetCount.toString(), color: "bg-accent" },
         ].map((stat, i) => (
@@ -65,7 +65,7 @@ export default async function DashboardPage() {
               <div className={`w-12 h-12 ${stat.color} flex items-center justify-center text-xl pixel-text-shadow`}>
                 {stat.value}
               </div>
-              <p className="text-[10px] text-muted-foreground">{stat.label}</p>
+              <p className="font-dialogue text-sm text-muted-foreground">{stat.label}</p>
             </div>
           </PixelCard>
         ))}
@@ -83,7 +83,7 @@ export default async function DashboardPage() {
                 >
                   {item.done && <span className="text-[8px]">✓</span>}
                 </div>
-                <span className={`text-[10px] break-words ${item.done ? "line-through text-muted-foreground" : ""}`}>
+                <span className={`font-dialogue text-sm break-words ${item.done ? "line-through text-muted-foreground" : ""}`}>
                   {item.task}
                 </span>
               </div>

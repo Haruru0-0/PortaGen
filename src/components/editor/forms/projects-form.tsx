@@ -86,7 +86,7 @@ export function ProjectsForm({ initialData, onChange, onFileSelect, onUrlSelect 
         <div className="space-y-8 max-w-5xl mx-auto pixel-text relative">
             {/* Header Section */}
             <AnimatedSection variant="fadeIn" duration={0.6} className="text-center group relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
-                <div className="absolute right-2 top-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                <div className="absolute right-2 top-2 opacity-70 lg:group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                     <Settings2 className="w-4 h-4 text-muted-foreground" />
                 </div>
                 <Input
@@ -105,7 +105,7 @@ export function ProjectsForm({ initialData, onChange, onFileSelect, onUrlSelect 
             <AnimatedSection variant="scale" delay={0.1} duration={0.7} className="relative group/section border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold pixel-title opacity-50">Featured View</h2>
-                    <Button variant="ghost" size="sm" onClick={addProject} className="h-6 w-6 p-0 opacity-100 lg:opacity-0 lg:group-hover/section:opacity-100 transition-opacity">
+                    <Button variant="ghost" size="sm" onClick={addProject} className="h-8 w-8 p-0 opacity-70 lg:group-hover/section:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                         <Plus className="w-4 h-4" />
                     </Button>
                 </div>
@@ -115,7 +115,7 @@ export function ProjectsForm({ initialData, onChange, onFileSelect, onUrlSelect 
                         {(data.projects || []).map((project, index) => (
                             <CarouselItem key={project.id} className="basis-full md:basis-1/2 lg:basis-1/3">
                                 <Card className="pixel-card border-0 shadow-lg overflow-hidden relative group">
-                                    <div className="absolute right-2 top-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity z-10 flex gap-1 bg-background/80 backdrop-blur-sm p-1 rounded-md border border-border">
+                                    <div className="absolute right-2 top-2 opacity-70 lg:group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10 flex gap-1 bg-background/80 backdrop-blur-sm p-1 rounded-md border border-border">
                                         {isDesktop ? (
                                             <Dialog>
                                                 <DialogTrigger asChild>
@@ -219,7 +219,7 @@ export function ProjectsForm({ initialData, onChange, onFileSelect, onUrlSelect 
                                             ) : (
                                                 <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground">No Image</div>
                                             )}
-                                            <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/image:opacity-100 transition-opacity">
+                                            <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/image:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity">
                                                 <FileUpload
                                                     accept="image/*"
                                                     onFileSelect={(file) => {

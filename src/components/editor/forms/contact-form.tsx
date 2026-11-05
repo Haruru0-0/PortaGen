@@ -105,7 +105,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
         <div className="space-y-8 max-w-5xl mx-auto pixel-text relative">
             {/* Header Section */}
             <AnimatedSection variant="scale" duration={0.7} className="text-center group relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
-                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                     <Settings2 className="w-4 h-4 text-muted-foreground" />
                 </div>
                 <Input
@@ -125,8 +125,8 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                 <AnimatedSection variant="slideRight" delay={0.1} className="md:col-span-1 space-y-6 group/section relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="font-medium pixel-text opacity-50">Contact Details</h3>
-                        <div className="flex gap-1 opacity-0 group-hover/section:opacity-100 transition-opacity">
-                            <Button variant="ghost" size="sm" onClick={addContactInfo} className="h-6 w-6 p-0" title="Add Info">
+                        <div className="flex gap-1 opacity-70 group-hover/section:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
+                            <Button variant="ghost" size="sm" onClick={addContactInfo} className="h-8 w-8 p-0" title="Add Info">
                                 <Plus className="w-4 h-4" />
                             </Button>
                         </div>
@@ -135,7 +135,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                     {(data.contactInfo || []).map((info, index) => (
                         <AnimatedItem key={index}>
                             <Card className="hover:shadow-md transition-shadow border-0 pixel-card relative group">
-                                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex gap-1">
+                                <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10 flex gap-1">
                                     {isDesktop ? (
                                         <Dialog>
                                             <DialogTrigger asChild>
@@ -262,7 +262,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                     <div className="pt-4 border-t-2 border-dashed border-border mt-4">
                         <div className="flex items-center justify-between mb-3">
                             <h3 className="font-medium pixel-title">Social Media</h3>
-                            <Button variant="ghost" size="sm" onClick={addSocialLink} className="h-6 w-6 p-0 opacity-0 group-hover/section:opacity-100 transition-opacity">
+                            <Button variant="ghost" size="sm" onClick={addSocialLink} className="h-8 w-8 p-0 opacity-70 group-hover/section:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                                 <Plus className="w-4 h-4" />
                             </Button>
                         </div>
@@ -422,7 +422,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
 
             {/* Map URL Section */}
             < AnimatedSection variant="fadeIn" delay={0.4} className="group relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors" >
-                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                     <Settings2 className="w-4 h-4 text-muted-foreground" />
                 </div>
                 <h3 className="text-lg font-bold mb-2 pixel-title">Map Embed URL</h3>

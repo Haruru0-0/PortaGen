@@ -22,7 +22,7 @@ function PrivacyPolicyContent() {
     }
 
     return (
-        <div className="min-h-screen relative flex items-center justify-center p-4">
+        <div className="min-h-screen relative flex items-center justify-center p-4 readable">
             <PixelClouds/>
             <div className="fixed bottom-0 left-0 right-0 h-48 z-0">
                 <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-[#8B5CF6] to-[#EC4899]"/>
@@ -46,12 +46,12 @@ function PrivacyPolicyContent() {
                     <div className="space-y-6">
                         <div className="text-center">
                             <h1 className="text-2xl pixel-text-shadow">PRIVACY POLICY</h1>
-                            <p className="text-xs text-muted-foreground mt-2">
+                            <p className="font-dialogue text-sm text-muted-foreground mt-2">
                                 Last updated: January 14, 2026
                             </p>
                         </div>
 
-                        <div className="text-xs space-y-4 text-left p-4 border-2 border-border bg-input/50">
+                        <div className="font-dialogue text-base leading-relaxed space-y-4 text-left p-4 border-2 border-border bg-input/50 [&_p]:max-w-[68ch] [&_li]:max-w-[68ch]">
                             <h2 className="font-bold text-sm">1. Introduction</h2>
                             <p>
                                 Welcome to PortaGen. We are committed to protecting your

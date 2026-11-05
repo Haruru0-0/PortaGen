@@ -28,7 +28,7 @@ export default function EditorPage() {
                                 <p className="text-[10px] font-bold">
                                     GOOGLE DRIVE NOT CONNECTED
                                 </p>
-                                <p className="text-[8px] text-muted-foreground">
+                                <p className="font-dialogue text-sm text-muted-foreground">
                                     Connect your Google Drive to upload and manage assets
                                 </p>
                             </div>

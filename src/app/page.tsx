@@ -91,7 +91,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen readable">
       {/* Navbar */}
       <nav className="relative z-20 border-b-4 border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -227,9 +227,9 @@ export default function LandingPage() {
             PORTFOLIO
           </h1>
 
-          <p className="text-xs md:text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            CREATE YOUR PIXEL-PERFECT PORTFOLIO WITH CUSTOM WALLPAPERS, ICONS,
-            AND MUSIC. BUILD A DESKTOP EXPERIENCE THAT STANDS OUT.
+          <p className="font-dialogue text-base md:text-xl text-foreground max-w-2xl mx-auto leading-relaxed">
+            Create your pixel-perfect portfolio with custom wallpapers, icons
+            and music. Build a desktop experience that stands out.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -301,7 +301,7 @@ export default function LandingPage() {
                   <h3 className="text-sm pixel-text-shadow">
                     CUSTOM WALLPAPERS
                   </h3>
-                  <p className="text-[10px] text-muted-foreground leading-relaxed">
+                  <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
                     UPLOAD YOUR OWN BACKGROUNDS OR CHOOSE FROM OUR PIXEL ART
                     LIBRARY
                   </p>
@@ -327,7 +327,7 @@ export default function LandingPage() {
                     </svg>
                   </div>
                   <h3 className="text-sm pixel-text-shadow">DESKTOP ICONS</h3>
-                  <p className="text-[10px] text-muted-foreground leading-relaxed">
+                  <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
                     DRAG AND DROP ICONS TO CREATE YOUR PERFECT DESKTOP LAYOUT
                   </p>
                 </div>
@@ -369,7 +369,7 @@ export default function LandingPage() {
                     </svg>
                   </div>
                   <h3 className="text-sm pixel-text-shadow">EMBEDDED MUSIC</h3>
-                  <p className="text-[10px] text-muted-foreground leading-relaxed">
+                  <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
                     ADD SPOTIFY TRACKS OR UPLOAD YOUR OWN CHIPTUNE SOUNDTRACK
                   </p>
                 </div>
@@ -411,7 +411,7 @@ export default function LandingPage() {
                     {item.step}
                   </div>
                   <h3 className="text-sm pixel-text-shadow">{item.title}</h3>
-                  <p className="text-[10px] text-muted-foreground leading-relaxed">
+                  <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
                     {item.desc}
                   </p>
                 </PixelCard>
@@ -467,7 +467,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div className="space-y-3">
               <h3 className="text-sm pixel-text-shadow">AETHER PORTFOLIO</h3>
-              <p className="text-[10px] text-muted-foreground leading-relaxed">
+              <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
                 CREATE PIXEL-PERFECT PORTFOLIOS WITH RETRO STYLE
               </p>
             </div>
@@ -522,7 +522,7 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-          <div className="text-center text-[10px] text-muted-foreground border-t-2 border-border pt-6">
+          <div className="font-dialogue text-center text-sm text-muted-foreground border-t-2 border-border pt-6">
             © 2025 AETHER PORTFOLIO. ALL RIGHTS RESERVED.
           </div>
         </div>

@@ -180,7 +180,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
             <AnimatedSection variant="stagger" delay={0.1} staggerChildren={0.15} className="group/section relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-2xl font-bold pixel-title border-b-2 border-[var(--cute-text)] inline-block">Education</h2>
-                    <Button variant="ghost" size="sm" onClick={addEducation} className="h-6 w-6 p-0 opacity-0 group-hover/section:opacity-100 transition-opacity">
+                    <Button variant="ghost" size="sm" onClick={addEducation} className="h-8 w-8 p-0 opacity-70 group-hover/section:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                         <Plus className="w-4 h-4" />
                     </Button>
                 </div>
@@ -188,7 +188,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                     {(data.education || []).map((edu, index) => (
                         <AnimatedItem key={index}>
                             <Card className="pixel-card border-0 relative group">
-                                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10">
                                     <Button variant="ghost" size="sm" onClick={() => removeEducation(index)} className="h-6 w-6 p-0 text-red-500">
                                         <Trash2 className="w-3 h-3" />
                                     </Button>
@@ -233,7 +233,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
             <AnimatedSection variant="stagger" delay={0.2} staggerChildren={0.15} className="group/section relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-2xl font-bold pixel-title border-b-2 border-[var(--cute-text)] inline-block">Work Experience</h2>
-                    <Button variant="ghost" size="sm" onClick={addExperience} className="h-6 w-6 p-0 opacity-0 group-hover/section:opacity-100 transition-opacity">
+                    <Button variant="ghost" size="sm" onClick={addExperience} className="h-8 w-8 p-0 opacity-70 group-hover/section:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                         <Plus className="w-4 h-4" />
                     </Button>
                 </div>
@@ -241,7 +241,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                     {(data.experience || []).map((exp, index) => (
                         <AnimatedItem key={index}>
                             <Card className="pixel-card border-0 relative group">
-                                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10">
                                     <Button variant="ghost" size="sm" onClick={() => removeExperience(index)} className="h-6 w-6 p-0 text-red-500">
                                         <Trash2 className="w-3 h-3" />
                                     </Button>
@@ -273,7 +273,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                                         {exp.achievements.map((achievement, i) => (
                                             <li key={i} className="text-sm opacity-70 flex items-start group/li">
                                                 <span className="flex-1">{achievement}</span>
-                                                <button onClick={() => removeAchievement(index, i)} className="opacity-0 group-hover/li:opacity-100 text-red-500 ml-2">
+                                                <button onClick={() => removeAchievement(index, i)} className="opacity-70 group-hover/li:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 text-red-500 ml-2">
                                                     <X className="w-3 h-3" />
                                                 </button>
                                             </li>
@@ -302,7 +302,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
             <AnimatedSection variant="stagger" delay={0.25} staggerChildren={0.15} className="group/section relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-2xl font-bold pixel-title border-b-2 border-[var(--cute-text)] inline-block">Leadership Experience</h2>
-                    <Button variant="ghost" size="sm" onClick={addLeadership} className="h-6 w-6 p-0 opacity-0 group-hover/section:opacity-100 transition-opacity">
+                    <Button variant="ghost" size="sm" onClick={addLeadership} className="h-8 w-8 p-0 opacity-70 group-hover/section:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                         <Plus className="w-4 h-4" />
                     </Button>
                 </div>
@@ -310,7 +310,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                     {(data.leadership || []).map((lead, index) => (
                         <AnimatedItem key={index}>
                             <Card className="pixel-card border-0 relative group">
-                                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10">
                                     <Button variant="ghost" size="sm" onClick={() => removeLeadership(index)} className="h-6 w-6 p-0 text-red-500">
                                         <Trash2 className="w-3 h-3" />
                                     </Button>
@@ -342,7 +342,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                                         {lead.achievements.map((achievement, i) => (
                                             <li key={i} className="text-sm opacity-70 flex items-start group/li">
                                                 <span className="flex-1">{achievement}</span>
-                                                <button onClick={() => removeLeadershipAchievement(index, i)} className="opacity-0 group-hover/li:opacity-100 text-red-500 ml-2">
+                                                <button onClick={() => removeLeadershipAchievement(index, i)} className="opacity-70 group-hover/li:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 text-red-500 ml-2">
                                                     <X className="w-3 h-3" />
                                                 </button>
                                             </li>
@@ -371,7 +371,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
             <AnimatedSection variant="stagger" delay={0.3} staggerChildren={0.1} className="group/section relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-2xl font-bold pixel-title border-b-2 border-[var(--cute-text)] inline-block">Skills</h2>
-                    <Button variant="ghost" size="sm" onClick={addSkillCategory} className="h-6 w-6 p-0 opacity-0 group-hover/section:opacity-100 transition-opacity">
+                    <Button variant="ghost" size="sm" onClick={addSkillCategory} className="h-8 w-8 p-0 opacity-70 group-hover/section:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                         <Plus className="w-4 h-4" />
                     </Button>
                 </div>
@@ -379,7 +379,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                     {(data.skills || []).map((category, index) => (
                         <AnimatedItem key={index}>
                             <Card className="h-full pixel-card border-0 relative group">
-                                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10">
                                     <Button variant="ghost" size="sm" onClick={() => removeSkillCategory(index)} className="h-6 w-6 p-0 text-red-500">
                                         <Trash2 className="w-3 h-3" />
                                     </Button>
@@ -434,7 +434,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                                 <li key={index} className="flex items-center group/li">
                                     <div className="mr-2 h-2 w-2 rounded-none bg-[var(--cute-text)]"></div>
                                     <span className="pixel-text flex-1">{interest}</span>
-                                    <button onClick={() => removeInterest(index)} className="opacity-0 group-hover/li:opacity-100 text-red-500">
+                                    <button onClick={() => removeInterest(index)} className="opacity-70 group-hover/li:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 text-red-500">
                                         <X className="w-3 h-3" />
                                     </button>
                                 </li>

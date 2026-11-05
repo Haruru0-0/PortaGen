@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Press_Start_2P } from "next/font/google"
+import { Press_Start_2P, Pixelify_Sans } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
@@ -10,6 +10,12 @@ const pressStart2P = Press_Start_2P({
     weight: "400",
     subsets: ["latin"],
     variable: "--font-pixel",
+})
+
+const pixelifyDialogue = Pixelify_Sans({
+    subsets: ["latin"],
+    variable: "--font-dialogue",
+    display: "swap",
 })
 
 export const metadata: Metadata = {
@@ -28,7 +34,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning>
-            <body className={`${pressStart2P.className} font-sans antialiased`}>
+            <body className={`${pressStart2P.className} ${pixelifyDialogue.variable} font-sans antialiased`}>
                 <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
                     {children}
                     <Toaster />

@@ -89,7 +89,7 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
         <div className="space-y-8 max-w-3xl mx-auto pixel-text relative">
             {/* Header Section */}
             <AnimatedSection variant="scale" duration={0.7} className="text-center group relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
-                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                     <Settings2 className="w-4 h-4 text-muted-foreground" />
                 </div>
                 <Input
@@ -125,7 +125,7 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
                                                 {getIcon(link.icon)}
                                                 <span className="ml-2 truncate">{link.name || link.platform}</span>
                                             </Button>
-                                            <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                            <div className="absolute -top-2 -right-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10">
                                                 <div className="bg-background border border-border rounded-full p-1 shadow-sm">
                                                     <Settings2 className="w-3 h-3" />
                                                 </div>
@@ -207,7 +207,7 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
                                                 {getIcon(link.icon)}
                                                 <span className="ml-2 truncate">{link.name || link.platform}</span>
                                             </Button>
-                                            <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                            <div className="absolute -top-2 -right-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10">
                                                 <div className="bg-background border border-border rounded-full p-1 shadow-sm">
                                                     <Settings2 className="w-3 h-3" />
                                                 </div>
@@ -300,7 +300,7 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
                         <AnimatedItem key={index}>
                             <Card className="h-full hover:shadow-md transition-shadow pixel-card border-0 relative group">
                                 <CardContent className="p-4">
-                                    <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex gap-1">
+                                    <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10 flex gap-1">
                                         {isDesktop ? (
                                             <Dialog>
                                                 <DialogTrigger asChild>

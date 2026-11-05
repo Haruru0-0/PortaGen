@@ -189,7 +189,7 @@ export default function SignUpPage() {
   // OTP Verification View
   if (verifying) {
     return (
-      <div className="min-h-screen relative flex items-center justify-center p-4">
+      <div className="min-h-screen relative flex items-center justify-center p-4 readable">
         <PixelClouds />
 
         <div className="fixed bottom-0 left-0 right-0 h-48 z-0">
@@ -217,7 +217,7 @@ export default function SignUpPage() {
                   <PixelCharacter color="#8B5CF6" size={60} />
                 </div>
                 <h1 className="text-xl pixel-text-shadow">VERIFY EMAIL</h1>
-                <p className="text-xs text-muted-foreground leading-relaxed uppercase">
+                <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
                   Check your email for a verification link.
                 </p>
               </div>
@@ -238,7 +238,7 @@ export default function SignUpPage() {
                 </div>
 
                 <div className="text-center space-y-4">
-                  <p className="text-[9px] text-muted-foreground uppercase">
+                  <p className="font-dialogue text-sm text-muted-foreground">
                     Didn't receive an email? Check your spam folder or try again later.
                   </p>
 
@@ -273,7 +273,7 @@ export default function SignUpPage() {
 
   // Signup Form View
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4">
+    <div className="min-h-screen relative flex items-center justify-center p-4 readable">
       <PixelClouds />
 
       <div className="fixed bottom-0 left-0 right-0 h-48 z-0">
@@ -301,7 +301,7 @@ export default function SignUpPage() {
                 <PixelCharacter color="#8B5CF6" size={60} />
               </div>
               <h1 className="text-xl pixel-text-shadow">SIGN UP</h1>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
                 CREATE YOUR PIXEL PORTFOLIO
               </p>
             </div>
@@ -322,7 +322,7 @@ export default function SignUpPage() {
                     {...form.register("firstName")}
                   />
                   {form.formState.errors.firstName && (
-                    <p className="text-red-500 text-[10px] mt-1">
+                    <p className="font-dialogue text-red-700 dark:text-red-400 text-sm mt-1">
                       {form.formState.errors.firstName.message}
                     </p>
                   )}
@@ -336,7 +336,7 @@ export default function SignUpPage() {
                     {...form.register("lastName")}
                   />
                   {form.formState.errors.lastName && (
-                    <p className="text-red-500 text-[10px] mt-1">
+                    <p className="font-dialogue text-red-700 dark:text-red-400 text-sm mt-1">
                       {form.formState.errors.lastName.message}
                     </p>
                   )}
@@ -351,7 +351,7 @@ export default function SignUpPage() {
                   {...form.register("username")}
                 />
                 {form.formState.errors.username && (
-                  <p className="text-red-500 text-[10px] mt-1">
+                  <p className="font-dialogue text-red-700 dark:text-red-400 text-sm mt-1">
                     {form.formState.errors.username.message}
                   </p>
                 )}
@@ -365,7 +365,7 @@ export default function SignUpPage() {
                   {...form.register("email")}
                 />
                 {form.formState.errors.email && (
-                  <p className="text-red-500 text-[10px] mt-1">
+                  <p className="font-dialogue text-red-700 dark:text-red-400 text-sm mt-1">
                     {form.formState.errors.email.message}
                   </p>
                 )}
@@ -380,7 +380,7 @@ export default function SignUpPage() {
                     onChange={handlePasswordChange}
                   />
                   {form.formState.errors.password && (
-                    <p className="text-red-500 text-[10px] mt-1">
+                    <p className="font-dialogue text-red-700 dark:text-red-400 text-sm mt-1">
                       {form.formState.errors.password.message}
                     </p>
                   )}
@@ -398,7 +398,7 @@ export default function SignUpPage() {
                           />
                         ))}
                       </div>
-                      <p className="text-[10px] text-muted-foreground">
+                      <p className="font-dialogue text-sm text-muted-foreground">
                         STRENGTH: {getStrengthText()}
                       </p>
                     </div>
@@ -412,13 +412,13 @@ export default function SignUpPage() {
                     {...form.register("confirmPassword")}
                   />
                   {form.formState.errors.confirmPassword && (
-                    <p className="text-red-500 text-[10px] mt-1">
+                    <p className="font-dialogue text-red-700 dark:text-red-400 text-sm mt-1">
                       {form.formState.errors.confirmPassword.message}
                     </p>
                   )}
                 </div>
               </div>
-              <div className="text-center text-[10px] text-muted-foreground leading-relaxed">
+              <div className="font-dialogue text-center text-sm text-muted-foreground leading-relaxed">
                 By creating an account, you agree to our{" "}
                 <Link href="/privacy?from=Signup" className="text-primary hover:underline">
                   Privacy Policy
@@ -469,7 +469,7 @@ export default function SignUpPage() {
               </div>
             </div>
 
-            <p className="text-center text-[10px] text-muted-foreground leading-relaxed">
+            <p className="font-dialogue text-center text-sm text-muted-foreground leading-relaxed">
               ALREADY HAVE AN ACCOUNT?{" "}
               <Link href="/auth/login" className="text-primary hover:underline">
                 LOG IN

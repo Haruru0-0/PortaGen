@@ -65,7 +65,7 @@ export function PortfolioUrlShare() {
         <h3 className="font-bold text-lg">Share Your Portfolio</h3>
       </div>
 
-      <p className="text-sm text-muted-foreground mb-4">
+      <p className="font-dialogue text-base text-muted-foreground mb-4">
         Your portfolio is live! Share this link with others to showcase your work.
       </p>
 

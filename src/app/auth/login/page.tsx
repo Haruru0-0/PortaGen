@@ -92,7 +92,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4">
+    <div className="min-h-screen relative flex items-center justify-center p-4 readable">
       <PixelClouds />
 
       {/* Pixel cityscape background */}
@@ -122,7 +122,7 @@ export default function LoginPage() {
                 <PixelCharacter color="#EC4899" size={60} />
               </div>
               <h1 className="text-xl pixel-text-shadow">LOG IN</h1>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
                 WELCOME BACK, PLAYER!
               </p>
             </div>
@@ -144,7 +144,7 @@ export default function LoginPage() {
                   {...form.register("identifier")}
                 />
                 {form.formState.errors.identifier && (
-                  <p className="text-red-500 text-[10px] mt-1">
+                  <p className="font-dialogue text-red-700 dark:text-red-400 text-sm mt-1">
                     {form.formState.errors.identifier.message}
                   </p>
                 )}
@@ -157,7 +157,7 @@ export default function LoginPage() {
                   {...form.register("password")}
                 />
                 {form.formState.errors.password && (
-                  <p className="text-red-500 text-[10px] mt-1">
+                  <p className="font-dialogue text-red-700 dark:text-red-400 text-sm mt-1">
                     {form.formState.errors.password.message}
                   </p>
                 )}
@@ -218,7 +218,7 @@ export default function LoginPage() {
             </div>
 
             {/* Sign Up Link */}
-            <p className="text-center text-[10px] text-muted-foreground leading-relaxed">
+            <p className="font-dialogue text-center text-sm text-muted-foreground leading-relaxed">
               NEW PLAYER?{" "}
               <Link href="/auth/signup" className="text-primary hover:underline">
                 CREATE ACCOUNT
