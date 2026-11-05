@@ -66,7 +66,7 @@ export const TabsNavigation = () => {
             {activeCategory === "lockScreen" ? "LOCK SCREEN" : "HOME SCREEN"}
           </h3>
 
-          <div className="space-y-2">
+          <div role="tablist" aria-label="Editor sections" className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">
             {activeCategory === "lockScreen"
               ? lockScreenTabs.map((tab, index) => (
                 <button
@@ -74,8 +74,10 @@ export const TabsNavigation = () => {
                   ref={(el) => {
                     if (el) tabsRef.current[index] = el;
                   }}
+                  role="tab"
+                  aria-selected={activeLockScreenTab === tab.id}
                   onClick={() => handleTabChange(tab.id as LockScreenTab)}
-                  className={`w-full cursor-pointer text-left px-4 py-3 text-[10px] border-2 border-border transition-colors ${activeLockScreenTab === tab.id
+                  className={`lg:w-full shrink-0 whitespace-nowrap min-h-11 cursor-pointer text-left px-4 py-3 text-[10px] border-2 border-border transition-colors ${activeLockScreenTab === tab.id
                     ? "bg-primary text-primary-foreground"
                     : "bg-card hover:bg-muted"
                     }`}
@@ -89,8 +91,10 @@ export const TabsNavigation = () => {
                   ref={(el) => {
                     if (el) tabsRef.current[index] = el;
                   }}
+                  role="tab"
+                  aria-selected={activeHomeScreenTab === tab.id}
                   onClick={() => handleTabChange(tab.id as HomeScreenTab)}
-                  className={`w-full cursor-pointer text-left px-4 py-3 text-[10px] border-2 border-border transition-colors ${activeHomeScreenTab === tab.id
+                  className={`lg:w-full shrink-0 whitespace-nowrap min-h-11 cursor-pointer text-left px-4 py-3 text-[10px] border-2 border-border transition-colors ${activeHomeScreenTab === tab.id
                     ? "bg-primary text-primary-foreground"
                     : "bg-card hover:bg-muted"
                     }`}

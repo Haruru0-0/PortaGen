@@ -37,9 +37,9 @@ type PasswordFormValues = z.infer<typeof passwordSchema>
 function SettingsContent() {
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState({
-    username: "PLAYER_ONE",
-    email: "player@example.com",
-    bio: "PIXEL ART ENTHUSIAST",
+    username: "",
+    email: "",
+    bio: "",
   })
   const supabase = createClient()
 
@@ -54,8 +54,8 @@ function SettingsContent() {
           if (res.ok) {
             const data = await res.json()
             setProfile({
-              username: data.username || user.user_metadata?.username || user.email?.split('@')[0] || "PLAYER_ONE",
-              email: data.email || user.email || "player@example.com",
+              username: data.username || user.user_metadata?.username || user.email?.split('@')[0] || "",
+              email: data.email || user.email || "",
               bio: "PIXEL ART ENTHUSIAST", // We can refine this later if needed
             })
           }
@@ -231,7 +231,7 @@ function SettingsContent() {
 
   return (
     <>
-      <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
+      <div className="max-w-5xl mx-auto space-y-6 md:space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h2 className="text-lg pixel-text-shadow mb-2">SETTINGS</h2>
@@ -240,7 +240,7 @@ function SettingsContent() {
         </div>
         {message && (
           <div className={`p-3 border-2 text-[10px] text-center ${message.includes('Error')
-            ? 'bg-red-500/20 border-red-500 text-red-500'
+            ? 'bg-red-500/20 border-red-700 text-red-700 dark:text-red-300'
             : 'bg-green-500/20 border-green-500 text-green-500'
             }`}>
             {message}
@@ -293,8 +293,8 @@ function SettingsContent() {
                   onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                   disabled
                 />
-                <p className="text-[8px] text-muted-foreground">
-                  EMAIL CANNOT BE CHANGED HERE. CONTACT SUPPORT.
+                <p className="font-dialogue text-sm text-muted-foreground">
+                  Your email cannot be changed here.
                 </p>
               </div>
             </div>
@@ -384,7 +384,7 @@ function SettingsContent() {
             <h3 className="text-sm pixel-text-shadow">CHANGE PASSWORD</h3>
 
             {passwordError && (
-              <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 text-[10px] text-center">
+              <div role="alert" className="p-3 bg-red-500/20 border-2 border-red-700 text-red-700 dark:text-red-300 font-dialogue text-sm text-center">
                 {passwordError}
               </div>
             )}
@@ -400,11 +400,11 @@ function SettingsContent() {
                 <PixelInput
                   label="CURRENT PASSWORD"
                   type="password"
-                  placeholder="********"
+                  autoComplete="current-password"
                   {...passwordForm.register("currentPassword")}
                 />
                 {passwordForm.formState.errors.currentPassword && (
-                  <p className="text-red-500 text-[10px] mt-1">
+                  <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
                     {passwordForm.formState.errors.currentPassword.message}
                   </p>
                 )}
@@ -414,11 +414,11 @@ function SettingsContent() {
                 <PixelInput
                   label="NEW PASSWORD"
                   type="password"
-                  placeholder="********"
+                  autoComplete="new-password"
                   {...passwordForm.register("newPassword")}
                 />
                 {passwordForm.formState.errors.newPassword && (
-                  <p className="text-red-500 text-[10px] mt-1">
+                  <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
                     {passwordForm.formState.errors.newPassword.message}
                   </p>
                 )}
@@ -428,11 +428,11 @@ function SettingsContent() {
                 <PixelInput
                   label="CONFIRM NEW PASSWORD"
                   type="password"
-                  placeholder="********"
+                  autoComplete="new-password"
                   {...passwordForm.register("confirmPassword")}
                 />
                 {passwordForm.formState.errors.confirmPassword && (
-                  <p className="text-red-500 text-[10px] mt-1">
+                  <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
                     {passwordForm.formState.errors.confirmPassword.message}
                   </p>
                 )}
@@ -453,15 +453,15 @@ function SettingsContent() {
         </PixelCard>
 
         {/* Danger Zone */}
-        <PixelCard className="border-destructive">
+        <PixelCard className="border-red-700">
           <div className="space-y-4">
-            <h3 className="text-sm pixel-text-shadow text-destructive">DANGER ZONE</h3>
+            <h3 className="text-sm pixel-text-shadow text-red-700 dark:text-red-300">DANGER ZONE</h3>
             <p className="text-[10px] text-muted-foreground leading-relaxed">
               ONCE YOU DELETE YOUR ACCOUNT, THERE IS NO GOING BACK. PLEASE BE CERTAIN.
             </p>
             <PixelButton
               variant="primary"
-              className="bg-destructive border-destructive w-full sm:w-auto"
+              className="bg-red-700 border-red-700 text-white w-full sm:w-auto"
               onClick={() => setShowDeleteAccount(true)}
             >
               DELETE ACCOUNT

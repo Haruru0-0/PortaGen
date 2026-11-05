@@ -75,14 +75,17 @@ export function UserDropdown() {
   }
 
   // Get user data from Supabase
-  const displayName = dbUsername || user?.user_metadata?.username || user?.user_metadata?.full_name || user?.email?.split('@')[0] || "PLAYER"
-  const displayEmail = user?.email || "player@example.com"
+  const displayName = dbUsername || user?.user_metadata?.username || user?.user_metadata?.full_name || user?.email?.split('@')[0] || (user ? "ACCOUNT" : "…")
+  const displayEmail = user?.email || ""
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-3 px-3 py-2 border-2 border-border bg-card hover:bg-muted transition-colors rounded-none"
+        aria-label="Account menu"
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
       >
         {avatarUrl ? (
           <img src={avatarUrl} alt="Avatar" className="w-8 h-8 object-cover border-2 border-border" />

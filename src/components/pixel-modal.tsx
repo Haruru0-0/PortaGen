@@ -31,14 +31,15 @@ export function PixelModal({ isOpen, onClose, title, children }: PixelModalProps
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent
-          className="bg-card border-4 border-border shadow-pixel max-w-lg w-full max-h-[90vh] overflow-y-auto p-0"
+          className="bg-card border-4 border-border shadow-pixel max-w-lg w-full max-h-[90vh] overflow-y-auto p-0 readable"
           showCloseButton={false}
         >
           <DialogHeader className="sticky top-0 bg-primary text-primary-foreground px-4 py-3 flex flex-row items-center justify-between border-b-4 border-border z-50 space-y-0">
             <DialogTitle className="text-sm dashboard-pixel-text-shadow">{title}</DialogTitle>
             <button
               onClick={onClose}
-              className="w-6 h-6 border-2 border-primary-foreground hover:bg-primary-foreground hover:text-primary transition-colors flex items-center justify-center"
+              className="w-8 h-8 border-2 border-primary-foreground hover:bg-primary-foreground hover:text-primary transition-colors flex items-center justify-center"
+              aria-label="Close"
             >
               <X className="w-4 h-4" />
             </button>
@@ -51,7 +52,17 @@ export function PixelModal({ isOpen, onClose, title, children }: PixelModalProps
 
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
-      <DrawerContent className="bg-card border-4 border-t-border border-x-0 border-b-0 max-h-[90vh]">
+      <DrawerContent className="bg-card border-4 border-t-border border-x-0 border-b-0 max-h-[90vh] readable">
+        <div className="flex items-center justify-between bg-primary text-primary-foreground px-4 py-3 border-b-4 border-border">
+          <DrawerTitle className="text-sm dashboard-pixel-text-shadow">{title}</DrawerTitle>
+          <button
+            onClick={onClose}
+            className="w-10 h-10 border-2 border-primary-foreground hover:bg-primary-foreground hover:text-primary transition-colors flex items-center justify-center"
+            aria-label="Close"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
         <div className="p-6 overflow-y-auto">{children}</div>
       </DrawerContent>
     </Drawer>

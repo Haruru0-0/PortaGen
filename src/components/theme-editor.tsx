@@ -98,8 +98,12 @@ export function ThemeEditor() {
   return (
     <div className="space-y-4">
       {/* Theme Presets */}
-      <div className="space-y-3">
-        <h4 className="text-[10px] pixel-text-shadow">THEME PRESETS</h4>
+      <details open className="group space-y-3">
+        <summary className="cursor-pointer list-none flex items-center justify-between min-h-11 text-[10px] pixel-text-shadow [&::-webkit-details-marker]:hidden">
+          THEME PRESETS
+          <span aria-hidden="true" className="group-open:hidden">+</span>
+          <span aria-hidden="true" className="hidden group-open:inline">−</span>
+        </summary>
         <div className="grid grid-cols-1 gap-2">
           {THEME_PRESETS.map((preset, index) => (
             <button
@@ -124,11 +128,15 @@ export function ThemeEditor() {
             </button>
           ))}
         </div>
-      </div>
+      </details>
 
       {/* Custom Colors */}
-      <div className="space-y-3">
-        <h4 className="text-[10px] pixel-text-shadow">CUSTOM COLORS</h4>
+      <details className="group space-y-3">
+        <summary className="cursor-pointer list-none flex items-center justify-between min-h-11 text-[10px] pixel-text-shadow [&::-webkit-details-marker]:hidden">
+          CUSTOM COLORS
+          <span aria-hidden="true" className="group-open:hidden">+</span>
+          <span aria-hidden="true" className="hidden group-open:inline">−</span>
+        </summary>
         {Object.entries(customTheme.colors).map(([key, value]) => (
           <div key={key} className="space-y-1">
             <label className="text-[8px] uppercase">{key}</label>
@@ -147,7 +155,7 @@ export function ThemeEditor() {
             </div>
           </div>
         ))}
-      </div>
+      </details>
 
       {/* Font */}
       <div className="space-y-2">

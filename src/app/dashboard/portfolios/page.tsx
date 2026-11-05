@@ -53,10 +53,10 @@ export default function PortfoliosPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-4">
+    <div className="max-w-5xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-base font-bold">Your Portfolios</h1>
-        <PixelButton className="text-[10px]" onClick={() => setIsCreateOpen(true)}>NEW PORTFOLIO</PixelButton>
+        <h2 className="text-lg pixel-text-shadow">YOUR PORTFOLIOS</h2>
+        <PixelButton className="text-[10px] w-full sm:w-auto" onClick={() => setIsCreateOpen(true)}>NEW PORTFOLIO</PixelButton>
       </div>
       {loadingList ? (
         <PixelCard>
@@ -85,17 +85,14 @@ export default function PortfoliosPage() {
                 <div className="absolute top-2 left-2">
                   <PixelCharacter color="#8B5CF6" size={20} />
                 </div>
-                <div className="absolute bottom-2 right-2 text-[8px] text-white pixel-text-shadow">
-                  ID {p.id}
-                </div>
               </div>
               <div className="space-y-1">
                 <h3 className="text-sm pixel-text-shadow truncate">{p.portfolioName}</h3>
                 <p className="text-[10px] pixel-text-shadow truncate">{p.bio}</p>
               </div>
               <div className="mt-auto flex gap-2">
-                <PixelButton variant="secondary" className="text-[10px] flex-1" onClick={() => router.push(`/dashboard/editor/${p.id}`)}>EDIT</PixelButton>
-                <PixelButton className="text-[10px] flex-1" onClick={() => setDeleteTarget({ id: p.id, name: p.portfolioName })}>DELETE</PixelButton>
+                <PixelButton variant="primary" className="text-[10px] flex-1" onClick={() => router.push(`/dashboard/editor/${p.id}`)}>EDIT</PixelButton>
+                <PixelButton variant="secondary" className="text-[10px] flex-1 bg-card text-red-700 border-red-700 hover:bg-red-700 hover:text-white dark:text-red-300 dark:border-red-300" onClick={() => setDeleteTarget({ id: p.id, name: p.portfolioName })}>DELETE</PixelButton>
               </div>
             </PixelCard>
           ))}

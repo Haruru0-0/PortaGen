@@ -1,4 +1,4 @@
-import { Suspense, useRef, useState } from "react"
+import { Suspense, useEffect, useRef, useState } from "react"
 import { PixelCard } from "@/components/pixel-card"
 import { Monitor, Smartphone, Lock, Unlock, Maximize2, Minimize2 } from "lucide-react"
 import { LockScreen } from "@/components/portfolio/lock-screen"
@@ -15,7 +15,9 @@ export function PreviewPanel() {
     const [isFullScreen, setIsFullScreen] = useState(false)
     const stageContainerRef = useRef<HTMLDivElement>(null)
     const { width: containerWidth } = useResizeObserver(stageContainerRef)
-    const isNarrow = (containerWidth || 0) < 738
+    const measured = (containerWidth || 0) > 0
+    // Until the stage has been measured we do not know yet, so show a quiet placeholder instead of the "larger screens" message
+    const isNarrow = measured && (containerWidth || 0) < 738
     const {
         previewMode,
         setPreviewMode,
@@ -25,6 +27,12 @@ export function PreviewPanel() {
         setIsLocked
     } = useLockScreenStore()
     const font = useThemeStore((state) => state.font)
+
+    // On a phone the desktop preview cannot fit, so start in the mobile view
+    useEffect(() => {
+        if (window.innerWidth < 768) setPreviewMode("mobile")
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     // Get the font class based on the selected font name
     const selectedFont = PORTFOLIO_FONTS.find((f) => f.name === font)
@@ -42,6 +50,7 @@ export function PreviewPanel() {
                             <div className="flex items-center gap-1">
                                 <button
                                     onClick={() => setPreviewMode("desktop")}
+                                    aria-pressed={previewMode === "desktop"}
                                     className={`px-3 py-2 text-[10px] border-2 border-border flex items-center gap-1 ${previewMode === "desktop"
                                         ? "bg-primary text-primary-foreground"
                                         : "bg-card hover:bg-muted"
@@ -54,6 +63,7 @@ export function PreviewPanel() {
                                 </button>
                                 <button
                                     onClick={() => setPreviewMode("mobile")}
+                                    aria-pressed={previewMode === "mobile"}
                                     className={`px-3 py-2 text-[10px] border-2 border-border flex items-center gap-1 ${previewMode === "mobile"
                                         ? "bg-primary text-primary-foreground"
                                         : "bg-card hover:bg-muted"
@@ -125,7 +135,9 @@ export function PreviewPanel() {
                             </div>
                         ) : (
                             <div className="mx-auto w-full" style={{ aspectRatio: "16/9" }}>
-                                {isNarrow ? (
+                                {!measured ? (
+                                    <div className="w-full h-full bg-muted" aria-hidden="true" />
+                                ) : isNarrow ? (
                                     <div className="w-full h-full flex items-center justify-center p-4 text-center text-[10px] sm:text-xs">
                                         Desktop preview is available on larger screens. Switch to Mobile view or widen your window.
                                     </div>

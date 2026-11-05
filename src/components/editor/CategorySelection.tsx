@@ -14,6 +14,7 @@ export const CategorySelection = () => {
         <div className="grid grid-cols-2 gap-4">
           <button
             onClick={() => setActiveCategory("lockScreen")}
+            aria-pressed={activeCategory === "lockScreen"}
             className={`flex cursor-pointer items-center justify-center gap-3 px-4 py-3 text-sm border-2 border-border transition-colors font-bold ${activeCategory === "lockScreen"
               ? "bg-primary text-primary-foreground"
               : "bg-card hover:bg-muted"
@@ -24,6 +25,7 @@ export const CategorySelection = () => {
           </button>
           <button
             onClick={() => setActiveCategory("homeScreen")}
+            aria-pressed={activeCategory === "homeScreen"}
             className={`flex cursor-pointer items-center justify-center gap-3 px-4 py-3 text-sm border-2 border-border transition-colors font-bold ${activeCategory === "homeScreen"
               ? "bg-primary text-primary-foreground"
               : "bg-card hover:bg-muted"

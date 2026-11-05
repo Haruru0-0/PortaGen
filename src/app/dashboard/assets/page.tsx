@@ -14,6 +14,7 @@ import Image from "next/image";
 import { Asset, AssetType } from "@/lib/types";
 import AssetCard from "@/components/asset-card";
 import { toast } from "sonner";
+import { PixelCharacter } from "@/components/pixel-character";
 
 // Available asset types for user selection
 const ASSET_TYPES = [
@@ -404,9 +405,9 @@ export default function AssetsPage() {
               <XCircle className="w-6 h-6 text-yellow-500" />
               <div>
                 <p className="text-[10px] font-bold">
-                  GOOGLE DRIVE NOT CONNECTED
+                  {driveLoading ? "CHECKING GOOGLE DRIVE..." : "GOOGLE DRIVE NOT CONNECTED"}
                 </p>
-                <p className="text-[8px] text-muted-foreground">
+                <p className="font-dialogue text-sm text-muted-foreground">
                   Connect your Google Drive to upload and manage assets
                 </p>
               </div>
@@ -418,7 +419,7 @@ export default function AssetsPage() {
               disabled={driveLoading}
             >
               <Cloud className="w-4 h-4" />
-              {driveLoading ? "CONNECTING..." : "CONNECT NOW"}
+              {driveLoading ? "CHECKING..." : "CONNECT NOW"}
             </PixelButton>
           </div>
         </PixelCard>
@@ -517,13 +518,29 @@ export default function AssetsPage() {
       {!loading && filteredAssets.length === 0 && (
         <PixelCard>
           <div className="text-center py-12 space-y-4">
-            <div className="text-4xl">🖼️</div>
+            <div className="flex justify-center">
+              <PixelCharacter color="#8B5CF6" size={48} />
+            </div>
             <h4 className="text-sm pixel-text-shadow">NO ASSETS FOUND</h4>
-            <p className="text-[10px] text-muted-foreground leading-relaxed">
+            <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
               {searchQuery
-                ? "TRY A DIFFERENT SEARCH TERM"
-                : "UPLOAD YOUR FIRST ASSET TO GET STARTED"}
+                ? "Try a different search term."
+                : connected
+                  ? "Upload your first asset to get started."
+                  : "Connect Google Drive, then upload your first asset."}
             </p>
+            {!searchQuery && (
+              connected ? (
+                <PixelButton className="text-[10px]" onClick={() => setIsUploadModalOpen(true)}>
+                  UPLOAD ASSETS
+                </PixelButton>
+              ) : (
+                <PixelButton className="text-[10px] inline-flex items-center gap-2" onClick={connectDrive} disabled={driveLoading}>
+                  <Cloud className="w-4 h-4" />
+                  {driveLoading ? "CHECKING DRIVE..." : "CONNECT GOOGLE DRIVE"}
+                </PixelButton>
+              )
+            )}
           </div>
         </PixelCard>
       )}

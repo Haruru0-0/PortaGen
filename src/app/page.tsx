@@ -20,11 +20,11 @@ export default function LandingPage() {
   const stepsRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLElement>(null);
   const [heroBuildings] = useState(() =>
-    Array.from({ length: 30 }, () => Math.random() * 50 + 30)
+    Array.from({ length: 30 }, (_, i) => 30 + ((i * 37 + 11) % 50))
   );
 
   const [ctaBuildings] = useState(() =>
-    Array.from({ length: 30 }, () => Math.random() * 50 + 30)
+    Array.from({ length: 30 }, (_, i) => 30 + ((i * 37 + 11) % 50))
   );
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -95,7 +95,7 @@ export default function LandingPage() {
       {/* Navbar */}
       <nav className="relative z-20 border-b-4 border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <Link href="/" aria-label="PortaGen home" className="flex items-center gap-3">
             <Image
               src={logo}
               alt="PortaGen"
@@ -110,8 +110,8 @@ export default function LandingPage() {
               height={40}
               className="h-8 w-8 sm:h-10 sm:w-10 dark:hidden"
             />
-            <h1 className="text-sm pixel-text-shadow">PortaGen</h1>
-          </div>
+            <span className="text-sm pixel-text-shadow">PortaGen</span>
+          </Link>
 
           {/* Desktop nav */}
           <div className="hidden md:flex gap-4">
@@ -129,26 +129,20 @@ export default function LandingPage() {
             </Link>
           </div>
           <div className="hidden md:flex gap-4">
-            <Link href="/auth/login">
-              <PixelButton
+            <PixelButton asChild
                 variant="secondary"
-                className="text-[10px] px-4 py-2"
-              >
-                LOG IN
-              </PixelButton>
-            </Link>
-            <Link href="/auth/signup">
-              <PixelButton variant="primary" className="text-[10px] px-4 py-2">
-                SIGN UP
-              </PixelButton>
-            </Link>
+                className="text-[10px] px-4 py-2"><Link href="/auth/login">LOG IN</Link></PixelButton>
+            <PixelButton asChild variant="primary" className="text-[10px] px-4 py-2"><Link href="/auth/signup">SIGN UP</Link></PixelButton>
           </div>
 
           {/* Mobile nav button */}
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 border-2 border-border rounded-md"
+              className="w-11 h-11 flex items-center justify-center border-2 border-border"
+              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-menu"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -171,33 +165,25 @@ export default function LandingPage() {
 
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t-4 border-border bg-card">
+          <div id="mobile-menu" className="md:hidden border-t-4 border-border bg-card">
             <div className="container mx-auto px-4 py-4 space-y-4">
               <Link
                 href="#features"
-                className="block text-sm hover:text-primary transition-colors"
+                className="block py-3 text-sm hover:text-primary transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Features
               </Link>
               <Link
                 href="#how-it-works"
-                className="block text-sm hover:text-primary transition-colors"
+                className="block py-3 text-sm hover:text-primary transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 How it Works
               </Link>
               <div className="flex gap-4 pt-4">
-                <Link href="/auth/login" className="w-full">
-                  <PixelButton variant="secondary" className="text-xs w-full">
-                    LOG IN
-                  </PixelButton>
-                </Link>
-                <Link href="/auth/signup" className="w-full">
-                  <PixelButton variant="primary" className="text-xs w-full">
-                    SIGN UP
-                  </PixelButton>
-                </Link>
+                <PixelButton asChild variant="secondary" className="w-full text-xs w-full"><Link href="/auth/login">LOG IN</Link></PixelButton>
+                <PixelButton asChild variant="primary" className="w-full text-xs w-full"><Link href="/auth/signup">SIGN UP</Link></PixelButton>
               </div>
             </div>
           </div>
@@ -222,9 +208,9 @@ export default function LandingPage() {
           </div>
 
           <h1 className="hero-title text-2xl md:text-4xl pixel-text-shadow leading-relaxed">
-            AETHER
+            PORTAGEN
             <br />
-            PORTFOLIO
+            PIXEL PORTFOLIOS
           </h1>
 
           <p className="font-dialogue text-base md:text-xl text-foreground max-w-2xl mx-auto leading-relaxed">
@@ -233,16 +219,8 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/auth/signup">
-              <PixelButton variant="primary" className="w-full sm:w-auto">
-                GET STARTED
-              </PixelButton>
-            </Link>
-            <Link href="#features">
-              <PixelButton variant="secondary" className="w-full sm:w-auto">
-                LEARN MORE
-              </PixelButton>
-            </Link>
+            <PixelButton asChild variant="primary" className="w-full sm:w-auto"><Link href="/auth/signup">GET STARTED</Link></PixelButton>
+            <PixelButton asChild variant="secondary" className="w-full sm:w-auto"><Link href="#features">LEARN MORE</Link></PixelButton>
           </div>
         </div>
 
@@ -435,11 +413,7 @@ export default function LandingPage() {
             YOUR PIXEL PORTFOLIO?
           </h2>
 
-          <Link href="/auth/signup">
-            <PixelButton variant="primary" className="text-sm">
-              START FOR FREE
-            </PixelButton>
-          </Link>
+          <PixelButton asChild variant="primary" className="text-sm"><Link href="/auth/signup">START FOR FREE</Link></PixelButton>
         </div>
 
         {/* Bottom cityscape */}
@@ -464,16 +438,16 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t-4 border-border bg-card py-8 px-4 relative z-10">
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div className="space-y-3">
-              <h3 className="text-sm pixel-text-shadow">AETHER PORTFOLIO</h3>
+              <h3 className="text-sm pixel-text-shadow">PORTAGEN</h3>
               <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
                 CREATE PIXEL-PERFECT PORTFOLIOS WITH RETRO STYLE
               </p>
             </div>
             <div className="space-y-3">
               <h3 className="text-[10px] pixel-text-shadow">QUICK LINKS</h3>
-              <div className="space-y-2 text-[10px]">
+              <div className="text-[10px] [&_a]:inline-block [&_a]:py-2">
                 <div>
                   <Link
                     href="/auth/signup"
@@ -508,22 +482,9 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-            <div className="space-y-3">
-              <h3 className="text-[10px] pixel-text-shadow">CONNECT</h3>
-              <div className="flex gap-3">
-                {["TW", "IG", "GH"].map((social) => (
-                  <div
-                    key={social}
-                    className="w-8 h-8 bg-primary flex items-center justify-center text-[8px]"
-                  >
-                    {social}
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
           <div className="font-dialogue text-center text-sm text-muted-foreground border-t-2 border-border pt-6">
-            © 2025 AETHER PORTFOLIO. ALL RIGHTS RESERVED.
+            © {new Date().getFullYear()} PORTAGEN. ALL RIGHTS RESERVED.
           </div>
         </div>
       </footer>

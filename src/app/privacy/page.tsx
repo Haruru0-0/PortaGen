@@ -33,7 +33,7 @@ function PrivacyPolicyContent() {
                             className="bg-[#6D28D9]"
                             style={{
                                 width: "40px",
-                                height: `${Math.random() * 60 + 40}px`,
+                                height: `${40 + ((i * 29 + 7) % 60)}px`,
                                 opacity: 0.8,
                             }}
                         />
@@ -44,15 +44,32 @@ function PrivacyPolicyContent() {
             <div className="relative z-10 w-full max-w-4xl">
                 <PixelCard>
                     <div className="space-y-6">
+                        <button
+                            onClick={handleBack}
+                            className="text-primary hover:underline text-xs py-2"
+                        >
+                            {getBackLabel()}
+                        </button>
                         <div className="text-center">
                             <h1 className="text-2xl pixel-text-shadow">PRIVACY POLICY</h1>
                             <p className="font-dialogue text-sm text-muted-foreground mt-2">
                                 Last updated: January 14, 2026
                             </p>
+                            {process.env.NEXT_PUBLIC_CONTACT_EMAIL && (
+                                <p className="font-dialogue text-sm mt-1">
+                                    Questions? Email{" "}
+                                    <a
+                                        className="text-primary underline"
+                                        href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}
+                                    >
+                                        {process.env.NEXT_PUBLIC_CONTACT_EMAIL}
+                                    </a>
+                                </p>
+                            )}
                         </div>
 
-                        <div className="font-dialogue text-base leading-relaxed space-y-4 text-left p-4 border-2 border-border bg-input/50 [&_p]:max-w-[68ch] [&_li]:max-w-[68ch]">
-                            <h2 className="font-bold text-sm">1. Introduction</h2>
+                        <div className="font-dialogue text-base leading-relaxed space-y-4 text-left [&_p]:max-w-[68ch] [&_li]:max-w-[68ch]">
+                            <h2 className="font-bold text-base pt-4 border-t-2 border-border first:pt-0 first:border-t-0">1. Introduction</h2>
                             <p>
                                 Welcome to PortaGen. We are committed to protecting your
                                 personal information and your right to privacy. If you have any
@@ -60,7 +77,7 @@ function PrivacyPolicyContent() {
                                 regards to your personal information, please contact us.
                             </p>
 
-                            <h2 className="font-bold text-sm">2. Information We Collect</h2>
+                            <h2 className="font-bold text-base pt-4 border-t-2 border-border first:pt-0 first:border-t-0">2. Information We Collect</h2>
                             <p>
                                 We collect personal information that you voluntarily provide to
                                 us when you register on the website, express an interest in
@@ -76,7 +93,7 @@ function PrivacyPolicyContent() {
                                 address, username, password, and contact preferences.
                             </p>
 
-                            <h2 className="font-bold text-sm">3. How We Use Your Information</h2>
+                            <h2 className="font-bold text-base pt-4 border-t-2 border-border first:pt-0 first:border-t-0">3. How We Use Your Information</h2>
                             <p>
                                 We use personal information collected via our website for a
                                 variety of business purposes described below. We process your
@@ -86,28 +103,27 @@ function PrivacyPolicyContent() {
                                 compliance with our legal obligations.
                             </p>
 
-                            <h2 className="font-bold text-sm">4. Will Your Information Be Shared?</h2>
+                            <h2 className="font-bold text-base pt-4 border-t-2 border-border first:pt-0 first:border-t-0">4. Will Your Information Be Shared?</h2>
                             <p>
                                 We only share information with your consent, to comply with
                                 laws, to provide you with services, to protect your rights, or
                                 to fulfill business obligations.
                             </p>
 
-                            <h2 className="font-bold text-sm">5. Do We Use Cookies?</h2>
+                            <h2 className="font-bold text-base pt-4 border-t-2 border-border first:pt-0 first:border-t-0">5. Do We Use Cookies?</h2>
                             <p>
                                 We may use cookies and similar tracking technologies to access
-                                or store information. Specific information about how we use such
-                                technologies is set out in our Cookie Policy (not yet created).
+                                or store information, for example to keep you signed in.
                             </p>
 
-                            <h2 className="font-bold text-sm">6. How Long Do We Keep Your Information?</h2>
+                            <h2 className="font-bold text-base pt-4 border-t-2 border-border first:pt-0 first:border-t-0">6. How Long Do We Keep Your Information?</h2>
                             <p>
                                 We keep your information for as long as necessary to fulfill
                                 the purposes outlined in this privacy policy unless otherwise
                                 required by law.
                             </p>
 
-                            <h2 className="font-bold text-sm">7. How Do We Keep Your Information Safe?</h2>
+                            <h2 className="font-bold text-base pt-4 border-t-2 border-border first:pt-0 first:border-t-0">7. How Do We Keep Your Information Safe?</h2>
                             <p>
                                 We aim to protect your personal information through a system of
                                 organizational and technical security measures.

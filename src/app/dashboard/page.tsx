@@ -5,6 +5,7 @@ import { getUserBySupabaseId, getOrCreateUser } from "@/lib/db/helpers"
 import { getDashboardStats } from "@/lib/activity"
 import { formatDistanceToNow } from "date-fns"
 import { redirect } from "next/navigation"
+import Link from "next/link"
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -34,14 +35,14 @@ export default async function DashboardPage() {
   const { checklist, recentActivity, stats } = await getDashboardStats(user.id);
 
   const checklistItems = [
-    { id: 'CREATE_PORTFOLIO', task: "CREATE YOUR FIRST PORTFOLIO", done: checklist.CREATE_PORTFOLIO },
-    { id: 'UPLOAD_WALLPAPER', task: "UPLOAD A WALLPAPER", done: checklist.UPLOAD_WALLPAPER },
-    { id: 'ADD_DESKTOP_ICONS', task: "ADD DESKTOP ICONS", done: checklist.ADD_DESKTOP_ICONS },
-    { id: 'EMBED_MUSIC', task: "EMBED MUSIC", done: checklist.EMBED_MUSIC },
+    { id: 'CREATE_PORTFOLIO', task: "CREATE YOUR FIRST PORTFOLIO", href: "/dashboard/portfolios", done: checklist.CREATE_PORTFOLIO },
+    { id: 'UPLOAD_WALLPAPER', task: "UPLOAD A WALLPAPER", href: "/dashboard/assets", done: checklist.UPLOAD_WALLPAPER },
+    { id: 'ADD_DESKTOP_ICONS', task: "ADD DESKTOP ICONS", href: "/dashboard/portfolios", done: checklist.ADD_DESKTOP_ICONS },
+    { id: 'EMBED_MUSIC', task: "EMBED MUSIC", href: "/dashboard/portfolios", done: checklist.EMBED_MUSIC },
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="max-w-5xl mx-auto space-y-8">
       {/* Welcome Section */}
       <PixelCard>
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -77,16 +78,19 @@ export default async function DashboardPage() {
           <h3 className="text-sm pixel-text-shadow">GET STARTED CHECKLIST</h3>
           <div className="space-y-3">
             {checklistItems.map((item, i) => (
-              <div key={i} className="flex items-center gap-3">
+              <Link key={i} href={item.href} className="flex items-center gap-3 min-h-11 hover:underline">
                 <div
-                  className={`w-4 h-4 border-2 border-border ${item.done ? "bg-primary" : "bg-muted"} flex items-center justify-center`}
+                  className={`w-5 h-5 shrink-0 border-2 border-border ${item.done ? "bg-primary text-primary-foreground" : "bg-muted"} flex items-center justify-center`}
+                  aria-hidden="true"
                 >
-                  {item.done && <span className="text-[8px]">✓</span>}
+                  {item.done && <span className="text-[10px]">✓</span>}
                 </div>
-                <span className={`font-dialogue text-sm break-words ${item.done ? "line-through text-muted-foreground" : ""}`}>
+                <span className={`font-dialogue text-sm break-words ${item.done ? "text-muted-foreground" : ""}`}>
                   {item.task}
+                  <span className="sr-only">{item.done ? " (done)" : " (to do)"}</span>
                 </span>
-              </div>
+                <span aria-hidden="true" className="ml-auto text-xs">→</span>
+              </Link>
             ))}
           </div>
         </div>
@@ -104,7 +108,9 @@ export default async function DashboardPage() {
                     <div className="w-2 h-2 bg-primary shrink-0 mt-1.5" />
                     <div className="space-y-1 min-w-0 flex-1">
                       <p className="text-[10px] leading-normal break-words">
-                        <span className="text-primary font-bold mr-1">{activity.actionType}</span>
+                        {!activity.description.toLowerCase().startsWith(String(activity.actionType).toLowerCase()) && (
+                          <span className="text-primary font-bold mr-1">{activity.actionType}</span>
+                        )}
                         {activity.description}
                       </p>
                     </div>

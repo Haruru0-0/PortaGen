@@ -201,7 +201,7 @@ export default function SignUpPage() {
                 className="bg-[#6D28D9]"
                 style={{
                   width: "40px",
-                  height: `${Math.random() * 60 + 40}px`,
+                  height: `${40 + ((i * 29 + 7) % 60)}px`,
                   opacity: 0.8,
                 }}
               />
@@ -210,6 +210,7 @@ export default function SignUpPage() {
         </div>
 
         <div className="relative z-10 w-full max-w-md">
+          <Link href="/" className="inline-block py-2 mb-2 font-dialogue text-sm text-foreground hover:underline">← Back to home</Link>
           <PixelCard>
             <div className="space-y-6">
               <div className="text-center space-y-4">
@@ -285,7 +286,7 @@ export default function SignUpPage() {
               className="bg-[#6D28D9]"
               style={{
                 width: "40px",
-                height: `${Math.random() * 60 + 40}px`,
+                height: `${40 + ((i * 29 + 7) % 60)}px`,
                 opacity: 0.8,
               }}
             />
@@ -294,6 +295,7 @@ export default function SignUpPage() {
       </div>
 
       <div className="relative z-10 w-full max-w-lg">
+        <Link href="/" className="inline-block py-2 mb-2 font-dialogue text-sm text-foreground hover:underline">← Back to home</Link>
         <PixelCard>
           <div className="space-y-6">
             <div className="text-center space-y-4">
@@ -312,17 +314,17 @@ export default function SignUpPage() {
               </div>
             )}
 
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="flex justify-between items-start gap-3">
                 <div>
                   <PixelInput
                     label="FIRST NAME"
                     type="text"
                     placeholder="JOHN"
-                    {...form.register("firstName")}
+                    {...form.register("firstName")} aria-invalid={!!form.formState.errors.firstName} autoComplete="given-name"
                   />
                   {form.formState.errors.firstName && (
-                    <p className="font-dialogue text-red-700 dark:text-red-400 text-sm mt-1">
+                    <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
                       {form.formState.errors.firstName.message}
                     </p>
                   )}
@@ -333,10 +335,10 @@ export default function SignUpPage() {
                     label="LAST NAME"
                     type="text"
                     placeholder="DOE"
-                    {...form.register("lastName")}
+                    {...form.register("lastName")} aria-invalid={!!form.formState.errors.lastName} autoComplete="family-name"
                   />
                   {form.formState.errors.lastName && (
-                    <p className="font-dialogue text-red-700 dark:text-red-400 text-sm mt-1">
+                    <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
                       {form.formState.errors.lastName.message}
                     </p>
                   )}
@@ -348,10 +350,10 @@ export default function SignUpPage() {
                   label="USERNAME"
                   type="text"
                   placeholder="YOURUSERNAME"
-                  {...form.register("username")}
+                  {...form.register("username")} aria-invalid={!!form.formState.errors.username} autoComplete="username"
                 />
                 {form.formState.errors.username && (
-                  <p className="font-dialogue text-red-700 dark:text-red-400 text-sm mt-1">
+                  <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
                     {form.formState.errors.username.message}
                   </p>
                 )}
@@ -362,10 +364,10 @@ export default function SignUpPage() {
                   label="EMAIL"
                   type="email"
                   placeholder="YOU@EXAMPLE.COM"
-                  {...form.register("email")}
+                  {...form.register("email")} aria-invalid={!!form.formState.errors.email} autoComplete="email"
                 />
                 {form.formState.errors.email && (
-                  <p className="font-dialogue text-red-700 dark:text-red-400 text-sm mt-1">
+                  <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
                     {form.formState.errors.email.message}
                   </p>
                 )}
@@ -376,11 +378,11 @@ export default function SignUpPage() {
                   <PixelPasswordInput
                     label="PASSWORD"
                     placeholder="********"
-                    {...form.register("password")}
+                    {...form.register("password")} aria-invalid={!!form.formState.errors.password} autoComplete="new-password"
                     onChange={handlePasswordChange}
                   />
                   {form.formState.errors.password && (
-                    <p className="font-dialogue text-red-700 dark:text-red-400 text-sm mt-1">
+                    <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
                       {form.formState.errors.password.message}
                     </p>
                   )}
@@ -409,10 +411,10 @@ export default function SignUpPage() {
                   <PixelPasswordInput
                     label="CONFIRM PASSWORD"
                     placeholder="********"
-                    {...form.register("confirmPassword")}
+                    {...form.register("confirmPassword")} aria-invalid={!!form.formState.errors.confirmPassword} autoComplete="new-password"
                   />
                   {form.formState.errors.confirmPassword && (
-                    <p className="font-dialogue text-red-700 dark:text-red-400 text-sm mt-1">
+                    <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
                       {form.formState.errors.confirmPassword.message}
                     </p>
                   )}
