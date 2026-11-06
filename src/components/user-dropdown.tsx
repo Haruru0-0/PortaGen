@@ -95,14 +95,14 @@ export function UserDropdown() {
         <div className="text-left hidden md:block max-w-[120px]">
           <Tooltip>
             <TooltipTrigger asChild>
-              <p className="text-[10px] font-bold truncate cursor-help">{displayName.toUpperCase()}</p>
+              <p className="text-xs font-bold truncate cursor-help">{displayName.toUpperCase()}</p>
             </TooltipTrigger>
             <TooltipContent side="bottom">{displayName.toUpperCase()}</TooltipContent>
           </Tooltip>
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <p className="text-[8px] text-muted-foreground truncate cursor-help">{displayEmail}</p>
+              <p className="font-dialogue text-sm text-muted-foreground truncate cursor-help">{displayEmail}</p>
             </TooltipTrigger>
             <TooltipContent side="bottom">{displayEmail}</TooltipContent>
           </Tooltip>
@@ -123,14 +123,14 @@ export function UserDropdown() {
             <div className="min-w-0">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <p className="text-[10px] font-bold truncate cursor-help">{displayName.toUpperCase()}</p>
+                  <p className="text-xs font-bold truncate cursor-help">{displayName.toUpperCase()}</p>
                 </TooltipTrigger>
                 <TooltipContent side="right">{displayName.toUpperCase()}</TooltipContent>
               </Tooltip>
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <p className="text-[8px] text-muted-foreground truncate cursor-help">{displayEmail}</p>
+                  <p className="font-dialogue text-sm text-muted-foreground truncate cursor-help">{displayEmail}</p>
                 </TooltipTrigger>
                 <TooltipContent side="right">{displayEmail}</TooltipContent>
               </Tooltip>
@@ -140,7 +140,7 @@ export function UserDropdown() {
           <div className="p-2">
             <Link
               href="/dashboard"
-              className="flex items-center gap-3 px-3 py-2 text-[10px] hover:bg-muted transition-colors"
+              className="flex items-center gap-3 px-3 py-2 font-dialogue text-sm hover:bg-muted transition-colors"
               onClick={() => setIsOpen(false)}
             >
               <User className="w-4 h-4" />
@@ -148,7 +148,7 @@ export function UserDropdown() {
             </Link>
             <Link
               href="/dashboard/settings"
-              className="flex items-center gap-3 px-3 py-2 text-[10px] hover:bg-muted transition-colors"
+              className="flex items-center gap-3 px-3 py-2 font-dialogue text-sm hover:bg-muted transition-colors"
               onClick={() => setIsOpen(false)}
             >
               <Settings className="w-4 h-4" />
@@ -156,7 +156,7 @@ export function UserDropdown() {
             </Link>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-3 py-2 text-[10px] hover:bg-destructive hover:text-destructive-foreground transition-colors"
+              className="w-full flex items-center gap-3 px-3 py-2 text-xs hover:bg-destructive hover:text-destructive-foreground transition-colors"
             >
               <LogOut className="w-4 h-4" />
               LOGOUT

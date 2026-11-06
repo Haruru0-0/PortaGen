@@ -46,7 +46,7 @@ function PrivacyPolicyContent() {
                     <div className="space-y-6">
                         <button
                             onClick={handleBack}
-                            className="text-primary hover:underline text-xs py-2"
+                            className="text-primary hover:underline text-xs min-h-10 py-2"
                         >
                             {getBackLabel()}
                         </button>
@@ -133,7 +133,7 @@ function PrivacyPolicyContent() {
                         <div className="text-center">
                             <button
                                 onClick={handleBack}
-                                className="text-primary hover:underline text-xs"
+                                className="text-primary hover:underline text-xs min-h-10 py-2"
                             >
                                 {getBackLabel()}
                             </button>

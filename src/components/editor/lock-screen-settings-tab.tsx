@@ -55,7 +55,7 @@ export function LockScreenSettingsTab() {
                         render={({ field }) => (
                             <FormItem>
                                 <div className="flex items-center justify-between p-3 border-2 border-border bg-muted">
-                                    <span className="text-[10px]">ENABLE LOCK SCREEN</span>
+                                    <span className="font-dialogue text-sm">ENABLE LOCK SCREEN</span>
                                     <FormControl>
                                         <Switch
                                             checked={!!field.value}
@@ -92,7 +92,7 @@ export function LockScreenSettingsTab() {
                     />}
 
                     <div className="pt-2">
-                        <PixelButton type="submit" className="w-full text-[10px]" disabled={loading}>
+                        <PixelButton type="submit" className="w-full text-xs" disabled={loading}>
                             {loading ? 'SAVING…' : 'SAVE'}
                         </PixelButton>
                     </div>

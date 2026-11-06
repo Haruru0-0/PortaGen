@@ -224,7 +224,7 @@ export default function SignUpPage() {
               </div>
 
               {error && (
-                <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 text-[10px] text-center">
+                <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 font-dialogue text-sm text-center">
                   {error}
                 </div>
               )}
@@ -232,7 +232,7 @@ export default function SignUpPage() {
               <div className="space-y-6">
                 <div className="pixel-card bg-primary/20 border-2 border-primary p-6 text-center space-y-4">
                   <p className="text-sm font-bold pixel-text-shadow">CHECK YOUR MAIL</p>
-                  <p className="text-[10px] leading-relaxed uppercase">
+                  <p className="text-xs leading-relaxed uppercase">
                     We've sent a verification link to your email address.
                     Please click the link to activate your account.
                   </p>
@@ -244,11 +244,11 @@ export default function SignUpPage() {
                   </p>
 
                   {resendMessage && (
-                    <p className="text-[10px] text-green-500 font-bold animate-pulse">{resendMessage}</p>
+                    <p className="text-xs text-green-500 font-bold animate-pulse">{resendMessage}</p>
                   )}
 
                   <PixelButton
-                    className="w-full text-[10px] mb-2"
+                    className="w-full text-xs mb-2"
                     onClick={handleResendEmail}
                     disabled={resending}
                     variant="secondary"
@@ -259,7 +259,7 @@ export default function SignUpPage() {
                   <button
                     type="button"
                     onClick={() => setVerifying(false)}
-                    className="w-full text-[10px] text-muted-foreground hover:text-primary"
+                    className="w-full text-xs text-muted-foreground hover:text-primary"
                   >
                     ← BACK TO SIGNUP
                   </button>
@@ -309,7 +309,7 @@ export default function SignUpPage() {
             </div>
 
             {error && (
-              <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 text-[10px] text-center">
+              <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 font-dialogue text-sm text-center">
                 {error}
               </div>
             )}
@@ -442,7 +442,7 @@ export default function SignUpPage() {
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t-2 border-border" />
                 </div>
-                <div className="relative flex justify-center text-[10px]">
+                <div className="relative flex justify-center font-dialogue text-sm">
                   <span className="bg-card px-2 text-muted-foreground">
                     OR CONTINUE WITH
                   </span>
@@ -452,7 +452,7 @@ export default function SignUpPage() {
               <div className="grid grid-cols-2 gap-3">
                 <PixelButton
                   variant="secondary"
-                  className="w-full text-[10px]"
+                  className="w-full text-xs"
                   onClick={() => handleOAuthSignUp("google")}
                   disabled={loading}
                   type="button"
@@ -461,7 +461,7 @@ export default function SignUpPage() {
                 </PixelButton>
                 <PixelButton
                   variant="secondary"
-                  className="w-full text-[10px]"
+                  className="w-full text-xs"
                   onClick={() => handleOAuthSignUp("github")}
                   disabled={loading}
                   type="button"

@@ -130,7 +130,7 @@ export default function LoginPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 text-[10px] text-center">
+              <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 font-dialogue text-sm text-center">
                 {error}
               </div>
             )}
@@ -167,7 +167,7 @@ export default function LoginPage() {
               <div className="flex justify-end">
                 <Link
                   href="/auth/forgot-password"
-                  className="text-[10px] text-primary hover:underline"
+                  className="inline-block py-2 font-dialogue text-sm text-primary hover:underline"
                 >
                   FORGOT PASSWORD?
                 </Link>
@@ -189,7 +189,7 @@ export default function LoginPage() {
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t-2 border-border" />
                 </div>
-                <div className="relative flex justify-center text-[10px]">
+                <div className="relative flex justify-center font-dialogue text-sm">
                   <span className="bg-card px-2 text-muted-foreground">
                     OR CONTINUE WITH
                   </span>
@@ -199,7 +199,7 @@ export default function LoginPage() {
               <div className="grid grid-cols-2 gap-3">
                 <PixelButton
                   variant="secondary"
-                  className="w-full text-[10px]"
+                  className="w-full text-xs"
                   onClick={() => handleOAuthSignIn("google")}
                   disabled={loading}
                   type="button"
@@ -208,7 +208,7 @@ export default function LoginPage() {
                 </PixelButton>
                 <PixelButton
                   variant="secondary"
-                  className="w-full text-[10px]"
+                  className="w-full text-xs"
                   onClick={() => handleOAuthSignIn("github")}
                   disabled={loading}
                   type="button"

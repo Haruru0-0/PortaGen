@@ -99,14 +99,14 @@ export function DeleteConfirmationModal({ isOpen, onClose, onConfirm, title, mes
         >
           <div className="space-y-3">
             <h3 className="text-sm pixel-text-shadow text-destructive">{title}</h3>
-            <p className="text-[10px] text-muted-foreground leading-relaxed">{message}</p>
+            <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">{message}</p>
           </div>
 
           <div className="flex gap-3">
             <PixelButton
                 variant="secondary"
                 onClick={handleClose}
-                className="flex-1 text-[10px]"
+                className="flex-1 text-xs"
                 disabled={isDeleting}
             >
               CANCEL
@@ -114,7 +114,7 @@ export function DeleteConfirmationModal({ isOpen, onClose, onConfirm, title, mes
             <PixelButton
                 variant="primary"
                 onClick={handleConfirm}
-                className="flex-1 text-[10px] bg-destructive border-destructive hover:bg-destructive/90 flex items-center justify-center gap-2"
+                className="flex-1 text-xs bg-destructive border-destructive hover:bg-destructive/90 flex items-center justify-center gap-2"
                 disabled={isDeleting}
             >
               {isDeleting ? (

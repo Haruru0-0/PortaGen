@@ -229,7 +229,7 @@ function ChatContent({ onClose, isMobile = false }: { onClose: () => void, isMob
                         )}
                     </button>
                 </div>
-                <p className="mt-2 text-[10px] text-muted-foreground text-center">
+                <p className="mt-2 font-dialogue text-sm text-muted-foreground text-center">
                     I help with bios, projects & PortaGen tips only
                 </p>
             </form>

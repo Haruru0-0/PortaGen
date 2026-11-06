@@ -21,7 +21,7 @@ export const PixelButton = forwardRef<HTMLButtonElement, PixelButtonProps>(
       <Comp
         ref={ref}
         className={cn(
-          "dashboard-pixel-button inline-block text-center px-6 py-3 text-xs uppercase tracking-wider font-bold",
+          "dashboard-pixel-button inline-block min-h-10 text-center px-6 py-3 text-xs uppercase tracking-wider font-bold",
           "cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
           variantStyles[variant],
           className,

@@ -166,7 +166,7 @@ export default function ForgotPasswordPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 text-[10px] text-center">
+              <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 font-dialogue text-sm text-center">
                 {error}
               </div>
             )}
@@ -203,7 +203,7 @@ export default function ForgotPasswordPage() {
             {step === "code" && (
               <form onSubmit={resetForm.handleSubmit(onResetSubmit)} className="space-y-4">
                 <div className="pixel-card bg-accent/20 p-3">
-                  <p className="text-[10px] leading-relaxed text-center uppercase">
+                  <p className="text-xs leading-relaxed text-center uppercase">
                     Check your email for a reset link or enter the 6-digit code below with your new password.
                   </p>
                 </div>
@@ -269,7 +269,7 @@ export default function ForgotPasswordPage() {
                 <button
                   type="button"
                   onClick={() => setStep("email")}
-                  className="w-full text-[10px] text-muted-foreground hover:text-primary"
+                  className="w-full text-xs text-muted-foreground hover:text-primary"
                 >
                   ← BACK
                 </button>
@@ -280,7 +280,7 @@ export default function ForgotPasswordPage() {
             {step === "success" && (
               <div className="space-y-4">
                 <div className="pixel-card bg-green-500/20 border-2 border-green-500 p-4">
-                  <p className="text-[10px] leading-relaxed text-center text-green-500">
+                  <p className="font-dialogue text-sm leading-relaxed text-center text-green-500">
                     ✓ PASSWORD RESET SUCCESSFUL
                     <br />
                     REDIRECTING TO LOGIN...

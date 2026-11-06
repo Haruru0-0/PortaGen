@@ -171,7 +171,7 @@ export function MobileWidgetsTab() {
                         preview={previewUrl1 || (data?.widget1Asset?.fileId ? `https://drive.google.com/uc?id=${data.widget1Asset.fileId}` : '')} maxSize={5} />
                     <PixelButton
                         variant="secondary"
-                        className="w-full text-[10px] flex items-center justify-center gap-2"
+                        className="w-full text-xs flex items-center justify-center gap-2"
                         onClick={() => openAssetPicker(1)}
                     >
                         <Library className="w-3 h-3" />
@@ -179,21 +179,21 @@ export function MobileWidgetsTab() {
                     </PixelButton>
                     {pendingWidget1File && (
                         <PixelButton
-                            className="w-full text-[10px]"
+                            className="w-full text-xs"
                             onClick={handleSave1}
                         >
                             SAVE WIDGET 1
                         </PixelButton>
                     )}
                     <div className="pt-2 space-y-2">
-                        <p className="text-[10px] text-muted-foreground uppercase">OR IMAGE LINK</p>
+                        <p className="text-xs text-muted-foreground uppercase">OR IMAGE LINK</p>
                         <div className="flex gap-2">
                             <PixelInput
                                 placeholder="https://..."
                                 value={urlInput1}
                                 onChange={handleUrlInput1Change}
                             />
-                            <PixelButton className="text-[10px]" onClick={handleSaveUrl1} disabled={!urlInput1}>SAVE</PixelButton>
+                            <PixelButton className="text-xs" onClick={handleSaveUrl1} disabled={!urlInput1}>SAVE</PixelButton>
                         </div>
                         {urlInput1 && (
                             <div className="relative w-20 h-20 border border-border rounded overflow-hidden">
@@ -213,7 +213,7 @@ export function MobileWidgetsTab() {
                         preview={previewUrl2 || (data?.widget2Asset?.fileId ? `https://drive.google.com/uc?id=${data.widget2Asset.fileId}` : '')} maxSize={5} />
                     <PixelButton
                         variant="secondary"
-                        className="w-full text-[10px] flex items-center justify-center gap-2"
+                        className="w-full text-xs flex items-center justify-center gap-2"
                         onClick={() => openAssetPicker(2)}
                     >
                         <Library className="w-3 h-3" />
@@ -221,21 +221,21 @@ export function MobileWidgetsTab() {
                     </PixelButton>
                     {pendingWidget2File && (
                         <PixelButton
-                            className="w-full text-[10px]"
+                            className="w-full text-xs"
                             onClick={handleSave2}
                         >
                             SAVE WIDGET 2
                         </PixelButton>
                     )}
                     <div className="pt-2 space-y-2">
-                        <p className="text-[10px] text-muted-foreground uppercase">OR IMAGE LINK</p>
+                        <p className="text-xs text-muted-foreground uppercase">OR IMAGE LINK</p>
                         <div className="flex gap-2">
                             <PixelInput
                                 placeholder="https://..."
                                 value={urlInput2}
                                 onChange={handleUrlInput2Change}
                             />
-                            <PixelButton className="text-[10px]" onClick={handleSaveUrl2} disabled={!urlInput2}>SAVE</PixelButton>
+                            <PixelButton className="text-xs" onClick={handleSaveUrl2} disabled={!urlInput2}>SAVE</PixelButton>
                         </div>
                         {urlInput2 && (
                             <div className="relative w-20 h-20 border border-border rounded overflow-hidden">
@@ -254,7 +254,7 @@ export function MobileWidgetsTab() {
 
             <PixelModal isOpen={renameOpen1} onClose={() => !uploading && setRenameOpen1(false)} title="RENAME WIDGET 1">
                 <div className="space-y-4">
-                    <p className="text-[10px] text-muted-foreground">SET A NAME FOR YOUR WIDGET</p>
+                    <p className="font-dialogue text-sm text-muted-foreground">SET A NAME FOR YOUR WIDGET</p>
                     <PixelInput
                         value={customName1}
                         onChange={(e) => setCustomName1(e.target.value)}
@@ -263,14 +263,14 @@ export function MobileWidgetsTab() {
                     <div className="flex gap-3 pt-2">
                         <PixelButton
                             variant="secondary"
-                            className="flex-1 text-[10px]"
+                            className="flex-1 text-xs"
                             onClick={() => setRenameOpen1(false)}
                             disabled={uploading}
                         >
                             CANCEL
                         </PixelButton>
                         <PixelButton
-                            className="flex-1 text-[10px]"
+                            className="flex-1 text-xs"
                             onClick={confirmUpload1}
                             disabled={uploading || !pendingWidget1File}
                         >
@@ -282,7 +282,7 @@ export function MobileWidgetsTab() {
 
             <PixelModal isOpen={renameOpen2} onClose={() => !uploading && setRenameOpen2(false)} title="RENAME WIDGET 2">
                 <div className="space-y-4">
-                    <p className="text-[10px] text-muted-foreground">SET A NAME FOR YOUR WIDGET</p>
+                    <p className="font-dialogue text-sm text-muted-foreground">SET A NAME FOR YOUR WIDGET</p>
                     <PixelInput
                         value={customName2}
                         onChange={(e) => setCustomName2(e.target.value)}
@@ -291,14 +291,14 @@ export function MobileWidgetsTab() {
                     <div className="flex gap-3 pt-2">
                         <PixelButton
                             variant="secondary"
-                            className="flex-1 text-[10px]"
+                            className="flex-1 text-xs"
                             onClick={() => setRenameOpen2(false)}
                             disabled={uploading}
                         >
                             CANCEL
                         </PixelButton>
                         <PixelButton
-                            className="flex-1 text-[10px]"
+                            className="flex-1 text-xs"
                             onClick={confirmUpload2}
                             disabled={uploading || !pendingWidget2File}
                         >

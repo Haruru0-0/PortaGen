@@ -91,7 +91,7 @@ export function FileUpload({ accept, onFileSelect, preview, label, maxSize = 5, 
 
   return (
     <div className={`space-y-3 ${className || ""}`}>
-      {label && <p className="text-[10px]">{label}</p>}
+      {label && <p className="font-dialogue text-sm">{label}</p>}
 
       <div
         className={`border-4 border-dashed p-8 text-center space-y-3 cursor-pointer transition-colors ${dragActive
@@ -121,14 +121,14 @@ export function FileUpload({ accept, onFileSelect, preview, label, maxSize = 5, 
             ) : accept?.includes("audio") ? (
               <div className="flex items-center justify-center gap-2">
                 <div className="w-12 h-12 bg-primary flex items-center justify-center text-xl">♪</div>
-                <span className="text-[10px]">AUDIO FILE LOADED</span>
+                <span className="font-dialogue text-sm">AUDIO FILE LOADED</span>
               </div>
             ) : (
               <div className="text-2xl">📄</div>
             )}
             <PixelButton
               variant="secondary"
-              className="text-[10px]"
+              className="text-xs"
               onClick={(e) => {
                 e.stopPropagation()
                 handleClick()
@@ -140,8 +140,8 @@ export function FileUpload({ accept, onFileSelect, preview, label, maxSize = 5, 
         ) : (
           <>
             <Upload className="w-8 h-8 mx-auto" />
-            <p className="text-[10px] text-muted-foreground">{error || "DRAG & DROP OR CLICK TO UPLOAD"}</p>
-            {!error && <p className="text-[8px] text-muted-foreground">MAX SIZE: {maxSize}MB</p>}
+            <p className="font-dialogue text-sm text-muted-foreground">{error || "DRAG & DROP OR CLICK TO UPLOAD"}</p>
+            {!error && <p className="font-dialogue text-sm text-muted-foreground">MAX SIZE: {maxSize}MB</p>}
           </>
         )}
       </div>

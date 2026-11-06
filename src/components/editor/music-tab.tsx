@@ -93,12 +93,12 @@ export function MusicTab() {
                 </FormItem>
               )}
             />
-            <p className="text-[10px] text-muted-foreground">Private playlists require Spotify connect. Full playback requires Premium.</p>
+            <p className="font-dialogue text-sm text-muted-foreground">Private playlists require Spotify connect. Full playback requires Premium.</p>
 
             <div className="mt-4">
               <PixelButton
                 type="submit"
-                className="w-full text-[10px]"
+                className="w-full text-xs"
                 disabled={desktopLoading || form.formState.isSubmitting}
               >
                 {desktopLoading || form.formState.isSubmitting ? 'SAVING…' : 'SAVE'}
@@ -110,7 +110,7 @@ export function MusicTab() {
         {!connected && (
           <PixelButton
             variant="secondary"
-            className="w-full text-[10px]"
+            className="w-full text-xs"
             onClick={connectSpotify}
             disabled={loading}
           >

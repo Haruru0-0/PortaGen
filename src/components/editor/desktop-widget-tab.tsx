@@ -118,7 +118,7 @@ export function DesktopWidgetTab() {
           />
           <PixelButton
             variant="secondary"
-            className="w-full text-[10px] flex items-center justify-center gap-2"
+            className="w-full text-xs flex items-center justify-center gap-2"
             onClick={() => setAssetPickerOpen(true)}
           >
             <Library className="w-3 h-3" />
@@ -126,14 +126,14 @@ export function DesktopWidgetTab() {
           </PixelButton>
 
           <div className="pt-2 space-y-2">
-            <p className="text-[10px] text-muted-foreground uppercase">OR IMAGE LINK</p>
+            <p className="text-xs text-muted-foreground uppercase">OR IMAGE LINK</p>
             <div className="flex gap-2">
               <PixelInput
                 placeholder="https://..."
                 value={urlInput}
                 onChange={handleUrlInputChange}
               />
-              <PixelButton className="text-[10px]" onClick={handleSaveUrl} disabled={!urlInput}>SAVE</PixelButton>
+              <PixelButton className="text-xs" onClick={handleSaveUrl} disabled={!urlInput}>SAVE</PixelButton>
             </div>
             {urlInput && (
               <div className="relative w-full h-32 border border-border rounded overflow-hidden">
@@ -151,7 +151,7 @@ export function DesktopWidgetTab() {
 
         {pendingGifFile && (
           <PixelButton
-            className="w-full text-[10px]"
+            className="w-full text-xs"
             onClick={handleSave}
           >
             SAVE GIF
@@ -160,11 +160,11 @@ export function DesktopWidgetTab() {
       </div>
       <PixelModal isOpen={renameOpen} onClose={() => !uploading && setRenameOpen(false)} title="RENAME GIF">
         <div className="space-y-4">
-          <p className="text-[10px] text-muted-foreground">SET A NAME FOR YOUR GIF</p>
+          <p className="font-dialogue text-sm text-muted-foreground">SET A NAME FOR YOUR GIF</p>
           <PixelInput value={customName} onChange={(e) => setCustomName(e.target.value)} placeholder="Enter name" />
           <div className="flex gap-3 pt-2">
-            <PixelButton variant="secondary" className="flex-1 text-[10px]" onClick={() => setRenameOpen(false)} disabled={uploading}>CANCEL</PixelButton>
-            <PixelButton className="flex-1 text-[10px]" onClick={confirmUpload} disabled={uploading || !pendingGifFile}>{uploading ? 'UPLOADING…' : 'UPLOAD'}</PixelButton>
+            <PixelButton variant="secondary" className="flex-1 text-xs" onClick={() => setRenameOpen(false)} disabled={uploading}>CANCEL</PixelButton>
+            <PixelButton className="flex-1 text-xs" onClick={confirmUpload} disabled={uploading || !pendingGifFile}>{uploading ? 'UPLOADING…' : 'UPLOAD'}</PixelButton>
           </div>
         </div>
       </PixelModal>

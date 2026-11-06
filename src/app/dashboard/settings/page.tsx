@@ -235,11 +235,11 @@ function SettingsContent() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h2 className="text-lg pixel-text-shadow mb-2">SETTINGS</h2>
-            <p className="text-[10px] text-muted-foreground">MANAGE YOUR ACCOUNT</p>
+            <p className="font-dialogue text-sm text-muted-foreground">MANAGE YOUR ACCOUNT</p>
           </div>
         </div>
         {message && (
-          <div className={`p-3 border-2 text-[10px] text-center ${message.includes('Error')
+          <div className={`p-3 border-2 font-dialogue text-sm text-center ${message.includes('Error')
             ? 'bg-red-500/20 border-red-700 text-red-700 dark:text-red-300'
             : 'bg-green-500/20 border-green-500 text-green-500'
             }`}>
@@ -315,8 +315,8 @@ function SettingsContent() {
               <div className="flex items-center gap-3">
                 <Cloud className="w-6 h-6" />
                 <div>
-                  <p className="text-[10px] font-bold">GOOGLE DRIVE STATUS</p>
-                  <p className="text-[8px] text-muted-foreground">
+                  <p className="text-xs font-bold">GOOGLE DRIVE STATUS</p>
+                  <p className="font-dialogue text-sm text-muted-foreground">
                     {loading ? 'Checking...' : connected ? 'Connected' : 'Not connected'}
                   </p>
                 </div>
@@ -329,7 +329,7 @@ function SettingsContent() {
                       <CheckCircle className="w-5 h-5 text-green-500" />
                       <PixelButton
                         variant="secondary"
-                        className="text-[10px]"
+                        className="text-xs"
                         onClick={disconnectDrive}
                       >
                         DISCONNECT
@@ -340,7 +340,7 @@ function SettingsContent() {
                       <XCircle className="w-5 h-5 text-red-500" />
                       <PixelButton
                         variant="primary"
-                        className="text-[10px]"
+                        className="text-xs"
                         onClick={connectDrive}
                         disabled={connecting}
                       >
@@ -353,7 +353,7 @@ function SettingsContent() {
             </div>
 
             <div className="p-3 bg-accent/20 border-2 border-border">
-              <p className="text-[10px] leading-relaxed">
+              <p className="font-dialogue text-sm leading-relaxed">
                 <strong>WHY CONNECT GOOGLE DRIVE?</strong>
                 <br />
                 • Your files are stored in YOUR Google Drive
@@ -370,7 +370,7 @@ function SettingsContent() {
 
             {connected && (
               <div className="p-3 bg-green-500/10 border-2 border-green-500">
-                <p className="text-[10px] text-green-500">
+                <p className="font-dialogue text-sm text-green-500">
                   ✓ Your portfolio files will be saved to a &#34;Portfolio Assets&#34; folder in your Google Drive
                 </p>
               </div>
@@ -390,7 +390,7 @@ function SettingsContent() {
             )}
 
             {passwordSuccess && (
-              <div className="p-3 bg-green-500/20 border-2 border-green-500 text-green-500 text-[10px] text-center">
+              <div className="p-3 bg-green-500/20 border-2 border-green-500 text-green-500 font-dialogue text-sm text-center">
                 ✓ PASSWORD UPDATED SUCCESSFULLY
               </div>
             )}
@@ -456,7 +456,7 @@ function SettingsContent() {
         <PixelCard className="border-red-700">
           <div className="space-y-4">
             <h3 className="text-sm pixel-text-shadow text-red-700 dark:text-red-300">DANGER ZONE</h3>
-            <p className="text-[10px] text-muted-foreground leading-relaxed">
+            <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
               ONCE YOU DELETE YOUR ACCOUNT, THERE IS NO GOING BACK. PLEASE BE CERTAIN.
             </p>
             <PixelButton
@@ -493,7 +493,7 @@ export default function SettingsPage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-[10px] animate-pulse">LOADING SETTINGS...</div>
+        <div className="font-dialogue text-sm animate-pulse">LOADING SETTINGS...</div>
       </div>
     }>
       <SettingsContent />

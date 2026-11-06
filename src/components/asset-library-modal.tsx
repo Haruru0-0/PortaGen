@@ -168,7 +168,7 @@ export function AssetLibraryModal({
                   setActiveTab("default")
                   setSelectedAsset(null)
                 }}
-                className={`px-4 py-2 text-[10px] border-2 border-border transition-colors flex items-center gap-2 ${
+                className={`px-4 py-2 text-xs border-2 border-border transition-colors flex items-center gap-2 ${
                     activeTab === "default"
                         ? "bg-primary text-primary-foreground"
                         : "bg-card hover:bg-muted"
@@ -182,7 +182,7 @@ export function AssetLibraryModal({
                   setActiveTab("uploaded")
                   setSelectedAsset(null)
                 }}
-                className={`px-4 py-2 text-[10px] border-2 border-border transition-colors flex items-center gap-2 ${
+                className={`px-4 py-2 text-xs border-2 border-border transition-colors flex items-center gap-2 ${
                     activeTab === "uploaded"
                         ? "bg-primary text-primary-foreground"
                         : "bg-card hover:bg-muted"
@@ -198,7 +198,7 @@ export function AssetLibraryModal({
               <div className="flex gap-2">
                 <button
                     onClick={() => setPortfolioFilter("current")}
-                    className={`px-3 py-1 text-[10px] border-2 border-border transition-colors ${
+                    className={`px-3 py-1 text-xs border-2 border-border transition-colors ${
                         portfolioFilter === "current"
                             ? "bg-accent text-accent-foreground"
                             : "bg-card hover:bg-muted"
@@ -209,7 +209,7 @@ export function AssetLibraryModal({
                 </button>
                 <button
                     onClick={() => setPortfolioFilter("all")}
-                    className={`px-3 py-1 text-[10px] border-2 border-border transition-colors ${
+                    className={`px-3 py-1 text-xs border-2 border-border transition-colors ${
                         portfolioFilter === "all"
                             ? "bg-accent text-accent-foreground"
                             : "bg-card hover:bg-muted"
@@ -224,20 +224,20 @@ export function AssetLibraryModal({
           <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto">
             {loading ? (
                 <div className="col-span-2 flex justify-center items-center py-8">
-                  <div className="text-[10px] text-muted-foreground">LOADING ASSETS...</div>
+                  <div className="font-dialogue text-sm text-muted-foreground">LOADING ASSETS...</div>
                 </div>
             ) : displayAssets.length === 0 ? (
                 <div className="col-span-2 flex flex-col items-center justify-center py-8 text-center">
                   <div className="text-2xl mb-2">
                     {activeTab === "default" ? "📁" : "☁️"}
                   </div>
-                  <p className="text-[10px] text-muted-foreground mb-2">
+                  <p className="font-dialogue text-sm text-muted-foreground mb-2">
                     {activeTab === "default"
                         ? `NO DEFAULT ${type.toUpperCase()}S AVAILABLE`
                         : `NO UPLOADED ${type.toUpperCase()}S FOUND`}
                   </p>
                   {activeTab === "uploaded" && portfolioFilter === "current" && !currentPortfolioId && (
-                      <p className="text-[8px] text-muted-foreground">
+                      <p className="font-dialogue text-sm text-muted-foreground">
                         SELECT A PORTFOLIO TO SEE ASSETS
                       </p>
                   )}
@@ -255,7 +255,7 @@ export function AssetLibraryModal({
                     >
                       {/* Type Badge */}
                       {asset.type === "uploaded" && (
-                          <div className="absolute top-1 right-1 bg-blue-500 text-white text-[8px] px-1 py-0.5">
+                          <div className="absolute top-1 right-1 bg-blue-500 text-white font-dialogue text-sm px-1 py-0.5">
                             MY
                           </div>
                       )}
@@ -321,9 +321,9 @@ export function AssetLibraryModal({
                           </div>
                       )}
 
-                      <p className="text-[10px] text-center truncate">{asset.name}</p>
+                      <p className="font-dialogue text-sm text-center truncate">{asset.name}</p>
                       {asset.portfolioName && asset.type === "uploaded" && (
-                          <p className="text-[8px] text-muted-foreground text-center truncate">
+                          <p className="font-dialogue text-sm text-muted-foreground text-center truncate">
                             {asset.portfolioName}
                           </p>
                       )}
@@ -335,7 +335,7 @@ export function AssetLibraryModal({
           {/* Selection Info */}
           {selectedAsset && (
               <div className="p-3 border-2 border-border bg-muted">
-                <p className="text-[10px]">
+                <p className="font-dialogue text-sm">
                   SELECTED: <strong>{selectedAsset.name}</strong>
                   {selectedAsset.type === "uploaded" && " (Your Upload)"}
                 </p>
@@ -356,12 +356,12 @@ export function AssetLibraryModal({
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-2 border-t-2 border-border">
-            <PixelButton variant="secondary" className="flex-1 text-[10px]" onClick={onClose}>
+            <PixelButton variant="secondary" className="flex-1 text-xs" onClick={onClose}>
               CANCEL
             </PixelButton>
             <PixelButton
                 variant="primary"
-                className="flex-1 text-[10px]"
+                className="flex-1 text-xs"
                 onClick={handleSelect}
                 disabled={!selectedAsset}
             >

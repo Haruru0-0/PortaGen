@@ -117,13 +117,13 @@ export default function LandingPage() {
           <div className="hidden md:flex gap-4">
             <Link
               href="#features"
-              className="text-xs hover:text-primary transition-colors"
+              className="inline-block py-3 text-xs hover:text-primary transition-colors"
             >
               Features
             </Link>
             <Link
               href="#how-it-works"
-              className="text-xs hover:text-primary transition-colors"
+              className="inline-block py-3 text-xs hover:text-primary transition-colors"
             >
               How it Works
             </Link>
@@ -131,8 +131,8 @@ export default function LandingPage() {
           <div className="hidden md:flex gap-4">
             <PixelButton asChild
                 variant="secondary"
-                className="text-[10px] px-4 py-2"><Link href="/auth/login">LOG IN</Link></PixelButton>
-            <PixelButton asChild variant="primary" className="text-[10px] px-4 py-2"><Link href="/auth/signup">SIGN UP</Link></PixelButton>
+                className="text-xs px-4 py-2"><Link href="/auth/login">LOG IN</Link></PixelButton>
+            <PixelButton asChild variant="primary" className="text-xs px-4 py-2"><Link href="/auth/signup">SIGN UP</Link></PixelButton>
           </div>
 
           {/* Mobile nav button */}
@@ -208,9 +208,9 @@ export default function LandingPage() {
           </div>
 
           <h1 className="hero-title text-2xl md:text-4xl pixel-text-shadow leading-relaxed">
-            PORTAGEN
+            BUILD A DESKTOP.
             <br />
-            PIXEL PORTFOLIOS
+            PUBLISH A LINK.
           </h1>
 
           <p className="font-dialogue text-base md:text-xl text-foreground max-w-2xl mx-auto leading-relaxed">
@@ -446,8 +446,8 @@ export default function LandingPage() {
               </p>
             </div>
             <div className="space-y-3">
-              <h3 className="text-[10px] pixel-text-shadow">QUICK LINKS</h3>
-              <div className="text-[10px] [&_a]:inline-block [&_a]:py-2">
+              <h3 className="text-xs pixel-text-shadow">QUICK LINKS</h3>
+              <div className="font-dialogue text-sm [&_a]:inline-block [&_a]:py-3">
                 <div>
                   <Link
                     href="/auth/signup"

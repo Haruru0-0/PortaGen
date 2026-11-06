@@ -53,7 +53,7 @@ export function IconsTab() {
                                     height={32}
                                     className="w-8 h-8 object-cover border-2 border-border"
                                 />
-                                <span className="text-[10px]">{icon.name}</span>
+                                <span className="font-dialogue text-sm">{icon.name}</span>
                             </div>
                             <div className="flex gap-2">
                                 <button
@@ -79,7 +79,7 @@ export function IconsTab() {
 
                 <PixelButton
                     variant="secondary"
-                    className="w-full text-[10px] flex items-center justify-center gap-2"
+                    className="w-full text-xs flex items-center justify-center gap-2"
                     onClick={handleAdd}
                 >
                     <Plus className="w-4 h-4" />

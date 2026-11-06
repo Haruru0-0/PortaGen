@@ -99,6 +99,7 @@ export function AssetPicker({ isOpen, onClose, onSelect, type = "all" }: AssetPi
             <div className="space-y-4 h-[60vh] flex flex-col">
                 <div className="shrink-0">
                     <PixelInput
+                        aria-label="Search assets"
                         placeholder="SEARCH ASSETS..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -113,7 +114,7 @@ export function AssetPicker({ isOpen, onClose, onSelect, type = "all" }: AssetPi
                     ) : filteredAssets.length === 0 ? (
                         <div className="flex flex-col justify-center items-center h-full text-muted-foreground space-y-2">
                             <div className="text-4xl">📂</div>
-                            <p className="text-[10px]">NO ASSETS FOUND</p>
+                            <p className="font-dialogue text-sm">NO ASSETS FOUND</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -151,8 +152,8 @@ export function AssetPicker({ isOpen, onClose, onSelect, type = "all" }: AssetPi
                                             )}
                                         </div>
                                         <div className="w-full">
-                                            <p className="text-[10px] font-bold truncate">{asset.name}</p>
-                                            <div className="flex justify-between items-center text-[8px] text-muted-foreground">
+                                            <p className="text-xs font-bold truncate">{asset.name}</p>
+                                            <div className="flex justify-between items-center font-dialogue text-sm text-muted-foreground">
                                                 <span>{asset.type.toUpperCase()}</span>
                                                 <span>{formatFileSize(asset.fileSize)}</span>
                                             </div>
@@ -167,14 +168,14 @@ export function AssetPicker({ isOpen, onClose, onSelect, type = "all" }: AssetPi
                 <div className="shrink-0 pt-2 flex gap-3">
                     <PixelButton
                         variant="secondary"
-                        className="flex-1 text-[10px]"
+                        className="flex-1 text-xs"
                         onClick={onClose}
                     >
                         CANCEL
                     </PixelButton>
                     <PixelButton
                         variant="primary"
-                        className="flex-1 text-[10px]"
+                        className="flex-1 text-xs"
                         onClick={handleSelect}
                         disabled={!selectedAssetId}
                     >

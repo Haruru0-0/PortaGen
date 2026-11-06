@@ -23,7 +23,7 @@ export function WindowsTab() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm dashboard-pixel-text-shadow">YOUR WINDOWS</h3>
-            <div className="text-[10px] text-muted-foreground">
+            <div className="font-dialogue text-sm text-muted-foreground">
               {windows.length} window{windows.length !== 1 ? 's' : ''}
             </div>
           </div>
@@ -32,7 +32,7 @@ export function WindowsTab() {
             A window opens when a visitor clicks a desktop icon. To make a new one, add an icon that links to a window;
             it then shows up here so you can edit what is inside.
           </p>
-          <PixelButton variant="secondary" className="text-[10px]" onClick={() => setActiveHomeScreenTab("icons")}>
+          <PixelButton variant="secondary" className="text-xs" onClick={() => setActiveHomeScreenTab("icons")}>
             ADD AN ICON
           </PixelButton>
 
@@ -54,12 +54,12 @@ export function WindowsTab() {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[10px] font-bold truncate">{w.name}</span>
-                        <span className="text-[8px] px-1 py-0.5 border border-border bg-card capitalize">
+                        <span className="text-xs font-bold truncate">{w.name}</span>
+                        <span className="font-dialogue text-sm px-1 py-0.5 border border-border bg-card capitalize">
                           {w.data?.type || 'text'}
                         </span>
                       </div>
-                      <p className="text-[8px] text-muted-foreground truncate">
+                      <p className="font-dialogue text-sm text-muted-foreground truncate">
                         {w.data?.description || 'Custom content'}
                       </p>
                     </div>

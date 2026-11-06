@@ -6,6 +6,9 @@ import { getDashboardStats } from "@/lib/activity"
 import { formatDistanceToNow } from "date-fns"
 import { redirect } from "next/navigation"
 import Link from "next/link"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = { title: "Dashboard | PortaGen" }
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -48,7 +51,7 @@ export default async function DashboardPage() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="space-y-3 flex-1">
             <h2 className="text-lg pixel-text-shadow break-words">WELCOME BACK, {user.username?.toUpperCase() || 'PLAYER'}!</h2>
-            <p className="text-[10px] text-muted-foreground leading-relaxed">READY TO BUILD SOMETHING AWESOME TODAY?</p>
+            <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">READY TO BUILD SOMETHING AWESOME TODAY?</p>
           </div>
           <PixelCharacter color="#8B5CF6" size={40} animate />
         </div>
@@ -83,7 +86,7 @@ export default async function DashboardPage() {
                   className={`w-5 h-5 shrink-0 border-2 border-border ${item.done ? "bg-primary text-primary-foreground" : "bg-muted"} flex items-center justify-center`}
                   aria-hidden="true"
                 >
-                  {item.done && <span className="text-[10px]">✓</span>}
+                  {item.done && <span className="font-dialogue text-sm">✓</span>}
                 </div>
                 <span className={`font-dialogue text-sm break-words ${item.done ? "text-muted-foreground" : ""}`}>
                   {item.task}
@@ -107,7 +110,7 @@ export default async function DashboardPage() {
                   <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className="w-2 h-2 bg-primary shrink-0 mt-1.5" />
                     <div className="space-y-1 min-w-0 flex-1">
-                      <p className="text-[10px] leading-normal break-words">
+                      <p className="font-dialogue text-sm leading-normal break-words">
                         {!activity.description.toLowerCase().startsWith(String(activity.actionType).toLowerCase()) && (
                           <span className="text-primary font-bold mr-1">{activity.actionType}</span>
                         )}
@@ -115,13 +118,13 @@ export default async function DashboardPage() {
                       </p>
                     </div>
                   </div>
-                  <span className="text-[9px] text-muted-foreground uppercase sm:text-right shrink-0 whitespace-nowrap self-end sm:self-start sm:mt-1">
+                  <span className="text-xs text-muted-foreground uppercase sm:text-right shrink-0 whitespace-nowrap self-end sm:self-start sm:mt-1">
                     {formatDistanceToNow(activity.createdAt, { addSuffix: true })}
                   </span>
                 </div>
               ))
             ) : (
-              <div className="text-[10px] text-muted-foreground py-2">NO RECENT ACTIVITY</div>
+              <div className="font-dialogue text-sm text-muted-foreground py-2">NO RECENT ACTIVITY</div>
             )}
           </div>
         </div>

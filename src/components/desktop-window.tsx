@@ -127,7 +127,7 @@ export function DesktopWindow({
       >
         <div className="flex items-center gap-2">
           <span className="text-base">{icon}</span>
-          <span className="text-[10px]">{title}</span>
+          <span className="font-dialogue text-sm">{title}</span>
         </div>
         <div className="flex gap-2 window-controls">
           <button

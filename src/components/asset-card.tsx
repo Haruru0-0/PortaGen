@@ -28,7 +28,7 @@ export default function AssetCard(props: {
                     } flex items-center justify-center`}
                 >
                     {props.selectedAssets.includes(props.asset.id) && (
-                        <span className="text-[10px]">✓</span>
+                        <span className="font-dialogue text-sm">✓</span>
                     )}
                 </button>
             </div>
@@ -76,7 +76,7 @@ export default function AssetCard(props: {
                     </Tooltip>
                 </div>
 
-                <div className="flex flex-col text-[10px] text-muted-foreground">
+                <div className="flex flex-col font-dialogue text-sm text-muted-foreground">
                     <p>{props.fileSize}</p>
                     <p>{new Date(props.asset.date).toLocaleDateString()}</p>
                     <p>{props.asset.type}</p>
@@ -86,7 +86,7 @@ export default function AssetCard(props: {
             <div className="flex gap-2">
                 <PixelButton
                     variant="secondary"
-                    className="flex-1 text-[10px] px-2 py-1"
+                    className="flex-1 text-xs px-2 py-1"
                     onClick={props.onView}
                 >
                     VIEW
@@ -95,7 +95,7 @@ export default function AssetCard(props: {
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <button
-                            className="w-8 h-8 border-2 border-border bg-card hover:bg-muted text-[10px]"
+                            className="w-8 h-8 border-2 border-border bg-card hover:bg-muted text-xs"
                             onClick={props.onDownload}
                         >
                             <Image alt={"Download button"} src={Download}/>
@@ -109,7 +109,7 @@ export default function AssetCard(props: {
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <button
-                            className="w-8 h-8 border-2 bg-card hover:bg-destructive text-[10px]"
+                            className="w-8 h-8 border-2 bg-card hover:bg-destructive text-xs"
                             onClick={props.onDelete}
                         >
                             <Image alt={"Delete button"} src={Delete}/>
