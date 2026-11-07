@@ -4,7 +4,7 @@ Read this first. One line per note.
 
 - [[architecture]]: stack, routes, data and the window system.
 - [[features-built]]: what the app does, including the unfinished port.
-- [[decisions]]: choices and why.
+- [[decisions]]: choices and why (includes the game-menu redesign direction).
 - [[gotchas]]: traps.
 - [[roadmap]]: what is open.
 

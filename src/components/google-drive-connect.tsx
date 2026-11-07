@@ -32,7 +32,7 @@ export function GoogleDriveConnect({ portfolioId }: GoogleDriveConnectProps) {
         <>
             <PixelButton
                 variant="primary"
-                className="text-[10px]"
+                className="text-xs"
                 onClick={() => setIsModalOpen(true)}
                 disabled={isConnecting}
             >
@@ -45,7 +45,7 @@ export function GoogleDriveConnect({ portfolioId }: GoogleDriveConnectProps) {
                 title="CONNECT GOOGLE DRIVE"
             >
                 <div className="space-y-4">
-                    <p className="text-[10px] text-muted-foreground">
+                    <p className="font-dialogue text-sm text-muted-foreground">
                         Connect your Google Drive to store and manage assets for this portfolio.
                         Files will be organized in a portfolio-specific folder.
                     </p>

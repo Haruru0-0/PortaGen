@@ -210,6 +210,7 @@ export function DashboardSidebar() {
               isCollapsed ? "px-2" : "px-4",
             )}
             title={isCollapsed ? item.label : undefined}
+            aria-label={isCollapsed ? item.label : undefined}
             onMouseEnter={(e) => handleNavHover(e, true)}
             onMouseLeave={(e) => handleNavHover(e, false)}
           >

@@ -48,7 +48,7 @@ export function SoundEditor({ sounds, onSoundsChange }: SoundEditorProps) {
         <PixelCard key={sound.id}>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h4 className="text-[10px] font-bold">{sound.name}</h4>
+              <h4 className="text-xs font-bold">{sound.name}</h4>
               {sound.url && (
                 <button
                   onClick={() => playSound(sound.url, sound.volume)}
@@ -69,11 +69,11 @@ export function SoundEditor({ sounds, onSoundsChange }: SoundEditorProps) {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-[8px] uppercase flex items-center gap-1">
+                <label className="text-xs uppercase flex items-center gap-1">
                   {sound.volume > 0 ? <Volume2 className="w-3 h-3" /> : <VolumeX className="w-3 h-3" />}
                   VOLUME
                 </label>
-                <span className="text-[8px]">{sound.volume}%</span>
+                <span className="font-dialogue text-sm">{sound.volume}%</span>
               </div>
               <input
                 type="range"

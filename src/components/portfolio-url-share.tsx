@@ -62,10 +62,10 @@ export function PortfolioUrlShare() {
     >
       <div className="flex items-center gap-2 mb-4">
         <div className="w-3 h-3 rounded-full bg-accent animate-pulse" />
-        <h3 className="font-bold text-lg">Share Your Portfolio</h3>
+        <h2 className="font-bold text-lg">Share Your Portfolio</h2>
       </div>
 
-      <p className="text-sm text-muted-foreground mb-4">
+      <p className="font-dialogue text-base text-muted-foreground mb-4">
         Your portfolio is live! Share this link with others to showcase your work.
       </p>
 

@@ -116,7 +116,7 @@ export function ComponentRenderer({
                                                     </CardContent>
                                                 </Card>
                                                 {/* Edit Item Overlay */}
-                                                <div className="absolute top-2 right-2 opacity-0 group-hover/item:opacity-100 transition-opacity z-10">
+                                                <div className="absolute top-2 right-2 opacity-70 group-hover/item:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10">
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation()
@@ -160,7 +160,7 @@ export function ComponentRenderer({
                                         )}
                                     </PixelCard>
                                     {/* Edit Item Overlay */}
-                                    <div className="absolute top-2 right-2 opacity-0 group-hover/item:opacity-100 transition-opacity z-10">
+                                    <div className="absolute top-2 right-2 opacity-70 group-hover/item:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10">
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation()

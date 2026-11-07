@@ -72,7 +72,7 @@ export function PortfolioSelector({
                         <label className="block text-xs uppercase tracking-wider">PORTFOLIO</label>
                         <PixelButton
                             variant="secondary"
-                            className="text-[10px] flex items-center gap-1 px-3 py-1"
+                            className="text-xs flex items-center gap-1 px-3 py-1"
                             onClick={() => setIsCreatePortfolioModalOpen(true)}
                         >
                             <Plus className="w-3 h-3" />
@@ -92,7 +92,7 @@ export function PortfolioSelector({
                         ))}
                     </select>
                     {portfolios.length === 0 && (
-                        <p className="text-[10px] text-muted-foreground mt-2">
+                        <p className="font-dialogue text-sm text-muted-foreground mt-2">
                             No portfolios found. Create your first portfolio to get started.
                         </p>
                     )}
@@ -117,14 +117,14 @@ export function PortfolioSelector({
                     <div className="flex gap-3 justify-end">
                         <PixelButton
                             variant="secondary"
-                            className="text-[10px]"
+                            className="text-xs"
                             onClick={() => setIsCreatePortfolioModalOpen(false)}
                         >
                             CANCEL
                         </PixelButton>
                         <PixelButton
                             variant="primary"
-                            className="text-[10px]"
+                            className="text-xs"
                             onClick={createPortfolio}
                             disabled={creatingPortfolio || !newPortfolioName.trim()}
                         >

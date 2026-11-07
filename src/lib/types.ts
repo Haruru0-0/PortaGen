@@ -54,7 +54,7 @@ export const playlist: Track[] = [
 ];
 
 
-export type WindowContentType = "about" | "projects" | "contact" | "resume" | "blog" | "links" | "blank"
+export type WindowContentType = "about" | "projects" | "contact" | "resume" | "blog" | "links" | "terminal" | "achievements" | "blank"
 
 export interface SocialLink {
     platform: string
@@ -175,6 +175,67 @@ export interface BlogData {
     source?: 'hashnode' | 'devto' | 'medium' | 'custom'
     username?: string
     rssUrl?: string
+}
+
+export interface TerminalFile {
+    name: string
+    lines: string[]
+}
+
+export interface TerminalCustomCommand {
+    command: string
+    output: string[]
+    style?: 'output' | 'success' | 'error'
+    unlocks?: string // achievement id unlocked when this command runs
+}
+
+export interface TerminalInfoRow {
+    label: string
+    value: string
+}
+
+export interface TerminalData {
+    username?: string // prompt user, e.g. "visitor"
+    hostname?: string // prompt host, e.g. "my-portfolio"
+    welcomeLines?: string[]
+    whoami?: string
+    files?: TerminalFile[]
+    infoRows?: TerminalInfoRow[] // shown by the neofetch command
+    commands?: TerminalCustomCommand[]
+}
+
+export type AchievementTriggerType =
+    | 'first_window'
+    | 'window_opened'
+    | 'all_windows'
+    | 'windows_open'
+    | 'music_play'
+    | 'minimize'
+    | 'time_range'
+    | 'terminal_open'
+    | 'terminal_command'
+    | 'manual' // only unlocked by a terminal command's "unlocks" field
+
+export interface AchievementItem {
+    id: string
+    name: string
+    description: string
+    icon: string
+    trigger: {
+        type: AchievementTriggerType
+        windowName?: string // window_opened
+        count?: number // windows_open
+        fromHour?: number // time_range (0-23, wraps past midnight when fromHour > toHour)
+        toHour?: number
+        command?: string // terminal_command
+    }
+}
+
+export interface AchievementsData {
+    title?: string
+    subtitle?: string
+    footer?: string
+    achievements: AchievementItem[]
 }
 
 export type ComponentType = 'text' | 'image' | 'card' | 'carousel' | 'button' | 'divider' | 'spacer' | 'card-group' | 'vertical-separator'

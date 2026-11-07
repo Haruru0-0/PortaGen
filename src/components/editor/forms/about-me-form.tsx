@@ -99,7 +99,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
         <div className="space-y-8 max-w-4xl mx-auto pixel-text relative">
             {/* Profile Section */}
             <AnimatedSection variant="scale" duration={0.7} className="text-center group relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
-                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                     <Settings2 className="w-4 h-4 text-muted-foreground" />
                 </div>
 
@@ -116,7 +116,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                             <AvatarImage src={data.profileImage || "/profile-photo.jpg"} alt="Profile" />
                             <AvatarFallback className="rounded-none bg-[var(--cute-highlight)] text-[var(--cute-text)]">AK</AvatarFallback>
                         </Avatar>
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity rounded-none">
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/avatar:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity rounded-none">
                             <span className="text-white text-xs font-bold pointer-events-none">CHANGE</span>
                         </div>
                     </div>
@@ -441,7 +441,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                         {(data.testimonials || []).map((testimonial, index) => (
                             <CarouselItem key={index} className="basis-full sm:basis-1/2 lg:basis-1/3">
                                 <div className="p-1 h-full relative group">
-                                    <div className="absolute right-2 top-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity z-10 flex gap-1">
+                                    <div className="absolute right-2 top-2 opacity-70 lg:group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10 flex gap-1">
                                         {isDesktop ? (
                                             <Dialog>
                                                 <DialogTrigger asChild>
@@ -660,7 +660,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                     {(data.hobbies || []).map((hobby, index) => (
                         <AnimatedItem key={index}>
                             <Card className="h-full pixel-card hover:shadow-md transition-shadow relative group">
-                                <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10">
                                     <Button
                                         variant="ghost"
                                         size="sm"

@@ -30,7 +30,7 @@ export function MobileNav() {
               }`}
             >
               <Icon className="w-5 h-5" />
-              <span className="text-[9px] font-medium tracking-wide scale-90 sm:scale-100">{item.label}</span>
+              <span className="font-dialogue text-sm font-medium tracking-wide scale-90 sm:scale-100">{item.label}</span>
             </Link>
           )
         })}

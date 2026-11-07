@@ -943,3 +943,62 @@
 html {
   scroll-behavior: smooth;
 }
+
+/* ------------------------------------------------------------------
+   Readability for PortaGen's own pages (landing, auth, privacy, dashboard, editor).
+   The published portfolio is deliberately left alone: it does not use these classes.
+------------------------------------------------------------------- */
+
+/* The shared muted grey (#9e9e9e) is only 2.0 to 2.7:1 on white and the cyan sky. Inside these pages use a navy grey. */
+.readable {
+  --muted-foreground: #3d5a73;
+  --color-muted-foreground: #3d5a73;
+}
+.dark .readable {
+  --muted-foreground: #a7ebf2;
+  --color-muted-foreground: #a7ebf2;
+}
+
+/* Dialogue type for sentences, like the text box in a retro RPG; Press Start 2P stays for titles, buttons and numbers. */
+.font-dialogue {
+  font-family: var(--font-dialogue), ui-monospace, monospace;
+  letter-spacing: 0.01em;
+}
+
+/* The drop shadow for pixel headings. It was used on every heading but never defined. */
+.pixel-text-shadow {
+  text-shadow: 2px 2px 0 var(--pixel-text-shadow-color, var(--luna-cyan));
+}
+.dark .pixel-text-shadow {
+  --pixel-text-shadow-color: #000;
+}
+
+/* A solid, square focus ring for keyboard users on PortaGen's own pages. The default was a 1px outline at 50% opacity. */
+.readable :focus-visible {
+  outline: 3px solid var(--luna-blue-darkest);
+  outline-offset: 2px;
+}
+.dark .readable :focus-visible {
+  outline-color: var(--luna-cyan-light);
+}
+
+/* Real pixel press states: the button sinks toward its shadow on hover and lands on it when pressed. */
+.dashboard-pixel-button:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
+}
+.dashboard-pixel-button:active:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-pixel-button:hover:not(:disabled),
+  .dashboard-pixel-button:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* In dark mode the shared muted background is a neutral #424242, the only grey in the app. Use a navy step instead. */
+.dark .readable {
+  --muted: #02294a;
+}

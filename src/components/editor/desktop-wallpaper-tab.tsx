@@ -201,7 +201,7 @@ export function DesktopWallpaperTab() {
             />
             <PixelButton
               variant="secondary"
-              className="w-full text-[10px] flex items-center justify-center gap-2"
+              className="w-full text-xs flex items-center justify-center gap-2"
               onClick={() => openAssetPicker("wallpaper")}
             >
               <Library className="w-3 h-3" />
@@ -209,14 +209,14 @@ export function DesktopWallpaperTab() {
             </PixelButton>
 
             <div className="pt-2 space-y-2">
-              <p className="text-[10px] text-muted-foreground uppercase">OR IMAGE LINK (PINTEREST ETC)</p>
+              <p className="text-xs text-muted-foreground uppercase">OR IMAGE LINK (PINTEREST ETC)</p>
               <div className="flex gap-2">
                 <PixelInput
                   placeholder="https://..."
                   value={urlInput}
                   onChange={handleUrlInputChange}
                 />
-                <PixelButton className="text-[10px]" onClick={handleSaveUrl} disabled={!urlInput}>SAVE</PixelButton>
+                <PixelButton className="text-xs" onClick={handleSaveUrl} disabled={!urlInput}>SAVE</PixelButton>
               </div>
               {urlInput && (
                 <div className="relative w-full h-32 border border-border rounded overflow-hidden">
@@ -233,7 +233,7 @@ export function DesktopWallpaperTab() {
           </div>
           {pendingWallpaperFile && (
             <PixelButton
-              className="w-full text-[10px]"
+              className="w-full text-xs"
               onClick={handleSaveWallpaper}
             >
               SAVE WALLPAPER
@@ -248,7 +248,7 @@ export function DesktopWallpaperTab() {
           <h3 className="text-sm dashboard-pixel-text-shadow">MENU BAR SETTINGS</h3>
 
           <div className="space-y-2">
-            <p className="text-[10px] text-muted-foreground uppercase">Menu Bar Icon</p>
+            <p className="text-xs text-muted-foreground uppercase">Menu Bar Icon</p>
             <div className="space-y-2">
               <FileUpload
                 accept="image/*"
@@ -259,7 +259,7 @@ export function DesktopWallpaperTab() {
               />
               <PixelButton
                 variant="secondary"
-                className="w-full text-[10px] flex items-center justify-center gap-2"
+                className="w-full text-xs flex items-center justify-center gap-2"
                 onClick={() => openAssetPicker("icon")}
               >
                 <Library className="w-3 h-3" />
@@ -267,14 +267,14 @@ export function DesktopWallpaperTab() {
               </PixelButton>
 
               <div className="pt-2 space-y-2">
-                <p className="text-[10px] text-muted-foreground uppercase">OR IMAGE LINK</p>
+                <p className="text-xs text-muted-foreground uppercase">OR IMAGE LINK</p>
                 <div className="flex gap-2">
                   <PixelInput
                     placeholder="https://..."
                     value={menubarUrlInput}
                     onChange={handleMenubarUrlInputChange}
                   />
-                  <PixelButton className="text-[10px]" onClick={handleSaveMenubarUrl} disabled={!menubarUrlInput}>SAVE</PixelButton>
+                  <PixelButton className="text-xs" onClick={handleSaveMenubarUrl} disabled={!menubarUrlInput}>SAVE</PixelButton>
                 </div>
                 {menubarUrlInput && (
                   <div className="relative w-10 h-10 border border-border rounded overflow-hidden">
@@ -292,7 +292,7 @@ export function DesktopWallpaperTab() {
           </div>
 
           <div className="space-y-2">
-            <p className="text-[10px] text-muted-foreground uppercase">Menu Bar Name</p>
+            <p className="text-xs text-muted-foreground uppercase">Menu Bar Name</p>
             <PixelInput
               value={menubarText}
               onChange={(e) => setMenubarText(e.target.value)}
@@ -301,7 +301,7 @@ export function DesktopWallpaperTab() {
           </div>
 
           <PixelButton
-            className="w-full text-[10px]"
+            className="w-full text-xs"
             onClick={handleSaveMenubar}
             disabled={uploading}
           >
@@ -313,11 +313,11 @@ export function DesktopWallpaperTab() {
 
       <PixelModal isOpen={renameOpen} onClose={() => !uploading && setRenameOpen(false)} title="RENAME WALLPAPER">
         <div className="space-y-4">
-          <p className="text-[10px] text-muted-foreground">SET A NAME FOR YOUR WALLPAPER</p>
+          <p className="font-dialogue text-sm text-muted-foreground">SET A NAME FOR YOUR WALLPAPER</p>
           <PixelInput value={customName} onChange={(e) => setCustomName(e.target.value)} placeholder="Enter name" />
           <div className="flex gap-3 pt-2">
-            <PixelButton variant="secondary" className="flex-1 text-[10px]" onClick={() => setRenameOpen(false)} disabled={uploading}>CANCEL</PixelButton>
-            <PixelButton className="flex-1 text-[10px]" onClick={confirmUploadWallpaper} disabled={uploading || !pendingWallpaperFile}>{uploading ? 'UPLOADING…' : 'UPLOAD'}</PixelButton>
+            <PixelButton variant="secondary" className="flex-1 text-xs" onClick={() => setRenameOpen(false)} disabled={uploading}>CANCEL</PixelButton>
+            <PixelButton className="flex-1 text-xs" onClick={confirmUploadWallpaper} disabled={uploading || !pendingWallpaperFile}>{uploading ? 'UPLOADING…' : 'UPLOAD'}</PixelButton>
           </div>
         </div>
       </PixelModal>

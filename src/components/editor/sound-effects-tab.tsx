@@ -94,7 +94,7 @@ export function SoundEffectsTab() {
                     <h3 className="text-sm dashboard-pixel-text-shadow">SOUND PRESETS</h3>
                 </div>
 
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                     Choose from different 8-bit sound presets for your portfolio
                 </p>
 
@@ -129,14 +129,14 @@ export function SoundEffectsTab() {
 
                 <PixelButton
                     onClick={handleSave}
-                    className="w-full text-[10px]"
+                    className="w-full font-dialogue text-sm"
                     disabled={isLoading}
                 >
                     {isLoading ? 'SAVING…' : 'SAVE'}
                 </PixelButton>
 
                 <div className="border-t-2 border-border pt-4">
-                    <div className="text-[10px] text-muted-foreground space-y-2">
+                    <div className="text-xs text-muted-foreground space-y-2">
                         <p><strong>Tips:</strong></p>
                         <ul className="list-disc list-inside space-y-1">
                             <li>Click the play button to preview a preset's sounds</li>

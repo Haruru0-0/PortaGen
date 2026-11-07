@@ -17,8 +17,8 @@ import { useState } from "react"
 
 // Validation schema
 const loginSchema = z.object({
-  identifier: z.string().min(1, { message: "IDENTIFIER IS REQUIRED" }),
-  password: z.string().min(8, { message: "PASSWORD MUST BE 8+ CHARACTERS" }),
+  identifier: z.string().min(1, { message: "Enter your email or username" }),
+  password: z.string().min(1, { message: "Enter your password" }),
 })
 
 type LoginFormValues = z.infer<typeof loginSchema>
@@ -92,7 +92,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4">
+    <div className="min-h-screen relative flex items-center justify-center p-4 readable">
       <PixelClouds />
 
       {/* Pixel cityscape background */}
@@ -105,7 +105,7 @@ export default function LoginPage() {
               className="bg-[#6D28D9]"
               style={{
                 width: "40px",
-                height: `${Math.random() * 60 + 40}px`,
+                height: `${40 + ((i * 29 + 7) % 60)}px`,
                 opacity: 0.8,
               }}
             />
@@ -114,6 +114,7 @@ export default function LoginPage() {
       </div>
 
       <div className="relative z-10 w-full max-w-md">
+        <Link href="/" className="inline-block py-2 mb-2 font-dialogue text-sm text-foreground hover:underline">← Back to home</Link>
         <PixelCard>
           <div className="space-y-6">
             {/* Header */}
@@ -122,29 +123,29 @@ export default function LoginPage() {
                 <PixelCharacter color="#EC4899" size={60} />
               </div>
               <h1 className="text-xl pixel-text-shadow">LOG IN</h1>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
                 WELCOME BACK, PLAYER!
               </p>
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 text-[10px] text-center">
+              <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 font-dialogue text-sm text-center">
                 {error}
               </div>
             )}
 
             {/* Form with React Hook Form */}
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div>
                 <PixelInput
                   label="EMAIL OR USERNAME"
                   type="text"
-                  placeholder="YOU@EXAMPLE.COM OR YOUR USERNAME"
-                  {...form.register("identifier")}
+                  placeholder="EMAIL OR USERNAME"
+                  {...form.register("identifier")} aria-invalid={!!form.formState.errors.identifier} autoComplete="username"
                 />
                 {form.formState.errors.identifier && (
-                  <p className="text-red-500 text-[10px] mt-1">
+                  <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
                     {form.formState.errors.identifier.message}
                   </p>
                 )}
@@ -154,10 +155,10 @@ export default function LoginPage() {
                 <PixelPasswordInput
                   label="PASSWORD"
                   placeholder="********"
-                  {...form.register("password")}
+                  {...form.register("password")} aria-invalid={!!form.formState.errors.password} autoComplete="current-password"
                 />
                 {form.formState.errors.password && (
-                  <p className="text-red-500 text-[10px] mt-1">
+                  <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
                     {form.formState.errors.password.message}
                   </p>
                 )}
@@ -166,7 +167,7 @@ export default function LoginPage() {
               <div className="flex justify-end">
                 <Link
                   href="/auth/forgot-password"
-                  className="text-[10px] text-primary hover:underline"
+                  className="inline-block py-2 font-dialogue text-sm text-primary hover:underline"
                 >
                   FORGOT PASSWORD?
                 </Link>
@@ -188,7 +189,7 @@ export default function LoginPage() {
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t-2 border-border" />
                 </div>
-                <div className="relative flex justify-center text-[10px]">
+                <div className="relative flex justify-center font-dialogue text-sm">
                   <span className="bg-card px-2 text-muted-foreground">
                     OR CONTINUE WITH
                   </span>
@@ -198,7 +199,7 @@ export default function LoginPage() {
               <div className="grid grid-cols-2 gap-3">
                 <PixelButton
                   variant="secondary"
-                  className="w-full text-[10px]"
+                  className="w-full text-xs"
                   onClick={() => handleOAuthSignIn("google")}
                   disabled={loading}
                   type="button"
@@ -207,7 +208,7 @@ export default function LoginPage() {
                 </PixelButton>
                 <PixelButton
                   variant="secondary"
-                  className="w-full text-[10px]"
+                  className="w-full text-xs"
                   onClick={() => handleOAuthSignIn("github")}
                   disabled={loading}
                   type="button"
@@ -218,7 +219,7 @@ export default function LoginPage() {
             </div>
 
             {/* Sign Up Link */}
-            <p className="text-center text-[10px] text-muted-foreground leading-relaxed">
+            <p className="font-dialogue text-center text-sm text-muted-foreground leading-relaxed">
               NEW PLAYER?{" "}
               <Link href="/auth/signup" className="text-primary hover:underline">
                 CREATE ACCOUNT

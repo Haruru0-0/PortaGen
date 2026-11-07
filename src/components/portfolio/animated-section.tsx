@@ -1,9 +1,21 @@
-import { type ReactNode, useRef, useEffect, useState } from "react"
+import { type ReactNode, createContext, useRef, useEffect, useState } from "react"
 import { gsap } from "gsap"
 import { useGSAP } from "@gsap/react"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
 gsap.registerPlugin(ScrollTrigger)
+
+export const ScrollContainerContext = createContext<{ current: HTMLElement | null } | null>(null)
+
+export function ScrollContainerProvider({
+  children,
+  container,
+}: {
+  children: ReactNode
+  container: { current: HTMLElement | null }
+}) {
+  return <ScrollContainerContext.Provider value={container}>{children}</ScrollContainerContext.Provider>
+}
 
 type AnimationVariant =
   | "fadeIn"

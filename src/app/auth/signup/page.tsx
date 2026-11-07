@@ -189,7 +189,7 @@ export default function SignUpPage() {
   // OTP Verification View
   if (verifying) {
     return (
-      <div className="min-h-screen relative flex items-center justify-center p-4">
+      <div className="min-h-screen relative flex items-center justify-center p-4 readable">
         <PixelClouds />
 
         <div className="fixed bottom-0 left-0 right-0 h-48 z-0">
@@ -201,7 +201,7 @@ export default function SignUpPage() {
                 className="bg-[#6D28D9]"
                 style={{
                   width: "40px",
-                  height: `${Math.random() * 60 + 40}px`,
+                  height: `${40 + ((i * 29 + 7) % 60)}px`,
                   opacity: 0.8,
                 }}
               />
@@ -210,6 +210,7 @@ export default function SignUpPage() {
         </div>
 
         <div className="relative z-10 w-full max-w-md">
+          <Link href="/" className="inline-block py-2 mb-2 font-dialogue text-sm text-foreground hover:underline">← Back to home</Link>
           <PixelCard>
             <div className="space-y-6">
               <div className="text-center space-y-4">
@@ -217,13 +218,13 @@ export default function SignUpPage() {
                   <PixelCharacter color="#8B5CF6" size={60} />
                 </div>
                 <h1 className="text-xl pixel-text-shadow">VERIFY EMAIL</h1>
-                <p className="text-xs text-muted-foreground leading-relaxed uppercase">
+                <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
                   Check your email for a verification link.
                 </p>
               </div>
 
               {error && (
-                <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 text-[10px] text-center">
+                <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 font-dialogue text-sm text-center">
                   {error}
                 </div>
               )}
@@ -231,23 +232,23 @@ export default function SignUpPage() {
               <div className="space-y-6">
                 <div className="pixel-card bg-primary/20 border-2 border-primary p-6 text-center space-y-4">
                   <p className="text-sm font-bold pixel-text-shadow">CHECK YOUR MAIL</p>
-                  <p className="text-[10px] leading-relaxed uppercase">
+                  <p className="text-xs leading-relaxed uppercase">
                     We've sent a verification link to your email address.
                     Please click the link to activate your account.
                   </p>
                 </div>
 
                 <div className="text-center space-y-4">
-                  <p className="text-[9px] text-muted-foreground uppercase">
+                  <p className="font-dialogue text-sm text-muted-foreground">
                     Didn't receive an email? Check your spam folder or try again later.
                   </p>
 
                   {resendMessage && (
-                    <p className="text-[10px] text-green-500 font-bold animate-pulse">{resendMessage}</p>
+                    <p className="text-xs text-green-500 font-bold animate-pulse">{resendMessage}</p>
                   )}
 
                   <PixelButton
-                    className="w-full text-[10px] mb-2"
+                    className="w-full text-xs mb-2"
                     onClick={handleResendEmail}
                     disabled={resending}
                     variant="secondary"
@@ -258,7 +259,7 @@ export default function SignUpPage() {
                   <button
                     type="button"
                     onClick={() => setVerifying(false)}
-                    className="w-full text-[10px] text-muted-foreground hover:text-primary"
+                    className="w-full text-xs text-muted-foreground hover:text-primary"
                   >
                     ← BACK TO SIGNUP
                   </button>
@@ -273,7 +274,7 @@ export default function SignUpPage() {
 
   // Signup Form View
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4">
+    <div className="min-h-screen relative flex items-center justify-center p-4 readable">
       <PixelClouds />
 
       <div className="fixed bottom-0 left-0 right-0 h-48 z-0">
@@ -285,7 +286,7 @@ export default function SignUpPage() {
               className="bg-[#6D28D9]"
               style={{
                 width: "40px",
-                height: `${Math.random() * 60 + 40}px`,
+                height: `${40 + ((i * 29 + 7) % 60)}px`,
                 opacity: 0.8,
               }}
             />
@@ -294,6 +295,7 @@ export default function SignUpPage() {
       </div>
 
       <div className="relative z-10 w-full max-w-lg">
+        <Link href="/" className="inline-block py-2 mb-2 font-dialogue text-sm text-foreground hover:underline">← Back to home</Link>
         <PixelCard>
           <div className="space-y-6">
             <div className="text-center space-y-4">
@@ -301,28 +303,28 @@ export default function SignUpPage() {
                 <PixelCharacter color="#8B5CF6" size={60} />
               </div>
               <h1 className="text-xl pixel-text-shadow">SIGN UP</h1>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
                 CREATE YOUR PIXEL PORTFOLIO
               </p>
             </div>
 
             {error && (
-              <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 text-[10px] text-center">
+              <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 font-dialogue text-sm text-center">
                 {error}
               </div>
             )}
 
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="flex justify-between items-start gap-3">
                 <div>
                   <PixelInput
                     label="FIRST NAME"
                     type="text"
                     placeholder="JOHN"
-                    {...form.register("firstName")}
+                    {...form.register("firstName")} aria-invalid={!!form.formState.errors.firstName} autoComplete="given-name"
                   />
                   {form.formState.errors.firstName && (
-                    <p className="text-red-500 text-[10px] mt-1">
+                    <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
                       {form.formState.errors.firstName.message}
                     </p>
                   )}
@@ -333,10 +335,10 @@ export default function SignUpPage() {
                     label="LAST NAME"
                     type="text"
                     placeholder="DOE"
-                    {...form.register("lastName")}
+                    {...form.register("lastName")} aria-invalid={!!form.formState.errors.lastName} autoComplete="family-name"
                   />
                   {form.formState.errors.lastName && (
-                    <p className="text-red-500 text-[10px] mt-1">
+                    <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
                       {form.formState.errors.lastName.message}
                     </p>
                   )}
@@ -348,10 +350,10 @@ export default function SignUpPage() {
                   label="USERNAME"
                   type="text"
                   placeholder="YOURUSERNAME"
-                  {...form.register("username")}
+                  {...form.register("username")} aria-invalid={!!form.formState.errors.username} autoComplete="username"
                 />
                 {form.formState.errors.username && (
-                  <p className="text-red-500 text-[10px] mt-1">
+                  <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
                     {form.formState.errors.username.message}
                   </p>
                 )}
@@ -362,10 +364,10 @@ export default function SignUpPage() {
                   label="EMAIL"
                   type="email"
                   placeholder="YOU@EXAMPLE.COM"
-                  {...form.register("email")}
+                  {...form.register("email")} aria-invalid={!!form.formState.errors.email} autoComplete="email"
                 />
                 {form.formState.errors.email && (
-                  <p className="text-red-500 text-[10px] mt-1">
+                  <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
                     {form.formState.errors.email.message}
                   </p>
                 )}
@@ -376,11 +378,11 @@ export default function SignUpPage() {
                   <PixelPasswordInput
                     label="PASSWORD"
                     placeholder="********"
-                    {...form.register("password")}
+                    {...form.register("password")} aria-invalid={!!form.formState.errors.password} autoComplete="new-password"
                     onChange={handlePasswordChange}
                   />
                   {form.formState.errors.password && (
-                    <p className="text-red-500 text-[10px] mt-1">
+                    <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
                       {form.formState.errors.password.message}
                     </p>
                   )}
@@ -398,7 +400,7 @@ export default function SignUpPage() {
                           />
                         ))}
                       </div>
-                      <p className="text-[10px] text-muted-foreground">
+                      <p className="font-dialogue text-sm text-muted-foreground">
                         STRENGTH: {getStrengthText()}
                       </p>
                     </div>
@@ -409,16 +411,16 @@ export default function SignUpPage() {
                   <PixelPasswordInput
                     label="CONFIRM PASSWORD"
                     placeholder="********"
-                    {...form.register("confirmPassword")}
+                    {...form.register("confirmPassword")} aria-invalid={!!form.formState.errors.confirmPassword} autoComplete="new-password"
                   />
                   {form.formState.errors.confirmPassword && (
-                    <p className="text-red-500 text-[10px] mt-1">
+                    <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
                       {form.formState.errors.confirmPassword.message}
                     </p>
                   )}
                 </div>
               </div>
-              <div className="text-center text-[10px] text-muted-foreground leading-relaxed">
+              <div className="font-dialogue text-center text-sm text-muted-foreground leading-relaxed">
                 By creating an account, you agree to our{" "}
                 <Link href="/privacy?from=Signup" className="text-primary hover:underline">
                   Privacy Policy
@@ -440,7 +442,7 @@ export default function SignUpPage() {
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t-2 border-border" />
                 </div>
-                <div className="relative flex justify-center text-[10px]">
+                <div className="relative flex justify-center font-dialogue text-sm">
                   <span className="bg-card px-2 text-muted-foreground">
                     OR CONTINUE WITH
                   </span>
@@ -450,7 +452,7 @@ export default function SignUpPage() {
               <div className="grid grid-cols-2 gap-3">
                 <PixelButton
                   variant="secondary"
-                  className="w-full text-[10px]"
+                  className="w-full text-xs"
                   onClick={() => handleOAuthSignUp("google")}
                   disabled={loading}
                   type="button"
@@ -459,7 +461,7 @@ export default function SignUpPage() {
                 </PixelButton>
                 <PixelButton
                   variant="secondary"
-                  className="w-full text-[10px]"
+                  className="w-full text-xs"
                   onClick={() => handleOAuthSignUp("github")}
                   disabled={loading}
                   type="button"
@@ -469,7 +471,7 @@ export default function SignUpPage() {
               </div>
             </div>
 
-            <p className="text-center text-[10px] text-muted-foreground leading-relaxed">
+            <p className="font-dialogue text-center text-sm text-muted-foreground leading-relaxed">
               ALREADY HAVE AN ACCOUNT?{" "}
               <Link href="/auth/login" className="text-primary hover:underline">
                 LOG IN

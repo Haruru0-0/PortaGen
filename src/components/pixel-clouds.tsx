@@ -1,6 +1,6 @@
 export function PixelClouds() {
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10" aria-hidden="true">
       {/* Cloud 1 */}
       <div className="absolute top-12 left-[10%] dashboard-pixel-cloud" style={{ animationDelay: "0s" }}>
         <svg width="80" height="40" viewBox="0 0 80 40" fill="none">

@@ -98,8 +98,12 @@ export function ThemeEditor() {
   return (
     <div className="space-y-4">
       {/* Theme Presets */}
-      <div className="space-y-3">
-        <h4 className="text-[10px] pixel-text-shadow">THEME PRESETS</h4>
+      <details open className="group space-y-3">
+        <summary className="cursor-pointer list-none flex items-center justify-between min-h-11 text-xs pixel-text-shadow [&::-webkit-details-marker]:hidden">
+          THEME PRESETS
+          <span aria-hidden="true" className="group-open:hidden">+</span>
+          <span aria-hidden="true" className="hidden group-open:inline">−</span>
+        </summary>
         <div className="grid grid-cols-1 gap-2">
           {THEME_PRESETS.map((preset, index) => (
             <button
@@ -110,7 +114,7 @@ export function ThemeEditor() {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] font-bold">{preset.name}</p>
+                  <p className="text-xs font-bold">{preset.name}</p>
                 </div>
                 {customTheme.name === preset.name && <Check className="w-4 h-4" />}
               </div>
@@ -124,14 +128,18 @@ export function ThemeEditor() {
             </button>
           ))}
         </div>
-      </div>
+      </details>
 
       {/* Custom Colors */}
-      <div className="space-y-3">
-        <h4 className="text-[10px] pixel-text-shadow">CUSTOM COLORS</h4>
+      <details className="group space-y-3">
+        <summary className="cursor-pointer list-none flex items-center justify-between min-h-11 text-xs pixel-text-shadow [&::-webkit-details-marker]:hidden">
+          CUSTOM COLORS
+          <span aria-hidden="true" className="group-open:hidden">+</span>
+          <span aria-hidden="true" className="hidden group-open:inline">−</span>
+        </summary>
         {Object.entries(customTheme.colors).map(([key, value]) => (
           <div key={key} className="space-y-1">
-            <label className="text-[8px] uppercase">{key}</label>
+            <label className="text-xs uppercase">{key}</label>
             <div className="flex gap-2">
               <input
                 type="color"
@@ -147,15 +155,15 @@ export function ThemeEditor() {
             </div>
           </div>
         ))}
-      </div>
+      </details>
 
       {/* Font */}
       <div className="space-y-2">
-        <label className="text-[8px] uppercase">FONT</label>
+        <label className="text-xs uppercase">FONT</label>
         <select
           value={customTheme.font}
           onChange={(e) => handleFontChange(e.target.value)}
-          className="w-full px-3 py-2 text-[10px] bg-input border-2 border-border focus:outline-none focus:ring-2 focus:ring-ring"
+          className="w-full px-3 py-2 font-dialogue text-sm bg-input border-2 border-border focus:outline-none focus:ring-2 focus:ring-ring"
         >
           {PORTFOLIO_FONTS.map((font) => (
             <option
@@ -173,13 +181,13 @@ export function ThemeEditor() {
       <div className="space-y-3">
         {/* Taskbar Style */}
         <div className="space-y-2">
-          <label className="text-[8px] uppercase">TASKBAR STYLE</label>
+          <label className="text-xs uppercase">TASKBAR STYLE</label>
           <div className="grid grid-cols-2 gap-2">
             {TASKBAR_TEMPLATES.map((template) => (
               <button
                 key={template.id}
                 onClick={() => handleTaskbarStyleChange(template.id)}
-                className={`px-3 py-2 text-[8px] border-2 border-border ${customTheme.taskbarStyleId === template.id
+                className={`px-3 py-2 text-xs border-2 border-border ${customTheme.taskbarStyleId === template.id
                   ? "bg-primary text-primary-foreground"
                   : "bg-card hover:bg-muted"
                   }`}
@@ -191,13 +199,13 @@ export function ThemeEditor() {
         </div>
         {/* Menubar Style */}
         <div className="space-y-2">
-          <label className="text-[8px] uppercase">MENUBAR STYLE</label>
+          <label className="text-xs uppercase">MENUBAR STYLE</label>
           <div className="grid grid-cols-2 gap-2">
             {MENUBAR_TEMPLATES.map((template) => (
               <button
                 key={template.id}
                 onClick={() => handleMenubarStyleChange(template.id)}
-                className={`px-3 py-2 text-[8px] border-2 border-border ${customTheme.menubarStyleId === template.id
+                className={`px-3 py-2 text-xs border-2 border-border ${customTheme.menubarStyleId === template.id
                   ? "bg-primary text-primary-foreground"
                   : "bg-card hover:bg-muted"
                   }`}
@@ -210,13 +218,13 @@ export function ThemeEditor() {
       </div>
       {/* Window Style */}
       <div className="space-y-2">
-        <label className="text-[8px] uppercase">WINDOW STYLE</label>
+        <label className="text-xs uppercase">WINDOW STYLE</label>
         <div className="grid grid-cols-2 gap-2">
           {WINDOW_TEMPLATES.map((template) => (
             <button
               key={template.id}
               onClick={() => handleWindowStyleChange(template.id)}
-              className={`px-3 py-2 text-[8px] border-2 border-border ${customTheme.windowStyleId === template.id
+              className={`px-3 py-2 text-xs border-2 border-border ${customTheme.windowStyleId === template.id
                 ? "bg-primary text-primary-foreground"
                 : "bg-card hover:bg-muted"
                 }`}
@@ -228,13 +236,13 @@ export function ThemeEditor() {
       </div>
       {/* Music Player Style */}
       <div className="space-y-2">
-        <label className="text-[8px] uppercase">MUSIC PLAYER STYLE</label>
+        <label className="text-xs uppercase">MUSIC PLAYER STYLE</label>
         <div className="grid grid-cols-2 gap-2">
           {MUSIC_PLAYER_TEMPLATES.map((template) => (
             <button
               key={template.id}
               onClick={() => handleMusicPlayerStyleChange(template.id)}
-              className={`px-3 py-2 text-[8px] border-2 border-border ${customTheme.musicPlayerStyleId === template.id
+              className={`px-3 py-2 text-xs border-2 border-border ${customTheme.musicPlayerStyleId === template.id
                 ? "bg-primary text-primary-foreground"
                 : "bg-card hover:bg-muted"
                 }`}
@@ -246,7 +254,7 @@ export function ThemeEditor() {
       </div>
       <div className="mt-6">
         <PixelButton
-          className="w-full text-[10px]"
+          className="w-full text-xs"
           onClick={() => {
             updateTheme(currentPortfolioId, customTheme)
           }}

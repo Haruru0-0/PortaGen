@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { PortfolioUrlShare } from "@/components/portfolio-url-share"
 import { PreviewPanel } from "@/components/editor/preview-panel"
 import { CategorySelection } from "@/components/editor/CategorySelection"
@@ -19,23 +20,28 @@ export default function EditorPage() {
         <div>
             <PortfolioUrlShare />
 
+            {driveLoading && (
+                <PixelCard className="mt-4">
+                    <div className="min-h-24 bg-muted animate-pulse motion-reduce:animate-none" role="status" aria-label="Checking Google Drive" />
+                </PixelCard>
+            )}
             {!driveLoading && !connected && (
-                <PixelCard className="border-yellow-500 mt-8">
+                <PixelCard className="border-yellow-500 mt-4">
                     <div className="flex flex-col md:flex-row items-center justify-between p-4 gap-4 md:gap-2">
                         <div className="flex items-center gap-3">
                             <XCircle className="w-6 h-6 text-yellow-500" />
                             <div>
-                                <p className="text-[10px] font-bold">
+                                <p className="text-xs font-bold">
                                     GOOGLE DRIVE NOT CONNECTED
                                 </p>
-                                <p className="text-[8px] text-muted-foreground">
+                                <p className="font-dialogue text-sm text-muted-foreground">
                                     Connect your Google Drive to upload and manage assets
                                 </p>
                             </div>
                         </div>
                         <PixelButton
                             variant="primary"
-                            className="text-[10px] flex items-center gap-2"
+                            className="text-xs flex items-center gap-2"
                             onClick={connectDrive}
                             disabled={driveLoading}
                         >
@@ -46,21 +52,56 @@ export default function EditorPage() {
                 </PixelCard>
             )}
 
-            <div className={`min-h-[calc(100vh-180px)] flex flex-col ${!driveLoading && !connected ? 'mt-4' : 'mt-8'}`}>
-                <PortfolioSettings />
+            <div id="editor-top" className="min-h-[calc(100vh-180px)] flex flex-col mt-4">
+                {/* From 1400px the preview sits beside all the controls and stays in view; below that it stacks under them */}
+                <div className="min-[1400px]:grid min-[1400px]:grid-cols-[minmax(0,1fr)_440px] min-[1400px]:gap-6 min-[1400px]:items-start">
+                    <div className="min-w-0">
+                        <PortfolioSettings />
 
-                <CategorySelection />
+                        <CategorySelection />
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                    <TabsNavigation />
-                    <TabContent />
-                </div>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 min-[1400px]:grid-cols-[180px_minmax(0,1fr)] gap-6 mb-6">
+                            <TabsNavigation />
+                            <TabContent />
+                        </div>
+                    </div>
 
-                {/* Preview Panel - Below Everything */}
-                <div className="flex-1">
-                    <PreviewPanel />
+                    <div id="live-preview" className="flex-1 scroll-mt-4 min-[1400px]:sticky min-[1400px]:top-4 min-[1400px]:max-h-[calc(100vh-2rem)] min-[1400px]:overflow-y-auto">
+                        <a
+                            href="#editor-top"
+                            className="inline-block py-2 mb-2 font-dialogue text-sm text-foreground hover:underline min-[1400px]:hidden"
+                        >
+                            ↑ Back to the controls
+                        </a>
+                        <PreviewPanel />
+                    </div>
                 </div>
             </div>
+            <JumpToPreviewButton />
         </div>
+    )
+}
+
+/** A floating "preview" button, shown only while the live preview is scrolled out of view. */
+function JumpToPreviewButton() {
+    const [visible, setVisible] = useState(false)
+
+    useEffect(() => {
+        const target = document.getElementById("live-preview")
+        if (!target) return
+        const observer = new IntersectionObserver(([entry]) => setVisible(!entry.isIntersecting), { threshold: 0.05 })
+        observer.observe(target)
+        return () => observer.disconnect()
+    }, [])
+
+    if (!visible) return null
+    return (
+        <a
+            href="#live-preview"
+            className="min-[1400px]:hidden fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] md:bottom-4 right-20 z-50 h-14 px-4 flex items-center bg-secondary text-secondary-foreground border-4 border-foreground shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-xs font-bold uppercase tracking-wider"
+            aria-label="Jump to the live preview"
+        >
+            Preview ↓
+        </a>
     )
 }

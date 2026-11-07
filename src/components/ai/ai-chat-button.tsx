@@ -10,7 +10,7 @@ export function AIChatButton() {
         <button
             onClick={() => setIsOpen(!isOpen)}
             className={`
-        fixed bottom-4 right-4 z-50
+        fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] md:bottom-4 right-4 z-50
         w-14 h-14
         bg-primary hover:bg-primary/90
         border-4 border-foreground

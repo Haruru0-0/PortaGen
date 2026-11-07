@@ -108,11 +108,11 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
                   onValueChange={field.onChange}
                   className="grid grid-cols-2 gap-2 p-2 border-2 border-border bg-card"
                 >
-                  <label className="flex items-center gap-2 px-2 py-1 text-[10px] border-2 border-border bg-muted cursor-pointer">
+                  <label className="flex items-center gap-2 px-2 py-1 text-xs border-2 border-border bg-muted cursor-pointer">
                     <RadioGroupItem value="window" className="border-2 border-border" />
                     Link to Window
                   </label>
-                  <label className="flex items-center gap-2 px-2 py-1 text-[10px] border-2 border-border bg-muted cursor-pointer">
+                  <label className="flex items-center gap-2 px-2 py-1 text-xs border-2 border-border bg-muted cursor-pointer">
                     <RadioGroupItem value="url" className="border-2 border-border" />
                     Link to URL
                   </label>
@@ -132,7 +132,7 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
             <FileUpload accept="image/*" onFileSelect={handleUpload} maxSize={1} label={preview ? "REPLACE IMAGE" : "UPLOAD IMAGE"} />
             <PixelButton
               variant="secondary"
-              className="w-full text-[10px] flex items-center justify-center gap-2"
+              className="w-full text-xs flex items-center justify-center gap-2"
               onClick={() => setAssetPickerOpen(true)}
               type="button"
             >
@@ -167,10 +167,10 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
             )} />
           )}
           <div className="flex gap-3 pt-2">
-            <PixelButton type="button" variant="secondary" className="flex-1 text-[10px]" onClick={onClose} disabled={loading || uploading}>
+            <PixelButton type="button" variant="secondary" className="flex-1 text-xs" onClick={onClose} disabled={loading || uploading}>
               CANCEL
             </PixelButton>
-            <PixelButton type="submit" variant="primary" className="flex-1 text-[10px]" disabled={loading || uploading}>
+            <PixelButton type="submit" variant="primary" className="flex-1 text-xs" disabled={loading || uploading}>
               {loading || uploading ? 'UPDATING…' : 'UPDATE'}
             </PixelButton>
           </div>

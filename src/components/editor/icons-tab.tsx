@@ -34,7 +34,6 @@ export function IconsTab() {
         setOpenEdit(true)
     }
     const handleDelete = (id: number) => setDeleteTarget(id)
-    console.log(icons)
     return (
         <PixelCard>
             <div className="space-y-4">
@@ -54,20 +53,24 @@ export function IconsTab() {
                                     height={32}
                                     className="w-8 h-8 object-cover border-2 border-border"
                                 />
-                                <span className="text-[10px]">{icon.name}</span>
+                                <span className="font-dialogue text-sm">{icon.name}</span>
                             </div>
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => handleEdit(icon)}
-                                    className="w-8 h-8 border-2 border-border bg-card hover:bg-primary hover:text-primary-foreground transition-colors flex items-center justify-center"
+                                    aria-label={`Edit icon ${icon.name}`}
+                                    title="Edit icon"
+                                    className="w-10 h-10 border-2 border-border bg-card hover:bg-primary hover:text-primary-foreground transition-colors flex items-center justify-center"
                                 >
-                                    <Edit2 className="w-3 h-3" />
+                                    <Edit2 className="w-4 h-4" />
                                 </button>
                                 <button
                                     onClick={() => handleDelete(icon.id)}
-                                    className="w-8 h-8 border-2 border-border bg-card hover:bg-destructive hover:text-destructive-foreground transition-colors flex items-center justify-center"
+                                    aria-label={`Delete icon ${icon.name}`}
+                                    title="Delete icon"
+                                    className="w-10 h-10 border-2 border-border bg-card hover:bg-destructive hover:text-destructive-foreground transition-colors flex items-center justify-center"
                                 >
-                                    <Trash2 className="w-3 h-3" />
+                                    <Trash2 className="w-4 h-4" />
                                 </button>
                             </div>
                         </div>
@@ -76,7 +79,7 @@ export function IconsTab() {
 
                 <PixelButton
                     variant="secondary"
-                    className="w-full text-[10px] flex items-center justify-center gap-2"
+                    className="w-full text-xs flex items-center justify-center gap-2"
                     onClick={handleAdd}
                 >
                     <Plus className="w-4 h-4" />

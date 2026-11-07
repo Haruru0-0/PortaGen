@@ -28,16 +28,17 @@ export function PortfolioSettings() {
             <PixelCard>
                 <div className="flex flex-col gap-4">
                     <div>
-                        <label className="block text-xs uppercase tracking-wider mb-1">Portfolio Name</label>
                         <PixelInput
+                            label="Portfolio Name"
                             value={portfolioInfo?.portfolioName || ""}
                             onChange={(e) => setPortfolioName(e.target.value)}
                             placeholder="MY PORTFOLIO"
                         />
                     </div>
                     <div>
-                        <label className="block text-xs uppercase tracking-wider mb-1">Bio</label>
+                        <label htmlFor="portfolio-bio" className="block text-xs uppercase tracking-wider mb-2">Bio</label>
                         <textarea
+                            id="portfolio-bio"
                             value={portfolioInfo?.bio || ""}
                             onChange={(e) => setBio(e.target.value)}
                             placeholder="A short description..."

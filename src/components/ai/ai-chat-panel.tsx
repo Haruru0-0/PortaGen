@@ -24,7 +24,7 @@ export function AIChatPanel() {
           fixed bottom-20 right-4 z-50
           w-[360px] max-w-[calc(100vw-2rem)]
           h-[500px] max-h-[calc(100vh-8rem)]
-          bg-white
+          bg-card readable
           border-4 border-foreground
           shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)]
           flex flex-col
@@ -38,8 +38,8 @@ export function AIChatPanel() {
 
     return (
         <Drawer open={isOpen} onOpenChange={setIsOpen}>
-            <DrawerContent className="bg-white">
-                <DrawerHeader className="border-b pb-2">
+            <DrawerContent className="bg-card readable">
+                <DrawerHeader className="border-b pb-2 relative pr-14">
                     <DrawerTitle className="flex items-center gap-2">
                         <Sparkles className="w-5 h-5 text-primary" />
                         PORTAGEN AI
@@ -47,6 +47,14 @@ export function AIChatPanel() {
                     <DrawerDescription>
                         Your pixel-perfect portfolio assistant
                     </DrawerDescription>
+                    <button
+                        type="button"
+                        onClick={() => setIsOpen(false)}
+                        className="absolute right-3 top-3 w-10 h-10 bg-destructive hover:bg-destructive/80 border-2 border-foreground flex items-center justify-center transition-colors"
+                        aria-label="Close chat"
+                    >
+                        <X className="w-5 h-5 text-destructive-foreground" />
+                    </button>
                 </DrawerHeader>
                 <div className="h-[50vh] flex flex-col">
                     <ChatContent onClose={() => setIsOpen(false)} isMobile />
@@ -195,7 +203,7 @@ function ChatContent({ onClose, isMobile = false }: { onClose: () => void, isMob
                         className="
               flex-1 px-3 py-2
               text-xs
-              bg-white
+              bg-background text-foreground
               border-2 border-foreground
               focus:outline-none focus:ring-2 focus:ring-primary
               placeholder:text-muted-foreground
@@ -221,7 +229,7 @@ function ChatContent({ onClose, isMobile = false }: { onClose: () => void, isMob
                         )}
                     </button>
                 </div>
-                <p className="mt-2 text-[10px] text-muted-foreground text-center">
+                <p className="mt-2 font-dialogue text-sm text-muted-foreground text-center">
                     I help with bios, projects & PortaGen tips only
                 </p>
             </form>
