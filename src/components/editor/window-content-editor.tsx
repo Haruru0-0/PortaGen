@@ -1,8 +1,8 @@
 import React, { useState, useEffect, JSX } from "react"
 import { PixelCard } from "@/components/pixel-card"
 import { PixelButton } from "@/components/pixel-button"
-import { Save, Layout, User, Briefcase, Mail, FileText, Link, BookOpen, ArrowLeft } from "lucide-react"
-import type { WindowContent, WindowContentType, TemplateData, AboutMeData, ProjectsData, ContactData, ResumeData, BlogData, LinksData } from "@/lib/types"
+import { Save, Layout, User, Briefcase, Mail, FileText, Link, BookOpen, ArrowLeft, Terminal as TerminalIcon, Trophy } from "lucide-react"
+import type { WindowContent, WindowContentType, TemplateData, AboutMeData, ProjectsData, ContactData, ResumeData, BlogData, LinksData, TerminalData, AchievementsData } from "@/lib/types"
 import { LinksForm } from "./forms/links-form"
 import { AboutMeForm } from "./forms/about-me-form"
 import { ProjectsForm } from "./forms/projects-form"
@@ -10,6 +10,9 @@ import { ContactForm } from "./forms/contact-form"
 import { ResumeForm } from "./forms/resume-form"
 import { BlogForm } from "./forms/blog-form"
 import { BlankTemplateEditor } from "./forms/blank-template-editor"
+import { TerminalForm } from "./forms/terminal-form"
+import { AchievementsForm } from "./forms/achievements-form"
+import { DEFAULT_CONTENT_BY_TYPE } from "@/lib/portfolio-extras"
 import { uploadFile } from "@/lib/services/uploadService"
 import { useWindowsContext } from "@/contexts/windowsContext"
 
@@ -53,6 +56,16 @@ const CONTENT_TEMPLATES: Record<WindowContentType, {
         name: "Links",
         icon: <Link className="w-4 h-4" />,
         description: "Social media and external links"
+    },
+    terminal: {
+        name: "Terminal",
+        icon: <TerminalIcon className="w-4 h-4" />,
+        description: "Interactive command line with your own files and commands"
+    },
+    achievements: {
+        name: "Achievements",
+        icon: <Trophy className="w-4 h-4" />,
+        description: "Unlockable achievements for visitors who explore"
     }
 }
 
@@ -116,7 +129,7 @@ export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }:
     const handleTypeChange = (type: WindowContentType) => {
         setSelectedType(type)
         // Reset content data when type changes, or set default structure
-        setContentData({})
+        setContentData((DEFAULT_CONTENT_BY_TYPE[type] as TemplateData) ?? {})
         setFilesToUpload(new Map())
 
         // Update window name to match template if it's a new window or using default name
@@ -199,6 +212,10 @@ export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }:
                 return <BlogForm initialData={contentData as BlogData} onChange={setContentData} onFileSelect={handleFileSelect} onUrlSelect={handleUrlUpdate} />
             case "links":
                 return <LinksForm initialData={contentData as LinksData} onChange={setContentData} />
+            case "terminal":
+                return <TerminalForm initialData={contentData as TerminalData} onChange={setContentData} />
+            case "achievements":
+                return <AchievementsForm initialData={contentData as AchievementsData} onChange={setContentData} />
             case "blank":
                 return <BlankTemplateEditor initialData={contentData as any} onChange={setContentData} />
             default:

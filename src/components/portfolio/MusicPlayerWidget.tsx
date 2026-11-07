@@ -11,6 +11,7 @@ import { ExpandedPlayer } from "./music-player/ExpandedPlayer";
 import { MobilePlayer } from "./music-player/MobilePlayer";
 import { getMusicPlayerJSX } from "./music-player-styles";
 import { MusicPlayerStyleProps } from "./music-player-styles/types";
+import { useAchievements } from "./achievement-context";
 
 // Type definition for Spotify Web Playback SDK Player
 interface SpotifyPlayer {
@@ -164,6 +165,11 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
   } = useContext(AudioContext);
 
   const { playClickSound, playMenuSound, playPowerUpSound } = useAppSound();
+  const { emit: emitAchievement } = useAchievements();
+
+  useEffect(() => {
+    if (isPlaying) emitAchievement({ type: "music_play" });
+  }, [isPlaying, emitAchievement]);
 
   // Resolve track source (string | next-video Asset) to URL string
   const resolveTrackSrc = (src: Track["src"]): string => {

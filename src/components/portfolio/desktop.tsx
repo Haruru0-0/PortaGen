@@ -21,6 +21,7 @@ import { useDesktopContext } from "@/contexts/desktopContext";
 import { useDesktopStore } from "@/lib/stores/desktop-store";
 import type { WindowContent } from "@/lib/types";
 import { useParams } from "next/navigation";
+import { AchievementProvider, useAchievements } from "./achievement-context";
 
 const AboutMe = React.lazy(() => import("./about-me"));
 const Resume = React.lazy(() => import("./resume"));
@@ -28,12 +29,26 @@ const Projects = React.lazy(() => import("./projects"));
 const Blog = React.lazy(() => import("./blog"));
 const Links = React.lazy(() => import("./links"));
 const Contact = React.lazy(() => import("./contact"));
+const Terminal = React.lazy(() => import("./terminal"));
+const Achievements = React.lazy(() => import("./achievements"));
 
 import { useWindowsContext } from "@/contexts/windowsContext";
 import { useThemeStore } from "@/lib/stores/theme-store";
 import { useTheme } from "@/contexts/theme-context";
 
-export default function Desktop({ preview = false, previewMode }: { preview?: boolean; previewMode?: "desktop" | "mobile" }) {
+type DesktopProps = { preview?: boolean; previewMode?: "desktop" | "mobile" };
+
+export default function Desktop(props: DesktopProps) {
+  // The editor preview must not toast or persist achievement progress
+  if (props.preview) return <DesktopInner {...props} />;
+  return (
+    <AchievementProvider>
+      <DesktopInner {...props} />
+    </AchievementProvider>
+  );
+}
+
+function DesktopInner({ preview = false, previewMode }: DesktopProps) {
   type WindowData = {
     name: string;
     minimized: boolean;
@@ -48,6 +63,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
   const { windows: fetchedWindows, fetchWindows, displayWindows } = useWindowsContext();
   const musicPlayerStyleId = useThemeStore((state) => state.musicPlayerStyleId);
   const { getThemeData, displayThemeData } = useTheme()
+  const { emit } = useAchievements();
 
   useEffect(() => {
     if (currentPortfolioId && !data) {
@@ -119,6 +135,11 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
     }
   }, [openWindows, isDesktop]);
 
+  useEffect(() => {
+    const visible = openWindows.filter((w) => !w.minimized).length;
+    if (visible > 0) emit({ type: "windows_open", count: visible });
+  }, [openWindows, emit]);
+
   const getComponentForWindow = (name: string) => {
     const windowContent = effectiveWindows.find((w: WindowContent) => w.name === name);
 
@@ -135,6 +156,8 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
         case "blog": return <Blog data={actualContent} />;
         case "links": return <Links />;
         case "contact": return <Contact data={actualContent} />;
+        case "terminal": return <Terminal data={actualContent} />;
+        case "achievements": return <Achievements data={actualContent} />;
         default: return <div>{windowContent.data.description || "Content"}</div>;
       }
     }
@@ -164,6 +187,8 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
       return;
     }
 
+    emit({ type: "window_opened", windowName: windowContent.name });
+
     setOpenWindows((prev) => {
       if (prev.find((w) => w.name === windowContent.name)) return prev;
       return [
@@ -178,6 +203,7 @@ export default function Desktop({ preview = false, previewMode }: { preview?: bo
   };
 
   const minimizeWindow = (name: string) => {
+    emit({ type: "minimize" });
     setOpenWindows((prev) =>
       prev.map((w) => (w.name === name ? { ...w, minimized: true } : w))
     );
