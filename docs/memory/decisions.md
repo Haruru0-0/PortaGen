@@ -9,6 +9,9 @@ See [[architecture]]. Reasons marked (inferred) were not stated.
 
 ## Game-menu redesign direction (2026-11-07)
 
+- **2026-11-10 integration:** completed the earlier authorized local merge and switched to `main`. The full redesign and all-page correction are in commit `eea3bd6`; the fast-forward had no conflicts and policy tests pass on the merged tree. No remote push or deployment.
+
+
 - **2026-11-10 Persona correction implemented:** the approved visual language now extends across auth, portfolio slots, assets, settings, editor controls/window titles, privacy and owner dialogs. Added route artwork/water scenes, angled headings and pointed white/red/pink selections. Forty responsive fixture combinations pass, plus keyboard tabs, asset-picker geometry/focus return and preview token isolation. The temporary fixture route was removed. See `docs/qa/2026-11-10-persona-correction.md`; real authenticated service flows remain unverified. This supersedes the earlier note that visual correction was pending.
 
 

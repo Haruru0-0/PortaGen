@@ -9,7 +9,7 @@ Read this first. One line per note.
 - [[roadmap]]: what is open.
 - [Persona design plan](../persona-design-plan.md): proposed visual system, mockup screens, and implementation sequence.
 - [Eighty-Six artwork set](../artwork/eighty-six-reference-set.md): the eleven supplied-reference edits, art constraints, and source/output mapping.
-- [Blue Hour redesign specification](../superpowers/specs/2026-11-09-blue-hour-redesign-design.md) and [implementation plan](../superpowers/plans/2026-11-09-blue-hour-redesign.md): supplied video, longer landing, owner-page scope and staged execution. [Impeccable + UI UX Pro Max review](../superpowers/reviews/2026-11-09-blue-hour-ui-ux-review.md) incorporated; implementation is now in the local working tree. [Implementation QA](../qa/2026-11-09-blue-hour-redesign.md) records responsive checks and authenticated validation limits.
+- [Blue Hour redesign specification](../superpowers/specs/2026-11-09-blue-hour-redesign-design.md) and [implementation plan](../superpowers/plans/2026-11-09-blue-hour-redesign.md): supplied video, longer landing, owner-page scope and staged execution. [Impeccable + UI UX Pro Max review](../superpowers/reviews/2026-11-09-blue-hour-ui-ux-review.md) incorporated; implementation and the all-page correction are merged into local `main` (code commit `eea3bd6`). [Implementation QA](../qa/2026-11-09-blue-hour-redesign.md) records responsive checks and authenticated validation limits.
 
 - [Persona identity correction QA](../qa/2026-11-10-persona-correction.md): all owner routes now use the shared game-menu identity; responsive fixtures, keyboard/dialog checks and remaining live-service limits.
 
