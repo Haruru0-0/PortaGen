@@ -2,8 +2,8 @@
 
 import { useMemo } from "react"
 import { Plus, Trash2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/components/editor/editor-form-controls"
+import { Input } from "@/components/editor/editor-form-controls"
 import { Label } from "@/components/ui/label"
 import { DEFAULT_ACHIEVEMENTS_DATA } from "@/lib/portfolio-extras"
 import type { AchievementItem, AchievementTriggerType, AchievementsData } from "@/lib/types"

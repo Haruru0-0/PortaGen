@@ -4,15 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useState } from "react";
-import Link from "next/link";
+import Link from "@/components/workspace/workspace-link";
 import { createClient } from "@/utils/supabase/client"
 import { useRouter } from "next/navigation"
-import { PixelButton } from "@/components/pixel-button"
-import { PixelCard } from "@/components/pixel-card"
-import { PixelInput } from "@/components/pixel-input"
-import { PixelPasswordInput } from "@/components/pixel-password-input"
-import { PixelClouds } from "@/components/pixel-clouds"
-import { PixelCharacter } from "@/components/pixel-character"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
+import { useWorkspaceExperience } from "@/components/workspace/workspace-experience-provider"
+import { AuthScene } from "@/components/workspace/auth-scene"
+import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
+import { WorkspacePasswordInput as PixelPasswordInput } from "@/components/workspace/workspace-primitives"
 
 // Validation schema
 const signupSchema = z
@@ -43,6 +42,7 @@ const signupSchema = z
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function SignUpPage() {
+  const { cancelPendingTransition } = useWorkspaceExperience()
   const supabase = createClient();
   const router = useRouter();
   const [error, setError] = useState("");
@@ -114,7 +114,7 @@ export default function SignUpPage() {
 
       if (signUpError) throw signUpError;
 
-      // Note: In a production app, you'd usually have a trigger to sync users 
+      // Note: In a production app, you'd usually have a trigger to sync users
       // or redirect to a page that handles database insertion.
       // For now, if the user is automatically signed in (or we have authData.user),
       // we might want to try to create the user record via an API call or similar.
@@ -123,8 +123,8 @@ export default function SignUpPage() {
       if (authData.user) {
         setVerifying(true);
       }
-    } catch (err: any) {
-      setError(err.message || "SIGNUP FAILED");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "SIGNUP FAILED");
     } finally {
       setLoading(false);
     }
@@ -144,9 +144,10 @@ export default function SignUpPage() {
 
       if (error) throw error;
 
+      cancelPendingTransition()
       router.push("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "INVALID CODE");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "INVALID CODE");
     } finally {
       setLoading(false);
     }
@@ -163,8 +164,8 @@ export default function SignUpPage() {
         },
       });
       if (error) throw error;
-    } catch (err: any) {
-      setError(err.message || "OAUTH FAILED");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "OAUTH FAILED");
     }
   };
 
@@ -179,8 +180,8 @@ export default function SignUpPage() {
       });
       if (error) throw error;
       setResendMessage("EMAIL RESENT! CHECK YOUR INBOX.");
-    } catch (err: any) {
-      setError(err.message || "FAILED TO RESEND EMAIL");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "FAILED TO RESEND EMAIL");
     } finally {
       setResending(false);
     }
@@ -189,133 +190,51 @@ export default function SignUpPage() {
   // OTP Verification View
   if (verifying) {
     return (
-      <div className="min-h-screen relative flex items-center justify-center p-4 readable">
-        <PixelClouds />
-
-        <div className="fixed bottom-0 left-0 right-0 h-48 z-0">
-          <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-[#8B5CF6] to-[#EC4899]" />
-          <div className="absolute bottom-0 w-full flex justify-around items-end">
-            {[...Array(20)].map((_, i) => (
-              <div
-                key={i}
-                className="bg-[#6D28D9]"
-                style={{
-                  width: "40px",
-                  height: `${40 + ((i * 29 + 7) % 60)}px`,
-                  opacity: 0.8,
-                }}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="relative z-10 w-full max-w-md">
-          <Link href="/" className="inline-block py-2 mb-2 font-dialogue text-sm text-foreground hover:underline">← Back to home</Link>
-          <PixelCard>
+      <AuthScene artwork="/artwork/eighty-six/reference-set/09-lena-bouquet.webp" title="Verify your email" description="Check your inbox to activate your account.">
             <div className="space-y-6">
-              <div className="text-center space-y-4">
-                <div className="flex justify-center">
-                  <PixelCharacter color="#8B5CF6" size={60} />
-                </div>
-                <h1 className="text-xl pixel-text-shadow">VERIFY EMAIL</h1>
-                <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
-                  Check your email for a verification link.
-                </p>
-              </div>
+
 
               {error && (
-                <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 font-dialogue text-sm text-center">
+                <div role="alert" className="p-3 bg-red-500/20 border border-red-500 text-[#ffb2c5] font-[family-name:var(--font-workspace-body)] text-sm text-center">
                   {error}
                 </div>
               )}
 
               <div className="space-y-6">
-                <div className="pixel-card bg-primary/20 border-2 border-primary p-6 text-center space-y-4">
-                  <p className="text-sm font-bold pixel-text-shadow">CHECK YOUR MAIL</p>
-                  <p className="text-xs leading-relaxed uppercase">
-                    We've sent a verification link to your email address.
+                <div className="workspace-panel bg-primary/20 border border-primary p-6 text-center space-y-4">
+                  <p className="text-sm font-bold ">CHECK YOUR MAIL</p>
+                  <p className="text-sm leading-relaxed uppercase">
+                    We&apos;ve sent a verification link to your email address.
                     Please click the link to activate your account.
                   </p>
                 </div>
 
                 <div className="text-center space-y-4">
-                  <p className="font-dialogue text-sm text-muted-foreground">
-                    Didn't receive an email? Check your spam folder or try again later.
-                  </p>
-
-                  {resendMessage && (
-                    <p className="text-xs text-green-500 font-bold animate-pulse">{resendMessage}</p>
-                  )}
-
-                  <PixelButton
-                    className="w-full text-xs mb-2"
-                    onClick={handleResendEmail}
-                    disabled={resending}
-                    variant="secondary"
-                  >
-                    {resending ? "SENDING..." : "RESEND EMAIL"}
-                  </PixelButton>
-
-                  <button
-                    type="button"
-                    onClick={() => setVerifying(false)}
-                    className="w-full text-xs text-muted-foreground hover:text-primary"
-                  >
-                    ← BACK TO SIGNUP
-                  </button>
+                  <p className="text-sm text-[#bdd3f3]">Didn’t receive an email? Check your spam folder or try again later.</p>
+                  {resendMessage && <p role="status" className="text-sm text-[#83efbd]">{resendMessage}</p>}
+                  <PixelButton className="w-full" onClick={handleResendEmail} disabled={resending} variant="secondary">{resending ? "Sending…" : "Resend email"}</PixelButton>
+                  <button type="button" onClick={() => setVerifying(false)} className="w-full min-h-11 text-[#44e4ff] hover:underline">Back to signup</button>
                 </div>
               </div>
             </div>
-          </PixelCard>
-        </div>
-      </div>
+          </AuthScene>
     );
   }
 
   // Signup Form View
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4 readable">
-      <PixelClouds />
-
-      <div className="fixed bottom-0 left-0 right-0 h-48 z-0">
-        <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-[#8B5CF6] to-[#EC4899]" />
-        <div className="absolute bottom-0 w-full flex justify-around items-end">
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="bg-[#6D28D9]"
-              style={{
-                width: "40px",
-                height: `${40 + ((i * 29 + 7) % 60)}px`,
-                opacity: 0.8,
-              }}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="relative z-10 w-full max-w-lg">
-        <Link href="/" className="inline-block py-2 mb-2 font-dialogue text-sm text-foreground hover:underline">← Back to home</Link>
-        <PixelCard>
+    <AuthScene artwork="/artwork/eighty-six/reference-set/09-lena-bouquet.webp" title="Create an account" description="Make a portfolio people can explore.">
           <div className="space-y-6">
-            <div className="text-center space-y-4">
-              <div className="flex justify-center">
-                <PixelCharacter color="#8B5CF6" size={60} />
-              </div>
-              <h1 className="text-xl pixel-text-shadow">SIGN UP</h1>
-              <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
-                CREATE YOUR PIXEL PORTFOLIO
-              </p>
-            </div>
+
 
             {error && (
-              <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 font-dialogue text-sm text-center">
+              <div role="alert" className="p-3 bg-red-500/20 border border-red-500 text-[#ffb2c5] font-[family-name:var(--font-workspace-body)] text-sm text-center">
                 {error}
               </div>
             )}
 
             <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="flex justify-between items-start gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <PixelInput
                     label="FIRST NAME"
@@ -324,7 +243,7 @@ export default function SignUpPage() {
                     {...form.register("firstName")} aria-invalid={!!form.formState.errors.firstName} autoComplete="given-name"
                   />
                   {form.formState.errors.firstName && (
-                    <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
+                    <p role="alert" className="font-[family-name:var(--font-workspace-body)] text-[#ffb2c5] text-sm mt-1">
                       {form.formState.errors.firstName.message}
                     </p>
                   )}
@@ -338,7 +257,7 @@ export default function SignUpPage() {
                     {...form.register("lastName")} aria-invalid={!!form.formState.errors.lastName} autoComplete="family-name"
                   />
                   {form.formState.errors.lastName && (
-                    <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
+                    <p role="alert" className="font-[family-name:var(--font-workspace-body)] text-[#ffb2c5] text-sm mt-1">
                       {form.formState.errors.lastName.message}
                     </p>
                   )}
@@ -353,7 +272,7 @@ export default function SignUpPage() {
                   {...form.register("username")} aria-invalid={!!form.formState.errors.username} autoComplete="username"
                 />
                 {form.formState.errors.username && (
-                  <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
+                  <p role="alert" className="font-[family-name:var(--font-workspace-body)] text-[#ffb2c5] text-sm mt-1">
                     {form.formState.errors.username.message}
                   </p>
                 )}
@@ -367,13 +286,13 @@ export default function SignUpPage() {
                   {...form.register("email")} aria-invalid={!!form.formState.errors.email} autoComplete="email"
                 />
                 {form.formState.errors.email && (
-                  <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
+                  <p role="alert" className="font-[family-name:var(--font-workspace-body)] text-[#ffb2c5] text-sm mt-1">
                     {form.formState.errors.email.message}
                   </p>
                 )}
               </div>
 
-              <div className={"flex justify-between items-start gap-3"}>
+              <div className={"grid grid-cols-1 sm:grid-cols-2 gap-4"}>
                 <div>
                   <PixelPasswordInput
                     label="PASSWORD"
@@ -382,7 +301,7 @@ export default function SignUpPage() {
                     onChange={handlePasswordChange}
                   />
                   {form.formState.errors.password && (
-                    <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
+                    <p role="alert" className="font-[family-name:var(--font-workspace-body)] text-[#ffb2c5] text-sm mt-1">
                       {form.formState.errors.password.message}
                     </p>
                   )}
@@ -393,14 +312,14 @@ export default function SignUpPage() {
                         {[...Array(4)].map((_, i) => (
                           <div
                             key={i}
-                            className={`h-2 flex-1 border-2 border-border ${i < passwordStrength / 25
+                            className={`h-2 flex-1 border border-border ${i < passwordStrength / 25
                               ? getStrengthColor()
                               : "bg-muted"
                               }`}
                           />
                         ))}
                       </div>
-                      <p className="font-dialogue text-sm text-muted-foreground">
+                      <p className="font-[family-name:var(--font-workspace-body)] text-sm text-[#bdd3f3]">
                         STRENGTH: {getStrengthText()}
                       </p>
                     </div>
@@ -414,15 +333,15 @@ export default function SignUpPage() {
                     {...form.register("confirmPassword")} aria-invalid={!!form.formState.errors.confirmPassword} autoComplete="new-password"
                   />
                   {form.formState.errors.confirmPassword && (
-                    <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
+                    <p role="alert" className="font-[family-name:var(--font-workspace-body)] text-[#ffb2c5] text-sm mt-1">
                       {form.formState.errors.confirmPassword.message}
                     </p>
                   )}
                 </div>
               </div>
-              <div className="font-dialogue text-center text-sm text-muted-foreground leading-relaxed">
+              <div className="font-[family-name:var(--font-workspace-body)] text-center text-sm text-[#bdd3f3] leading-relaxed">
                 By creating an account, you agree to our{" "}
-                <Link href="/privacy?from=Signup" className="text-primary hover:underline">
+                <Link href="/privacy?from=Signup" className="text-[#44e4ff] hover:underline">
                   Privacy Policy
                 </Link>.
               </div>
@@ -442,8 +361,8 @@ export default function SignUpPage() {
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t-2 border-border" />
                 </div>
-                <div className="relative flex justify-center font-dialogue text-sm">
-                  <span className="bg-card px-2 text-muted-foreground">
+                <div className="relative flex justify-center font-[family-name:var(--font-workspace-body)] text-sm">
+                  <span className="bg-[#071657] px-2 text-[#bdd3f3]">
                     OR CONTINUE WITH
                   </span>
                 </div>
@@ -452,7 +371,7 @@ export default function SignUpPage() {
               <div className="grid grid-cols-2 gap-3">
                 <PixelButton
                   variant="secondary"
-                  className="w-full text-xs"
+                  className="w-full text-sm"
                   onClick={() => handleOAuthSignUp("google")}
                   disabled={loading}
                   type="button"
@@ -461,7 +380,7 @@ export default function SignUpPage() {
                 </PixelButton>
                 <PixelButton
                   variant="secondary"
-                  className="w-full text-xs"
+                  className="w-full text-sm"
                   onClick={() => handleOAuthSignUp("github")}
                   disabled={loading}
                   type="button"
@@ -471,15 +390,13 @@ export default function SignUpPage() {
               </div>
             </div>
 
-            <p className="font-dialogue text-center text-sm text-muted-foreground leading-relaxed">
+            <p className="font-[family-name:var(--font-workspace-body)] text-center text-sm text-[#bdd3f3] leading-relaxed">
               ALREADY HAVE AN ACCOUNT?{" "}
-              <Link href="/auth/login" className="text-primary hover:underline">
+              <Link href="/auth/login" className="text-[#44e4ff] hover:underline">
                 LOG IN
               </Link>
             </p>
           </div>
-        </PixelCard>
-      </div>
-    </div>
+        </AuthScene>
   );
 }

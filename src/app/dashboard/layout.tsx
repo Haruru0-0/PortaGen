@@ -11,11 +11,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <PortfolioProvider>
       <AIChatProvider>
-        <div className="flex min-h-screen readable">
+        <div className="ws-dashboard">
           <DashboardSidebar />
-          <div className="flex-1 flex flex-col min-w-0">
+          <div className="ws-dashboard-body">
             <DashboardHeader />
-            <main className="flex-1 p-4 md:p-6 bg-background pb-20 md:pb-6">{children}</main>
+            <main className="ws-dashboard-main">{children}</main>
           </div>
           <MobileNav />
         </div>

@@ -1,11 +1,11 @@
-import { PixelCard } from "@/components/pixel-card"
-import { PixelCharacter } from "@/components/pixel-character"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
+import { DashboardMainMenu } from "@/components/workspace/dashboard-main-menu"
 import { createClient } from "@/utils/supabase/server"
-import { getUserBySupabaseId, getOrCreateUser } from "@/lib/db/helpers"
+import { getOrCreateUser } from "@/lib/db/helpers"
 import { getDashboardStats } from "@/lib/activity"
 import { formatDistanceToNow } from "date-fns"
 import { redirect } from "next/navigation"
-import Link from "next/link"
+import Link from "@/components/workspace/workspace-link"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = { title: "Dashboard | PortaGen" }
@@ -46,39 +46,17 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
-      {/* Welcome Section */}
-      <PixelCard>
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="space-y-3 flex-1">
-            <h2 className="text-lg pixel-text-shadow break-words">WELCOME BACK, {user.username?.toUpperCase() || 'PLAYER'}!</h2>
-            <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">READY TO BUILD SOMETHING AWESOME TODAY?</p>
-          </div>
-          <PixelCharacter color="#8B5CF6" size={40} animate />
-        </div>
-      </PixelCard>
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[
-          { label: "PORTFOLIOS", value: stats.portfolioCount.toString(), color: "bg-primary text-primary-foreground" },
-          { label: "TOTAL VIEWS", value: stats.totalViews.toString(), color: "bg-secondary" },
-          { label: "ASSETS", value: stats.assetCount.toString(), color: "bg-accent" },
-        ].map((stat, i) => (
-          <PixelCard key={i}>
-            <div className="space-y-2">
-              <div className={`w-12 h-12 ${stat.color} flex items-center justify-center text-xl pixel-text-shadow`}>
-                {stat.value}
-              </div>
-              <p className="font-dialogue text-sm text-muted-foreground">{stat.label}</p>
-            </div>
-          </PixelCard>
-        ))}
+      <DashboardMainMenu username={user.username || 'Player'} />
+      <div className="ws-dashboard-stats">
+        <div><strong>{stats.portfolioCount}</strong> Portfolios</div>
+        <div><strong>{stats.totalViews}</strong> Total views</div>
+        <div><strong>{stats.assetCount}</strong> Assets</div>
       </div>
-
+      <div className="ws-dashboard-details">
       {/* Get Started Checklist */}
       <PixelCard>
         <div className="space-y-4">
-          <h3 className="text-sm pixel-text-shadow">GET STARTED CHECKLIST</h3>
+          <h3 className="text-lg font-semibold">GET STARTED CHECKLIST</h3>
           <div className="space-y-3">
             {checklistItems.map((item, i) => (
               <Link key={i} href={item.href} className="flex items-center gap-3 min-h-11 hover:underline">
@@ -102,7 +80,7 @@ export default async function DashboardPage() {
       {/* Activity Feed */}
       <PixelCard>
         <div className="space-y-4">
-          <h3 className="text-sm pixel-text-shadow">RECENT ACTIVITY</h3>
+          <h3 className="text-lg font-semibold">RECENT ACTIVITY</h3>
           <div className="space-y-4">
             {recentActivity.length > 0 ? (
               recentActivity.map((activity, i) => (
@@ -118,7 +96,7 @@ export default async function DashboardPage() {
                       </p>
                     </div>
                   </div>
-                  <span className="text-xs text-muted-foreground uppercase sm:text-right shrink-0 whitespace-nowrap self-end sm:self-start sm:mt-1">
+                  <span className="text-sm text-muted-foreground uppercase sm:text-right shrink-0 whitespace-nowrap self-end sm:self-start sm:mt-1">
                     {formatDistanceToNow(activity.createdAt, { addSuffix: true })}
                   </span>
                 </div>
@@ -129,6 +107,7 @@ export default async function DashboardPage() {
           </div>
         </div>
       </PixelCard>
+      </div>
     </div>
   )
 }

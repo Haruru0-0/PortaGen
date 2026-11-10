@@ -1,10 +1,10 @@
-import { PixelCard } from "@/components/pixel-card"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
 import { Edit2, Layout } from "lucide-react"
 import { useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { useWindowsContext } from "@/contexts/windowsContext"
 import { useEditorUIStore } from "@/lib/stores/ui-store"
-import { PixelButton } from "@/components/pixel-button"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
 
 export function WindowsTab() {
   const router = useRouter()
@@ -22,7 +22,7 @@ export function WindowsTab() {
       <PixelCard>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm dashboard-pixel-text-shadow">YOUR WINDOWS</h3>
+            <h3 className="text-sm workspace-editor-title">YOUR WINDOWS</h3>
             <div className="font-dialogue text-sm text-muted-foreground">
               {windows.length} window{windows.length !== 1 ? 's' : ''}
             </div>
@@ -64,7 +64,7 @@ export function WindowsTab() {
                       </p>
                     </div>
                   </div>
-                  <button
+                  <button data-workspace-control
                     onClick={() => {
                       const pid = params?.id
                       if (pid && w.id) router.push(`/dashboard/editor/${pid}/windows/${w.id}`)

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, JSX } from "react"
-import { PixelCard } from "@/components/pixel-card"
-import { PixelButton } from "@/components/pixel-button"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
 import { Save, Layout, User, Briefcase, Mail, FileText, Link, BookOpen, ArrowLeft, Terminal as TerminalIcon, Trophy } from "lucide-react"
 import type { WindowContent, WindowContentType, TemplateData, AboutMeData, ProjectsData, ContactData, ResumeData, BlogData, LinksData, TerminalData, AchievementsData } from "@/lib/types"
 import { LinksForm } from "./forms/links-form"
@@ -226,20 +226,21 @@ export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }:
     return (
         <PixelCard className="w-full h-full flex flex-col">
             <div className="flex-none space-y-6 flex flex-col h-full">
-                <div className="flex items-center justify-between border-b-2 border-border pb-4 flex-none">
+                <div className="flex flex-wrap gap-4 items-center justify-between border-b-2 border-border pb-4 flex-none">
                     <div className="flex items-center gap-3">
-                        <button
+                        <button data-workspace-control
                             onClick={onCancel}
-                            className="w-8 h-8 border-2 border-border bg-card hover:bg-muted transition-colors flex items-center justify-center"
+                            aria-label="Back to portfolio controls"
+                            className="min-w-11 min-h-11 border-2 border-border bg-card hover:bg-muted transition-colors flex items-center justify-center"
                             disabled={isLoading}
                         >
                             <ArrowLeft className="w-3 h-3" />
                         </button>
                         <div>
-                            <h3 className="text-sm dashboard-pixel-text-shadow">
+                            <h1 tabIndex={-1} className="workspace-editor-page-title persona-page-title" data-page-heading>
                                 {isEditing ? "EDIT WINDOW" : "CREATE WINDOW"}
-                            </h3>
-                            <p className="text-[10px] text-muted-foreground">
+                            </h1>
+                            <p className="text-sm text-muted-foreground">
                                 {isEditing ? "Modify window content and settings" : "Create a new content window"}
                             </p>
                         </div>
@@ -247,7 +248,7 @@ export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }:
 
                     <PixelButton
                         variant="primary"
-                        className="text-[10px] flex items-center gap-2"
+                        className="text-sm flex items-center gap-2"
                         onClick={handleSave}
                         disabled={isLoading}
                     >
@@ -261,8 +262,9 @@ export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }:
                     <label className="block text-xs uppercase tracking-wider">CONTENT TEMPLATE</label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         {(Object.entries(CONTENT_TEMPLATES) as [WindowContentType, typeof CONTENT_TEMPLATES[WindowContentType]][]).map(([key, template]) => (
-                            <button
+                            <button data-workspace-control
                                 key={key}
+                                aria-pressed={selectedType === key}
                                 onClick={() => handleTypeChange(key)}
                                 className={`p-3 border-2 text-left transition-all ${selectedType === key
                                     ? "border-primary bg-primary text-primary-foreground"
@@ -272,9 +274,9 @@ export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }:
                             >
                                 <div className="flex items-center gap-2 mb-2">
                                     {template.icon}
-                                    <span className="text-[10px] font-bold">{template.name}</span>
+                                    <span className="text-sm font-bold">{template.name}</span>
                                 </div>
-                                <p className="text-[8px] text-muted-foreground">
+                                <p className="text-sm text-muted-foreground">
                                     {template.description}
                                 </p>
                             </button>
@@ -283,7 +285,7 @@ export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }:
                 </div>
 
                 {/* Specific Form Rendering */}
-                <div className="flex-1 overflow-y-auto border-2 border-border p-4 bg-muted/20">
+                <div className="workspace-editor-form flex-1 min-w-0 p-2 sm:p-4">
                     {renderForm()}
                 </div>
             </div>

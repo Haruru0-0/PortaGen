@@ -3,8 +3,8 @@
 import type React from "react"
 
 import { useRef, useState } from "react"
-import { Upload } from "lucide-react"
-import { PixelButton } from "./pixel-button"
+import { Upload, Music, FileText } from "lucide-react"
+import { WorkspaceAction as PixelButton } from "./workspace/workspace-primitives"
 import Image from "next/image"
 
 interface FileUploadProps {
@@ -94,7 +94,7 @@ export function FileUpload({ accept, onFileSelect, preview, label, maxSize = 5, 
       {label && <p className="font-dialogue text-sm">{label}</p>}
 
       <div
-        className={`border-4 border-dashed p-8 text-center space-y-3 cursor-pointer transition-colors ${dragActive
+        className={`persona-upload border border-dashed p-6 text-center space-y-3 cursor-pointer transition-colors ${dragActive
           ? "border-primary bg-primary/10"
           : error
             ? "border-destructive bg-destructive/10"
@@ -120,11 +120,11 @@ export function FileUpload({ accept, onFileSelect, preview, label, maxSize = 5, 
               />
             ) : accept?.includes("audio") ? (
               <div className="flex items-center justify-center gap-2">
-                <div className="w-12 h-12 bg-primary flex items-center justify-center text-xl">♪</div>
+                <div className="w-12 h-12 bg-primary text-primary-foreground flex items-center justify-center"><Music className="size-6" aria-hidden="true" /></div>
                 <span className="font-dialogue text-sm">AUDIO FILE LOADED</span>
               </div>
             ) : (
-              <div className="text-2xl">📄</div>
+              <FileText className="size-8 mx-auto" aria-hidden="true" />
             )}
             <PixelButton
               variant="secondary"

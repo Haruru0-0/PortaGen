@@ -1,22 +1,24 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/editor/editor-form-controls"
+import { Input } from "@/components/editor/editor-form-controls"
+import { Textarea } from "@/components/editor/editor-form-controls"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 import { Label } from "@/components/ui/label"
 import { FileUpload } from "@/components/file-upload"
 import { Plus, Trash2, Settings2, X } from "lucide-react"
-import { AnimatedSection, AnimatedItem } from "@/components/portfolio/animated-section"
+import { AnimatedSection, AnimatedItem } from "@/components/editor/editor-form-section"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
+import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { DialogContent } from "@/components/workspace/workspace-overlays"
+import { Drawer, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
+import { DrawerContent } from "@/components/workspace/workspace-overlays"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import type { AboutMeData, Testimonial, Hobby } from "@/lib/types"
-import { PixelInput } from "@/components/pixel-input"
+import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
 
 interface AboutMeFormProps {
     initialData: AboutMeData
@@ -96,7 +98,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
     }
 
     return (
-        <div className="space-y-8 max-w-4xl mx-auto pixel-text relative">
+        <div className="space-y-8 max-w-4xl mx-auto workspace-editor-copy relative">
             {/* Profile Section */}
             <AnimatedSection variant="scale" duration={0.7} className="text-center group relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
                 <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
@@ -112,9 +114,9 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                             setShowAvatarDialog(true)
                         }}
                     >
-                        <Avatar className="w-24 h-24 mx-auto border-2 border-[var(--cute-text)] rounded-none">
+                        <Avatar className="w-24 h-24 mx-auto border-2 border-[var(--workspace-white,#fffef5)] rounded-none">
                             <AvatarImage src={data.profileImage || "/profile-photo.jpg"} alt="Profile" />
-                            <AvatarFallback className="rounded-none bg-[var(--cute-highlight)] text-[var(--cute-text)]">AK</AvatarFallback>
+                            <AvatarFallback className="rounded-none bg-[var(--workspace-blue,#0755d8)] text-[var(--workspace-white,#fffef5)]">AK</AvatarFallback>
                         </Avatar>
                         <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/avatar:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity rounded-none">
                             <span className="text-white text-xs font-bold pointer-events-none">CHANGE</span>
@@ -125,8 +127,8 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                 {/* Avatar Selection Dialog/Drawer */}
                 {isDesktop ? (
                     <Dialog open={showAvatarDialog} onOpenChange={setShowAvatarDialog}>
-                        <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
-                            <DialogHeader className="bg-white dark:bg-zinc-950">
+                        <DialogContent className="workspace-controls sm:max-w-[425px] rounded-none border-4 border-[var(--workspace-white,#fffef5)]  bg-card ">
+                            <DialogHeader className="bg-card ">
                                 <DialogTitle>Update Profile Picture</DialogTitle>
                                 <DialogDescription>
                                     Choose how you want to update your profile picture.
@@ -134,14 +136,14 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                             </DialogHeader>
                             <Tabs defaultValue="upload" className="w-full">
                                 <TabsList className="grid w-full grid-cols-2 gap-4 bg-transparent p-0 h-auto">
-                                    <TabsTrigger value="upload" className="rounded-none border-2 border-[var(--cute-text)] bg-white data-[state=active]:bg-[var(--cute-highlight)] data-[state=active]:text-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] data-[state=active]:shadow-none data-[state=active]:translate-x-[2px] data-[state=active]:translate-y-[2px] transition-all py-2 font-bold pixel-text">Upload</TabsTrigger>
-                                    <TabsTrigger value="link" className="rounded-none border-2 border-[var(--cute-text)] bg-white data-[state=active]:bg-[var(--cute-highlight)] data-[state=active]:text-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] data-[state=active]:shadow-none data-[state=active]:translate-x-[2px] data-[state=active]:translate-y-[2px] transition-all py-2 font-bold pixel-text">Image URL</TabsTrigger>
+                                    <TabsTrigger value="upload" className="rounded-none border-2 border-[var(--workspace-white,#fffef5)] bg-card data-[state=active]:bg-[var(--workspace-blue,#0755d8)] data-[state=active]:text-[var(--workspace-white,#fffef5)]  data-[state=active]:shadow-none data-[state=active]:translate-x-[2px] data-[state=active]:translate-y-[2px] transition-all py-2 font-bold workspace-editor-copy">Upload</TabsTrigger>
+                                    <TabsTrigger value="link" className="rounded-none border-2 border-[var(--workspace-white,#fffef5)] bg-card data-[state=active]:bg-[var(--workspace-blue,#0755d8)] data-[state=active]:text-[var(--workspace-white,#fffef5)]  data-[state=active]:shadow-none data-[state=active]:translate-x-[2px] data-[state=active]:translate-y-[2px] transition-all py-2 font-bold workspace-editor-copy">Image URL</TabsTrigger>
                                 </TabsList>
                                 <div className="py-4">
                                     <div className="flex justify-center mb-4">
-                                        <Avatar className="w-24 h-24 border-2 border-[var(--cute-text)] rounded-none">
+                                        <Avatar className="w-24 h-24 border-2 border-[var(--workspace-white,#fffef5)] rounded-none">
                                             <AvatarImage src={tempAvatar || data.profileImage || "/profile-photo.jpg"} />
-                                            <AvatarFallback className="rounded-none bg-[var(--cute-highlight)] text-xs">Preview</AvatarFallback>
+                                            <AvatarFallback className="rounded-none bg-[var(--workspace-blue,#0755d8)] text-xs">Preview</AvatarFallback>
                                         </Avatar>
                                     </div>
                                     <TabsContent value="upload" className="mt-0">
@@ -176,8 +178,8 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                     </TabsContent>
                                 </div>
                             </Tabs>
-                            <DialogFooter className="bg-white dark:bg-zinc-950">
-                                <Button variant="outline" onClick={() => setShowAvatarDialog(false)} className="rounded-none border-2 border-[var(--cute-text)]">Cancel</Button>
+                            <DialogFooter className="bg-card ">
+                                <Button variant="outline" onClick={() => setShowAvatarDialog(false)} className="rounded-none border-2 border-[var(--workspace-white,#fffef5)]">Cancel</Button>
                                 <Button
                                     onClick={() => {
                                         updateData({ ...data, profileImage: tempAvatar })
@@ -185,7 +187,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                         else if (onUrlSelect) onUrlSelect("profileImage", tempAvatar)
                                         setShowAvatarDialog(false)
                                     }}
-                                    className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]"
+                                    className="rounded-none border-2 border-[var(--workspace-white,#fffef5)]  hover:bg-[var(--workspace-blue,#0755d8)] hover:text-[var(--workspace-white,#fffef5)]"
                                 >
                                     Save Changes
                                 </Button>
@@ -194,8 +196,8 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                     </Dialog>
                 ) : (
                     <Drawer open={showAvatarDialog} onOpenChange={setShowAvatarDialog}>
-                        <DrawerContent className="rounded-t-none border-t-4 border-x-4 border-[var(--cute-text)] shadow-[0px_-4px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
-                            <DrawerHeader className="text-left bg-white dark:bg-zinc-950">
+                        <DrawerContent className="workspace-controls rounded-t-none border-t border-x border-[var(--workspace-white,#fffef5)]  bg-card ">
+                            <DrawerHeader className="text-left bg-card ">
                                 <DrawerTitle>Update Profile Picture</DrawerTitle>
                                 <DrawerDescription>
                                     Choose how you want to update your profile picture.
@@ -204,14 +206,14 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                             <div className="p-4">
                                 <Tabs defaultValue="upload" className="w-full">
                                     <TabsList className="grid w-full grid-cols-2 gap-4 bg-transparent p-0 h-auto">
-                                        <TabsTrigger value="upload" className="rounded-none border-2 border-[var(--cute-text)] bg-white data-[state=active]:bg-[var(--cute-highlight)] data-[state=active]:text-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] data-[state=active]:shadow-none data-[state=active]:translate-x-[2px] data-[state=active]:translate-y-[2px] transition-all py-2 font-bold pixel-text">Upload</TabsTrigger>
-                                        <TabsTrigger value="link" className="rounded-none border-2 border-[var(--cute-text)] bg-white data-[state=active]:bg-[var(--cute-highlight)] data-[state=active]:text-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] data-[state=active]:shadow-none data-[state=active]:translate-x-[2px] data-[state=active]:translate-y-[2px] transition-all py-2 font-bold pixel-text">Image URL</TabsTrigger>
+                                        <TabsTrigger value="upload" className="rounded-none border-2 border-[var(--workspace-white,#fffef5)] bg-card data-[state=active]:bg-[var(--workspace-blue,#0755d8)] data-[state=active]:text-[var(--workspace-white,#fffef5)]  data-[state=active]:shadow-none data-[state=active]:translate-x-[2px] data-[state=active]:translate-y-[2px] transition-all py-2 font-bold workspace-editor-copy">Upload</TabsTrigger>
+                                        <TabsTrigger value="link" className="rounded-none border-2 border-[var(--workspace-white,#fffef5)] bg-card data-[state=active]:bg-[var(--workspace-blue,#0755d8)] data-[state=active]:text-[var(--workspace-white,#fffef5)]  data-[state=active]:shadow-none data-[state=active]:translate-x-[2px] data-[state=active]:translate-y-[2px] transition-all py-2 font-bold workspace-editor-copy">Image URL</TabsTrigger>
                                     </TabsList>
                                     <div className="py-4">
                                         <div className="flex justify-center mb-4">
-                                            <Avatar className="w-24 h-24 border-2 border-[var(--cute-text)] rounded-none">
+                                            <Avatar className="w-24 h-24 border-2 border-[var(--workspace-white,#fffef5)] rounded-none">
                                                 <AvatarImage src={tempAvatar || data.profileImage || "/profile-photo.jpg"} />
-                                                <AvatarFallback className="rounded-none bg-[var(--cute-highlight)] text-[var(--cute-text)]">Preview</AvatarFallback>
+                                                <AvatarFallback className="rounded-none bg-[var(--workspace-blue,#0755d8)] text-[var(--workspace-white,#fffef5)]">Preview</AvatarFallback>
                                             </Avatar>
                                         </div>
                                         <TabsContent value="upload" className="mt-0">
@@ -247,7 +249,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                     </div>
                                 </Tabs>
                             </div>
-                            <DrawerFooter className="bg-white dark:bg-zinc-950">
+                            <DrawerFooter className="bg-card ">
                                 <Button
                                     onClick={() => {
                                         updateData({ ...data, profileImage: tempAvatar })
@@ -255,11 +257,11 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                         else if (onUrlSelect) onUrlSelect("profileImage", tempAvatar)
                                         setShowAvatarDialog(false)
                                     }}
-                                    className="w-full rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]"
+                                    className="w-full rounded-none border-2 border-[var(--workspace-white,#fffef5)]  hover:bg-[var(--workspace-blue,#0755d8)] hover:text-[var(--workspace-white,#fffef5)]"
                                 >
                                     Save Changes
                                 </Button>
-                                <Button variant="outline" onClick={() => setShowAvatarDialog(false)} className="w-full rounded-none border-2 border-[var(--cute-text)]">Cancel</Button>
+                                <Button variant="outline" onClick={() => setShowAvatarDialog(false)} className="w-full rounded-none border-2 border-[var(--workspace-white,#fffef5)]">Cancel</Button>
                             </DrawerFooter>
                         </DrawerContent>
                     </Drawer>
@@ -268,7 +270,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                 <Input
                     value={data.title || "Ahmad Kanaan"}
                     onChange={(e) => updateData({ ...data, title: e.target.value })}
-                    className="text-3xl font-bold mb-2 pixel-title text-center border-none bg-transparent shadow-none focus-visible:ring-1 focus-visible:ring-primary h-auto p-0"
+                    className="text-3xl font-bold mb-2 workspace-editor-title text-center border-none bg-transparent shadow-none focus-visible:ring-1 focus-visible:ring-primary h-auto p-0"
                 />
                 <Input
                     value={data.subtitle || "Full-Stack Developer"}
@@ -278,9 +280,9 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
 
                 <div className="flex flex-wrap justify-center gap-2 items-center">
                     {(data.skills || []).map((skill, index) => (
-                        <Badge key={index} variant="secondary" className="pixel-badge hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors pr-1 gap-1">
+                        <Badge key={index} variant="secondary" className="workspace-editor-badge hover:bg-[var(--workspace-white,#fffef5)] hover:text-[var(--workspace-ink,#061039)] transition-colors pr-1 gap-1">
                             {skill}
-                            <button onClick={() => removeSkill(index)} className="hover:text-red-500">
+                            <button data-workspace-control onClick={() => removeSkill(index)} className="hover:text-red-500">
                                 <X className="w-3 h-3" />
                             </button>
                         </Badge>
@@ -290,14 +292,14 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                             <DialogTrigger asChild>
                                 <Badge
                                     variant="outline"
-                                    className="pixel-badge border-dashed border-2 cursor-pointer hover:border-solid hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors gap-1"
+                                    className="workspace-editor-badge border-dashed border-2 cursor-pointer hover:border-solid hover:bg-[var(--workspace-white,#fffef5)] hover:text-[var(--workspace-ink,#061039)] transition-colors gap-1"
                                 >
                                     <Plus className="w-3 h-3" />
                                     Add Skill
                                 </Badge>
                             </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
-                                <DialogHeader className="bg-white dark:bg-zinc-950">
+                            <DialogContent className="workspace-controls sm:max-w-[425px] rounded-none border-4 border-[var(--workspace-white,#fffef5)]  bg-card ">
+                                <DialogHeader className="bg-card ">
                                     <DialogTitle>Add New Skill</DialogTitle>
                                     <DialogDescription>
                                         Enter a skill to add to your profile.
@@ -311,7 +313,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                         <Input
                                             id="skill"
                                             placeholder="e.g. React, TypeScript"
-                                            className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                            className="col-span-3 rounded-none border-2 border-[var(--workspace-white,#fffef5)]  focus-visible:ring-0 focus-visible:border-[var(--workspace-blue,#0755d8)]"
                                             onKeyPress={(e) => {
                                                 if (e.key === 'Enter') {
                                                     const value = (e.target as HTMLInputElement).value
@@ -326,7 +328,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                         />
                                     </div>
                                 </div>
-                                <DialogFooter className="bg-white dark:bg-zinc-950">
+                                <DialogFooter className="bg-card ">
                                     <Button
                                         type="button"
                                         onClick={() => {
@@ -338,7 +340,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                                 closeButton?.click()
                                             }
                                         }}
-                                        className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]"
+                                        className="rounded-none border-2 border-[var(--workspace-white,#fffef5)]  active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--workspace-blue,#0755d8)] hover:text-[var(--workspace-white,#fffef5)]"
                                     >
                                         Add Skill
                                     </Button>
@@ -350,14 +352,14 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                             <DrawerTrigger asChild>
                                 <Badge
                                     variant="outline"
-                                    className="pixel-badge border-dashed border-2 cursor-pointer hover:border-solid hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors gap-1"
+                                    className="workspace-editor-badge border-dashed border-2 cursor-pointer hover:border-solid hover:bg-[var(--workspace-white,#fffef5)] hover:text-[var(--workspace-ink,#061039)] transition-colors gap-1"
                                 >
                                     <Plus className="w-3 h-3" />
                                     Add Skill
                                 </Badge>
                             </DrawerTrigger>
-                            <DrawerContent className="rounded-t-none border-t-4 border-x-4 border-[var(--cute-text)] shadow-[0px_-4px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
-                                <DrawerHeader className="text-left bg-white dark:bg-zinc-950">
+                            <DrawerContent className="workspace-controls rounded-t-none border-t border-x border-[var(--workspace-white,#fffef5)]  bg-card ">
+                                <DrawerHeader className="text-left bg-card ">
                                     <DrawerTitle>Add New Skill</DrawerTitle>
                                     <DrawerDescription>
                                         Enter a skill to add to your profile.
@@ -371,7 +373,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                         <Input
                                             id="skill-mobile"
                                             placeholder="e.g. React, TypeScript"
-                                            className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                            className="col-span-3 rounded-none border-2 border-[var(--workspace-white,#fffef5)]  focus-visible:ring-0 focus-visible:border-[var(--workspace-blue,#0755d8)]"
                                             onKeyPress={(e) => {
                                                 if (e.key === 'Enter') {
                                                     const value = (e.target as HTMLInputElement).value
@@ -386,7 +388,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                         />
                                     </div>
                                 </div>
-                                <DrawerFooter className="bg-white dark:bg-zinc-950">
+                                <DrawerFooter className="bg-card ">
                                     <Button
                                         type="button"
                                         onClick={() => {
@@ -396,7 +398,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                                 input.value = ''
                                             }
                                         }}
-                                        className="w-full rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]"
+                                        className="w-full rounded-none border-2 border-[var(--workspace-white,#fffef5)]  active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--workspace-blue,#0755d8)] hover:text-[var(--workspace-white,#fffef5)]"
                                     >
                                         Add Skill
                                     </Button>
@@ -409,7 +411,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
 
             {/* About Me Section */}
             <AnimatedSection variant="slideUp" delay={0.1} className="group relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
-                <h2 className="text-2xl font-bold mb-4 pixel-title border-b-2 border-[var(--cute-text)] inline-block">About Me</h2>
+                <h2 className="text-2xl font-bold mb-4 workspace-editor-title border-b-2 border-[var(--workspace-white,#fffef5)] inline-block">About Me</h2>
                 <Textarea
                     value={data.description || ""}
                     onChange={(e) => updateData({ ...data, description: e.target.value })}
@@ -421,10 +423,10 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
             {/* Testimonials Section */}
             <AnimatedSection variant="stagger" delay={0.2} staggerChildren={0.1} className="group/section relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-2xl font-bold pixel-title border-b-2 border-[var(--cute-text)] inline-block">
+                    <h2 className="text-2xl font-bold workspace-editor-title border-b-2 border-[var(--workspace-white,#fffef5)] inline-block">
                         Testimonials
                     </h2>
-                    <Button variant="outline" size="sm" onClick={addTestimonial} className="pixel-badge cursor-pointer">
+                    <Button variant="outline" size="sm" onClick={addTestimonial} className="workspace-editor-badge cursor-pointer">
                         <Plus className="w-4 h-4 mr-1" />
                         Add
                     </Button>
@@ -445,12 +447,12 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                         {isDesktop ? (
                                             <Dialog>
                                                 <DialogTrigger asChild>
-                                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0 bg-background/80 backdrop-blur-sm border border-border hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors">
+                                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0 bg-background/80 backdrop-blur-sm border border-border hover:bg-[var(--workspace-white,#fffef5)] hover:text-[var(--workspace-ink,#061039)] transition-colors">
                                                         <Settings2 className="w-3 h-3" />
                                                     </Button>
                                                 </DialogTrigger>
-                                                <DialogContent className="rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
-                                                    <DialogHeader className="bg-white dark:bg-zinc-950">
+                                                <DialogContent className="workspace-controls rounded-none border-4 border-[var(--workspace-white,#fffef5)]  bg-card ">
+                                                    <DialogHeader className="bg-card ">
                                                         <DialogTitle>Edit Testimonial</DialogTitle>
                                                         <DialogDescription>
                                                             Update the testimonial details below.
@@ -462,7 +464,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                                             <Input
                                                                 value={testimonial.name}
                                                                 onChange={(e) => updateTestimonial(index, "name", e.target.value)}
-                                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                                className="col-span-3 rounded-none border-2 border-[var(--workspace-white,#fffef5)]  focus-visible:ring-0 focus-visible:border-[var(--workspace-blue,#0755d8)]"
                                                             />
                                                         </div>
                                                         <div className="grid grid-cols-4 items-center gap-4">
@@ -470,7 +472,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                                             <Input
                                                                 value={testimonial.role}
                                                                 onChange={(e) => updateTestimonial(index, "role", e.target.value)}
-                                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                                className="col-span-3 rounded-none border-2 border-[var(--workspace-white,#fffef5)]  focus-visible:ring-0 focus-visible:border-[var(--workspace-blue,#0755d8)]"
                                                             />
                                                         </div>
                                                         <div className="grid grid-cols-4 items-center gap-4">
@@ -478,7 +480,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                                             <Textarea
                                                                 value={testimonial.content}
                                                                 onChange={(e) => updateTestimonial(index, "content", e.target.value)}
-                                                                className="col-span-3 min-h-[100px] rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                                className="col-span-3 min-h-[100px] rounded-none border-2 border-[var(--workspace-white,#fffef5)]  focus-visible:ring-0 focus-visible:border-[var(--workspace-blue,#0755d8)]"
                                                             />
                                                         </div>
                                                         <div className="grid grid-cols-4 items-center gap-4">
@@ -508,15 +510,15 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <DialogFooter className="sm:justify-between bg-white dark:bg-zinc-950">
-                                                        <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
+                                                    <DialogFooter className="sm:justify-between bg-card ">
+                                                        <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive  active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
                                                             removeTestimonial(index)
                                                             const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
                                                             closeButton?.click()
                                                         }}>
                                                             <Trash2 className="w-4 h-4 mr-2" /> Remove
                                                         </Button>
-                                                        <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
+                                                        <Button type="button" className="rounded-none border-2 border-[var(--workspace-white,#fffef5)]  active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--workspace-blue,#0755d8)] hover:text-[var(--workspace-white,#fffef5)]" onClick={() => {
                                                             const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
                                                             closeButton?.click()
                                                         }}>
@@ -528,12 +530,12 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                         ) : (
                                             <Drawer>
                                                 <DrawerTrigger asChild>
-                                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0 bg-background/80 backdrop-blur-sm border border-border hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors">
+                                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0 bg-background/80 backdrop-blur-sm border border-border hover:bg-[var(--workspace-white,#fffef5)] hover:text-[var(--workspace-ink,#061039)] transition-colors">
                                                         <Settings2 className="w-3 h-3" />
                                                     </Button>
                                                 </DrawerTrigger>
-                                                <DrawerContent className="rounded-t-none border-t-4 border-x-4 border-[var(--cute-text)] shadow-[0px_-4px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
-                                                    <DrawerHeader className="text-left bg-white dark:bg-zinc-950">
+                                                <DrawerContent className="workspace-controls rounded-t-none border-t border-x border-[var(--workspace-white,#fffef5)]  bg-card ">
+                                                    <DrawerHeader className="text-left bg-card ">
                                                         <DrawerTitle>Edit Testimonial</DrawerTitle>
                                                         <DrawerDescription>
                                                             Update the testimonial details below.
@@ -545,7 +547,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                                             <Input
                                                                 value={testimonial.name}
                                                                 onChange={(e) => updateTestimonial(index, "name", e.target.value)}
-                                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                                className="col-span-3 rounded-none border-2 border-[var(--workspace-white,#fffef5)]  focus-visible:ring-0 focus-visible:border-[var(--workspace-blue,#0755d8)]"
                                                             />
                                                         </div>
                                                         <div className="grid grid-cols-4 items-center gap-4">
@@ -553,7 +555,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                                             <Input
                                                                 value={testimonial.role}
                                                                 onChange={(e) => updateTestimonial(index, "role", e.target.value)}
-                                                                className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                                className="col-span-3 rounded-none border-2 border-[var(--workspace-white,#fffef5)]  focus-visible:ring-0 focus-visible:border-[var(--workspace-blue,#0755d8)]"
                                                             />
                                                         </div>
                                                         <div className="grid grid-cols-4 items-center gap-4">
@@ -561,7 +563,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                                             <Textarea
                                                                 value={testimonial.content}
                                                                 onChange={(e) => updateTestimonial(index, "content", e.target.value)}
-                                                                className="col-span-3 min-h-[100px] rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                                className="col-span-3 min-h-[100px] rounded-none border-2 border-[var(--workspace-white,#fffef5)]  focus-visible:ring-0 focus-visible:border-[var(--workspace-blue,#0755d8)]"
                                                             />
                                                         </div>
                                                         <div className="grid grid-cols-4 items-center gap-4">
@@ -589,11 +591,11 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <DrawerFooter className="flex-col gap-2 bg-white dark:bg-zinc-950">
-                                                        <Button variant="destructive" size="sm" className="w-full rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => removeTestimonial(index)}>
+                                                    <DrawerFooter className="flex-col gap-2 bg-card ">
+                                                        <Button variant="destructive" size="sm" className="w-full rounded-none border-2 border-destructive  active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => removeTestimonial(index)}>
                                                             <Trash2 className="w-4 h-4 mr-2" /> Remove
                                                         </Button>
-                                                        <Button type="button" className="w-full rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]">
+                                                        <Button type="button" className="w-full rounded-none border-2 border-[var(--workspace-white,#fffef5)]  active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--workspace-blue,#0755d8)] hover:text-[var(--workspace-white,#fffef5)]">
                                                             Done
                                                         </Button>
                                                     </DrawerFooter>
@@ -602,17 +604,17 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                         )}
                                     </div>
 
-                                    <Card className="h-full pixel-card">
+                                    <Card className="h-full workspace-editor-form-card">
                                         <CardContent className="pt-6 flex-grow flex flex-col">
                                             <div className="flex items-start gap-4 mb-4">
-                                                <Avatar className="shrink-0 border-2 border-[var(--cute-text)] rounded-none w-10 h-10">
+                                                <Avatar className="shrink-0 border-2 border-[var(--workspace-white,#fffef5)] rounded-none w-10 h-10">
                                                     <AvatarImage src={testimonial.avatar || "/placeholder.svg"} alt={testimonial.name} />
-                                                    <AvatarFallback className="rounded-none bg-[var(--cute-highlight)] text-[var(--cute-text)]">
+                                                    <AvatarFallback className="rounded-none bg-[var(--workspace-blue,#0755d8)] text-[var(--workspace-white,#fffef5)]">
                                                         {testimonial.name.charAt(0)}
                                                     </AvatarFallback>
                                                 </Avatar>
                                                 <div className="min-w-0 flex-1">
-                                                    <p className="font-medium pixel-text truncate">{testimonial.name}</p>
+                                                    <p className="font-medium workspace-editor-copy truncate">{testimonial.name}</p>
                                                     <p className="text-sm opacity-70 truncate">{testimonial.role}</p>
                                                 </div>
                                             </div>
@@ -630,7 +632,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                             <div className="p-1 h-full">
                                 <Button
                                     variant="ghost"
-                                    className="w-full h-full cursor-pointer min-h-[200px] border-4 border-dashed border-[var(--cute-text)]/50 hover:border-solid hover:border-[var(--cute-text)] hover:bg-transparent hover:shadow-[4px_4px_0px_0px_var(--cute-text)] transition-all rounded-none flex flex-col gap-2 pixel-text"
+                                    className="w-full h-full cursor-pointer min-h-[200px] border-4 border-dashed border-[var(--workspace-white,#fffef5)]/50 hover:border-solid hover:border-[var(--workspace-white,#fffef5)] hover:bg-transparent  transition-all rounded-none flex flex-col gap-2 workspace-editor-copy"
                                     onClick={addTestimonial}
                                 >
                                     <Plus className="w-8 h-8" />
@@ -639,18 +641,18 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                             </div>
                         </CarouselItem>
                     </CarouselContent>
-                    <CarouselPrevious className="border-2 border-[var(--cute-text)] rounded-none text-[var(--cute-text)] hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors" />
-                    <CarouselNext className="border-2 border-[var(--cute-text)] rounded-none text-[var(--cute-text)] hover:bg-[var(--cute-text)] hover:text-[var(--card-bg)] transition-colors" />
+                    <CarouselPrevious className="border-2 border-[var(--workspace-white,#fffef5)] rounded-none text-[var(--workspace-white,#fffef5)] hover:bg-[var(--workspace-white,#fffef5)] hover:text-[var(--workspace-ink,#061039)] transition-colors" />
+                    <CarouselNext className="border-2 border-[var(--workspace-white,#fffef5)] rounded-none text-[var(--workspace-white,#fffef5)] hover:bg-[var(--workspace-white,#fffef5)] hover:text-[var(--workspace-ink,#061039)] transition-colors" />
                 </Carousel>
             </AnimatedSection>
 
             {/* Hobbies Section */}
             <AnimatedSection variant="stagger" delay={0.3} staggerChildren={0.1} className="group/section relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-2xl font-bold pixel-title border-b-2 border-[var(--cute-text)] inline-block">
+                    <h2 className="text-2xl font-bold workspace-editor-title border-b-2 border-[var(--workspace-white,#fffef5)] inline-block">
                         Hobbies & Interests
                     </h2>
-                    <Button variant="outline" size="sm" onClick={addHobby} className="pixel-badge cursor-pointer">
+                    <Button variant="outline" size="sm" onClick={addHobby} className="workspace-editor-badge cursor-pointer">
                         <Plus className="w-4 h-4 mr-1" />
                         Add
                     </Button>
@@ -659,13 +661,13 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                 <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))" }}>
                     {(data.hobbies || []).map((hobby, index) => (
                         <AnimatedItem key={index}>
-                            <Card className="h-full pixel-card hover:shadow-md transition-shadow relative group">
+                            <Card className="h-full workspace-editor-form-card hover:shadow-md transition-shadow relative group">
                                 <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10">
                                     <Button
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => removeHobby(index)}
-                                        className="h-6 w-6 p-0 bg-white/50 hover:bg-red-500 hover:text-white border-2 border-transparent hover:border-[var(--cute-text)] transition-all rounded-none"
+                                        className="h-6 w-6 p-0 bg-card/50 hover:bg-red-500 hover:text-white border-2 border-transparent hover:border-[var(--workspace-white,#fffef5)] transition-all rounded-none"
                                     >
                                         <Trash2 className="w-3 h-3" />
                                     </Button>
@@ -679,7 +681,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                                     <Input
                                         value={hobby.name}
                                         onChange={(e) => updateHobby(index, "name", e.target.value)}
-                                        className="font-bold mb-1 pixel-text text-center border-none bg-transparent shadow-none focus-visible:ring-0 h-auto p-0"
+                                        className="font-bold mb-1 workspace-editor-copy text-center border-none bg-transparent shadow-none focus-visible:ring-0 h-auto p-0"
                                     />
                                     <Textarea
                                         value={hobby.description}
@@ -693,7 +695,7 @@ export function AboutMeForm({ initialData, onChange, onFileSelect, onUrlSelect }
                     <AnimatedItem>
                         <Button
                             variant="ghost"
-                            className="w-full h-full cursor-pointer min-h-[150px] border-4 border-dashed border-[var(--cute-text)]/50 hover:border-solid hover:border-[var(--cute-text)] hover:bg-transparent hover:shadow-[4px_4px_0px_0px_var(--cute-text)] transition-all rounded-none flex flex-col gap-2 pixel-text"
+                            className="w-full h-full cursor-pointer min-h-[150px] border-4 border-dashed border-[var(--workspace-white,#fffef5)]/50 hover:border-solid hover:border-[var(--workspace-white,#fffef5)] hover:bg-transparent  transition-all rounded-none flex flex-col gap-2 workspace-editor-copy"
                             onClick={addHobby}
                         >
                             <Plus className="w-6 h-6" />

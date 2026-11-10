@@ -1,5 +1,14 @@
 # Repository Guidelines
 
+## Project Context
+- PortaGen is a portfolio generator: users build a desktop-OS-style portfolio in an editor and publish it at `/portfolio/[username]`.
+- Stack: Next.js 16 (App Router), TypeScript, Drizzle, Supabase libraries, and Vercel AI SDK.
+- See `README.md` (generic) and `docs/memory/` for project context.
+
+## Memory and Code Map
+- At session start, read `docs/memory/index.md` and the relevant linked notes. Save durable decisions in `docs/memory/` as Markdown and keep the index current.
+- `graphify-out/GRAPH_REPORT.md` summarizes code structure; refresh with `python -m graphify update .` (the `.exe` is blocked on this machine).
+
 ## Project Structure & Module Organization
 - `src/app`: Next.js App Router (routes, layouts, pages, API routes).
 - `src/components`: UI, editor, portfolio, and window-content components.
@@ -10,13 +19,16 @@
 - Root config: `next.config.ts`, `tsconfig.json` (alias `@/* -> src/*`), `eslint.config.mjs`.
 
 ## Build, Test, and Development Commands
+- `yarn install` — Install dependencies.
 - `yarn dev` — Run the app locally with hot reload.
+- Use `yarn dev -p 3001` if port 3000 is busy.
 - `yarn build` — Create an optimized production build.
 - `yarn start` — Start the production server (after build).
 - `yarn lint` — Lint code using Next + ESLint config.
 - `yarn db:generate` — Generate Drizzle migrations from `src/lib/db/schema.ts`.
 - `yarn db:push` — Push schema to the database.
 - `yarn db:migrate` — Apply migrations in `drizzle/` to the target DB.
+- Drizzle commands use `DATABASE_URL`.
 
 ## Coding Style & Naming Conventions
 - TypeScript, strict mode enabled; prefer 2‑space indentation.
@@ -24,6 +36,8 @@
 - API route handlers in App Router: `route.ts` inside the route folder.
 - Use path alias imports (example: `import { cn } from '@/lib/utils'`).
 - Run `yarn lint` before pushing; fix or justify warnings in PRs.
+- Window content is saved data (`src/lib/types.ts`, `src/lib/portfolio-extras.ts`); add a window type by adding its type, default content, renderer, and editor form together.
+- Respect `prefers-reduced-motion`.
 
 ## Testing Guidelines
 - No official test runner configured yet. If adding tests, place under `src/__tests__` using `*.test.ts(x)` and keep units small and deterministic.
@@ -31,7 +45,9 @@
 - Aim for clear Arrange‑Act‑Assert structure and fast, isolated tests.
 
 ## Commit & Pull Request Guidelines
+- Default branch is `main`.
 - Commits: imperative mood, concise summary (≤72 chars), include scope when helpful (e.g., `editor:`), and group related changes.
+- Commit messages are plain, with no `Co-Authored-By` trailer.
 - PRs: include description, linked issues, test/QA steps, screenshots for UI, and call out DB migration impact (`drizzle/`) and env changes.
 
 ## Security & Configuration Tips

@@ -1,0 +1,16 @@
+{
+  "layouts": [
+    {
+      "width": 390,
+      "screen": "editor keyboard, asset picker, preview token reset",
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "screen": "editor keyboard, asset picker, preview token reset",
+      "overflow": false
+    }
+  ],
+  "errors": [],
+  "fixture": true
+}

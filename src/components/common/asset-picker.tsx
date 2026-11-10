@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { PixelModal } from "@/components/pixel-modal"
-import { PixelButton } from "@/components/pixel-button"
-import { PixelInput } from "@/components/pixel-input"
-import { Loader2, Music, Zap, FileImage } from "lucide-react"
+import { WorkspaceModal as PixelModal } from "@/components/workspace/workspace-modal"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
+import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
+import { Loader2, Music, Zap, FileImage, FolderOpen } from "lucide-react"
 import Image from "next/image"
 import { Asset } from "@/lib/types"
 
@@ -113,7 +113,7 @@ export function AssetPicker({ isOpen, onClose, onSelect, type = "all" }: AssetPi
                         </div>
                     ) : filteredAssets.length === 0 ? (
                         <div className="flex flex-col justify-center items-center h-full text-muted-foreground space-y-2">
-                            <div className="text-4xl">📂</div>
+                            <FolderOpen className="size-10" aria-hidden="true" />
                             <p className="font-dialogue text-sm">NO ASSETS FOUND</p>
                         </div>
                     ) : (
@@ -125,6 +125,7 @@ export function AssetPicker({ isOpen, onClose, onSelect, type = "all" }: AssetPi
                                 return (
                                     <button
                                         key={asset.id}
+                                        aria-pressed={selectedAssetId === asset.id}
                                         onClick={() => setSelectedAssetId(asset.id)}
                                         className={`relative group border-2 text-left p-2 transition-all cursor-pointer flex flex-col gap-2 ${isSelected
                                             ? "border-primary bg-primary/10 ring-2 ring-primary ring-offset-2 ring-offset-background"

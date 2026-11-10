@@ -1,0 +1,4 @@
+"use client";
+import { useId } from 'react';
+import { useWorkspaceMotion } from './workspace-motion-provider';
+export function MotionPreferenceControl() { const { preference, reducedMotion, setPreference } = useWorkspaceMotion(); const id = useId(); return <div className="ws-motion-control"><label htmlFor={id} className="ws-switch-label"><span>Reduce animation</span><input id={id} type="checkbox" role="switch" checked={reducedMotion} onChange={e => setPreference(e.target.checked ? 'reduced' : 'full')} aria-describedby={`${id}-help`}/></label><p id={`${id}-help`} className="ws-helper">{preference === 'system' ? 'Following your device setting.' : 'Your choice is saved on this device.'} Reduces entrances, water, parallax and page transitions.</p><button type="button" className="ws-text-button" onClick={() => setPreference('system')}>Use device setting</button></div>; }

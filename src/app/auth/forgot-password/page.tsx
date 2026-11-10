@@ -5,14 +5,13 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { useState, useEffect } from "react"
-import Link from "next/link"
+import Link from "@/components/workspace/workspace-link"
 import { createClient } from "@/utils/supabase/client"
 import { useRouter } from "next/navigation"
-import { PixelButton } from "@/components/pixel-button"
-import { PixelCard } from "@/components/pixel-card"
-import { PixelInput } from "@/components/pixel-input"
-import { PixelClouds } from "@/components/pixel-clouds"
-import { PixelCharacter } from "@/components/pixel-character"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
+import { useWorkspaceExperience } from "@/components/workspace/workspace-experience-provider"
+import { AuthScene } from "@/components/workspace/auth-scene"
+import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
 
 // Validation schemas
 const emailSchema = z.object({
@@ -37,6 +36,7 @@ type EmailFormValues = z.infer<typeof emailSchema>
 type ResetFormValues = z.infer<typeof resetSchema>
 
 export default function ForgotPasswordPage() {
+  const { cancelPendingTransition } = useWorkspaceExperience()
   const supabase = createClient()
   const router = useRouter()
   const [error, setError] = useState("")
@@ -112,6 +112,7 @@ export default function ForgotPasswordPage() {
       setStep("success")
       // Redirect after 2 seconds
       setTimeout(() => {
+        cancelPendingTransition()
         router.push("/auth/login")
       }, 2000)
     } catch (err: any) {
@@ -122,51 +123,14 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4 readable">
-      <PixelClouds />
-
-      {/* Pixel cityscape background */}
-      <div className="fixed bottom-0 left-0 right-0 h-48 z-0">
-        <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-[#8B5CF6] to-[#EC4899]" />
-        <div className="absolute bottom-0 w-full flex justify-around items-end">
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="bg-[#6D28D9]"
-              style={{
-                width: "40px",
-                height: `${40 + ((i * 29 + 7) % 60)}px`,
-                opacity: 0.8,
-              }}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="relative z-10 w-full max-w-md">
-        <Link href="/" className="inline-block py-2 mb-2 font-dialogue text-sm text-foreground hover:underline">← Back to home</Link>
-        <PixelCard>
+    <AuthScene artwork="/artwork/eighty-six/reference-set/05-lena-salute.webp" title={step === "success" ? "Password reset" : "Reset your password"} description={step === "email" ? "Get back to your portfolio." : step === "code" ? "Enter your code and new password." : "Your password has been updated."}>
           <div className="space-y-6">
             {/* Header */}
-            <div className="text-center space-y-4">
-              <div className="flex justify-center">
-                <PixelCharacter color="#FBBF24" size={60} />
-              </div>
-              <h1 className="text-lg pixel-text-shadow">
-                {step === "email" && "FORGOT PASSWORD?"}
-                {step === "code" && "RESET PASSWORD"}
-                {step === "success" && "SUCCESS!"}
-              </h1>
-              <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
-                {step === "email" && "ENTER YOUR EMAIL TO RESET"}
-                {step === "code" && "ENTER CODE AND NEW PASSWORD"}
-                {step === "success" && "PASSWORD RESET COMPLETE"}
-              </p>
-            </div>
+
 
             {/* Error Message */}
             {error && (
-              <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 font-dialogue text-sm text-center">
+              <div role="alert" className="p-3 bg-red-500/20 border border-red-500 text-[#ffb2c5] font-[family-name:var(--font-workspace-body)] text-sm text-center">
                 {error}
               </div>
             )}
@@ -182,7 +146,7 @@ export default function ForgotPasswordPage() {
                     {...emailForm.register("email")}
                   />
                   {emailForm.formState.errors.email && (
-                    <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
+                    <p role="alert" className="font-[family-name:var(--font-workspace-body)] text-[#ffb2c5] text-sm mt-1">
                       {emailForm.formState.errors.email.message}
                     </p>
                   )}
@@ -202,8 +166,8 @@ export default function ForgotPasswordPage() {
             {/* Step 2: Reset Code & New Password */}
             {step === "code" && (
               <form onSubmit={resetForm.handleSubmit(onResetSubmit)} className="space-y-4">
-                <div className="pixel-card bg-accent/20 p-3">
-                  <p className="text-xs leading-relaxed text-center uppercase">
+                <div className="workspace-panel bg-accent/20 p-3">
+                  <p className="text-sm leading-relaxed text-center uppercase">
                     Check your email for a reset link or enter the 6-digit code below with your new password.
                   </p>
                 </div>
@@ -217,7 +181,7 @@ export default function ForgotPasswordPage() {
                     {...resetForm.register("code")}
                   />
                   {resetForm.formState.errors.code && (
-                    <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
+                    <p role="alert" className="font-[family-name:var(--font-workspace-body)] text-[#ffb2c5] text-sm mt-1">
                       {resetForm.formState.errors.code.message}
                     </p>
                   )}
@@ -231,7 +195,7 @@ export default function ForgotPasswordPage() {
                     {...resetForm.register("password")}
                   />
                   {resetForm.formState.errors.password && (
-                    <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
+                    <p role="alert" className="font-[family-name:var(--font-workspace-body)] text-[#ffb2c5] text-sm mt-1">
                       {resetForm.formState.errors.password.message}
                     </p>
                   )}
@@ -245,7 +209,7 @@ export default function ForgotPasswordPage() {
                     {...resetForm.register("confirmPassword")}
                   />
                   {resetForm.formState.errors.confirmPassword && (
-                    <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
+                    <p role="alert" className="font-[family-name:var(--font-workspace-body)] text-[#ffb2c5] text-sm mt-1">
                       {resetForm.formState.errors.confirmPassword.message}
                     </p>
                   )}
@@ -261,7 +225,7 @@ export default function ForgotPasswordPage() {
                 </PixelButton>
 
                 <div className="text-center">
-                  <p className="font-dialogue text-sm text-muted-foreground">
+                  <p className="font-[family-name:var(--font-workspace-body)] text-sm text-[#bdd3f3]">
                     IF YOU RECEIVED A LINK, CLICK IT TO SET YOUR NEW PASSWORD.
                   </p>
                 </div>
@@ -269,7 +233,7 @@ export default function ForgotPasswordPage() {
                 <button
                   type="button"
                   onClick={() => setStep("email")}
-                  className="w-full text-xs text-muted-foreground hover:text-primary"
+                  className="w-full text-sm text-[#bdd3f3] hover:text-[#44e4ff]"
                 >
                   ← BACK
                 </button>
@@ -279,33 +243,29 @@ export default function ForgotPasswordPage() {
             {/* Step 3: Success */}
             {step === "success" && (
               <div className="space-y-4">
-                <div className="pixel-card bg-green-500/20 border-2 border-green-500 p-4">
-                  <p className="font-dialogue text-sm leading-relaxed text-center text-green-500">
+                <div className="workspace-panel bg-green-500/20 border border-green-500 p-4">
+                  <p className="font-[family-name:var(--font-workspace-body)] text-sm leading-relaxed text-center text-[#83efbd]">
                     ✓ PASSWORD RESET SUCCESSFUL
                     <br />
                     REDIRECTING TO LOGIN...
                   </p>
                 </div>
 
-                <Link href="/auth/login">
-                  <PixelButton variant="primary" className="w-full">
-                    GO TO LOGIN
-                  </PixelButton>
-                </Link>
+                <PixelButton asChild variant="primary" className="w-full">
+                  <Link href="/auth/login">Go to login</Link>
+                </PixelButton>
               </div>
             )}
 
             {/* Back to Login */}
             {step !== "success" && (
-              <p className="font-dialogue text-center text-sm text-muted-foreground">
-                <Link href="/auth/login" className="text-primary hover:underline">
+              <p className="font-[family-name:var(--font-workspace-body)] text-center text-sm text-[#bdd3f3]">
+                <Link href="/auth/login" className="text-[#44e4ff] hover:underline">
                   ← BACK TO LOGIN
                 </Link>
               </p>
             )}
           </div>
-        </PixelCard>
-      </div>
-    </div>
+        </AuthScene>
   )
 }

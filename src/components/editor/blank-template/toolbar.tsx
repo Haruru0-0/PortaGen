@@ -2,7 +2,7 @@ import React from "react"
 import { useDraggable } from "@dnd-kit/core"
 import { ComponentType } from "@/lib/types"
 import { Type, ImageIcon, CreditCard, MousePointerClick, Minus, ArrowUpDown, Layout } from "lucide-react"
-import { PixelCard } from "@/components/pixel-card"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
 
 export const TOOLBAR_ITEMS: { type: ComponentType; label: string; icon: React.ReactNode }[] = [
     { type: "text", label: "Text", icon: <Type className="w-4 h-4" /> },

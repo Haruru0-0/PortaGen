@@ -1,125 +1,29 @@
-import {PixelCard} from "@/components/pixel-card";
-import Image from "next/image";
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
-import Edit from "@/assets/Edit.png";
-import {PixelButton} from "@/components/pixel-button";
-import Download from "@/assets/Download.png";
-import Delete from "@/assets/Delete.png";
-import {Asset} from "@/lib/types";
+"use client"
+
+import Image from "next/image"
+import { Check, Download, FileImage, Music, Pencil, Trash2 } from "lucide-react"
+import { WorkspacePanel, WorkspaceAction } from "@/components/workspace/workspace-primitives"
+import { Asset } from "@/lib/types"
 
 export default function AssetCard(props: {
-    onToggle: () => void,
-    selectedAssets: number[],
-    asset: Asset,
-    assetIcon: string,
-    onRename: () => void,
-    fileSize: string,
-    onView: () => void,
-    onDownload: () => void,
-    onDelete: () => void
+  onToggle: () => void; selectedAssets: number[]; asset: Asset; assetIcon: string;
+  onRename: () => void; fileSize: string; onView: () => void; onDownload: () => void; onDelete: () => void
 }) {
-    return <PixelCard className="relative">
-        <div className="space-y-3">
-            <div className="absolute top-4 left-4 z-10">
-                <button
-                    onClick={props.onToggle}
-                    className={`w-6 h-6 border-2 border-border ${
-                        props.selectedAssets.includes(props.asset.id) ? "bg-primary" : "bg-card"
-                    } flex items-center justify-center`}
-                >
-                    {props.selectedAssets.includes(props.asset.id) && (
-                        <span className="font-dialogue text-sm">✓</span>
-                    )}
-                </button>
-            </div>
-
-            <div
-                className="aspect-square bg-muted border-2 border-border flex items-center justify-center text-4xl overflow-hidden relative">
-                {props.asset.fileId && props.asset.type !== "music" && props.asset.type !== "sound" ? (
-                    <Image
-                        src={`https://drive.google.com/uc?id=${props.asset.fileId}`}
-                        alt={props.asset.name}
-                        fill
-                        sizes="200px"
-                        className="object-cover"
-                    />
-                ) : (
-                    props.assetIcon
-                )}
-            </div>
-
-            <div className="space-y-1">
-                {/* Asset Name with Rename Button */}
-                <div className="flex items-center justify-between gap-1 group">
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <div className="text-xs overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer">
-                                {props.asset.name}.{props.asset.mimeType ? props.asset.mimeType.split("/")[1] : "file"}
-                            </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>{props.asset.name}.{props.asset.mimeType ? props.asset.mimeType.split("/")[1] : "file"}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <button
-                                onClick={props.onRename}
-                                className="w-8 h-8 border-2 bg-card hover:bg-primary hover:text-primary-foreground transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 shrink-0"
-                            >
-                                <Image alt={"Edit button"} src={Edit}/>
-                            </button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>Rename</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </div>
-
-                <div className="flex flex-col font-dialogue text-sm text-muted-foreground">
-                    <p>{props.fileSize}</p>
-                    <p>{new Date(props.asset.date).toLocaleDateString()}</p>
-                    <p>{props.asset.type}</p>
-                </div>
-            </div>
-
-            <div className="flex gap-2">
-                <PixelButton
-                    variant="secondary"
-                    className="flex-1 text-xs px-2 py-1"
-                    onClick={props.onView}
-                >
-                    VIEW
-                </PixelButton>
-
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <button
-                            className="w-8 h-8 border-2 border-border bg-card hover:bg-muted text-xs"
-                            onClick={props.onDownload}
-                        >
-                            <Image alt={"Download button"} src={Download}/>
-                        </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        <p>Download</p>
-                    </TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <button
-                            className="w-8 h-8 border-2 bg-card hover:bg-destructive text-xs"
-                            onClick={props.onDelete}
-                        >
-                            <Image alt={"Delete button"} src={Delete}/>
-                        </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        <p>Delete</p>
-                    </TooltipContent>
-                </Tooltip>
-            </div>
-        </div>
-    </PixelCard>;
+  const selected = props.selectedAssets.includes(props.asset.id)
+  const audio = props.asset.type === "music" || props.asset.type === "sound"
+  return <WorkspacePanel className={`relative min-w-0 space-y-4 ${selected ? "ring-2 ring-[#44e4ff]" : ""}`}>
+    <div className="aspect-[4/3] bg-[#0b2358] flex items-center justify-center overflow-hidden relative">
+      {props.asset.fileId && !audio ? <Image src={`https://drive.google.com/uc?id=${props.asset.fileId}`} alt={props.asset.name} fill sizes="(max-width: 768px) 100vw, 300px" className="object-cover" /> : audio ? <Music className="size-12 text-[#44e4ff]" /> : <FileImage className="size-12 text-[#44e4ff]" />}
+      <button type="button" onClick={props.onToggle} aria-pressed={selected} aria-label={`${selected ? "Deselect" : "Select"} ${props.asset.name}`} className="absolute top-2 left-2 min-w-11 min-h-11 bg-[#061039] border border-[#44e4ff] text-white flex items-center justify-center gap-2 px-2">
+        {selected ? <><Check className="size-4" /><span className="text-sm">Selected</span></> : <span className="text-sm">Select</span>}
+      </button>
+    </div>
+    <div><h3 className="font-semibold break-words">{props.asset.name}</h3><p className="mt-1 text-sm text-muted-foreground">{props.asset.type} · {props.fileSize}</p><p className="text-sm text-muted-foreground">{new Date(props.asset.date).toLocaleDateString()}</p></div>
+    <div className="flex flex-wrap items-center gap-1">
+      <WorkspaceAction variant="secondary" onClick={props.onView}>View</WorkspaceAction>
+      <button type="button" className="ws-action ws-action--secondary px-3" aria-label={`Rename ${props.asset.name}`} title="Rename" onClick={props.onRename}><Pencil className="size-4" /></button>
+      <button type="button" className="ws-action ws-action--secondary px-3" aria-label={`Download ${props.asset.name}`} title="Download" onClick={props.onDownload}><Download className="size-4" /></button>
+      <button type="button" className="ws-action ws-action--secondary px-3 text-[#ffb2c5]" aria-label={`Delete ${props.asset.name}`} title="Delete" onClick={props.onDelete}><Trash2 className="size-4" /></button>
+    </div>
+  </WorkspacePanel>
 }

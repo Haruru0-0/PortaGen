@@ -5,7 +5,7 @@ import { Canvas } from "../blank-template/canvas"
 import { Toolbar, TOOLBAR_ITEMS } from "../blank-template/toolbar"
 import { PropertiesDialog } from "../blank-template/properties-dialog"
 import { ItemEditorDialog } from "../blank-template/item-editor-dialog"
-import { PixelCard } from "@/components/pixel-card"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
 
 // Simple ID generator to avoid uuid dependency issues
 const generateId = () => Math.random().toString(36).substr(2, 9)

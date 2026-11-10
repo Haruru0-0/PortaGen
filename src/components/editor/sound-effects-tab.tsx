@@ -1,10 +1,10 @@
-import { PixelCard } from "@/components/pixel-card"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
 import { Volume2, Play } from "lucide-react"
 import { useAppSound } from "@/contexts/sound-context"
 import { useSoundEffects } from "@/contexts/soundEffectContext"
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
-import { PixelButton } from "../pixel-button"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
 
 export function SoundEffectsTab() {
     const { presets, currentPreset, playClickSound, setPreset } = useAppSound()
@@ -91,7 +91,7 @@ export function SoundEffectsTab() {
             <div className="space-y-4">
                 <div className="flex items-center gap-2">
                     <Volume2 className="w-4 h-4" />
-                    <h3 className="text-sm dashboard-pixel-text-shadow">SOUND PRESETS</h3>
+                    <h3 className="text-sm workspace-editor-title">SOUND PRESETS</h3>
                 </div>
 
                 <p className="text-xs text-muted-foreground">
@@ -111,7 +111,7 @@ export function SoundEffectsTab() {
                                     <p className="text-xs text-muted-foreground pixel-retro-description">{preset.description}</p>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button
+                                    <button data-workspace-control
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handlePreview(preset.id)

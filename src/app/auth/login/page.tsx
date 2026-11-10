@@ -4,15 +4,14 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-import Link from "next/link"
+import Link from "@/components/workspace/workspace-link"
 import { createClient } from "@/utils/supabase/client"
 import { useRouter } from "next/navigation"
-import { PixelButton } from "@/components/pixel-button"
-import { PixelCard } from "@/components/pixel-card"
-import { PixelInput } from "@/components/pixel-input"
-import { PixelPasswordInput } from "@/components/pixel-password-input"
-import { PixelClouds } from "@/components/pixel-clouds"
-import { PixelCharacter } from "@/components/pixel-character"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
+import { useWorkspaceExperience } from "@/components/workspace/workspace-experience-provider"
+import { AuthScene } from "@/components/workspace/auth-scene"
+import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
+import { WorkspacePasswordInput as PixelPasswordInput } from "@/components/workspace/workspace-primitives"
 import { useState } from "react"
 
 // Validation schema
@@ -24,6 +23,7 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
+  const { cancelPendingTransition } = useWorkspaceExperience()
   const supabase = createClient()
   const router = useRouter()
   const [error, setError] = useState("")
@@ -68,6 +68,7 @@ export default function LoginPage() {
 
       if (error) throw error
 
+      cancelPendingTransition()
       router.push("/dashboard")
       router.refresh()
     } catch (err: any) {
@@ -92,45 +93,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4 readable">
-      <PixelClouds />
-
-      {/* Pixel cityscape background */}
-      <div className="fixed bottom-0 left-0 right-0 h-48 z-0">
-        <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-[#8B5CF6] to-[#EC4899]" />
-        <div className="absolute bottom-0 w-full flex justify-around items-end">
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="bg-[#6D28D9]"
-              style={{
-                width: "40px",
-                height: `${40 + ((i * 29 + 7) % 60)}px`,
-                opacity: 0.8,
-              }}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="relative z-10 w-full max-w-md">
-        <Link href="/" className="inline-block py-2 mb-2 font-dialogue text-sm text-foreground hover:underline">← Back to home</Link>
-        <PixelCard>
+    <AuthScene artwork="/artwork/eighty-six/reference-set/05-lena-salute.webp" title="Sign in" description="Welcome back. Continue building your world.">
           <div className="space-y-6">
             {/* Header */}
-            <div className="text-center space-y-4">
-              <div className="flex justify-center">
-                <PixelCharacter color="#EC4899" size={60} />
-              </div>
-              <h1 className="text-xl pixel-text-shadow">LOG IN</h1>
-              <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
-                WELCOME BACK, PLAYER!
-              </p>
-            </div>
+
 
             {/* Error Message */}
             {error && (
-              <div className="p-3 bg-red-500/20 border-2 border-red-500 text-red-500 font-dialogue text-sm text-center">
+              <div role="alert" className="p-3 bg-red-500/20 border border-red-500 text-[#ffb2c5] font-[family-name:var(--font-workspace-body)] text-sm text-center">
                 {error}
               </div>
             )}
@@ -145,7 +115,7 @@ export default function LoginPage() {
                   {...form.register("identifier")} aria-invalid={!!form.formState.errors.identifier} autoComplete="username"
                 />
                 {form.formState.errors.identifier && (
-                  <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
+                  <p role="alert" className="font-[family-name:var(--font-workspace-body)] text-[#ffb2c5] text-sm mt-1">
                     {form.formState.errors.identifier.message}
                   </p>
                 )}
@@ -158,7 +128,7 @@ export default function LoginPage() {
                   {...form.register("password")} aria-invalid={!!form.formState.errors.password} autoComplete="current-password"
                 />
                 {form.formState.errors.password && (
-                  <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
+                  <p role="alert" className="font-[family-name:var(--font-workspace-body)] text-[#ffb2c5] text-sm mt-1">
                     {form.formState.errors.password.message}
                   </p>
                 )}
@@ -167,7 +137,7 @@ export default function LoginPage() {
               <div className="flex justify-end">
                 <Link
                   href="/auth/forgot-password"
-                  className="inline-block py-2 font-dialogue text-sm text-primary hover:underline"
+                  className="inline-block py-2 font-[family-name:var(--font-workspace-body)] text-sm text-[#44e4ff] hover:underline"
                 >
                   FORGOT PASSWORD?
                 </Link>
@@ -179,7 +149,7 @@ export default function LoginPage() {
                 className="w-full"
                 disabled={loading}
               >
-                {loading ? "LOADING..." : "START GAME"}
+                {loading ? "LOADING..." : "Sign in"}
               </PixelButton>
             </form>
 
@@ -189,8 +159,8 @@ export default function LoginPage() {
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t-2 border-border" />
                 </div>
-                <div className="relative flex justify-center font-dialogue text-sm">
-                  <span className="bg-card px-2 text-muted-foreground">
+                <div className="relative flex justify-center font-[family-name:var(--font-workspace-body)] text-sm">
+                  <span className="bg-[#071657] px-2 text-[#bdd3f3]">
                     OR CONTINUE WITH
                   </span>
                 </div>
@@ -199,7 +169,7 @@ export default function LoginPage() {
               <div className="grid grid-cols-2 gap-3">
                 <PixelButton
                   variant="secondary"
-                  className="w-full text-xs"
+                  className="w-full text-sm"
                   onClick={() => handleOAuthSignIn("google")}
                   disabled={loading}
                   type="button"
@@ -208,7 +178,7 @@ export default function LoginPage() {
                 </PixelButton>
                 <PixelButton
                   variant="secondary"
-                  className="w-full text-xs"
+                  className="w-full text-sm"
                   onClick={() => handleOAuthSignIn("github")}
                   disabled={loading}
                   type="button"
@@ -219,20 +189,18 @@ export default function LoginPage() {
             </div>
 
             {/* Sign Up Link */}
-            <p className="font-dialogue text-center text-sm text-muted-foreground leading-relaxed">
+            <p className="font-[family-name:var(--font-workspace-body)] text-center text-sm text-[#bdd3f3] leading-relaxed">
               NEW PLAYER?{" "}
-              <Link href="/auth/signup" className="text-primary hover:underline">
+              <Link href="/auth/signup" className="text-[#44e4ff] hover:underline">
                 CREATE ACCOUNT
               </Link>
               <br />
               Read our{" "}
-              <Link href="/privacy?from=Login" className="text-primary hover:underline">
+              <Link href="/privacy?from=Login" className="text-[#44e4ff] hover:underline">
                 Privacy Policy
               </Link>
             </p>
           </div>
-        </PixelCard>
-      </div>
-    </div>
+        </AuthScene>
   )
 }

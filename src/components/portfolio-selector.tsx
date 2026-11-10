@@ -1,10 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { PixelCard } from "@/components/pixel-card"
-import { PixelButton } from "@/components/pixel-button"
-import { PixelModal } from "@/components/pixel-modal"
-import { PixelInput } from "@/components/pixel-input"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
+import { WorkspaceModal as PixelModal } from "@/components/workspace/workspace-modal"
+import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
 import { Plus, Loader2 } from "lucide-react"
 
 interface Portfolio {
@@ -69,20 +69,20 @@ export function PortfolioSelector({
             <PixelCard>
                 <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                        <label className="block text-xs uppercase tracking-wider">PORTFOLIO</label>
+                        <label className="block text-sm uppercase tracking-wider">PORTFOLIO</label>
                         <PixelButton
                             variant="secondary"
-                            className="text-xs flex items-center gap-1 px-3 py-1"
+                            className="text-sm flex items-center gap-1 px-3 py-1"
                             onClick={() => setIsCreatePortfolioModalOpen(true)}
                         >
                             <Plus className="w-3 h-3" />
                             NEW
                         </PixelButton>
                     </div>
-                    <select
+                    <select aria-label="Portfolio"
                         value={currentPortfolioId || ''}
-                        onChange={(e) => onPortfolioChange(Number(e.target.value))}
-                        className="w-full px-4 py-3 text-xs bg-input border-4 border-border focus:outline-none focus:ring-2 focus:ring-ring"
+                        onChange={(e) => { if (e.target.value) onPortfolioChange(Number(e.target.value)) }}
+                        className="ws-input w-full"
                     >
                         <option value="">SELECT PORTFOLIO</option>
                         {portfolios.map(portfolio => (
@@ -92,7 +92,7 @@ export function PortfolioSelector({
                         ))}
                     </select>
                     {portfolios.length === 0 && (
-                        <p className="font-dialogue text-sm text-muted-foreground mt-2">
+                        <p className="font-[family-name:var(--font-workspace-body)] text-sm text-muted-foreground mt-2">
                             No portfolios found. Create your first portfolio to get started.
                         </p>
                     )}
@@ -107,8 +107,8 @@ export function PortfolioSelector({
             >
                 <div className="space-y-4">
                     <div className="space-y-2">
-                        <label className="block text-xs uppercase tracking-wider">PORTFOLIO NAME</label>
-                        <PixelInput
+                        <label htmlFor="selector-new-portfolio-name" className="block text-sm uppercase tracking-wider">PORTFOLIO NAME</label>
+                        <PixelInput id="selector-new-portfolio-name"
                             placeholder="ENTER PORTFOLIO NAME"
                             value={newPortfolioName}
                             onChange={(e) => setNewPortfolioName(e.target.value)}
@@ -117,14 +117,14 @@ export function PortfolioSelector({
                     <div className="flex gap-3 justify-end">
                         <PixelButton
                             variant="secondary"
-                            className="text-xs"
+                            className="text-sm"
                             onClick={() => setIsCreatePortfolioModalOpen(false)}
                         >
                             CANCEL
                         </PixelButton>
                         <PixelButton
                             variant="primary"
-                            className="text-xs"
+                            className="text-sm"
                             onClick={createPortfolio}
                             disabled={creatingPortfolio || !newPortfolioName.trim()}
                         >

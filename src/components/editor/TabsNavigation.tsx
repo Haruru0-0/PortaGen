@@ -1,123 +1,77 @@
+"use client"
 
-import { PixelCard } from "@/components/pixel-card";
-import { homeScreenTabs, lockScreenTabs } from "@/lib/constants/tabs";
-import { useEditorUIStore, LockScreenTab, HomeScreenTab } from "@/lib/stores/ui-store";
-import { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
+import { WorkspacePanel } from "@/components/workspace/workspace-primitives"
+import { useWorkspaceMotion } from "@/components/workspace/workspace-motion-provider"
+import { homeScreenTabs, lockScreenTabs } from "@/lib/constants/tabs"
+import { useEditorUIStore, type LockScreenTab, type HomeScreenTab } from "@/lib/stores/ui-store"
+import { useEffect, useRef, useState, type KeyboardEvent } from "react"
 
-export const TabsNavigation = () => {
-  const {
-    activeCategory,
-    activeLockScreenTab,
-    activeHomeScreenTab,
-    setActiveLockScreenTab,
-    setActiveHomeScreenTab
-  } = useEditorUIStore();
+export function editorTabId(prefix: string, category: string, tab: string) {
+  return `${prefix}-${category}-${tab.replaceAll(" ", "-")}`
+}
 
-  const tabsRef = useRef<HTMLButtonElement[]>([]);
-  const stripRef = useRef<HTMLDivElement>(null);
-  const activeTab = activeCategory === "lockScreen" ? activeLockScreenTab : activeHomeScreenTab;
+export const TabsNavigation = ({ idPrefix }: { idPrefix: string }) => {
+  const { activeCategory, activeLockScreenTab, activeHomeScreenTab, setActiveLockScreenTab, setActiveHomeScreenTab } = useEditorUIStore()
+  const { reducedMotion, ready } = useWorkspaceMotion()
+  const stripRef = useRef<HTMLDivElement>(null)
+  const tabsRef = useRef<(HTMLButtonElement | null)[]>([])
+  const [vertical, setVertical] = useState(false)
+  const [focusedTab, setFocusedTab] = useState<{ category: string; tab: string } | null>(null)
+  const tabs = activeCategory === "lockScreen" ? lockScreenTabs : homeScreenTabs
+  const activeTab = activeCategory === "lockScreen" ? activeLockScreenTab : activeHomeScreenTab
+  const rovingTab = focusedTab?.category === activeCategory ? focusedTab.tab : activeTab
 
-  // On small screens the tab strip scrolls sideways: keep the selected tab in view without moving the page
   useEffect(() => {
-    const strip = stripRef.current;
-    const selected = strip?.querySelector<HTMLElement>('[aria-selected="true"]');
-    if (!strip || !selected || strip.scrollWidth <= strip.clientWidth) return;
-    strip.scrollTo({ left: selected.offsetLeft - (strip.clientWidth - selected.clientWidth) / 2, behavior: "smooth" });
-  }, [activeTab, activeCategory]);
-
-  useGSAP(() => {
-    const prefersReducedMotion =
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (prefersReducedMotion) return
-
-    tabsRef.current.forEach((tab, index) => {
-      if (tab) {
-        gsap.fromTo(
-          tab,
-          { y: -20, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.4,
-            delay: 0.2 + index * 0.05,
-            ease: "back.out(1.7)",
-          }
-        )
-      }
-    })
+    const query = window.matchMedia("(min-width: 1024px)")
+    const update = () => setVertical(query.matches)
+    update()
+    query.addEventListener("change", update)
+    return () => query.removeEventListener("change", update)
   }, [])
 
-  const handleTabChange = (tabId: LockScreenTab | HomeScreenTab) => {
-    // Animation logic for content switching could be added here if needed
-    // For now just updating state
-    const tabContent = document.querySelector(".tab-content");
-    if (tabContent) {
-      gsap.fromTo(
-        tabContent,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }
-      )
-    }
+  useEffect(() => {
+    const strip = stripRef.current
+    const selected = strip?.querySelector<HTMLElement>('[aria-selected="true"]')
+    if (!strip || !selected || strip.scrollWidth <= strip.clientWidth) return
+    strip.scrollTo({ left: selected.offsetLeft - (strip.clientWidth - selected.clientWidth) / 2, behavior: ready && !reducedMotion ? "smooth" : "auto" })
+  }, [activeTab, activeCategory, reducedMotion, ready])
 
-    if (activeCategory === "lockScreen") {
-      setActiveLockScreenTab(tabId as LockScreenTab)
-    } else {
-      setActiveHomeScreenTab(tabId as HomeScreenTab)
+  const activate = (tab: string) => {
+    if (activeCategory === "lockScreen") setActiveLockScreenTab(tab as LockScreenTab)
+    else setActiveHomeScreenTab(tab as HomeScreenTab)
+  }
+
+  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    let target: number | undefined
+    if (event.key === "Home") target = 0
+    else if (event.key === "End") target = tabs.length - 1
+    else if (event.key === (vertical ? "ArrowDown" : "ArrowRight")) target = (index + 1) % tabs.length
+    else if (event.key === (vertical ? "ArrowUp" : "ArrowLeft")) target = (index - 1 + tabs.length) % tabs.length
+    else if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault()
+      activate(tabs[index].id)
+    }
+    if (target !== undefined) {
+      event.preventDefault()
+      tabsRef.current[target]?.focus()
     }
   }
 
-  return (
-    <div className="lg:col-span-1">
-      <PixelCard>
-        <div className="space-y-4">
-          <h3 className="text-sm dashboard-pixel-text-shadow">
-            {activeCategory === "lockScreen" ? "LOCK SCREEN" : "HOME SCREEN"}
-          </h3>
-
-          <div className="relative">
-          <div ref={stripRef} role="tablist" aria-label="Editor sections" className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">
-            {activeCategory === "lockScreen"
-              ? lockScreenTabs.map((tab, index) => (
-                <button
-                  key={tab.id}
-                  ref={(el) => {
-                    if (el) tabsRef.current[index] = el;
-                  }}
-                  role="tab"
-                  aria-selected={activeLockScreenTab === tab.id}
-                  onClick={() => handleTabChange(tab.id as LockScreenTab)}
-                  className={`lg:w-full shrink-0 whitespace-nowrap min-h-11 cursor-pointer text-left px-4 py-3 text-xs border-2 border-border transition-colors ${activeLockScreenTab === tab.id
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-card hover:bg-muted"
-                    }`}
-                >
-                  {tab.label}
-                </button>
-              ))
-              : homeScreenTabs.map((tab, index) => (
-                <button
-                  key={tab.id}
-                  ref={(el) => {
-                    if (el) tabsRef.current[index] = el;
-                  }}
-                  role="tab"
-                  aria-selected={activeHomeScreenTab === tab.id}
-                  onClick={() => handleTabChange(tab.id as HomeScreenTab)}
-                  className={`lg:w-full shrink-0 whitespace-nowrap min-h-11 cursor-pointer text-left px-4 py-3 text-xs border-2 border-border transition-colors ${activeHomeScreenTab === tab.id
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-card hover:bg-muted"
-                    }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-          </div>
-          <div aria-hidden="true" className="lg:hidden pointer-events-none absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-card to-transparent" />
-          </div>
-        </div>
-      </PixelCard>
-    </div>
-  );
-};
+  return <div className="lg:col-span-1 min-w-0">
+    <WorkspacePanel>
+      <h2 className="workspace-editor-title mb-3">{activeCategory === "lockScreen" ? "Lock screen" : "Home screen"}</h2>
+      <div ref={stripRef} role="tablist" aria-label="Editor sections" aria-orientation={vertical ? "vertical" : "horizontal"} className="workspace-editor-tabs">
+        {tabs.map((tab, index) => {
+          const id = editorTabId(idPrefix, activeCategory, tab.id)
+          return <button data-workspace-control key={tab.id} type="button" ref={(element) => { tabsRef.current[index] = element }}
+            id={`${id}-tab`} role="tab" aria-selected={activeTab === tab.id} aria-controls={`${id}-panel`}
+            tabIndex={rovingTab === tab.id ? 0 : -1}
+            onFocus={() => setFocusedTab({ category: activeCategory, tab: tab.id })}
+            onKeyDown={(event) => onKeyDown(event, index)} onClick={() => activate(tab.id)} className="workspace-editor-tab">
+            {tab.label}
+          </button>
+        })}
+      </div>
+    </WorkspacePanel>
+  </div>
+}

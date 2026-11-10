@@ -1,8 +1,8 @@
-import { PixelCard } from "@/components/pixel-card"
-import { PixelButton } from "@/components/pixel-button"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
 import { FileUpload } from "@/components/file-upload"
-import { PixelModal } from "@/components/pixel-modal"
-import { PixelInput } from "@/components/pixel-input"
+import { PixelModal } from "@/components/editor/editor-modal"
+import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
 import { Library } from "lucide-react"
 import { useLockScreenContext } from "@/contexts/lockScreenContext"
 import { useLockScreenStore } from "@/lib/stores/lock-screen-store"
@@ -101,7 +101,7 @@ export function LockScreenWallpaperTab() {
   return (
     <PixelCard>
       <div className="space-y-4">
-        <h3 className="text-sm pixel-text-shadow">LOCK SCREEN WALLPAPER</h3>
+        <h3 className="text-sm workspace-editor-title">LOCK SCREEN WALLPAPER</h3>
 
         <div className="space-y-2">
           <FileUpload

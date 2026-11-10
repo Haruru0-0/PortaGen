@@ -1,9 +1,9 @@
 "use client"
 
-import { PixelCard } from "@/components/pixel-card"
-import { PixelInput } from "@/components/pixel-input"
-import { PixelPasswordInput } from "@/components/pixel-password-input"
-import { PixelButton } from "@/components/pixel-button"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
+import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
+import { WorkspacePasswordInput as PixelPasswordInput } from "@/components/workspace/workspace-primitives"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
 import { Switch } from "@/components/ui/switch";
 import { useLockScreenContext } from "@/contexts/lockScreenContext";
 import { useLockScreenStore } from "@/lib/stores/lock-screen-store";
@@ -47,7 +47,7 @@ export function LockScreenSettingsTab() {
         <PixelCard>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <h3 className="text-sm dashboard-pixel-text-shadow">LOCK SCREEN SETTINGS</h3>
+                    <h3 className="text-sm workspace-editor-title">LOCK SCREEN SETTINGS</h3>
 
                     <FormField
                         control={form.control}

@@ -1,0 +1,48 @@
+/* Editor owner controls only. Portfolio stages keep their own renderer and tokens. */
+.workspace-controls {
+  min-width: 0;
+  font-family: var(--font-workspace-body), sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  scroll-margin-top: 6rem;
+}
+.workspace-editor-page-title { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; line-height: 1.15; margin-bottom: .5rem; }
+.workspace-editor-title { font-family: var(--font-workspace-body), sans-serif; font-size: 1rem; font-weight: 700; text-shadow: none; }
+.workspace-editor-copy { font-family: var(--font-workspace-body), sans-serif; }
+.workspace-editor-location { color: var(--workspace-cyan, #44e4ff); font-size: .9375rem; margin-bottom: 1rem; overflow-wrap: anywhere; }
+.workspace-editor-return { display: inline-flex; align-items: center; min-height: 44px; margin-bottom: .5rem; text-decoration: underline; text-underline-offset: 4px; }
+.workspace-editor-categories { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.5rem; }
+.workspace-editor-category, .workspace-editor-tab {
+  display: flex; align-items: center; gap: .75rem; min-height: 44px; padding: .75rem 1rem;
+  font: inherit; font-weight: 600; text-align: left; border: 1px solid #526da0;
+  border-radius: 6px; background: var(--workspace-ink, #061039); color: var(--workspace-white, #fffef5); cursor: pointer;
+}
+.workspace-editor-category { flex: 1 1 150px; }
+.workspace-editor-tabs { display: flex; gap: .5rem; overflow-x: auto; padding-bottom: .5rem; scroll-padding-inline: .5rem; }
+.workspace-editor-tab { flex-shrink: 0; white-space: nowrap; }
+.workspace-editor-category[aria-pressed="true"], .workspace-editor-tab[aria-selected="true"] {
+  background: var(--workspace-white, #fffef5); color: #bc174c; border-color: var(--workspace-white, #fffef5); text-decoration: underline; text-underline-offset: 5px;
+}
+.workspace-editor-category:hover, .workspace-editor-tab:hover { border-color: var(--workspace-cyan, #44e4ff); }
+.workspace-controls :where(button, a, input, textarea, [tabindex]):focus-visible,
+.workspace-editor-preview-link:focus-visible { outline: 3px solid #44e4ff; outline-offset: 3px; }
+.workspace-editor-preview-link { font: 600 .9375rem var(--font-workspace-body), sans-serif; background: #071657; color: #fffef5; border: 1px solid #44e4ff; border-radius: 6px; padding-inline: 1rem; }
+.workspace-controls .workspace-editor-button { min-width: 44px; min-height: 44px; height: auto; white-space: normal; font-family: inherit; font-size: .9375rem; box-shadow: none; border-radius: 6px; transform: none; }
+.workspace-controls .workspace-editor-input {
+  min-height: 44px; border: 1px solid #526da0; border-radius: 6px; padding: .75rem;
+  background: #061039; color: #fffef5; font: inherit; box-shadow: none;
+}
+.workspace-controls .workspace-editor-input::placeholder { color: #b6cee8; opacity: 1; }
+.workspace-controls .workspace-editor-form-card { border-radius: 12px; box-shadow: none; background: #071657; color: #fffef5; }
+.workspace-controls .workspace-editor-badge { font: inherit; box-shadow: none; }
+.workspace-controls .workspace-editor-form { overflow-wrap: anywhere; }
+.workspace-controls [data-workspace-control] { min-width: 44px; min-height: 44px; }
+.workspace-controls .font-dialogue { font-family: inherit; }
+.workspace-controls :where(.text-xs, .text-\[10px\]) { font-size: .9375rem; }
+.workspace-editor-preview-shell { background: #071657; color: #fffef5; }
+.workspace-controls :where(button, input, textarea):disabled { cursor: not-allowed; }
+.workspace-controls :where(button, input, textarea) { scroll-margin-block: 6rem; }
+@media (min-width: 1024px) {
+  .workspace-editor-tabs { flex-direction: column; overflow: visible; padding: 0; }
+  .workspace-editor-tab { white-space: normal; width: 100%; }
+}

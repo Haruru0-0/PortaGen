@@ -5,7 +5,8 @@ import { X, Send, Loader2, Sparkles, RotateCcw } from "lucide-react"
 import { useRef, useEffect, type FormEvent } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useMediaQuery } from "@/hooks/use-media-query"
-import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
+import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from "@/components/workspace/workspace-overlays"
+import { useWorkspaceMotion } from "@/components/workspace/workspace-motion-provider"
 import { cn } from "@/lib/utils"
 
 export function AIChatPanel() {
@@ -14,21 +15,22 @@ export function AIChatPanel() {
         setIsOpen,
     } = useAIChat()
 
+    const { reducedMotion, ready } = useWorkspaceMotion()
     const isDesktop = useMediaQuery("(min-width: 768px)")
 
     if (isDesktop) {
         if (!isOpen) return null
         return (
-            <div
+            <div style={{ minHeight: 0 }} data-workspace-motion={!ready || reducedMotion ? "reduced" : "full"}
                 className="
           fixed bottom-20 right-4 z-50
           w-[360px] max-w-[calc(100vw-2rem)]
           h-[500px] max-h-[calc(100vh-8rem)]
-          bg-card readable
-          border-4 border-foreground
-          shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)]
+          workspace-theme bg-card font-[family-name:var(--font-workspace-body)]
+          border border-foreground
+          shadow-[0_12px_40px_rgba(0,0,0,.35)]
           flex flex-col
-          animate-in slide-in-from-bottom-5 fade-in duration-200
+
         "
             >
                 <ChatContent onClose={() => setIsOpen(false)} />
@@ -38,19 +40,19 @@ export function AIChatPanel() {
 
     return (
         <Drawer open={isOpen} onOpenChange={setIsOpen}>
-            <DrawerContent className="bg-card readable">
+            <DrawerContent className="workspace-theme bg-card font-[family-name:var(--font-workspace-body)]">
                 <DrawerHeader className="border-b pb-2 relative pr-14">
                     <DrawerTitle className="flex items-center gap-2">
                         <Sparkles className="w-5 h-5 text-primary" />
                         PORTAGEN AI
                     </DrawerTitle>
                     <DrawerDescription>
-                        Your pixel-perfect portfolio assistant
+                        Your portfolio assistant
                     </DrawerDescription>
                     <button
                         type="button"
                         onClick={() => setIsOpen(false)}
-                        className="absolute right-3 top-3 w-10 h-10 bg-destructive hover:bg-destructive/80 border-2 border-foreground flex items-center justify-center transition-colors"
+                        className="absolute right-3 top-3 w-10 h-10 bg-destructive hover:bg-destructive/80 border border-foreground flex items-center justify-center transition-colors"
                         aria-label="Close chat"
                     >
                         <X className="w-5 h-5 text-destructive-foreground" />
@@ -75,18 +77,20 @@ function ChatContent({ onClose, isMobile = false }: { onClose: () => void, isMob
         regenerate,
     } = useAIChat()
 
+    const { reducedMotion } = useWorkspaceMotion()
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
 
     // Scroll to bottom when messages change
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    }, [messages])
+        messagesEndRef.current?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" })
+    }, [messages, reducedMotion])
 
     // Focus input when mounted (only on desktop to avoid keyboard popping up on mobile instantly)
     useEffect(() => {
         if (!isMobile) {
-            setTimeout(() => inputRef.current?.focus(), 100)
+            const timer = setTimeout(() => inputRef.current?.focus(), 100)
+            return () => clearTimeout(timer)
         }
     }, [isMobile])
 
@@ -115,7 +119,7 @@ function ChatContent({ onClose, isMobile = false }: { onClose: () => void, isMob
         <>
             {/* Header - Only for Desktop (Mobile uses DrawerHeader) */}
             {!isMobile && (
-                <div className="flex items-center justify-between p-3 border-b-4 border-foreground bg-primary shrink-0">
+                <div className="flex items-center justify-between p-3 border-b border-foreground bg-primary shrink-0">
                     <div className="flex items-center gap-2">
                         <Sparkles className="w-5 h-5 text-primary-foreground" />
                         <span className="text-sm font-bold text-primary-foreground tracking-wide">
@@ -125,9 +129,9 @@ function ChatContent({ onClose, isMobile = false }: { onClose: () => void, isMob
                     <button
                         onClick={onClose}
                         className="
-              w-6 h-6 
+              w-11 h-11
               bg-destructive hover:bg-destructive/80
-              border-2 border-foreground
+              border border-foreground
               flex items-center justify-center
               transition-colors
             "
@@ -148,8 +152,8 @@ function ChatContent({ onClose, isMobile = false }: { onClose: () => void, isMob
                         >
                             <div
                                 className={`
-                  max-w-[85%] p-3 text-xs leading-relaxed
-                  border-2 border-foreground overflow-hidden
+                  max-w-[85%] p-3 text-sm leading-relaxed
+                  border border-foreground overflow-hidden
                   ${message.role === "user"
                                         ? "bg-primary text-primary-foreground"
                                         : "bg-muted text-foreground"
@@ -165,7 +169,7 @@ function ChatContent({ onClose, isMobile = false }: { onClose: () => void, isMob
 
                     {isLoading && (
                         <div className="flex justify-start">
-                            <div className="bg-muted border-2 border-foreground p-3">
+                            <div className="bg-muted border border-foreground p-3">
                                 <Loader2 className="w-4 h-4 animate-spin" />
                             </div>
                         </div>
@@ -173,7 +177,7 @@ function ChatContent({ onClose, isMobile = false }: { onClose: () => void, isMob
 
                     {error && (
                         <div className="flex justify-start">
-                            <div className="bg-destructive/20 border-2 border-destructive p-3 text-xs">
+                            <div className="bg-destructive/20 border border-destructive p-3 text-sm">
                                 <p className="text-destructive mb-2">Something went wrong</p>
                                 <button
                                     onClick={() => regenerate()}
@@ -191,9 +195,10 @@ function ChatContent({ onClose, isMobile = false }: { onClose: () => void, isMob
             </ScrollArea>
 
             {/* Input */}
-            <form onSubmit={onSubmit} className={cn("p-3 border-t-4 border-foreground shrink-0", isMobile ? "pb-6" : "")}>
+            <form onSubmit={onSubmit} className={cn("p-3 border-t border-foreground shrink-0", isMobile ? "pb-6" : "")}>
                 <div className="flex gap-2">
                     <input
+                        aria-label="Message to PortaGen AI"
                         ref={inputRef}
                         type="text"
                         value={input}
@@ -202,9 +207,9 @@ function ChatContent({ onClose, isMobile = false }: { onClose: () => void, isMob
                         disabled={isLoading}
                         className="
               flex-1 px-3 py-2
-              text-xs
+              text-sm
               bg-background text-foreground
-              border-2 border-foreground
+              border border-foreground
               focus:outline-none focus:ring-2 focus:ring-primary
               placeholder:text-muted-foreground
               disabled:opacity-50
@@ -216,7 +221,7 @@ function ChatContent({ onClose, isMobile = false }: { onClose: () => void, isMob
                         className="
               px-3 py-2
               bg-primary hover:bg-primary/90
-              border-2 border-foreground
+              border border-foreground
               disabled:opacity-50 disabled:cursor-not-allowed
               transition-colors
             "
@@ -229,7 +234,7 @@ function ChatContent({ onClose, isMobile = false }: { onClose: () => void, isMob
                         )}
                     </button>
                 </div>
-                <p className="mt-2 font-dialogue text-sm text-muted-foreground text-center">
+                <p className="mt-2 font-[family-name:var(--font-workspace-body)] text-sm text-muted-foreground text-center">
                     I help with bios, projects & PortaGen tips only
                 </p>
             </form>

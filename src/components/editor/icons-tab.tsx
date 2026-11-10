@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
-import { PixelCard } from "@/components/pixel-card"
-import { PixelButton } from "@/components/pixel-button"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
 import { Edit2, Plus, Trash2 } from "lucide-react"
 import Placeholder from "@/assets/Placeholder.png"
 import Image from "next/image";
@@ -37,7 +37,7 @@ export function IconsTab() {
     return (
         <PixelCard>
             <div className="space-y-4">
-                <h3 className="text-sm dashboard-pixel-text-shadow">DESKTOP ICONS</h3>
+                <h3 className="text-sm workspace-editor-title">DESKTOP ICONS</h3>
 
                 <div className="space-y-3 max-h-96 overflow-y-auto">
                     {(icons || []).map((icon: Icon) => (
@@ -56,7 +56,7 @@ export function IconsTab() {
                                 <span className="font-dialogue text-sm">{icon.name}</span>
                             </div>
                             <div className="flex gap-2">
-                                <button
+                                <button data-workspace-control
                                     onClick={() => handleEdit(icon)}
                                     aria-label={`Edit icon ${icon.name}`}
                                     title="Edit icon"
@@ -64,7 +64,7 @@ export function IconsTab() {
                                 >
                                     <Edit2 className="w-4 h-4" />
                                 </button>
-                                <button
+                                <button data-workspace-control
                                     onClick={() => handleDelete(icon.id)}
                                     aria-label={`Delete icon ${icon.name}`}
                                     title="Delete icon"

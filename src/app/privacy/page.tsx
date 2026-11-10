@@ -1,8 +1,7 @@
 "use client"
 
 import {Suspense} from "react"
-import {PixelCard} from "@/components/pixel-card"
-import {PixelClouds} from "@/components/pixel-clouds"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
 import {useRouter, useSearchParams} from "next/navigation"
 
 function PrivacyPolicyContent() {
@@ -22,44 +21,27 @@ function PrivacyPolicyContent() {
     }
 
     return (
-        <div className="min-h-screen relative flex items-center justify-center p-4 readable">
-            <PixelClouds/>
-            <div className="fixed bottom-0 left-0 right-0 h-48 z-0">
-                <div className="absolute bottom-0 w-full h-32 bg-gradient-to-t from-[#8B5CF6] to-[#EC4899]"/>
-                <div className="absolute bottom-0 w-full flex justify-around items-end">
-                    {[...Array(20)].map((_, i) => (
-                        <div
-                            key={i}
-                            className="bg-[#6D28D9]"
-                            style={{
-                                width: "40px",
-                                height: `${40 + ((i * 29 + 7) % 60)}px`,
-                                opacity: 0.8,
-                            }}
-                        />
-                    ))}
-                </div>
-            </div>
+        <div className="persona-privacy min-h-screen relative flex items-center justify-center px-4 py-12 text-[#fffef5]">
 
             <div className="relative z-10 w-full max-w-4xl">
                 <PixelCard>
                     <div className="space-y-6">
                         <button
                             onClick={handleBack}
-                            className="text-primary hover:underline text-xs min-h-10 py-2"
+                            className="text-[#44e4ff] hover:underline text-sm min-h-10 py-2"
                         >
                             {getBackLabel()}
                         </button>
                         <div className="text-center">
-                            <h1 className="text-2xl pixel-text-shadow">PRIVACY POLICY</h1>
-                            <p className="font-dialogue text-sm text-muted-foreground mt-2">
+                            <h1 className="persona-page-title" data-page-heading>Privacy policy</h1>
+                            <p className="font-[family-name:var(--font-workspace-body)] text-sm text-[#bdd3f3] mt-2">
                                 Last updated: January 14, 2026
                             </p>
                             {process.env.NEXT_PUBLIC_CONTACT_EMAIL && (
-                                <p className="font-dialogue text-sm mt-1">
+                                <p className="font-[family-name:var(--font-workspace-body)] text-sm mt-1">
                                     Questions? Email{" "}
                                     <a
-                                        className="text-primary underline"
+                                        className="text-[#44e4ff] underline"
                                         href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}
                                     >
                                         {process.env.NEXT_PUBLIC_CONTACT_EMAIL}
@@ -68,7 +50,7 @@ function PrivacyPolicyContent() {
                             )}
                         </div>
 
-                        <div className="font-dialogue text-base leading-relaxed space-y-4 text-left [&_p]:max-w-[68ch] [&_li]:max-w-[68ch]">
+                        <div className="font-[family-name:var(--font-workspace-body)] text-base leading-relaxed space-y-4 text-left [&_p]:max-w-[68ch] [&_li]:max-w-[68ch]">
                             <h2 className="font-bold text-base pt-4 border-t-2 border-border first:pt-0 first:border-t-0">1. Introduction</h2>
                             <p>
                                 Welcome to PortaGen. We are committed to protecting your
@@ -133,7 +115,7 @@ function PrivacyPolicyContent() {
                         <div className="text-center">
                             <button
                                 onClick={handleBack}
-                                className="text-primary hover:underline text-xs min-h-10 py-2"
+                                className="text-[#44e4ff] hover:underline text-sm min-h-10 py-2"
                             >
                                 {getBackLabel()}
                             </button>

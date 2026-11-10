@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
+import { useWorkspaceExperience } from "@/components/workspace/workspace-experience-provider"
 import { useWindowsContext } from "@/contexts/windowsContext"
 import { WindowContentEditor } from "@/components/editor/window-content-editor"
 import { WindowContent } from "@/lib/types";
 
 export default function EditWindowPage() {
   const router = useRouter()
+  const { cancelPendingTransition } = useWorkspaceExperience()
   const params = useParams<{ id: string; windowId: string }>() // Use windowId here
   const { getWindow, updateWindow } = useWindowsContext()
   const [windowContent, setWindowContent] = useState<WindowContent | null>(null)
@@ -26,16 +28,18 @@ export default function EditWindowPage() {
   const handleSave = async (content: WindowContent) => {
     if (portfolioId && windowId) {
       await updateWindow(portfolioId, windowId, content)
+      cancelPendingTransition()
       router.push(`/dashboard/editor/${portfolioId}`)
     }
   }
 
   const handleCancel = () => {
+    cancelPendingTransition()
     router.push(`/dashboard/editor/${portfolioId}`)
   }
 
   return (
-    <div className="h-full">
+    <div className="workspace-controls h-full">
       <WindowContentEditor
         windowId={windowId}
         portfolioId={portfolioId}

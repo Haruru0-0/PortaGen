@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Dialog, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { DialogContent } from "@/components/workspace/workspace-overlays"
 import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
+import { Input } from "@/components/editor/editor-form-controls"
+import { Textarea } from "@/components/editor/editor-form-controls"
+import { Button } from "@/components/editor/editor-form-controls"
 
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from "@/components/ui/drawer"
+import { Drawer, DrawerHeader, DrawerTitle, DrawerFooter } from "@/components/ui/drawer"
+import { DrawerContent } from "@/components/workspace/workspace-overlays"
 import { useMediaQuery } from "@/hooks/use-media-query"
 
 interface ItemEditorDialogProps {
@@ -36,7 +38,7 @@ export function ItemEditorDialog({ isOpen, onClose, onSave, initialData, title =
                 <Input
                     value={data.name || data.title || ""}
                     onChange={(e) => setData({ ...data, name: e.target.value, title: e.target.value })}
-                    className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                    className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                 />
             </div>
 
@@ -45,7 +47,7 @@ export function ItemEditorDialog({ isOpen, onClose, onSave, initialData, title =
                 <Input
                     value={data.role || data.subtitle || ""}
                     onChange={(e) => setData({ ...data, role: e.target.value, subtitle: e.target.value })}
-                    className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                    className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                 />
             </div>
 
@@ -54,7 +56,7 @@ export function ItemEditorDialog({ isOpen, onClose, onSave, initialData, title =
                 <Textarea
                     value={data.content || data.description || ""}
                     onChange={(e) => setData({ ...data, content: e.target.value, description: e.target.value })}
-                    className="min-h-[100px] border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                    className="min-h-[100px] border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                 />
             </div>
 
@@ -64,7 +66,7 @@ export function ItemEditorDialog({ isOpen, onClose, onSave, initialData, title =
                     value={data.avatar || ""}
                     onChange={(e) => setData({ ...data, avatar: e.target.value })}
                     placeholder="https://..."
-                    className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                    className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                 />
             </div>
 
@@ -74,7 +76,7 @@ export function ItemEditorDialog({ isOpen, onClose, onSave, initialData, title =
                     value={data.image || ""}
                     onChange={(e) => setData({ ...data, image: e.target.value })}
                     placeholder="https://..."
-                    className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                    className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                 />
             </div>
         </div>
@@ -91,7 +93,7 @@ export function ItemEditorDialog({ isOpen, onClose, onSave, initialData, title =
             </Button>
             <Button
                 onClick={handleSave}
-                className="rounded-none border-2 border-foreground shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all bg-primary text-primary-foreground flex-1 sm:flex-none"
+                className="rounded-none border-2 border-foreground  hover:translate-y-1 hover:shadow-none transition-all bg-primary text-primary-foreground flex-1 sm:flex-none"
             >
                 Save Changes
             </Button>
@@ -101,14 +103,14 @@ export function ItemEditorDialog({ isOpen, onClose, onSave, initialData, title =
     if (isDesktop) {
         return (
             <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-                <DialogContent className="max-w-md border-4 border-foreground rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-0 gap-0">
+                <DialogContent className="workspace-controls max-w-md border-4 border-foreground rounded-none  p-0 gap-0">
                     <DialogHeader className="border-b-4 border-foreground p-4 bg-muted/20">
                         <DialogTitle className="font-bold text-lg uppercase tracking-wider">{title}</DialogTitle>
                     </DialogHeader>
                     <div className="p-4 max-h-[60vh] overflow-y-auto">
                         {renderForm()}
                     </div>
-                    <DialogFooter className="p-4 border-t-4 border-foreground bg-muted/20 sm:gap-2">
+                    <DialogFooter className="p-4 border-t border-foreground bg-muted/20 sm:gap-2">
                         {renderFooter()}
                     </DialogFooter>
                 </DialogContent>
@@ -118,14 +120,14 @@ export function ItemEditorDialog({ isOpen, onClose, onSave, initialData, title =
 
     return (
         <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DrawerContent className="max-h-[85vh] border-t-4 border-x-4 border-foreground rounded-t-none shadow-[0px_-4px_0px_0px_rgba(0,0,0,1)] p-0 gap-0 bg-white dark:bg-zinc-950">
-                <DrawerHeader className="border-b-4 border-foreground p-4 bg-white dark:bg-zinc-950 text-left">
+            <DrawerContent className="workspace-controls max-h-[85vh] border-t border-x border-foreground rounded-t-none  p-0 gap-0 bg-card ">
+                <DrawerHeader className="border-b-4 border-foreground p-4 bg-card  text-left">
                     <DrawerTitle className="font-bold text-lg uppercase tracking-wider">{title}</DrawerTitle>
                 </DrawerHeader>
                 <div className="p-4 overflow-y-auto">
                     {renderForm()}
                 </div>
-                <DrawerFooter className="p-4 border-t-4 border-foreground bg-white dark:bg-zinc-950 flex-row gap-2">
+                <DrawerFooter className="p-4 border-t border-foreground bg-card  flex-row gap-2">
                     {renderFooter()}
                 </DrawerFooter>
             </DrawerContent>

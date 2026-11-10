@@ -1,7 +1,7 @@
-﻿import { PixelModal } from "@/components/pixel-modal";
-import { PixelInput } from "@/components/pixel-input";
+﻿import { PixelModal } from "@/components/editor/editor-modal";
+import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives";
 import { FileUpload } from "@/components/file-upload";
-import { PixelButton } from "@/components/pixel-button";
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives";
 import { Library } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";

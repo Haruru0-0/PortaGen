@@ -2,17 +2,13 @@
 
 import { useState, useEffect } from "react"
 import { Copy, Check, ExternalLink } from "lucide-react"
-import { PixelButton } from "./pixel-button"
-import { gsap } from "gsap"
-import { useGSAP } from "@gsap/react"
-import { useRef } from "react"
+import { WorkspaceAction as PixelButton } from "./workspace/workspace-primitives"
 import { createClient } from "@/utils/supabase/client"
 import { useParams } from "next/navigation"
 
 export function PortfolioUrlShare() {
   const [copied, setCopied] = useState(false)
   const [portfolioUrl, setPortfolioUrl] = useState("/portfolio/preview")
-  const containerRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
   const [user, setUser] = useState<any>(null)
   const params = useParams<{ id: string }>()
@@ -31,16 +27,6 @@ export function PortfolioUrlShare() {
     setPortfolioUrl(`${window.location.origin}/portfolio/${username}/${currentPortfolioId}`)
   }, [user, currentPortfolioId])
 
-  useGSAP(() => {
-    if (containerRef.current) {
-      gsap.fromTo(
-        containerRef.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.5, ease: "back.out(1.7)" },
-      )
-    }
-  }, [])
-
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(portfolioUrl)
@@ -57,11 +43,10 @@ export function PortfolioUrlShare() {
 
   return (
     <div
-      ref={containerRef}
-      className="bg-gradient-to-br from-primary/10 to-secondary/10 border-4 border-foreground rounded-lg p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+      className="ws-panel"
     >
       <div className="flex items-center gap-2 mb-4">
-        <div className="w-3 h-3 rounded-full bg-accent animate-pulse" />
+        <div className="w-3 h-3 rounded-full bg-primary" />
         <h2 className="font-bold text-lg">Share Your Portfolio</h2>
       </div>
 
@@ -70,7 +55,7 @@ export function PortfolioUrlShare() {
       </p>
 
       <div className="flex gap-2 mb-4">
-        <div className="flex-1 bg-background border-2 border-foreground rounded px-4 py-2 font-mono text-sm truncate w-20">
+        <div className="flex-1 bg-background border-2 border-foreground rounded px-4 py-2 font-[family-name:var(--font-workspace-body)] text-sm truncate w-20">
           {portfolioUrl}
         </div>
         <PixelButton onClick={handleCopy} variant="secondary" className="shrink-0 flex items-center justify-center">

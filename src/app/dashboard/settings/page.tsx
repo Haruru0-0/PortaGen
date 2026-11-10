@@ -6,14 +6,14 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { createClient } from "@/utils/supabase/client"
-import { PixelButton } from "@/components/pixel-button"
-import { PixelCard } from "@/components/pixel-card"
-import { PixelInput } from "@/components/pixel-input"
-import { PixelCharacter } from "@/components/pixel-character"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
+import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
+import { UserRound } from "lucide-react"
+import { MotionPreferenceControl } from "@/components/workspace/motion-preference-control"
 import { FileUpload } from "@/components/file-upload"
-import { Trash2, Eye, Cloud, CheckCircle, XCircle } from "lucide-react"
+import { Trash2, Cloud, CheckCircle, XCircle } from "lucide-react"
 import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal"
-import Link from "next/link"
 import { useSearchParams } from "next/navigation";
 import { useGoogleDrive } from "@/hooks/use-google-drive";
 
@@ -234,22 +234,23 @@ function SettingsContent() {
       <div className="max-w-5xl mx-auto space-y-6 md:space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h2 className="text-lg pixel-text-shadow mb-2">SETTINGS</h2>
-            <p className="font-dialogue text-sm text-muted-foreground">MANAGE YOUR ACCOUNT</p>
+            <h1 className="persona-page-title" data-page-heading>Settings</h1>
+            <p className="font-[family-name:var(--font-workspace-body)] text-sm text-muted-foreground">MANAGE YOUR ACCOUNT</p>
           </div>
         </div>
         {message && (
-          <div className={`p-3 border-2 font-dialogue text-sm text-center ${message.includes('Error')
-            ? 'bg-red-500/20 border-red-700 text-red-700 dark:text-red-300'
-            : 'bg-green-500/20 border-green-500 text-green-500'
+          <div className={`p-3 border font-[family-name:var(--font-workspace-body)] text-sm text-center ${/error|failed/i.test(message)
+            ? 'bg-red-500/20 border-red-700 text-[#ffb2c5]'
+            : 'bg-green-500/20 border-green-500 text-[#83efbd]'
             }`}>
             {message}
           </div>
         )}
+        <PixelCard><h2 className="text-xl font-semibold mb-4">Appearance</h2><MotionPreferenceControl /></PixelCard>
         {/* Profile Settings */}
         <PixelCard>
           <div className="space-y-6">
-            <h3 className="text-sm pixel-text-shadow">PROFILE</h3>
+            <h3 className="text-sm ">PROFILE</h3>
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
               <div className="flex flex-col items-center gap-3 mx-auto sm:mx-0">
@@ -258,17 +259,17 @@ function SettingsContent() {
                     <img
                       src={avatarPreview}
                       alt="Avatar"
-                      className="w-24 h-24 border-4 border-border object-cover"
+                      className="w-24 h-24 border border-border object-cover"
                     />
                     <button
-                      onClick={() => setShowDeleteAvatar(true)}
-                      className="absolute -top-2 -right-2 w-8 h-8 bg-destructive border-2 border-border flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-label="Delete avatar" onClick={() => setShowDeleteAvatar(true)}
+                      className="absolute -top-2 -right-2 w-8 h-8 bg-destructive border border-border flex items-center justify-center opacity-100 transition-opacity"
                     >
                       <Trash2 className="w-4 h-4 text-destructive-foreground" />
                     </button>
                   </div>
                 ) : (
-                  <PixelCharacter color="#8B5CF6" size={96} />
+                  <div className="size-24 flex items-center justify-center bg-[#0b2358]"><UserRound className="size-12 text-[#44e4ff]" /></div>
                 )}
                 <div className="w-full">
                   <FileUpload
@@ -293,7 +294,7 @@ function SettingsContent() {
                   onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                   disabled
                 />
-                <p className="font-dialogue text-sm text-muted-foreground">
+                <p className="font-[family-name:var(--font-workspace-body)] text-sm text-muted-foreground">
                   Your email cannot be changed here.
                 </p>
               </div>
@@ -309,14 +310,14 @@ function SettingsContent() {
 
         <PixelCard>
           <div className="space-y-6">
-            <h3 className="text-sm pixel-text-shadow">GOOGLE DRIVE INTEGRATION</h3>
+            <h3 className="text-sm ">GOOGLE DRIVE INTEGRATION</h3>
 
-            <div className="flex flex-col md:flex-row items-center justify-between p-4 border-2 border-border bg-muted gap-4 md:gap-2">
+            <div className="flex flex-col md:flex-row items-center justify-between p-4 border border-border bg-muted gap-4 md:gap-2">
               <div className="flex items-center gap-3">
                 <Cloud className="w-6 h-6" />
                 <div>
-                  <p className="text-xs font-bold">GOOGLE DRIVE STATUS</p>
-                  <p className="font-dialogue text-sm text-muted-foreground">
+                  <p className="text-sm font-bold">GOOGLE DRIVE STATUS</p>
+                  <p className="font-[family-name:var(--font-workspace-body)] text-sm text-muted-foreground">
                     {loading ? 'Checking...' : connected ? 'Connected' : 'Not connected'}
                   </p>
                 </div>
@@ -326,10 +327,10 @@ function SettingsContent() {
                 <div className="flex items-center gap-2">
                   {connected ? (
                     <>
-                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      <CheckCircle className="w-5 h-5 text-[#83efbd]" />
                       <PixelButton
                         variant="secondary"
-                        className="text-xs"
+                        className="text-sm"
                         onClick={disconnectDrive}
                       >
                         DISCONNECT
@@ -337,10 +338,10 @@ function SettingsContent() {
                     </>
                   ) : (
                     <>
-                      <XCircle className="w-5 h-5 text-red-500" />
+                      <XCircle className="w-5 h-5 text-[#ffb2c5]" />
                       <PixelButton
                         variant="primary"
-                        className="text-xs"
+                        className="text-sm"
                         onClick={connectDrive}
                         disabled={connecting}
                       >
@@ -352,8 +353,8 @@ function SettingsContent() {
               )}
             </div>
 
-            <div className="p-3 bg-accent/20 border-2 border-border">
-              <p className="font-dialogue text-sm leading-relaxed">
+            <div className="p-3 bg-accent/20 border border-border">
+              <p className="font-[family-name:var(--font-workspace-body)] text-sm leading-relaxed">
                 <strong>WHY CONNECT GOOGLE DRIVE?</strong>
                 <br />
                 • Your files are stored in YOUR Google Drive
@@ -369,8 +370,8 @@ function SettingsContent() {
             </div>
 
             {connected && (
-              <div className="p-3 bg-green-500/10 border-2 border-green-500">
-                <p className="font-dialogue text-sm text-green-500">
+              <div className="p-3 bg-green-500/10 border border-green-500">
+                <p className="font-[family-name:var(--font-workspace-body)] text-sm text-[#83efbd]">
                   ✓ Your portfolio files will be saved to a &#34;Portfolio Assets&#34; folder in your Google Drive
                 </p>
               </div>
@@ -381,16 +382,16 @@ function SettingsContent() {
         {/* Password Settings */}
         <PixelCard>
           <div className="space-y-6">
-            <h3 className="text-sm pixel-text-shadow">CHANGE PASSWORD</h3>
+            <h3 className="text-sm ">CHANGE PASSWORD</h3>
 
             {passwordError && (
-              <div role="alert" className="p-3 bg-red-500/20 border-2 border-red-700 text-red-700 dark:text-red-300 font-dialogue text-sm text-center">
+              <div role="alert" className="p-3 bg-red-500/20 border border-red-700 text-[#ffb2c5] font-[family-name:var(--font-workspace-body)] text-sm text-center">
                 {passwordError}
               </div>
             )}
 
             {passwordSuccess && (
-              <div className="p-3 bg-green-500/20 border-2 border-green-500 text-green-500 font-dialogue text-sm text-center">
+              <div className="p-3 bg-green-500/20 border border-green-500 text-[#83efbd] font-[family-name:var(--font-workspace-body)] text-sm text-center">
                 ✓ PASSWORD UPDATED SUCCESSFULLY
               </div>
             )}
@@ -404,7 +405,7 @@ function SettingsContent() {
                   {...passwordForm.register("currentPassword")}
                 />
                 {passwordForm.formState.errors.currentPassword && (
-                  <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
+                  <p role="alert" className="font-[family-name:var(--font-workspace-body)] text-[#ffb2c5] text-sm mt-1">
                     {passwordForm.formState.errors.currentPassword.message}
                   </p>
                 )}
@@ -418,7 +419,7 @@ function SettingsContent() {
                   {...passwordForm.register("newPassword")}
                 />
                 {passwordForm.formState.errors.newPassword && (
-                  <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
+                  <p role="alert" className="font-[family-name:var(--font-workspace-body)] text-[#ffb2c5] text-sm mt-1">
                     {passwordForm.formState.errors.newPassword.message}
                   </p>
                 )}
@@ -432,7 +433,7 @@ function SettingsContent() {
                   {...passwordForm.register("confirmPassword")}
                 />
                 {passwordForm.formState.errors.confirmPassword && (
-                  <p role="alert" className="font-dialogue text-red-700 dark:text-red-300 text-sm mt-1">
+                  <p role="alert" className="font-[family-name:var(--font-workspace-body)] text-[#ffb2c5] text-sm mt-1">
                     {passwordForm.formState.errors.confirmPassword.message}
                   </p>
                 )}
@@ -455,8 +456,8 @@ function SettingsContent() {
         {/* Danger Zone */}
         <PixelCard className="border-red-700">
           <div className="space-y-4">
-            <h3 className="text-sm pixel-text-shadow text-red-700 dark:text-red-300">DANGER ZONE</h3>
-            <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
+            <h3 className="text-sm  text-[#ffb2c5]">DANGER ZONE</h3>
+            <p className="font-[family-name:var(--font-workspace-body)] text-sm text-muted-foreground leading-relaxed">
               ONCE YOU DELETE YOUR ACCOUNT, THERE IS NO GOING BACK. PLEASE BE CERTAIN.
             </p>
             <PixelButton
@@ -493,7 +494,7 @@ export default function SettingsPage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="font-dialogue text-sm animate-pulse">LOADING SETTINGS...</div>
+        <div className="font-[family-name:var(--font-workspace-body)] text-sm animate-pulse">LOADING SETTINGS...</div>
       </div>
     }>
       <SettingsContent />

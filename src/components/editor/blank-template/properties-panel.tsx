@@ -1,12 +1,14 @@
 import React, { useState } from "react"
 import { DraggableComponent } from "@/lib/types"
 import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
+import { Input } from "@/components/editor/editor-form-controls"
+import { Textarea } from "@/components/editor/editor-form-controls"
+import { Select, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { SelectContent } from "@/components/workspace/workspace-overlays"
+import { Button } from "@/components/editor/editor-form-controls"
 import { Plus, Trash2, Pencil, X } from "lucide-react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Dialog, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { DialogContent } from "@/components/workspace/workspace-overlays"
 
 interface PropertiesPanelProps {
     component: DraggableComponent | null
@@ -37,7 +39,7 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                 value={component.props.content || ""}
                                 onChange={(e) => handleChange("content", e.target.value)}
                                 placeholder="Enter text content..."
-                                className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                                className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                             />
                         </div>
                         <div className="space-y-2">
@@ -47,7 +49,7 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                 value={component.props.fontSize || ""}
                                 onChange={(e) => handleChange("fontSize", parseInt(e.target.value))}
                                 placeholder="16"
-                                className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                                className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                             />
                         </div>
                         <div className="space-y-2">
@@ -56,7 +58,7 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                 type="color"
                                 value={component.props.color || "#000000"}
                                 onChange={(e) => handleChange("color", e.target.value)}
-                                className="h-10 p-1 border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                                className="h-10 p-1 border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                             />
                         </div>
                         <div className="space-y-2">
@@ -65,10 +67,10 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                 value={component.props.textAlign || "left"}
                                 onValueChange={(val) => handleChange("textAlign", val)}
                             >
-                                <SelectTrigger className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all">
+                                <SelectTrigger className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                <SelectContent className="border-2 border-foreground rounded-none ">
                                     <SelectItem value="left">Left</SelectItem>
                                     <SelectItem value="center">Center</SelectItem>
                                     <SelectItem value="right">Right</SelectItem>
@@ -87,7 +89,7 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                 value={component.props.src || ""}
                                 onChange={(e) => handleChange("src", e.target.value)}
                                 placeholder="https://..."
-                                className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                                className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                             />
                         </div>
                         <div className="space-y-2">
@@ -96,7 +98,7 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                 value={component.props.alt || ""}
                                 onChange={(e) => handleChange("alt", e.target.value)}
                                 placeholder="Image description"
-                                className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                                className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                             />
                         </div>
                     </>
@@ -110,7 +112,7 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                 value={component.props.title || ""}
                                 onChange={(e) => handleChange("title", e.target.value)}
                                 placeholder="Card Title"
-                                className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                                className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                             />
                         </div>
                         <div className="space-y-2">
@@ -119,7 +121,7 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                 value={component.props.description || ""}
                                 onChange={(e) => handleChange("description", e.target.value)}
                                 placeholder="Card description..."
-                                className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                                className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                             />
                         </div>
                     </>
@@ -135,7 +137,7 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                 value={component.props.count || 3}
                                 onChange={(e) => handleChange("count", Math.max(1, parseInt(e.target.value) || 1))}
                                 min={1}
-                                className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                                className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                             />
                         </div>
                         <div className="space-y-2">
@@ -146,7 +148,7 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                 onChange={(e) => handleChange("itemsPerSlide", Math.max(1, Math.min(5, parseInt(e.target.value) || 1)))}
                                 min={1}
                                 max={5}
-                                className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                                className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                             />
                         </div>
 
@@ -160,7 +162,7 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                         const newItems = [...items, { name: "New Item", role: "Role", content: "Content", avatar: "", image: "" }]
                                         handleChange("items", newItems)
                                     }}
-                                    className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-1 hover:shadow-none transition-all active:translate-y-1 active:shadow-none bg-background text-foreground hover:bg-muted"
+                                    className="border-2 border-foreground rounded-none  hover:translate-y-1 hover:shadow-none transition-all active:translate-y-1 active:shadow-none bg-background text-foreground hover:bg-muted"
                                 >
                                     <Plus className="w-3 h-3 mr-1" />
                                     Add
@@ -219,7 +221,7 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                 onChange={(e) => handleChange("count", parseInt(e.target.value))}
                                 min={1}
                                 max={12}
-                                className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                                className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                             />
                         </div>
                         <div className="space-y-2">
@@ -228,10 +230,10 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                 value={String(component.props.columns || 3)}
                                 onValueChange={(val) => handleChange("columns", parseInt(val))}
                             >
-                                <SelectTrigger className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all">
+                                <SelectTrigger className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                <SelectContent className="border-2 border-foreground rounded-none ">
                                     <SelectItem value="1">1 Column</SelectItem>
                                     <SelectItem value="2">2 Columns</SelectItem>
                                     <SelectItem value="3">3 Columns</SelectItem>
@@ -249,7 +251,7 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                             type="number"
                             value={component.props.height || 80}
                             onChange={(e) => handleChange("height", parseInt(e.target.value))}
-                            className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                            className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                         />
                     </div>
                 )
@@ -262,7 +264,7 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                 value={component.props.label || ""}
                                 onChange={(e) => handleChange("label", e.target.value)}
                                 placeholder="Button Label"
-                                className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                                className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                             />
                         </div>
                         <div className="space-y-2">
@@ -271,10 +273,10 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                 value={component.props.variant || "primary"}
                                 onValueChange={(val) => handleChange("variant", val)}
                             >
-                                <SelectTrigger className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all">
+                                <SelectTrigger className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                <SelectContent className="border-2 border-foreground rounded-none ">
                                     <SelectItem value="primary">Primary</SelectItem>
                                     <SelectItem value="secondary">Secondary</SelectItem>
                                     <SelectItem value="outline">Outline</SelectItem>
@@ -288,10 +290,10 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                                 value={component.props.alignment || "start"}
                                 onValueChange={(val) => handleChange("alignment", val)}
                             >
-                                <SelectTrigger className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all">
+                                <SelectTrigger className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                <SelectContent className="border-2 border-foreground rounded-none ">
                                     <SelectItem value="start">Left</SelectItem>
                                     <SelectItem value="center">Center</SelectItem>
                                     <SelectItem value="right">Right</SelectItem>
@@ -309,7 +311,7 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                             value={component.props.height || ""}
                             onChange={(e) => handleChange("height", parseInt(e.target.value))}
                             placeholder="20"
-                            className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                            className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                         />
                     </div>
                 )
@@ -341,7 +343,7 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                             value={component.props.padding || 0}
                             onChange={(e) => handleChange("padding", parseInt(e.target.value))}
                             placeholder="0"
-                            className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                            className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                         />
                     </div>
                     <div className="space-y-2">
@@ -351,7 +353,7 @@ export function PropertiesPanel({ component, onChange }: PropertiesPanelProps) {
                             value={component.props.marginBottom || 0}
                             onChange={(e) => handleChange("marginBottom", parseInt(e.target.value))}
                             placeholder="0"
-                            className="border-2 border-foreground rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:translate-y-1 focus:shadow-none transition-all"
+                            className="border-2 border-foreground rounded-none  focus:translate-y-1 focus:shadow-none transition-all"
                         />
                     </div>
                 </div>

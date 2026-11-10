@@ -2,10 +2,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { PixelCard } from "@/components/pixel-card";
-import { PixelInput } from "@/components/pixel-input";
-import { PixelButton } from "@/components/pixel-button";
-import { PixelModal } from "@/components/pixel-modal";
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
+import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
+import { WorkspaceModal as PixelModal } from "@/components/workspace/workspace-modal";
 import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal";
 import { useGoogleDrive } from "@/hooks/use-google-drive";
 import { useFileUpload } from "@/hooks/use-file-upload";
@@ -14,7 +14,7 @@ import Image from "next/image";
 import { Asset, AssetType } from "@/lib/types";
 import AssetCard from "@/components/asset-card";
 import { toast } from "sonner";
-import { PixelCharacter } from "@/components/pixel-character";
+
 
 // Available asset types for user selection
 const ASSET_TYPES = [
@@ -50,6 +50,7 @@ export default function AssetsPage() {
   const [selectedAssets, setSelectedAssets] = useState<number[]>([]);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState("");
 
   const { connected, loading: driveLoading, connectDrive } = useGoogleDrive();
   const {
@@ -111,12 +112,13 @@ export default function AssetsPage() {
     }
   };
   const fetchAssets = async () => {
+    setFetchError("");
     setLoading(true);
     try {
       const response = await fetch(`/api/assets`);
       if (response.ok) {
         const data = await response.json();
-        const assetsWithFixedUrls = data.assets.map((asset: any) => ({
+        const assetsWithFixedUrls = data.assets.map((asset: Asset & { url?: string; thumbnailUrl?: string }) => ({
           ...asset,
           url: asset.url || getOptimizedDriveUrl(asset.fileId, "display"),
           thumbnailUrl:
@@ -125,9 +127,12 @@ export default function AssetsPage() {
           mimeType: asset.mimeType,
         }));
         setAssets(assetsWithFixedUrls || []);
+      } else {
+        setFetchError("Could not load assets. Please try again.");
       }
     } catch (error) {
       console.error("Failed to fetch assets:", error);
+      setFetchError("Could not load assets. Check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -201,7 +206,7 @@ export default function AssetsPage() {
         } else {
           return { success: false, file: customName, error: result.error };
         }
-      } catch (error) {
+      } catch {
         return { success: false, file: file.name, error: "Upload failed" };
       }
     });
@@ -334,7 +339,7 @@ export default function AssetsPage() {
     try {
       link.download = downloadFileName;
       link.click();
-    } catch (error) {
+    } catch {
       console.log("Direct download failed, opening in new tab");
       link.click();
     }
@@ -348,29 +353,16 @@ export default function AssetsPage() {
     });
   };
 
-  const getAssetIcon = (type: string) => {
-    switch (type) {
-      case "wallpaper":
-        return "🖼️";
-      case "icon":
-        return "🎨";
-      case "music":
-        return "🎵";
-      case "sound":
-        return "🔊";
-      default:
-        return "📄";
-    }
-  };
+  const getAssetIcon = (type: string) => type === "music" || type === "sound" ? <Music className="size-10" /> : <FileImage className="size-10" />;
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg pixel-text-shadow mb-2">ASSET LIBRARY</h2>
-          <p className="font-dialogue text-sm text-muted-foreground">
-            MANAGE YOUR WALLPAPERS, ICONS, AND MUSIC
+          <h1 className="persona-page-title" data-page-heading>Assets</h1>
+          <p className="font-[family-name:var(--font-workspace-body)] text-sm text-muted-foreground">
+            Wallpapers, icons, music, and sounds for your world.
           </p>
         </div>
 
@@ -378,7 +370,7 @@ export default function AssetsPage() {
           {connected && (
             <PixelButton
               variant="primary"
-              className="text-xs"
+              className="text-sm"
               onClick={() => fileInputRef.current?.click()}
             >
               + UPLOAD ASSET
@@ -404,17 +396,17 @@ export default function AssetsPage() {
             <div className="flex items-center gap-3">
               <XCircle className="w-6 h-6 text-yellow-500" />
               <div>
-                <p className="text-xs font-bold">
+                <p className="text-sm font-bold">
                   {driveLoading ? "CHECKING GOOGLE DRIVE..." : "GOOGLE DRIVE NOT CONNECTED"}
                 </p>
-                <p className="font-dialogue text-sm text-muted-foreground">
+                <p className="font-[family-name:var(--font-workspace-body)] text-sm text-muted-foreground">
                   Connect your Google Drive to upload and manage assets
                 </p>
               </div>
             </div>
             <PixelButton
               variant="primary"
-              className="text-xs flex items-center gap-2"
+              className="text-sm flex items-center gap-2"
               onClick={connectDrive}
               disabled={driveLoading}
             >
@@ -434,8 +426,9 @@ export default function AssetsPage() {
               {filters.map((filter) => (
                 <button
                   key={filter.id}
+                  aria-pressed={activeFilter === filter.id}
                   onClick={() => setActiveFilter(filter.id)}
-                  className={`min-h-10 px-4 py-2 text-xs border-2 border-border ${activeFilter === filter.id
+                  className={`persona-filter min-h-10 px-4 py-2 text-sm border border-border ${activeFilter === filter.id
                       ? "bg-primary text-primary-foreground"
                       : "bg-card hover:bg-muted"
                     }`}
@@ -457,21 +450,21 @@ export default function AssetsPage() {
           </div>
 
           {selectedAssets.length > 0 && (
-            <div className="flex items-center gap-3 p-3 bg-accent border-2 border-border">
-              <span className="font-dialogue text-sm">
+            <div className="flex items-center gap-3 p-3 bg-accent border border-border">
+              <span className="font-[family-name:var(--font-workspace-body)] text-sm">
                 {selectedAssets.length} SELECTED
               </span>
               <div className="flex gap-2">
                 <PixelButton
                   variant="secondary"
-                  className="text-xs px-3 py-1"
+                  className="text-sm px-3 py-1"
                   onClick={handleBulkDownload}
                 >
                   DOWNLOAD
                 </PixelButton>
                 <PixelButton
                   variant="primary"
-                  className="text-xs px-3 py-1 bg-destructive border-destructive"
+                  className="text-sm px-3 py-1 bg-destructive border-destructive"
                   onClick={handleBulkDelete}
                 >
                   DELETE
@@ -479,7 +472,7 @@ export default function AssetsPage() {
               </div>
               <button
                 onClick={() => setSelectedAssets([])}
-                className="ml-auto text-xs text-muted-foreground hover:text-foreground"
+                className="ml-auto text-sm text-muted-foreground hover:text-foreground"
               >
                 CLEAR
               </button>
@@ -495,6 +488,7 @@ export default function AssetsPage() {
         </div>
       )}
 
+      {fetchError && <PixelCard><p role="alert" className="text-[#ffb2c5] mb-3">{fetchError}</p><PixelButton variant="secondary" onClick={fetchAssets}>Try again</PixelButton></PixelCard>}
       {/* Asset Grid */}
       {!loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -504,7 +498,7 @@ export default function AssetsPage() {
               onToggle={() => toggleAssetSelection(asset.id)}
               selectedAssets={selectedAssets}
               asset={asset}
-              assetIcon={getAssetIcon(asset.type)}
+              assetIcon={asset.type}
               onRename={() => handleRenameStart(asset)}
               fileSize={formatFileSize(asset.fileSize)}
               onView={() => handleView(asset)}
@@ -516,14 +510,14 @@ export default function AssetsPage() {
       )}
 
       {/* Empty State */}
-      {!loading && filteredAssets.length === 0 && (
+      {!loading && !fetchError && filteredAssets.length === 0 && (
         <PixelCard>
           <div className="text-center py-12 space-y-4">
             <div className="flex justify-center">
-              <PixelCharacter color="#8B5CF6" size={48} />
+              <FileImage className="size-12 text-[#44e4ff]" />
             </div>
-            <h3 className="text-sm pixel-text-shadow">NO ASSETS FOUND</h3>
-            <p className="font-dialogue text-sm text-muted-foreground leading-relaxed">
+            <h3 className="text-sm ">NO ASSETS FOUND</h3>
+            <p className="font-[family-name:var(--font-workspace-body)] text-sm text-muted-foreground leading-relaxed">
               {searchQuery
                 ? "Try a different search term."
                 : connected
@@ -532,11 +526,11 @@ export default function AssetsPage() {
             </p>
             {!searchQuery && (
               connected ? (
-                <PixelButton className="text-xs" onClick={() => setIsUploadModalOpen(true)}>
+                <PixelButton className="text-sm" onClick={() => fileInputRef.current?.click()}>
                   UPLOAD ASSETS
                 </PixelButton>
               ) : (
-                <PixelButton className="text-xs inline-flex items-center gap-2" onClick={connectDrive} disabled={driveLoading}>
+                <PixelButton className="text-sm inline-flex items-center gap-2" onClick={connectDrive} disabled={driveLoading}>
                   <Cloud className="w-4 h-4" />
                   {driveLoading ? "CHECKING DRIVE..." : "CONNECT GOOGLE DRIVE"}
                 </PixelButton>
@@ -560,7 +554,7 @@ export default function AssetsPage() {
           {/* Selected Files with Editable Names */}
           {selectedFiles.length > 0 && (
             <div className="space-y-2">
-              <label className="block text-xs uppercase tracking-wider">
+              <label className="block text-sm uppercase tracking-wider">
                 FILES TO UPLOAD
               </label>
               <div className="max-h-48 overflow-y-auto space-y-2">
@@ -580,8 +574,8 @@ export default function AssetsPage() {
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-dialogue text-sm text-muted-foreground shrink-0">
-                            {file.type.startsWith("image/") ? "🖼️" : "🎵"}
+                          <span className="font-[family-name:var(--font-workspace-body)] text-sm text-muted-foreground shrink-0">
+                            {file.type.startsWith("image/") ? <FileImage className="size-4" /> : <Music className="size-4" />}
                           </span>
                           <input
                             type="text"
@@ -591,14 +585,14 @@ export default function AssetsPage() {
                             onChange={(e) =>
                               handleFileNameChange(file.name, e.target.value)
                             }
-                            className="flex-1 px-2 py-1 font-dialogue text-sm bg-input border border-border focus:outline-none focus:ring-1 focus:ring-primary"
+                            className="flex-1 px-2 py-1 font-[family-name:var(--font-workspace-body)] text-sm bg-input border border-border focus:outline-none focus:ring-1 focus:ring-primary"
                             placeholder="Enter file name"
                           />
-                          <span className="font-dialogue text-sm text-muted-foreground shrink-0">
+                          <span className="font-[family-name:var(--font-workspace-body)] text-sm text-muted-foreground shrink-0">
                             .{extension}
                           </span>
                         </div>
-                        <div className="flex justify-between font-dialogue text-sm text-muted-foreground">
+                        <div className="flex justify-between font-[family-name:var(--font-workspace-body)] text-sm text-muted-foreground">
                           <span>{formatFileSize(file.size)}</span>
                           <span>Original: {file.name}</span>
                         </div>
@@ -612,7 +606,7 @@ export default function AssetsPage() {
 
           {/* Asset Type Selection */}
           <div className="space-y-2">
-            <label className="block text-xs uppercase tracking-wider">
+            <label className="block text-sm uppercase tracking-wider">
               ASSET TYPE
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -622,18 +616,18 @@ export default function AssetsPage() {
                   <button
                     key={type.id}
                     onClick={() => setSelectedAssetType(type.id)}
-                    className={`p-3 border-2 text-left transition-colors ${selectedAssetType === type.id
+                    className={`p-3 border text-left transition-colors ${selectedAssetType === type.id
                         ? "border-primary bg-primary/10"
                         : "border-border bg-card hover:bg-muted"
                       }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <IconComponent className="w-4 h-4" />
-                      <span className="text-xs font-bold">
+                      <span className="text-sm font-bold">
                         {type.label}
                       </span>
                     </div>
-                    <p className="font-dialogue text-sm text-muted-foreground">
+                    <p className="font-[family-name:var(--font-workspace-body)] text-sm text-muted-foreground">
                       {type.description}
                     </p>
                   </button>
@@ -646,7 +640,7 @@ export default function AssetsPage() {
           <div className="flex gap-3 pt-4 border-t-2 border-border">
             <PixelButton
               variant="secondary"
-              className="flex-1 text-xs"
+              className="flex-1 text-sm"
               onClick={() => {
                 setIsUploadModalOpen(false);
                 setSelectedFiles([]);
@@ -657,7 +651,7 @@ export default function AssetsPage() {
             </PixelButton>
             <PixelButton
               variant="primary"
-              className="flex-1 text-xs"
+              className="flex-1 text-sm"
               onClick={handleFileUpload}
               disabled={selectedFiles.length === 0 || uploading}
             >
@@ -681,7 +675,7 @@ export default function AssetsPage() {
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-xs uppercase tracking-wider mb-2">
+            <label className="block text-sm uppercase tracking-wider mb-2">
               NEW NAME
             </label>
             <PixelInput
@@ -696,7 +690,7 @@ export default function AssetsPage() {
           <div className="flex gap-3 pt-2">
             <PixelButton
               variant="secondary"
-              className="flex-1 text-xs"
+              className="flex-1 text-sm"
               onClick={() => {
                 setIsRenameModalOpen(false);
                 setRenamingAsset(null);
@@ -707,7 +701,7 @@ export default function AssetsPage() {
             </PixelButton>
             <PixelButton
               variant="primary"
-              className="flex-1 text-xs"
+              className="flex-1 text-sm"
               onClick={handleRenameConfirm}
               disabled={!newAssetName.trim()}
             >
@@ -727,7 +721,7 @@ export default function AssetsPage() {
             {(viewingAsset.type === "wallpaper" ||
               viewingAsset.type === "icon") &&
               viewingAsset.fileId ? (
-              <div className="border-2 border-border bg-muted relative w-full h-96">
+              <div className="border border-border bg-muted relative w-full h-96">
                 <Image
                   src={`https://drive.google.com/uc?id=${viewingAsset.fileId}`}
                   alt={viewingAsset.name}
@@ -744,11 +738,11 @@ export default function AssetsPage() {
               viewingAsset.type === "sound" ? (
               <audio controls className="w-full" src={`https://drive.google.com/uc?id=${viewingAsset.fileId}`} />
             ) : (
-              <div className="aspect-video bg-muted border-2 border-border flex items-center justify-center text-4xl">
+              <div className="aspect-video bg-muted border border-border flex items-center justify-center text-4xl">
                 {getAssetIcon(viewingAsset.type)}
               </div>
             )}
-            <div className="space-y-2 font-dialogue text-sm">
+            <div className="space-y-2 font-[family-name:var(--font-workspace-body)] text-sm">
               <p>
                 <strong>TYPE:</strong> {viewingAsset.type.toUpperCase()}
               </p>
@@ -765,7 +759,7 @@ export default function AssetsPage() {
               <div className="pt-2">
                 <PixelButton
                   variant="primary"
-                  className="text-xs w-full"
+                  className="text-sm w-full"
                   onClick={() => handleDownload(viewingAsset)}
                 >
                   DOWNLOAD FILE
@@ -842,14 +836,14 @@ export default function AssetsPage() {
 
       {/* Upload Error */}
       {uploadError && (
-        <div className="fixed bottom-4 right-4 p-4 bg-red-500 border-2 border-red-700 text-white font-dialogue text-sm max-w-sm">
+        <div className="fixed bottom-24 md:bottom-4 right-4 p-4 bg-red-500 border border-red-700 text-white font-[family-name:var(--font-workspace-body)] text-sm max-w-sm">
           ERROR: {uploadError}
         </div>
       )}
 
       {/* Uploading Indicator */}
       {uploading && (
-        <div className="fixed bottom-4 right-4 p-4 bg-primary border-2 border-border text-primary-foreground font-dialogue text-sm flex items-center gap-2">
+        <div className="fixed bottom-24 md:bottom-4 right-4 p-4 bg-primary border border-border text-primary-foreground font-[family-name:var(--font-workspace-body)] text-sm flex items-center gap-2">
           <Loader2 className="w-4 h-4 animate-spin" />
           UPLOADING...
         </div>

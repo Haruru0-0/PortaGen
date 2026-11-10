@@ -1,4 +1,5 @@
-import React, { useState } from "react"
+import React from "react"
+import { useWorkspaceMotion } from "@/components/workspace/workspace-motion-provider"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { PropertiesPanel } from "./properties-panel"
 import { DraggableComponent } from "@/lib/types"
@@ -11,11 +12,14 @@ interface CollapsibleSidebarProps {
 }
 
 export function CollapsibleSidebar({ component, onChange, isOpen, onToggle }: CollapsibleSidebarProps) {
+    const { ready, reducedMotion } = useWorkspaceMotion()
     return (
-        <div className={`transition-all duration-300 ease-in-out ${isOpen ? 'w-80' : 'w-0'} overflow-hidden`}>
+        <div className={`${ready && !reducedMotion ? "transition-[width] duration-160 ease-out" : ""} ${isOpen ? 'w-80' : 'w-0'} overflow-hidden`}>
             <div className="h-full flex">
                 {/* Toggle Button - Always visible */}
-                <button
+                <button data-workspace-control
+                    aria-label={isOpen ? "Collapse component properties" : "Expand component properties"}
+                    aria-expanded={isOpen}
                     onClick={onToggle}
                     className="w-8 h-12 bg-background border-l border-border flex items-center justify-center hover:bg-muted transition-colors z-10"
                 >

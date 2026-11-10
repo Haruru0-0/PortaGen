@@ -1,0 +1,139 @@
+{
+  "viewports": [
+    {
+      "width": 320,
+      "route": "/",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 320,
+      "route": "/auth/login",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 320,
+      "route": "/auth/signup",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 320,
+      "route": "/auth/forgot-password",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 320,
+      "route": "/privacy",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 390,
+      "route": "/",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 390,
+      "route": "/auth/login",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 390,
+      "route": "/auth/signup",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 390,
+      "route": "/auth/forgot-password",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 390,
+      "route": "/privacy",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 768,
+      "route": "/",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 768,
+      "route": "/auth/login",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 768,
+      "route": "/auth/signup",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 768,
+      "route": "/auth/forgot-password",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 768,
+      "route": "/privacy",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 1024,
+      "route": "/",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 1024,
+      "route": "/auth/login",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 1024,
+      "route": "/auth/signup",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 1024,
+      "route": "/auth/forgot-password",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 1024,
+      "route": "/privacy",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/auth/login",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/auth/signup",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/auth/forgot-password",
+      "horizontalOverflow": false
+    },
+    {
+      "width": 1440,
+      "route": "/privacy",
+      "horizontalOverflow": false
+    }
+  ],
+  "scenarios": [
+    "Reduced device preference: no video source, usable public routes, no overflow at 320/390/768/1024/1440.",
+    "Explicit full overrides reduced device; two tabs synchronize reset back to device.",
+    "Example desktop changes windows with real selected state.",
+    "Empty login form reports validation without submitting credentials.",
+    "Native Back cancels a pending delayed navigation; no late signup push/cover.",
+    "Blocked video settles to usable poster.",
+    "No JavaScript: account links and product copy remain rendered."
+  ],
+  "errors": []
+}

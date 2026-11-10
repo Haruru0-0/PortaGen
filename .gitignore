@@ -46,3 +46,6 @@ public/_next-video
 .env
 graphify-out
 .claude/.memory-state
+
+# Local execution and browser QA scratch
+.superpowers/

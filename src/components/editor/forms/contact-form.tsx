@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
+import { Input } from "@/components/editor/editor-form-controls"
+import { Textarea } from "@/components/editor/editor-form-controls"
+import { Button } from "@/components/editor/editor-form-controls"
 import { Label } from "@/components/ui/label"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
+import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { DialogContent } from "@/components/workspace/workspace-overlays"
+import { Drawer, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
+import { DrawerContent } from "@/components/workspace/workspace-overlays"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { Mail, Phone, MapPin, Send, Linkedin, Github, Twitter, Link as LinkIcon, Plus, Trash2, Settings2 } from "lucide-react"
-import { AnimatedSection, AnimatedItem } from "@/components/portfolio/animated-section"
+import { AnimatedSection, AnimatedItem } from "@/components/editor/editor-form-section"
 import type { ContactData, ContactInfoItem, SocialLink } from "@/lib/types"
 
 const ICON_MAP: Record<string, any> = {
@@ -102,7 +104,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
     }
 
     return (
-        <div className="space-y-8 max-w-5xl mx-auto pixel-text relative">
+        <div className="space-y-8 max-w-5xl mx-auto workspace-editor-copy relative">
             {/* Header Section */}
             <AnimatedSection variant="scale" duration={0.7} className="text-center group relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
                 <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
@@ -111,7 +113,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                 <Input
                     value={data.title || "Get In Touch"}
                     onChange={(e) => updateData({ ...data, title: e.target.value })}
-                    className="text-3xl font-bold mb-2 pixel-title text-center border-none bg-transparent shadow-none focus-visible:ring-1 focus-visible:ring-primary h-auto p-0"
+                    className="text-3xl font-bold mb-2 workspace-editor-title text-center border-none bg-transparent shadow-none focus-visible:ring-1 focus-visible:ring-primary h-auto p-0"
                 />
                 <Textarea
                     value={data.description || "Have a question or want to work together? Drop me a message!"}
@@ -124,7 +126,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                 {/* Contact Info & Socials */}
                 <AnimatedSection variant="slideRight" delay={0.1} className="md:col-span-1 space-y-6 group/section relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-medium pixel-text opacity-50">Contact Details</h3>
+                        <h3 className="font-medium workspace-editor-copy opacity-50">Contact Details</h3>
                         <div className="flex gap-1 opacity-70 group-hover/section:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                             <Button variant="ghost" size="sm" onClick={addContactInfo} className="h-8 w-8 p-0" title="Add Info">
                                 <Plus className="w-4 h-4" />
@@ -134,7 +136,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
 
                     {(data.contactInfo || []).map((info, index) => (
                         <AnimatedItem key={index}>
-                            <Card className="hover:shadow-md transition-shadow border-0 pixel-card relative group">
+                            <Card className="hover:shadow-md transition-shadow border-0 workspace-editor-form-card relative group">
                                 <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10 flex gap-1">
                                     {isDesktop ? (
                                         <Dialog>
@@ -143,8 +145,8 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                                     <Settings2 className="w-3 h-3" />
                                                 </Button>
                                             </DialogTrigger>
-                                            <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
-                                                <DialogHeader className="bg-white dark:bg-zinc-950">
+                                            <DialogContent className="workspace-controls sm:max-w-[425px] rounded-none border-4 border-[var(--workspace-white,#fffef5)]  bg-card ">
+                                                <DialogHeader className="bg-card ">
                                                     <DialogTitle>Edit Contact Info</DialogTitle>
                                                     <DialogDescription>
                                                         Update your contact details below.
@@ -156,7 +158,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                                         <select
                                                             value={info.type}
                                                             onChange={(e) => updateContactInfo(index, "type", e.target.value)}
-                                                            className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
+                                                            className="col-span-3 h-10 w-full border-2 border-[var(--workspace-white,#fffef5)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
                                                         >
                                                             {INFO_TYPES.map(type => (
                                                                 <option key={type.value} value={type.value}>{type.label}</option>
@@ -168,19 +170,19 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                                         <Input
                                                             value={info.link || ""}
                                                             onChange={(e) => updateContactInfo(index, "link", e.target.value)}
-                                                            className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                            className="col-span-3 rounded-none border-2 border-[var(--workspace-white,#fffef5)]  focus-visible:ring-0 focus-visible:border-[var(--workspace-blue,#0755d8)]"
                                                         />
                                                     </div>
                                                 </div>
-                                                <DialogFooter className="sm:justify-between bg-white dark:bg-zinc-950">
-                                                    <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
+                                                <DialogFooter className="sm:justify-between bg-card ">
+                                                    <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive  active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
                                                         removeContactInfo(index)
                                                         const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
                                                         closeButton?.click()
                                                     }}>
                                                         <Trash2 className="w-4 h-4 mr-2" /> Remove
                                                     </Button>
-                                                    <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
+                                                    <Button type="button" className="rounded-none border-2 border-[var(--workspace-white,#fffef5)]  active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--workspace-blue,#0755d8)] hover:text-[var(--workspace-white,#fffef5)]" onClick={() => {
                                                         const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
                                                         closeButton?.click()
                                                     }}>
@@ -196,8 +198,8 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                                     <Settings2 className="w-3 h-3" />
                                                 </Button>
                                             </DrawerTrigger>
-                                            <DrawerContent className="rounded-t-none border-t-4 border-x-4 border-[var(--cute-text)] shadow-[0px_-4px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
-                                                <DrawerHeader className="text-left bg-white dark:bg-zinc-950">
+                                            <DrawerContent className="workspace-controls rounded-t-none border-t border-x border-[var(--workspace-white,#fffef5)]  bg-card ">
+                                                <DrawerHeader className="text-left bg-card ">
                                                     <DrawerTitle>Edit Contact Info</DrawerTitle>
                                                     <DrawerDescription>
                                                         Update your contact details below.
@@ -209,7 +211,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                                         <select
                                                             value={info.type}
                                                             onChange={(e) => updateContactInfo(index, "type", e.target.value)}
-                                                            className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
+                                                            className="col-span-3 h-10 w-full border-2 border-[var(--workspace-white,#fffef5)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
                                                         >
                                                             {INFO_TYPES.map(type => (
                                                                 <option key={type.value} value={type.value}>{type.label}</option>
@@ -221,15 +223,15 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                                         <Input
                                                             value={info.link || ""}
                                                             onChange={(e) => updateContactInfo(index, "link", e.target.value)}
-                                                            className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                            className="col-span-3 rounded-none border-2 border-[var(--workspace-white,#fffef5)]  focus-visible:ring-0 focus-visible:border-[var(--workspace-blue,#0755d8)]"
                                                         />
                                                     </div>
                                                 </div>
-                                                <DrawerFooter className="flex-col gap-2 bg-white dark:bg-zinc-950">
-                                                    <Button variant="destructive" size="sm" className="w-full rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => removeContactInfo(index)}>
+                                                <DrawerFooter className="flex-col gap-2 bg-card ">
+                                                    <Button variant="destructive" size="sm" className="w-full rounded-none border-2 border-destructive  active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => removeContactInfo(index)}>
                                                         <Trash2 className="w-4 h-4 mr-2" /> Remove
                                                     </Button>
-                                                    <Button type="button" className="w-full rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]">
+                                                    <Button type="button" className="w-full rounded-none border-2 border-[var(--workspace-white,#fffef5)]  active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--workspace-blue,#0755d8)] hover:text-[var(--workspace-white,#fffef5)]">
                                                         Done
                                                     </Button>
                                                 </DrawerFooter>
@@ -239,14 +241,14 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                 </div>
 
                                 <CardContent className="p-4 flex items-center gap-4">
-                                    <div className="bg-[var(--cute-highlight)] p-3 rounded-none shrink-0 border-2 border-[var(--cute-text)] text-[var(--cute-text)]">
+                                    <div className="bg-[var(--workspace-blue,#0755d8)] p-3 rounded-none shrink-0 border-2 border-[var(--workspace-white,#fffef5)] text-[var(--workspace-white,#fffef5)]">
                                         {getIcon(info.type)}
                                     </div>
                                     <div className="min-w-0 flex-1">
                                         <Input
                                             value={info.label || info.type}
                                             onChange={(e) => updateContactInfo(index, "label", e.target.value)}
-                                            className="font-medium pixel-text h-6 p-0 border-none shadow-none focus-visible:ring-0 bg-transparent"
+                                            className="font-medium workspace-editor-copy h-6 p-0 border-none shadow-none focus-visible:ring-0 bg-transparent"
                                         />
                                         <Input
                                             value={info.value}
@@ -261,7 +263,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
 
                     <div className="pt-4 border-t-2 border-dashed border-border mt-4">
                         <div className="flex items-center justify-between mb-3">
-                            <h3 className="font-medium pixel-title">Social Media</h3>
+                            <h3 className="font-medium workspace-editor-title">Social Media</h3>
                             <Button variant="ghost" size="sm" onClick={addSocialLink} className="h-8 w-8 p-0 opacity-70 group-hover/section:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                                 <Plus className="w-4 h-4" />
                             </Button>
@@ -271,14 +273,14 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                 isDesktop ? (
                                     <Dialog key={index}>
                                         <DialogTrigger asChild>
-                                            <button
-                                                className="bg-[var(--cute-highlight)] hover:bg-[var(--cute-highlight)]/80 p-2 rounded-none border-2 border-[var(--cute-text)] text-[var(--cute-text)] transition-colors relative group"
+                                            <button data-workspace-control
+                                                className="bg-[var(--workspace-blue,#0755d8)] hover:bg-[var(--workspace-blue,#0755d8)]/80 p-2 rounded-none border-2 border-[var(--workspace-white,#fffef5)] text-[var(--workspace-white,#fffef5)] transition-colors relative group"
                                             >
                                                 {getIcon(social.platform)}
                                             </button>
                                         </DialogTrigger>
-                                        <DialogContent className="sm:max-w-[425px] rounded-none border-4 border-[var(--cute-text)] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
-                                            <DialogHeader className="bg-white dark:bg-zinc-950">
+                                        <DialogContent className="workspace-controls sm:max-w-[425px] rounded-none border-4 border-[var(--workspace-white,#fffef5)]  bg-card ">
+                                            <DialogHeader className="bg-card ">
                                                 <DialogTitle>Edit Social Link</DialogTitle>
                                                 <DialogDescription>
                                                     Update your social media link details.
@@ -293,7 +295,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                                             updateSocialLink(index, "platform", e.target.value)
                                                             updateSocialLink(index, "icon", e.target.value)
                                                         }}
-                                                        className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
+                                                        className="col-span-3 h-10 w-full border-2 border-[var(--workspace-white,#fffef5)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
                                                     >
                                                         {SOCIAL_PLATFORMS.map(platform => (
                                                             <option key={platform.value} value={platform.value}>{platform.label}</option>
@@ -305,19 +307,19 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                                     <Input
                                                         value={social.url}
                                                         onChange={(e) => updateSocialLink(index, "url", e.target.value)}
-                                                        className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                        className="col-span-3 rounded-none border-2 border-[var(--workspace-white,#fffef5)]  focus-visible:ring-0 focus-visible:border-[var(--workspace-blue,#0755d8)]"
                                                     />
                                                 </div>
                                             </div>
-                                            <DialogFooter className="sm:justify-between bg-white dark:bg-zinc-950">
-                                                <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
+                                            <DialogFooter className="sm:justify-between bg-card ">
+                                                <Button variant="destructive" size="sm" className="rounded-none border-2 border-destructive  active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => {
                                                     removeSocialLink(index)
                                                     const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
                                                     closeButton?.click()
                                                 }}>
                                                     <Trash2 className="w-4 h-4 mr-2" /> Remove
                                                 </Button>
-                                                <Button type="button" className="rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]" onClick={() => {
+                                                <Button type="button" className="rounded-none border-2 border-[var(--workspace-white,#fffef5)]  active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--workspace-blue,#0755d8)] hover:text-[var(--workspace-white,#fffef5)]" onClick={() => {
                                                     const closeButton = document.querySelector('[data-slot="dialog-close"]') as HTMLButtonElement
                                                     closeButton?.click()
                                                 }}>
@@ -329,14 +331,14 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                 ) : (
                                     <Drawer key={index}>
                                         <DrawerTrigger asChild>
-                                            <button
-                                                className="bg-[var(--cute-highlight)] hover:bg-[var(--cute-highlight)]/80 p-2 rounded-none border-2 border-[var(--cute-text)] text-[var(--cute-text)] transition-colors relative group"
+                                            <button data-workspace-control
+                                                className="bg-[var(--workspace-blue,#0755d8)] hover:bg-[var(--workspace-blue,#0755d8)]/80 p-2 rounded-none border-2 border-[var(--workspace-white,#fffef5)] text-[var(--workspace-white,#fffef5)] transition-colors relative group"
                                             >
                                                 {getIcon(social.platform)}
                                             </button>
                                         </DrawerTrigger>
-                                        <DrawerContent className="rounded-t-none border-t-4 border-x-4 border-[var(--cute-text)] shadow-[0px_-4px_0px_0px_rgba(0,0,0,0.2)] bg-white dark:bg-zinc-950">
-                                            <DrawerHeader className="text-left bg-white dark:bg-zinc-950">
+                                        <DrawerContent className="workspace-controls rounded-t-none border-t border-x border-[var(--workspace-white,#fffef5)]  bg-card ">
+                                            <DrawerHeader className="text-left bg-card ">
                                                 <DrawerTitle>Edit Social Link</DrawerTitle>
                                                 <DrawerDescription>
                                                     Update your social media link details.
@@ -351,7 +353,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                                             updateSocialLink(index, "platform", e.target.value)
                                                             updateSocialLink(index, "icon", e.target.value)
                                                         }}
-                                                        className="col-span-3 h-10 w-full border-2 border-[var(--cute-text)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
+                                                        className="col-span-3 h-10 w-full border-2 border-[var(--workspace-white,#fffef5)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
                                                     >
                                                         {SOCIAL_PLATFORMS.map(platform => (
                                                             <option key={platform.value} value={platform.value}>{platform.label}</option>
@@ -363,15 +365,15 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                                     <Input
                                                         value={social.url}
                                                         onChange={(e) => updateSocialLink(index, "url", e.target.value)}
-                                                        className="col-span-3 rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)]"
+                                                        className="col-span-3 rounded-none border-2 border-[var(--workspace-white,#fffef5)]  focus-visible:ring-0 focus-visible:border-[var(--workspace-blue,#0755d8)]"
                                                     />
                                                 </div>
                                             </div>
-                                            <DrawerFooter className="flex-col gap-2 bg-white dark:bg-zinc-950">
-                                                <Button variant="destructive" size="sm" className="w-full rounded-none border-2 border-destructive shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => removeSocialLink(index)}>
+                                            <DrawerFooter className="flex-col gap-2 bg-card ">
+                                                <Button variant="destructive" size="sm" className="w-full rounded-none border-2 border-destructive  active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" onClick={() => removeSocialLink(index)}>
                                                     <Trash2 className="w-4 h-4 mr-2" /> Remove
                                                 </Button>
-                                                <Button type="button" className="w-full rounded-none border-2 border-[var(--cute-text)] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--cute-highlight)] hover:text-[var(--cute-text)]">
+                                                <Button type="button" className="w-full rounded-none border-2 border-[var(--workspace-white,#fffef5)]  active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[var(--workspace-blue,#0755d8)] hover:text-[var(--workspace-white,#fffef5)]">
                                                     Done
                                                 </Button>
                                             </DrawerFooter>
@@ -379,7 +381,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                     </Drawer>
                                 )
                             ))}
-                            <Button variant="outline" size="sm" className="h-[42px] w-[42px] pixel-badge cursor-pointer" onClick={addSocialLink}>
+                            <Button variant="outline" size="sm" className="h-[42px] w-[42px] workspace-editor-badge cursor-pointer" onClick={addSocialLink}>
                                 <Plus className="w-4 h-4" />
                             </Button>
                         </div>
@@ -389,28 +391,28 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                 {/* Contact Form Preview (Non-editable) */}
                 <AnimatedSection variant="slideLeft" delay={0.2} className="md:col-span-2 relative group border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
                     <div className={data.showForm === false ? "opacity-50 grayscale pointer-events-none" : ""}>
-                        <Card className="border-0 pixel-card">
+                        <Card className="border-0 workspace-editor-form-card">
                             <CardContent className="p-6">
                                 <form className="space-y-4 pointer-events-none">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <Label className="pixel-text">Your Name</Label>
-                                            <Input placeholder="John Doe" className="rounded-none border-2 border-[var(--cute-text)] bg-[var(--card-bg)]" disabled />
+                                            <Label className="workspace-editor-copy">Your Name</Label>
+                                            <Input placeholder="John Doe" className="rounded-none border-2 border-[var(--workspace-white,#fffef5)] bg-[var(--workspace-ink,#061039)]" disabled />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label className="pixel-text">Email Address</Label>
-                                            <Input placeholder="john@example.com" className="rounded-none border-2 border-[var(--cute-text)] bg-[var(--card-bg)]" disabled />
+                                            <Label className="workspace-editor-copy">Email Address</Label>
+                                            <Input placeholder="john@example.com" className="rounded-none border-2 border-[var(--workspace-white,#fffef5)] bg-[var(--workspace-ink,#061039)]" disabled />
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="pixel-text">Subject</Label>
-                                        <Input placeholder="Project Inquiry" className="rounded-none border-2 border-[var(--cute-text)] bg-[var(--card-bg)]" disabled />
+                                        <Label className="workspace-editor-copy">Subject</Label>
+                                        <Input placeholder="Project Inquiry" className="rounded-none border-2 border-[var(--workspace-white,#fffef5)] bg-[var(--workspace-ink,#061039)]" disabled />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="pixel-text">Message</Label>
-                                        <Textarea placeholder="Tell me about your project..." rows={5} className="rounded-none border-2 border-[var(--cute-text)] bg-[var(--card-bg)]" disabled />
+                                        <Label className="workspace-editor-copy">Message</Label>
+                                        <Textarea placeholder="Tell me about your project..." rows={5} className="rounded-none border-2 border-[var(--workspace-white,#fffef5)] bg-[var(--workspace-ink,#061039)]" disabled />
                                     </div>
-                                    <Button className="w-full rounded-none border-2 border-[var(--cute-text)] bg-[var(--cute-text)] text-white" disabled>
+                                    <Button className="w-full rounded-none border-2 border-[var(--workspace-white,#fffef5)] bg-[var(--workspace-white,#fffef5)] text-white" disabled>
                                         <Send className="mr-2 h-4 w-4" /> Send Message
                                     </Button>
                                 </form>
@@ -425,13 +427,13 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                 <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                     <Settings2 className="w-4 h-4 text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-bold mb-2 pixel-title">Map Embed URL</h3>
+                <h3 className="text-lg font-bold mb-2 workspace-editor-title">Map Embed URL</h3>
                 <p className="text-sm opacity-70 mb-3">Paste your Google Maps embed URL here (get it from Google Maps → Share → Embed a map)</p>
                 <Input
                     value={data.mapUrl || ""}
                     onChange={(e) => updateData({ ...data, mapUrl: e.target.value })}
                     placeholder="https://www.google.com/maps/embed?pb=..."
-                    className="border-2 border-[var(--cute-text)] bg-[var(--card-bg)] focus-visible:ring-0 focus-visible:border-[var(--cute-highlight)] rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)]"
+                    className="border-2 border-[var(--workspace-white,#fffef5)] bg-[var(--workspace-ink,#061039)] focus-visible:ring-0 focus-visible:border-[var(--workspace-blue,#0755d8)] rounded-none "
                 />
             </AnimatedSection >
         </div >

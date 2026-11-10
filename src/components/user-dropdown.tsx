@@ -1,169 +1,52 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import { LogOut, Settings, User } from "lucide-react"
-import { PixelCharacter } from "./pixel-character"
-import Link from "next/link"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils"
-import { gsap } from "gsap"
+import { useState, useEffect } from "react"
+import { LogOut, Settings, UserRound } from "lucide-react"
+import Link from "@/components/workspace/workspace-link"
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/workspace/workspace-overlays"
 import { createClient } from "@/utils/supabase/client"
 import { useRouter } from "next/navigation"
+import { useWorkspaceExperience } from "@/components/workspace/workspace-experience-provider"
+import type { User } from "@supabase/supabase-js"
 
 export function UserDropdown() {
-  const [isOpen, setIsOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const menuRef = useRef<HTMLDivElement>(null)
-  const supabase = createClient()
-  const [user, setUser] = useState<any>(null)
+  const [supabase] = useState(() => createClient())
+  const [user, setUser] = useState<User | null>(null)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [dbUsername, setDbUsername] = useState<string | null>(null)
   const router = useRouter()
-
-  const fetchProfile = async () => {
-    const res = await fetch('/api/user/profile')
-    if (res.ok) {
-      const data = await res.json()
-      setAvatarUrl(data.avatarUrl)
-      setDbUsername(data.username)
-    }
-  }
-
+  const { cancelPendingTransition } = useWorkspaceExperience()
   useEffect(() => {
+    let active = true
+    const fetchProfile = async () => {
+      const res = await fetch("/api/user/profile")
+      if (res.ok && active) { const data = await res.json(); setAvatarUrl(data.avatarUrl); setDbUsername(data.username) }
+    }
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
+      if (!active) return
       setUser(user)
-
-      if (user) {
-        fetchProfile()
-      }
+      if (user) await fetchProfile()
     }
-    getUser()
-
-    window.addEventListener('profile-updated', fetchProfile)
-    return () => window.removeEventListener('profile-updated', fetchProfile)
+    void getUser()
+    window.addEventListener("profile-updated", fetchProfile)
+    return () => { active = false; window.removeEventListener("profile-updated", fetchProfile) }
   }, [supabase])
-
-  useEffect(() => {
-    if (isOpen && menuRef.current) {
-      gsap.fromTo(
-        menuRef.current,
-        { opacity: 0, y: -10, scale: 0.95 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.2, ease: "back.out(1.7)" },
-      )
-    }
-  }, [isOpen])
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
-
   const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut()
-      router.push("/")
-    } catch (error) {
-      console.error("Logout failed:", error)
-    }
+    try { await supabase.auth.signOut(); cancelPendingTransition(); router.push("/") } catch (error) { console.error("Logout failed:", error) }
   }
-
-  // Get user data from Supabase
-  const displayName = dbUsername || user?.user_metadata?.username || user?.user_metadata?.full_name || user?.email?.split('@')[0] || (user ? "ACCOUNT" : "…")
-  const displayEmail = user?.email || ""
-
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-3 px-3 py-2 border-2 border-border bg-card hover:bg-muted transition-colors rounded-none"
-        aria-label="Account menu"
-        aria-haspopup="menu"
-        aria-expanded={isOpen}
-      >
-        {avatarUrl ? (
-          <img src={avatarUrl} alt="Avatar" className="w-8 h-8 object-cover border-2 border-border" />
-        ) : (
-          <PixelCharacter color="#8B5CF6" size={32} />
-        )}
-        <div className="text-left hidden md:block max-w-[120px]">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <p className="text-xs font-bold truncate cursor-help">{displayName.toUpperCase()}</p>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">{displayName.toUpperCase()}</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <p className="font-dialogue text-sm text-muted-foreground truncate cursor-help">{displayEmail}</p>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">{displayEmail}</TooltipContent>
-          </Tooltip>
-        </div>
-      </button>
-
-      {isOpen && (
-        <div
-          ref={menuRef}
-          className="absolute right-0 top-full mt-2 w-56 bg-card border-4 border-border shadow-pixel z-50"
-        >
-          <div className="p-3 border-b-2 border-border flex items-center gap-3">
-            {avatarUrl ? (
-              <img src={avatarUrl} alt="Avatar" className="w-10 h-10 object-cover border-2 border-border" />
-            ) : (
-              <PixelCharacter color="#8B5CF6" size={32} />
-            )}
-            <div className="min-w-0">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <p className="text-xs font-bold truncate cursor-help">{displayName.toUpperCase()}</p>
-                </TooltipTrigger>
-                <TooltipContent side="right">{displayName.toUpperCase()}</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <p className="font-dialogue text-sm text-muted-foreground truncate cursor-help">{displayEmail}</p>
-                </TooltipTrigger>
-                <TooltipContent side="right">{displayEmail}</TooltipContent>
-              </Tooltip>
-            </div>
-          </div>
-
-          <div className="p-2">
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-3 px-3 py-2 font-dialogue text-sm hover:bg-muted transition-colors"
-              onClick={() => setIsOpen(false)}
-            >
-              <User className="w-4 h-4" />
-              DASHBOARD
-            </Link>
-            <Link
-              href="/dashboard/settings"
-              className="flex items-center gap-3 px-3 py-2 font-dialogue text-sm hover:bg-muted transition-colors"
-              onClick={() => setIsOpen(false)}
-            >
-              <Settings className="w-4 h-4" />
-              SETTINGS
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-3 py-2 text-xs hover:bg-destructive hover:text-destructive-foreground transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-              LOGOUT
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  )
+  const displayName = dbUsername || user?.user_metadata?.username || user?.user_metadata?.full_name || user?.email?.split("@")[0] || (user ? "Account" : "…")
+  return <DropdownMenu>
+    <DropdownMenuTrigger asChild><button type="button" aria-label="Account menu" className="ws-action ws-action--secondary flex gap-3 max-w-64">
+      {avatarUrl ? <img src={avatarUrl} alt="" className="size-8 object-cover" /> : <UserRound className="size-5" />}
+      <span className="hidden md:block truncate">{displayName}</span>
+    </button></DropdownMenuTrigger>
+    <DropdownMenuContent align="end" className="w-64">
+      <DropdownMenuLabel><p className="break-words">{displayName}</p><p className="text-sm font-normal text-muted-foreground break-all">{user?.email || ""}</p></DropdownMenuLabel>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem asChild><Link href="/dashboard" className="min-h-11"><UserRound className="size-4" /> Dashboard</Link></DropdownMenuItem>
+      <DropdownMenuItem asChild><Link href="/dashboard/settings" className="min-h-11"><Settings className="size-4" /> Settings</Link></DropdownMenuItem>
+      <DropdownMenuItem onSelect={handleLogout} className="min-h-11"><LogOut className="size-4" /> Sign out</DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
 }

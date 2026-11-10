@@ -2,10 +2,10 @@
 
 import { useMemo } from "react"
 import { Plus, Trash2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/components/editor/editor-form-controls"
+import { Input } from "@/components/editor/editor-form-controls"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { Textarea } from "@/components/editor/editor-form-controls"
 import { DEFAULT_TERMINAL_DATA } from "@/lib/portfolio-extras"
 import type { TerminalCustomCommand, TerminalData, TerminalFile, TerminalInfoRow } from "@/lib/types"
 

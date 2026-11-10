@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
-import { PixelCard } from "@/components/pixel-card"
-import { PixelButton } from "@/components/pixel-button"
-import { PixelInput } from "@/components/pixel-input"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
+import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
 import { useDesktopContext } from "@/contexts/desktopContext"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -70,7 +70,7 @@ export function MusicTab() {
   return (
     <PixelCard>
       <div className="space-y-4">
-        <h3 className="text-sm pixel-text-shadow">MUSIC (SPOTIFY)</h3>
+        <h3 className="text-sm workspace-editor-title">MUSIC (SPOTIFY)</h3>
 
         <Form {...form}>
           <form

@@ -1,11 +1,11 @@
-import { PixelCard } from "@/components/pixel-card"
-import { PixelButton } from "@/components/pixel-button"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
 import { FileUpload } from "@/components/file-upload"
 import { useDesktopContext } from "@/contexts/desktopContext"
 import { useDesktopStore } from "@/lib/stores/desktop-store"
 import { useEffect, useState } from "react"
-import { PixelModal } from "@/components/pixel-modal"
-import { PixelInput } from "@/components/pixel-input"
+import { PixelModal } from "@/components/editor/editor-modal"
+import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { useParams } from "next/navigation";
 import { AssetPicker } from "@/components/common/asset-picker"
@@ -165,7 +165,7 @@ export function MobileWidgetsTab() {
     return (
         <PixelCard>
             <div className="space-y-4">
-                <h3 className="text-sm dashboard-pixel-text-shadow">MOBILE WIDGETS</h3>
+                <h3 className="text-sm workspace-editor-title">MOBILE WIDGETS</h3>
                 <div className="space-y-2">
                     <FileUpload accept="image/*" onFileSelect={onUploadWidget1} label="WIDGET 1"
                         preview={previewUrl1 || (data?.widget1Asset?.fileId ? `https://drive.google.com/uc?id=${data.widget1Asset.fileId}` : '')} maxSize={5} />

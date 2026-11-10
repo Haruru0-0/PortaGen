@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useId, useState } from "react"
 import { PortfolioUrlShare } from "@/components/portfolio-url-share"
 import { PreviewPanel } from "@/components/editor/preview-panel"
 import { CategorySelection } from "@/components/editor/CategorySelection"
@@ -9,20 +9,24 @@ import { TabContent } from "@/components/editor/TabContent"
 
 import { PortfolioSettings } from "@/components/editor/portfolio-settings"
 import { useGoogleDrive } from "@/hooks/use-google-drive"
-import { PixelCard } from "@/components/pixel-card"
-import { PixelButton } from "@/components/pixel-button"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
+import { WorkspaceLink } from "@/components/workspace/workspace-link"
 import { Cloud, XCircle } from "lucide-react"
 
 export default function EditorPage() {
+    const tabsId = useId();
     const { connected, loading: driveLoading, connectDrive } = useGoogleDrive();
 
     return (
         <div>
-            <PortfolioUrlShare />
+            <div className="workspace-controls">
+                <WorkspaceLink href="/dashboard/portfolios" transition="back" className="workspace-editor-return">← Portfolios</WorkspaceLink>
+                <PortfolioUrlShare />
 
             {driveLoading && (
                 <PixelCard className="mt-4">
-                    <div className="min-h-24 bg-muted animate-pulse motion-reduce:animate-none" role="status" aria-label="Checking Google Drive" />
+                    <div className="min-h-24 bg-muted workspace-editor-loading" role="status" aria-label="Checking Google Drive" />
                 </PixelCard>
             )}
             {!driveLoading && !connected && (
@@ -52,24 +56,25 @@ export default function EditorPage() {
                 </PixelCard>
             )}
 
+            </div>
             <div id="editor-top" className="min-h-[calc(100vh-180px)] flex flex-col mt-4">
                 {/* From 1400px the preview sits beside all the controls and stays in view; below that it stacks under them */}
                 <div className="min-[1400px]:grid min-[1400px]:grid-cols-[minmax(0,1fr)_440px] min-[1400px]:gap-6 min-[1400px]:items-start">
-                    <div className="min-w-0">
+                    <div className="workspace-controls min-w-0">
                         <PortfolioSettings />
 
                         <CategorySelection />
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 min-[1400px]:grid-cols-[180px_minmax(0,1fr)] gap-6 mb-6">
-                            <TabsNavigation />
-                            <TabContent />
+                            <TabsNavigation idPrefix={tabsId} />
+                            <TabContent idPrefix={tabsId} />
                         </div>
                     </div>
 
-                    <div id="live-preview" className="flex-1 scroll-mt-4 min-[1400px]:sticky min-[1400px]:top-4 min-[1400px]:max-h-[calc(100vh-2rem)] min-[1400px]:overflow-y-auto">
+                    <div id="live-preview" className="workspace-editor-preview-shell flex-1 scroll-mt-4 min-[1400px]:sticky min-[1400px]:top-4 min-[1400px]:max-h-[calc(100vh-2rem)] min-[1400px]:overflow-y-auto">
                         <a
                             href="#editor-top"
-                            className="inline-block py-2 mb-2 font-dialogue text-sm text-foreground hover:underline min-[1400px]:hidden"
+                            className="workspace-editor-preview-link inline-flex items-center min-h-11 py-2 mb-2 text-sm hover:underline min-[1400px]:hidden"
                         >
                             ↑ Back to the controls
                         </a>
@@ -98,7 +103,7 @@ function JumpToPreviewButton() {
     return (
         <a
             href="#live-preview"
-            className="min-[1400px]:hidden fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] md:bottom-4 right-20 z-50 h-14 px-4 flex items-center bg-secondary text-secondary-foreground border-4 border-foreground shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-xs font-bold uppercase tracking-wider"
+            className="workspace-editor-preview-link min-[1400px]:hidden fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] md:bottom-4 right-20 z-50 min-h-11 px-4 flex items-center"
             aria-label="Jump to the live preview"
         >
             Preview ↓

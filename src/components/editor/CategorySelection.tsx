@@ -1,41 +1,14 @@
-
-import { PixelCard } from "@/components/pixel-card";
-import Image from "next/image";
-import Potion from "@/assets/Potion.png";
-import Jellyfish from "@/assets/Jellyfish.png";
-import { useEditorUIStore } from "@/lib/stores/ui-store";
+import { LockKeyhole, House } from "lucide-react"
+import { useEditorUIStore } from "@/lib/stores/ui-store"
 
 export const CategorySelection = () => {
-  const { activeCategory, setActiveCategory } = useEditorUIStore();
-
-  return (
-    <div className="mb-6">
-      <PixelCard>
-        <div className="grid grid-cols-2 gap-4">
-          <button
-            onClick={() => setActiveCategory("lockScreen")}
-            aria-pressed={activeCategory === "lockScreen"}
-            className={`flex cursor-pointer items-center justify-center gap-3 px-4 py-3 text-sm border-2 border-border transition-colors font-bold ${activeCategory === "lockScreen"
-              ? "bg-primary text-primary-foreground"
-              : "bg-card hover:bg-muted"
-              }`}
-          >
-            <Image src={Potion} alt={"potion"} className={"w-8 h-8"} />
-            LOCK SCREEN
-          </button>
-          <button
-            onClick={() => setActiveCategory("homeScreen")}
-            aria-pressed={activeCategory === "homeScreen"}
-            className={`flex cursor-pointer items-center justify-center gap-3 px-4 py-3 text-sm border-2 border-border transition-colors font-bold ${activeCategory === "homeScreen"
-              ? "bg-primary text-primary-foreground"
-              : "bg-card hover:bg-muted"
-              }`}
-          >
-            <Image src={Jellyfish} alt={"jellyfish"} className={"w-8 h-8"} />
-            HOME SCREEN
-          </button>
-        </div>
-      </PixelCard>
-    </div>
-  );
-};
+  const { activeCategory, setActiveCategory } = useEditorUIStore()
+  return <div className="workspace-editor-categories" role="group" aria-label="Portfolio screen">
+    <button data-workspace-control type="button" onClick={() => setActiveCategory("lockScreen")} aria-pressed={activeCategory === "lockScreen"} className="workspace-editor-category">
+      <LockKeyhole className="size-5 shrink-0" aria-hidden="true" /> Lock screen
+    </button>
+    <button data-workspace-control type="button" onClick={() => setActiveCategory("homeScreen")} aria-pressed={activeCategory === "homeScreen"} className="workspace-editor-category">
+      <House className="size-5 shrink-0" aria-hidden="true" /> Home screen
+    </button>
+  </div>
+}

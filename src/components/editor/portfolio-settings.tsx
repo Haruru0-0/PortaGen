@@ -1,9 +1,9 @@
-import { PixelCard } from "@/components/pixel-card"
-import { PixelInput } from "@/components/pixel-input"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
+import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
 import { usePortfolioContext } from "@/contexts/portfolioContext"
 import { useParams } from "next/navigation"
 import { useEffect } from "react"
-import { PixelButton } from "../pixel-button"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
 
 export function PortfolioSettings() {
     const { portfolioInfo, fetchInfo, updateInfo, setPortfolioName, setBio, loading: portfolioLoading } = usePortfolioContext()
@@ -27,6 +27,8 @@ export function PortfolioSettings() {
         <div className="mb-6">
             <PixelCard>
                 <div className="flex flex-col gap-4">
+                    <h1 className="workspace-editor-page-title persona-page-title" data-page-heading tabIndex={-1}>Portfolio editor</h1>
+                    <p className="text-muted-foreground">Save Info applies to the name and bio below.</p>
                     <div>
                         <PixelInput
                             label="Portfolio Name"
@@ -42,7 +44,7 @@ export function PortfolioSettings() {
                             value={portfolioInfo?.bio || ""}
                             onChange={(e) => setBio(e.target.value)}
                             placeholder="A short description..."
-                            className="w-full px-4 py-2 text-xs bg-input border-4 border-border focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                            className="workspace-editor-input w-full resize-y"
                             rows={2}
                         />
                     </div>

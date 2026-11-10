@@ -1,8 +1,8 @@
-import { PixelCard } from "@/components/pixel-card"
-import { PixelButton } from "@/components/pixel-button"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
+import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
 import { FileUpload } from "@/components/file-upload"
-import { PixelModal } from "@/components/pixel-modal"
-import { PixelInput } from "@/components/pixel-input"
+import { PixelModal } from "@/components/editor/editor-modal"
+import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
 import { Library } from "lucide-react"
 import { useDesktopContext } from "@/contexts/desktopContext"
 import { useDesktopStore } from "@/lib/stores/desktop-store"
@@ -190,7 +190,7 @@ export function DesktopWallpaperTab() {
       <div className="space-y-6">
         {/* WALLPAPER SECTION */}
         <div className="space-y-4">
-          <h3 className="text-sm dashboard-pixel-text-shadow">DESKTOP WALLPAPER</h3>
+          <h3 className="text-sm workspace-editor-title">DESKTOP WALLPAPER</h3>
           <div className="space-y-2">
             <FileUpload
               accept="image/*"
@@ -245,7 +245,7 @@ export function DesktopWallpaperTab() {
 
         {/* MENU BAR SECTION */}
         <div className="space-y-4">
-          <h3 className="text-sm dashboard-pixel-text-shadow">MENU BAR SETTINGS</h3>
+          <h3 className="text-sm workspace-editor-title">MENU BAR SETTINGS</h3>
 
           <div className="space-y-2">
             <p className="text-xs text-muted-foreground uppercase">Menu Bar Icon</p>

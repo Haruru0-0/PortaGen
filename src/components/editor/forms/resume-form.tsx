@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/editor/editor-form-controls"
+import { Input } from "@/components/editor/editor-form-controls"
+import { Textarea } from "@/components/editor/editor-form-controls"
 import { Badge } from "@/components/ui/badge"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Popover, PopoverTrigger } from "@/components/ui/popover"
+import { PopoverContent } from "@/components/workspace/workspace-overlays"
 import { Label } from "@/components/ui/label"
 import { Plus, Trash2, Settings2, X, Download } from "lucide-react"
-import { AnimatedSection, AnimatedItem } from "@/components/portfolio/animated-section"
+import { AnimatedSection, AnimatedItem } from "@/components/editor/editor-form-section"
 import type { ResumeData, EducationItem, ExperienceItem, SkillCategory } from "@/lib/types"
 
 interface ResumeFormProps {
@@ -165,12 +166,12 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
     }
 
     return (
-        <div className="space-y-8 max-w-4xl mx-auto pixel-text relative">
+        <div className="space-y-8 max-w-4xl mx-auto workspace-editor-copy relative">
             {/* Header */}
             <AnimatedSection variant="fadeIn" duration={0.6}>
                 <div className="flex justify-between items-center">
-                    <h1 className="text-3xl font-bold pixel-title">Resume</h1>
-                    <Button variant="outline" size="sm" className="border-2 border-[var(--cute-text)] rounded-none hover:bg-[var(--cute-highlight)] text-[var(--cute-text)] opacity-50 cursor-not-allowed">
+                    <h1 className="text-3xl font-bold workspace-editor-title">Resume</h1>
+                    <Button variant="outline" size="sm" className="border-2 border-[var(--workspace-white,#fffef5)] rounded-none hover:bg-[var(--workspace-blue,#0755d8)] text-[var(--workspace-white,#fffef5)] opacity-50 cursor-not-allowed">
                         <Download className="mr-2 h-4 w-4" /> Download PDF
                     </Button>
                 </div>
@@ -179,7 +180,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
             {/* Education Section */}
             <AnimatedSection variant="stagger" delay={0.1} staggerChildren={0.15} className="group/section relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-2xl font-bold pixel-title border-b-2 border-[var(--cute-text)] inline-block">Education</h2>
+                    <h2 className="text-2xl font-bold workspace-editor-title border-b-2 border-[var(--workspace-white,#fffef5)] inline-block">Education</h2>
                     <Button variant="ghost" size="sm" onClick={addEducation} className="h-8 w-8 p-0 opacity-70 group-hover/section:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                         <Plus className="w-4 h-4" />
                     </Button>
@@ -187,7 +188,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                 <div className="space-y-4">
                     {(data.education || []).map((edu, index) => (
                         <AnimatedItem key={index}>
-                            <Card className="pixel-card border-0 relative group">
+                            <Card className="workspace-editor-form-card border-0 relative group">
                                 <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10">
                                     <Button variant="ghost" size="sm" onClick={() => removeEducation(index)} className="h-6 w-6 p-0 text-red-500">
                                         <Trash2 className="w-3 h-3" />
@@ -199,7 +200,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                                             <Input
                                                 value={edu.degree}
                                                 onChange={(e) => updateEducation(index, "degree", e.target.value)}
-                                                className="font-bold text-lg pixel-text border-none bg-transparent shadow-none focus-visible:ring-0 h-auto p-0"
+                                                className="font-bold text-lg workspace-editor-copy border-none bg-transparent shadow-none focus-visible:ring-0 h-auto p-0"
                                                 placeholder="Degree"
                                             />
                                             <Input
@@ -212,7 +213,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                                         <Input
                                             value={edu.year}
                                             onChange={(e) => updateEducation(index, "year", e.target.value)}
-                                            className="mt-1 sm:mt-0 pixel-badge w-24 text-center border-none bg-transparent shadow-none focus-visible:ring-0 h-auto p-0"
+                                            className="mt-1 sm:mt-0 workspace-editor-badge w-24 text-center border-none bg-transparent shadow-none focus-visible:ring-0 h-auto p-0"
                                             placeholder="Year"
                                         />
                                     </div>
@@ -232,7 +233,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
             {/* Work Experience Section */}
             <AnimatedSection variant="stagger" delay={0.2} staggerChildren={0.15} className="group/section relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-2xl font-bold pixel-title border-b-2 border-[var(--cute-text)] inline-block">Work Experience</h2>
+                    <h2 className="text-2xl font-bold workspace-editor-title border-b-2 border-[var(--workspace-white,#fffef5)] inline-block">Work Experience</h2>
                     <Button variant="ghost" size="sm" onClick={addExperience} className="h-8 w-8 p-0 opacity-70 group-hover/section:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                         <Plus className="w-4 h-4" />
                     </Button>
@@ -240,7 +241,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                 <div className="space-y-4">
                     {(data.experience || []).map((exp, index) => (
                         <AnimatedItem key={index}>
-                            <Card className="pixel-card border-0 relative group">
+                            <Card className="workspace-editor-form-card border-0 relative group">
                                 <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10">
                                     <Button variant="ghost" size="sm" onClick={() => removeExperience(index)} className="h-6 w-6 p-0 text-red-500">
                                         <Trash2 className="w-3 h-3" />
@@ -252,7 +253,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                                             <Input
                                                 value={exp.role}
                                                 onChange={(e) => updateExperience(index, "role", e.target.value)}
-                                                className="font-bold text-lg pixel-text border-none bg-transparent shadow-none focus-visible:ring-0 h-auto p-0"
+                                                className="font-bold text-lg workspace-editor-copy border-none bg-transparent shadow-none focus-visible:ring-0 h-auto p-0"
                                                 placeholder="Role"
                                             />
                                             <Input
@@ -265,7 +266,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                                         <Input
                                             value={exp.period}
                                             onChange={(e) => updateExperience(index, "period", e.target.value)}
-                                            className="mt-1 sm:mt-0 pixel-badge w-32 text-center border-none bg-transparent shadow-none focus-visible:ring-0 h-auto p-0"
+                                            className="mt-1 sm:mt-0 workspace-editor-badge w-32 text-center border-none bg-transparent shadow-none focus-visible:ring-0 h-auto p-0"
                                             placeholder="Period"
                                         />
                                     </div>
@@ -273,7 +274,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                                         {exp.achievements.map((achievement, i) => (
                                             <li key={i} className="text-sm opacity-70 flex items-start group/li">
                                                 <span className="flex-1">{achievement}</span>
-                                                <button onClick={() => removeAchievement(index, i)} className="opacity-70 group-hover/li:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 text-red-500 ml-2">
+                                                <button data-workspace-control onClick={() => removeAchievement(index, i)} className="opacity-70 group-hover/li:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 text-red-500 ml-2">
                                                     <X className="w-3 h-3" />
                                                 </button>
                                             </li>
@@ -301,7 +302,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
             {/* Leadership Experience Section */}
             <AnimatedSection variant="stagger" delay={0.25} staggerChildren={0.15} className="group/section relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-2xl font-bold pixel-title border-b-2 border-[var(--cute-text)] inline-block">Leadership Experience</h2>
+                    <h2 className="text-2xl font-bold workspace-editor-title border-b-2 border-[var(--workspace-white,#fffef5)] inline-block">Leadership Experience</h2>
                     <Button variant="ghost" size="sm" onClick={addLeadership} className="h-8 w-8 p-0 opacity-70 group-hover/section:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                         <Plus className="w-4 h-4" />
                     </Button>
@@ -309,7 +310,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                 <div className="space-y-4">
                     {(data.leadership || []).map((lead, index) => (
                         <AnimatedItem key={index}>
-                            <Card className="pixel-card border-0 relative group">
+                            <Card className="workspace-editor-form-card border-0 relative group">
                                 <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10">
                                     <Button variant="ghost" size="sm" onClick={() => removeLeadership(index)} className="h-6 w-6 p-0 text-red-500">
                                         <Trash2 className="w-3 h-3" />
@@ -321,7 +322,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                                             <Input
                                                 value={lead.role}
                                                 onChange={(e) => updateLeadership(index, "role", e.target.value)}
-                                                className="font-bold text-lg pixel-text border-none bg-transparent shadow-none focus-visible:ring-0 h-auto p-0"
+                                                className="font-bold text-lg workspace-editor-copy border-none bg-transparent shadow-none focus-visible:ring-0 h-auto p-0"
                                                 placeholder="Role"
                                             />
                                             <Input
@@ -334,7 +335,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                                         <Input
                                             value={lead.period}
                                             onChange={(e) => updateLeadership(index, "period", e.target.value)}
-                                            className="mt-1 sm:mt-0 pixel-badge w-32 text-center border-none bg-transparent shadow-none focus-visible:ring-0 h-auto p-0"
+                                            className="mt-1 sm:mt-0 workspace-editor-badge w-32 text-center border-none bg-transparent shadow-none focus-visible:ring-0 h-auto p-0"
                                             placeholder="Period"
                                         />
                                     </div>
@@ -342,7 +343,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                                         {lead.achievements.map((achievement, i) => (
                                             <li key={i} className="text-sm opacity-70 flex items-start group/li">
                                                 <span className="flex-1">{achievement}</span>
-                                                <button onClick={() => removeLeadershipAchievement(index, i)} className="opacity-70 group-hover/li:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 text-red-500 ml-2">
+                                                <button data-workspace-control onClick={() => removeLeadershipAchievement(index, i)} className="opacity-70 group-hover/li:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 text-red-500 ml-2">
                                                     <X className="w-3 h-3" />
                                                 </button>
                                             </li>
@@ -370,7 +371,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
             {/* Skills Section */}
             <AnimatedSection variant="stagger" delay={0.3} staggerChildren={0.1} className="group/section relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-2xl font-bold pixel-title border-b-2 border-[var(--cute-text)] inline-block">Skills</h2>
+                    <h2 className="text-2xl font-bold workspace-editor-title border-b-2 border-[var(--workspace-white,#fffef5)] inline-block">Skills</h2>
                     <Button variant="ghost" size="sm" onClick={addSkillCategory} className="h-8 w-8 p-0 opacity-70 group-hover/section:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity">
                         <Plus className="w-4 h-4" />
                     </Button>
@@ -378,7 +379,7 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
                     {(data.skills || []).map((category, index) => (
                         <AnimatedItem key={index}>
-                            <Card className="h-full pixel-card border-0 relative group">
+                            <Card className="h-full workspace-editor-form-card border-0 relative group">
                                 <div className="absolute right-2 top-2 opacity-70 group-hover:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 transition-opacity z-10">
                                     <Button variant="ghost" size="sm" onClick={() => removeSkillCategory(index)} className="h-6 w-6 p-0 text-red-500">
                                         <Trash2 className="w-3 h-3" />
@@ -394,14 +395,14 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
                                         <Input
                                             value={category.name}
                                             onChange={(e) => updateSkillCategory(index, "name", e.target.value)}
-                                            className="text-xl font-bold pixel-text border-none bg-transparent shadow-none focus-visible:ring-0 h-auto p-0"
+                                            className="text-xl font-bold workspace-editor-copy border-none bg-transparent shadow-none focus-visible:ring-0 h-auto p-0"
                                         />
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         {category.skills.map((skill, i) => (
-                                            <Badge key={i} variant="secondary" className="text-sm py-1 pixel-badge hover:bg-[var(--cute-highlight)] gap-1 pr-1">
+                                            <Badge key={i} variant="secondary" className="text-sm py-1 workspace-editor-badge hover:bg-[var(--workspace-blue,#0755d8)] gap-1 pr-1">
                                                 {skill}
-                                                <button onClick={() => removeSkillFromCategory(index, i)} className="hover:text-red-500">
+                                                <button data-workspace-control onClick={() => removeSkillFromCategory(index, i)} className="hover:text-red-500">
                                                     <X className="w-3 h-3" />
                                                 </button>
                                             </Badge>
@@ -426,21 +427,21 @@ export function ResumeForm({ initialData, onChange }: ResumeFormProps) {
 
             {/* Interests Section */}
             <AnimatedSection variant="slideUp" delay={0.4} className="group/section relative border-2 border-transparent hover:border-dashed hover:border-primary/50 p-4 rounded-lg transition-colors">
-                <h2 className="text-2xl font-bold mb-4 pixel-title border-b-2 border-[var(--cute-text)] inline-block">Interests</h2>
-                <Card className="pixel-card border-0">
+                <h2 className="text-2xl font-bold mb-4 workspace-editor-title border-b-2 border-[var(--workspace-white,#fffef5)] inline-block">Interests</h2>
+                <Card className="workspace-editor-form-card border-0">
                     <CardContent className="pt-6">
                         <ul className="space-y-2">
                             {(data.interests || []).map((interest, index) => (
                                 <li key={index} className="flex items-center group/li">
-                                    <div className="mr-2 h-2 w-2 rounded-none bg-[var(--cute-text)]"></div>
-                                    <span className="pixel-text flex-1">{interest}</span>
-                                    <button onClick={() => removeInterest(index)} className="opacity-70 group-hover/li:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 text-red-500">
+                                    <div className="mr-2 h-2 w-2 rounded-none bg-[var(--workspace-white,#fffef5)]"></div>
+                                    <span className="workspace-editor-copy flex-1">{interest}</span>
+                                    <button data-workspace-control onClick={() => removeInterest(index)} className="opacity-70 group-hover/li:opacity-100 focus-within:opacity-100 focus-visible:opacity-100 text-red-500">
                                         <X className="w-3 h-3" />
                                     </button>
                                 </li>
                             ))}
                             <li className="flex items-center">
-                                <div className="mr-2 h-2 w-2 rounded-none bg-[var(--cute-text)] opacity-50"></div>
+                                <div className="mr-2 h-2 w-2 rounded-none bg-[var(--workspace-white,#fffef5)] opacity-50"></div>
                                 <Input
                                     placeholder="Add interest..."
                                     className="border-none bg-transparent shadow-none focus-visible:ring-0 h-auto p-0"

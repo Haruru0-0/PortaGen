@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useRef, useState } from "react"
-import { PixelCard } from "@/components/pixel-card"
+import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
 import { Monitor, Smartphone, Lock, Unlock, Maximize2, Minimize2 } from "lucide-react"
 import { LockScreen } from "@/components/portfolio/lock-screen"
 import Desktop from "@/components/portfolio/desktop"
@@ -39,10 +39,10 @@ export function PreviewPanel() {
     const fontClass = selectedFont?.className || ""
 
     return (
-        <PixelCard className={`transition-all duration-300 ${isFullScreen ? "fixed inset-0 z-50 m-0 rounded-none w-screen h-screen border-0" : ""}`}>
+        <PixelCard className={`workspace-editor-preview-shell ${isFullScreen ? "fixed inset-0 z-50 m-0 rounded-none w-screen h-screen border-0" : ""}`}>
             <div className="space-y-4 h-full flex flex-col">
-                <div className="flex flex-col md:flex-row md:items-center justify-between flex-wrap gap-4">
-                    <h3 className="text-sm dashboard-pixel-text-shadow">LIVE PREVIEW</h3>
+                <div className="workspace-controls flex flex-col md:flex-row md:items-center justify-between flex-wrap gap-4">
+                    <h3 className="text-sm workspace-editor-title">LIVE PREVIEW</h3>
                     <div className="flex gap-3 flex-col md:flex-row flex-wrap md:items-center">
                         {/* Screen Size Toggle */}
                         <div className="flex flex-col md:flex-row md:items-center gap-2">
@@ -54,7 +54,7 @@ export function PreviewPanel() {
                                         if (isNarrow) setIsFullScreen(true)
                                     }}
                                     aria-pressed={previewMode === "desktop"}
-                                    className={`min-h-10 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 ${previewMode === "desktop"
+                                    className={`min-h-11 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 ${previewMode === "desktop"
                                         ? "bg-primary text-primary-foreground"
                                         : "bg-card hover:bg-muted"
                                         }`}
@@ -66,7 +66,7 @@ export function PreviewPanel() {
                                 <button
                                     onClick={() => setPreviewMode("mobile")}
                                     aria-pressed={previewMode === "mobile"}
-                                    className={`min-h-10 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 ${previewMode === "mobile"
+                                    className={`min-h-11 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 ${previewMode === "mobile"
                                         ? "bg-primary text-primary-foreground"
                                         : "bg-card hover:bg-muted"
                                         }`}
@@ -83,7 +83,7 @@ export function PreviewPanel() {
                             <div className="flex items-center gap-1">
                                 <button
                                     onClick={() => setIsLocked(true)}
-                                    className={`min-h-10 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 ${isLocked
+                                    className={`min-h-11 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 ${isLocked
                                         ? "bg-primary text-primary-foreground"
                                         : "bg-card hover:bg-muted"
                                         }`}
@@ -93,7 +93,7 @@ export function PreviewPanel() {
                                 </button>
                                 <button
                                     onClick={() => setIsLocked(false)}
-                                    className={`min-h-10 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 ${!isLocked
+                                    className={`min-h-11 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 ${!isLocked
                                         ? "bg-primary text-primary-foreground"
                                         : "bg-card hover:bg-muted"
                                         }`}
@@ -108,7 +108,7 @@ export function PreviewPanel() {
                         <div className="flex items-center gap-1">
                             <button
                                 onClick={() => setIsFullScreen(!isFullScreen)}
-                                className={`min-h-10 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 bg-card hover:bg-muted`}
+                                className={`min-h-11 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 bg-card hover:bg-muted`}
                                 title={isFullScreen ? "Exit Full Screen" : "Full Screen"}
                             >
                                 {isFullScreen ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
@@ -118,7 +118,7 @@ export function PreviewPanel() {
                     </div>
                 </div>
 
-                <div className="flex-1 border-4 border-border relative bg-muted overflow-hidden" style={{ zIndex: 1 }}>
+                <div className="workspace-preview flex-1 border-4 border-border relative bg-muted overflow-hidden" style={{ zIndex: 1 }}>
                     <div ref={stageContainerRef} className={`w-full h-full ${fontClass}`}>
                         {previewMode === "mobile" ? (
                             <div className="mx-auto max-w-[375px] h-[800px] min-[1400px]:h-[max(560px,calc(100vh-17rem))]">
