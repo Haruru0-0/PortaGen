@@ -4,5 +4,5 @@ export type HeroMedia = {
     settledPoster: string;
 };
 export const INTRO_STORAGE_KEY = 'portagen:blue-hour-intro:v1';
-export const HERO_MEDIA: HeroMedia = { entranceSrc: '/media/blue-hour/shin-entrance.mp4', emptyPoster: '/media/blue-hour/empty-water.webp', settledPoster: '/media/blue-hour/settled-shin.webp' };
+export const HERO_MEDIA: HeroMedia = { entranceSrc: '/media/blue-hour/shin-entrance.mp4', emptyPoster: '/media/blue-hour/empty-water.webp', settledPoster: '/artwork/eighty-six/reference-set/10-shin-tilted-portrait.webp' };
 export const ENTRANCE_TIMEOUT_MS = 2000;

@@ -64,7 +64,7 @@
 .blue-hour-landing {overflow:clip;background:#061039;color:#fffef5}
 .entrance-hero {position:relative;min-height: min(900px,100svh);height: max(740px,100svh);max-height:1080px;isolation:isolate;background:#063479;display:flex;align-items:center}
 .entrance-art {position:absolute;inset:0;overflow:hidden;z-index:-2;background:#073c81}
-.entrance-settled {position:absolute;width:100%;height:100%;object-fit:contain;object-position:right center;background-position:right center;background-size:contain;background-repeat:no-repeat}
+.entrance-settled {position:absolute;inset:0;background-position:right top;background-size:cover;background-repeat:no-repeat}
 .entrance-art::after {content:'';position:absolute;inset:0;background:linear-gradient(90deg,#061039ce 0%,#06103960 38%,transparent 66%),linear-gradient(0deg,#061039 0%,transparent 23%)}
 .water-light {position:absolute;inset:-8%;opacity:.16;background:radial-gradient(ellipse at 20% 0%,#44e4ff80,transparent 45%),radial-gradient(ellipse at 75% 45%,transparent 35%,#44e4ff50 36%,transparent 39%);animation:water-drift 12s ease-in-out infinite alternate;pointer-events:none}
 @keyframes water-drift {from{transform:translate3d(-1%,0,0) rotate(-2deg)}to{transform:translate3d(1%,2%,0) rotate(2deg)}}
@@ -197,11 +197,10 @@
 .workspace-slot {display:flex;align-items:center;gap:1rem;text-align:left;border:1px solid #415780;border-radius:8px;background:#101f4d;color:#fffef5;padding:1.25rem;min-height:80px;cursor:pointer}
 .workspace-slot[aria-pressed=true] {background:#fffef5;color:#061039;border-color:#fffef5}
 .workspace-slot-detail {min-width:0}
-@media(min-width:1600px) {.entrance-settled {object-fit:contain;background-size:contain}}
 @media(max-width:1023px) {
  .entrance-hero {height:auto;min-height:850px;align-items:flex-end}
  .entrance-art {height:66%;inset:0 0 auto}
- .entrance-settled {object-position:center top;background-position:center top}
+ .entrance-settled {background-position:right top}
  .entrance-art::after {background:linear-gradient(0deg,#061039 0%,transparent 50%)}
  .entrance-hero {background:#061039}
  .entrance-menu {width:100%;padding:22rem 2rem 6rem;position:relative}
@@ -215,7 +214,7 @@
 @media(max-width:767px) {
  .landing-header {padding:1rem 1.25rem}.landing-header .ws-icon-control span {display:none}
  .entrance-hero {min-height:790px}
- .entrance-art {height:auto;aspect-ratio:16/9;top:4.5rem}
+ .entrance-art {height:auto;aspect-ratio:16/10;top:0}
  .entrance-menu {padding:calc(56.25vw + 4rem) 1.25rem 6rem}
  .entrance-menu h1 {font-size:clamp(2.8rem,11.5vw,4.4rem);line-height:.9;max-width:none;margin-bottom:1.5rem}
  .entrance-menu>p {font-size:1rem;margin-bottom:1.25rem}
