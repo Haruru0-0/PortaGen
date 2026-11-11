@@ -15,6 +15,8 @@ import { useFileUpload } from "@/hooks/use-file-upload";
 import Image from "next/image";
 import { AssetPicker } from "@/components/common/asset-picker";
 import { Asset } from "@/lib/types";
+import { assetUrl } from "@/lib/asset-url"
+import { useAssetCleanup } from "@/hooks/use-asset-cleanup"
 
 interface EditIconModalProps {
   isOpen: boolean;
@@ -44,12 +46,13 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
   const params = useParams<{ id: string }>()
   const currentPortfolioId = Number(params?.id)
   const { uploadFile, uploading } = useFileUpload()
+  const { cleanupAsset, cleanupDialog } = useAssetCleanup()
   const [assetPickerOpen, setAssetPickerOpen] = useState(false)
 
   useEffect(() => {
     if (icon) {
       form.reset({ name: icon.name || '', linkType: icon.linkType || 'window', url: icon.url || '', fileId: icon.iconAssetId, iconImageUrl: icon.iconImageUrl || '' })
-      setPreview(icon.iconImageUrl || `https://drive.google.com/uc?id=${icon.icon?.fileId}` || '')
+      setPreview(icon.iconImageUrl || assetUrl(icon.icon) || '')
       setSelectedFile(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -74,15 +77,36 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
         return
       }
       values = { ...values, fileId: res.data.id }
-      if (res.data.fileId) setPreview(`https://drive.google.com/uc?id=${res.data.fileId}`)
+      if (res.data.fileId) setPreview(assetUrl(res.data))
     }
     const updated = await updateIcon(currentPortfolioId, { id: icon.id, ...values })
     onUpdated(updated)
   }
 
+  const handleRemoveImage = async () => {
+    if (!icon || !currentPortfolioId) return
+    // A picture that was only chosen in this dialog and not saved yet: just drop it.
+    if (selectedFile) {
+      setSelectedFile(null)
+      form.setValue("fileId", icon.iconAssetId)
+      setPreview(icon.iconImageUrl || assetUrl(icon.icon) || "")
+      return
+    }
+    const asset = icon.icon
+    if (icon.iconAssetId || icon.iconImageUrl) {
+      const updated = await updateIcon(currentPortfolioId, { id: icon.id, clearImage: true })
+      onUpdated(updated)
+    }
+    // The icon no longer uses the file, so anything still using it is somewhere else.
+    await cleanupAsset(asset)
+    form.setValue("fileId", undefined)
+    form.setValue("iconImageUrl", "")
+    setPreview("")
+  }
+
   const handleAssetSelect = async (asset: Asset) => {
     form.setValue("fileId", asset.id)
-    setPreview(`https://drive.google.com/thumbnail?id=${asset.fileId}` || `https://drive.google.com/uc?id=${asset.fileId}`)
+    setPreview(assetUrl(asset, "thumbnail"))
     setSelectedFile(null)
   }
 
@@ -129,7 +153,8 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
                 <Image src={preview} width={64} height={64} alt="Icon preview" className="border-4 border-border object-cover" />
               </div>
             )}
-            <FileUpload accept="image/*" onFileSelect={handleUpload} maxSize={1} label={preview ? "REPLACE IMAGE" : "UPLOAD IMAGE"} />
+            <FileUpload accept="image/*" onFileSelect={handleUpload} maxSize={1} label={preview ? "REPLACE IMAGE" : "UPLOAD IMAGE"}
+              preview={preview} onRemove={handleRemoveImage} removeLabel="REMOVE IMAGE" />
             <PixelButton
               variant="secondary"
               className="w-full text-xs flex items-center justify-center gap-2"
@@ -176,6 +201,7 @@ export function EditIconModal({ isOpen, icon, onClose, onUpdated }: EditIconModa
           </div>
         </form>
       </Form>
+      {cleanupDialog}
       <AssetPicker
         isOpen={assetPickerOpen}
         onClose={() => setAssetPickerOpen(false)}

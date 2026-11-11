@@ -19,6 +19,7 @@ export const useTheme = () => useThemeStore((state) => ({
     colors: state.colors,
     font: state.font,
     taskbarStyleId: state.taskbarStyleId,
+    lockScreenStyleId: state.lockScreenStyleId,
     menubarStyleId: state.menubarStyleId,
     windowStyleId: state.windowStyleId,
     musicPlayerStyleId: state.musicPlayerStyleId,

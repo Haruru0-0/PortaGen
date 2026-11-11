@@ -12,6 +12,7 @@ import CinamonExit from "@/assets/CinamonExit.png";
 import { Slider } from "@/components/ui/slider";
 import SliderIcon from "@/assets/SliderIcon.png";
 import { Track } from "@/lib/types";
+import { SoundCloudCredit } from "./SoundCloudCredit";
 
 interface MobilePlayerProps {
     playerRef: React.RefObject<HTMLDivElement | null>;
@@ -131,6 +132,7 @@ export const MobilePlayer: React.FC<MobilePlayerProps> = ({
                                             .join(", ")) ||
                                         currentTrack.artist}
                                 </p>
+                                <SoundCloudCredit track={currentTrack} />
                             </div>
 
                             <div className="flex items-center justify-between w-full">

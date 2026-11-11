@@ -39,7 +39,7 @@ export default async function DashboardPage() {
 
   const checklistItems = [
     { id: 'CREATE_PORTFOLIO', task: "CREATE YOUR FIRST PORTFOLIO", href: "/dashboard/portfolios", done: checklist.CREATE_PORTFOLIO },
-    { id: 'UPLOAD_WALLPAPER', task: "UPLOAD A WALLPAPER", href: "/dashboard/assets", done: checklist.UPLOAD_WALLPAPER },
+    { id: 'UPLOAD_WALLPAPER', task: "UPLOAD A WALLPAPER", href: "/dashboard/portfolios", done: checklist.UPLOAD_WALLPAPER },
     { id: 'ADD_DESKTOP_ICONS', task: "ADD DESKTOP ICONS", href: "/dashboard/portfolios", done: checklist.ADD_DESKTOP_ICONS },
     { id: 'EMBED_MUSIC', task: "EMBED MUSIC", href: "/dashboard/portfolios", done: checklist.EMBED_MUSIC },
   ];

@@ -9,6 +9,7 @@ import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal"
 import { AddIconModal } from "@/components/editor/modals/AddIconModal";
 import { EditIconModal } from "@/components/editor/modals/EditIconModal";
 import { useParams } from "next/navigation";
+import { assetUrl } from "@/lib/asset-url"
 
 export function IconsTab() {
     const { icons, deleteIcon, setIcons, getAllIcons } = useIconContext()
@@ -47,7 +48,7 @@ export function IconsTab() {
                         >
                             <div className="flex items-center gap-3">
                                 <Image
-                                    src={icon.iconImageUrl || (icon.icon?.fileId ? `https://drive.google.com/uc?id=${icon.icon.fileId}` : Placeholder)}
+                                    src={icon.iconImageUrl || (icon.icon?.fileId ? assetUrl(icon.icon) : Placeholder)}
                                     alt={icon.name}
                                     width={32}
                                     height={32}

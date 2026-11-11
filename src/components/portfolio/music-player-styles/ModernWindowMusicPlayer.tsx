@@ -6,6 +6,7 @@ import MusicPlayerImage from "@/assets/MusicPlayerImage.png"
 import MusicWallpaper from "@/assets/MusicWallPaper.gif"
 import { Loader2, Pause, Play, SkipBack, SkipForward, List, X } from "lucide-react"
 import { Slider } from "@/components/ui/slider"
+import { SoundCloudCredit } from "../music-player/SoundCloudCredit"
 
 export function ModernWindowMusicPlayer(props: MusicPlayerStyleProps) {
     const { playerType, embedded, playerRef, buttonsRef, handleExpandClick, handleButtonClick,
@@ -162,6 +163,7 @@ export function ModernWindowMusicPlayer(props: MusicPlayerStyleProps) {
                                         <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium">
                                             {(useSpotify && spotifyCurrentTrack?.artists?.map((a) => a.name).join(", ")) || currentTrack.artist}
                                         </p>
+                                        <SoundCloudCredit track={currentTrack} />
                                     </div>
                                 </div>
                             )
@@ -303,6 +305,7 @@ export function ModernWindowMusicPlayer(props: MusicPlayerStyleProps) {
                                         <p className="text-[11px] truncate w-full text-zinc-500 dark:text-zinc-400">
                                             {(useSpotify && spotifyCurrentTrack?.artists?.map((a) => a.name).join(", ")) || currentTrack.artist}
                                         </p>
+                                        <SoundCloudCredit track={currentTrack} />
                                     </div>
 
                                     <div className="flex items-center justify-between w-full">

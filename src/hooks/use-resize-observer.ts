@@ -2,12 +2,24 @@
 
 import { useEffect, useState, type RefObject } from "react"
 
-export function useResizeObserver<T extends HTMLElement>(ref: RefObject<T> | RefObject<T | null>) {
+type Target<T extends HTMLElement> = RefObject<T> | RefObject<T | null> | T | null
+
+function isRef<T extends HTMLElement>(target: Target<T>): target is RefObject<T> | RefObject<T | null> {
+  return target !== null && "current" in target
+}
+
+/**
+ * Observes an element's size. Pass a ref object, or the element itself (kept in state)
+ * so the observer re-attaches when the element is swapped, e.g. a window going maximized.
+ */
+export function useResizeObserver<T extends HTMLElement>(target: Target<T>) {
   const [width, setWidth] = useState(0)
   const [height, setHeight] = useState(0)
+  const element = isRef(target) ? target.current : target
 
   useEffect(() => {
-    if (!ref.current) return
+    const el = isRef(target) ? target.current : target
+    if (!el) return
 
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
@@ -16,12 +28,13 @@ export function useResizeObserver<T extends HTMLElement>(ref: RefObject<T> | Ref
       }
     })
 
-    observer.observe(ref.current)
+    observer.observe(el)
 
     return () => {
       observer.disconnect()
     }
-  }, [ref])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [element, isRef(target) ? target : null])
 
   return { width, height }
 }

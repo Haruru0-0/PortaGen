@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 import { db } from '@/lib/db'
 import { uploadedAssets } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
+import { getAssetUsage } from '@/lib/asset-usage'
 import { getUserBySupabaseId } from '@/lib/db/helpers'
 
 export async function GET(req: NextRequest) {
@@ -31,9 +32,14 @@ export async function GET(req: NextRequest) {
             orderBy: (uploadedAssets, { desc }) => [desc(uploadedAssets.uploadedAt)],
         })
 
+        // Where each asset is used, so a delete can warn about it.
+        const usage = await getAssetUsage(user.id)
+
         const formattedAssets = assets.map(asset => ({
+            usedIn: usage.get(asset.id) ?? [],
             id: asset.id,
             fileId: asset.fileId,
+            url: asset.url,
             name: asset.fileName,
             type: asset.assetType,
             size: formatFileSize(asset.fileSize || 0),

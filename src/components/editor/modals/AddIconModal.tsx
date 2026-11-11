@@ -15,6 +15,7 @@ import { useFileUpload } from "@/hooks/use-file-upload";
 import Image from "next/image";
 import { AssetPicker } from "@/components/common/asset-picker";
 import { Asset } from "@/lib/types";
+import { assetUrl } from "@/lib/asset-url"
 
 interface AddIconModalProps {
   isOpen: boolean;
@@ -71,7 +72,7 @@ export function AddIconModal({ isOpen, onClose, onCreated }: AddIconModalProps) 
         return
       }
       payload = { ...payload, fileId: res.data.id }
-      if (res.data.fileId) setPreview(`https://drive.google.com/uc?id=${res.data.fileId}`)
+      if (res.data.fileId) setPreview(assetUrl(res.data))
     }
     const created = await addIcon(currentPortfolioId, {
       name: payload.name,
@@ -86,9 +87,16 @@ export function AddIconModal({ isOpen, onClose, onCreated }: AddIconModalProps) 
     setSelectedFile(null)
   }
 
+  const handleDiscardImage = () => {
+    // Nothing is saved yet, so this only drops the picture chosen in this dialog.
+    setSelectedFile(null)
+    form.setValue("fileId", undefined)
+    setPreview("")
+  }
+
   const handleAssetSelect = async (asset: Asset) => {
     form.setValue("fileId", asset.id)
-    setPreview(`https://drive.google.com/thumbnail?id=${asset.fileId}` || `https://drive.google.com/uc?id=${asset.fileId}`)
+    setPreview(assetUrl(asset, "thumbnail"))
     setSelectedFile(null)
   }
 
@@ -112,7 +120,8 @@ export function AddIconModal({ isOpen, onClose, onCreated }: AddIconModalProps) 
                 <Image src={preview} width={64} height={64} alt="Icon preview" className="border-4 border-border object-cover" />
               </div>
             )}
-            <FileUpload accept="image/*" onFileSelect={handleUpload} maxSize={1} label={preview && "REPLACE IMAGE"} />
+            <FileUpload accept="image/*" onFileSelect={handleUpload} maxSize={1} label={preview && "REPLACE IMAGE"}
+              preview={preview} onRemove={handleDiscardImage} removeLabel="REMOVE IMAGE" />
             <PixelButton
               variant="secondary"
               className="w-full text-xs flex items-center justify-center gap-2"

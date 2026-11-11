@@ -38,7 +38,7 @@ const SnapZone = ({
     type: SnapType;
 }) => (
     <div
-        className={`bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-blue-400 dark:hover:bg-blue-600 transition-colors cursor-pointer ${className}`}
+        className={`snap-zone cursor-pointer ${className}`}
         onMouseDown={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -51,10 +51,26 @@ const SnapZone = ({
     />
 );
 
+const SnapCell = ({
+    label,
+    children,
+}: {
+    label: string;
+    children: React.ReactNode;
+}) => (
+    <div className="flex flex-col gap-1">
+        {/* overflow-hidden keeps zones inside the border frame */}
+        <div className="snap-cell flex gap-px h-10 w-full overflow-hidden">
+            {children}
+        </div>
+        <span className="snap-label">{label}</span>
+    </div>
+);
+
 export function SnapMenu({ onSnap, onMouseEnter, onMouseLeave }: SnapMenuProps) {
     return (
         <div
-            className="absolute top-full right-0 pt-2 z-50 w-[280px]"
+            className="absolute top-full right-0 pt-1 z-50 w-[220px]"
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
             onMouseDown={(e) => {
@@ -66,49 +82,51 @@ export function SnapMenu({ onSnap, onMouseEnter, onMouseLeave }: SnapMenuProps) 
                 e.stopPropagation();
             }}
         >
-            <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl p-4 grid grid-cols-3 gap-4">
-                {/* 1. 50/50 Split */}
-                <div className="flex gap-1 h-16 w-full group">
-                    <SnapZone className="w-1/2 h-full" onSnap={onSnap} type="left" />
-                    <SnapZone className="w-1/2 h-full" onSnap={onSnap} type="right" />
-                </div>
+            <div className="snap-menu-panel grid grid-cols-3 gap-2">
+                {/* 1. 50/50 — equal flex */}
+                <SnapCell label="50/50">
+                    <SnapZone className="flex-1 h-full" onSnap={onSnap} type="left" />
+                    <SnapZone className="flex-1 h-full" onSnap={onSnap} type="right" />
+                </SnapCell>
 
-                {/* 2. 60/40 Split */}
-                <div className="flex gap-1 h-16 w-full group">
-                    <SnapZone className="w-[60%] h-full" onSnap={onSnap} type="left-wide" />
-                    <SnapZone className="w-[40%] h-full" onSnap={onSnap} type="right-narrow" />
-                </div>
+                {/* 2. 60/40 — 3:2 ratio */}
+                <SnapCell label="60/40">
+                    <SnapZone className="flex-[3] h-full min-w-0" onSnap={onSnap} type="left-wide" />
+                    <SnapZone className="flex-[2] h-full min-w-0" onSnap={onSnap} type="right-narrow" />
+                </SnapCell>
 
-                {/* 3. Three Columns */}
-                <div className="flex gap-1 h-16 w-full group">
-                    <SnapZone className="w-1/3 h-full" onSnap={onSnap} type="three-col-left" />
-                    <SnapZone className="w-1/3 h-full" onSnap={onSnap} type="three-col-center" />
-                    <SnapZone className="w-1/3 h-full" onSnap={onSnap} type="three-col-right" />
-                </div>
+                {/* 3. Three equal columns */}
+                <SnapCell label="3-COL">
+                    <SnapZone className="flex-1 h-full" onSnap={onSnap} type="three-col-left" />
+                    <SnapZone className="flex-1 h-full" onSnap={onSnap} type="three-col-center" />
+                    <SnapZone className="flex-1 h-full" onSnap={onSnap} type="three-col-right" />
+                </SnapCell>
 
-                {/* 4. Grid (Quadrants) */}
-                <div className="grid grid-cols-2 gap-1 h-16 w-full group">
-                    <SnapZone className="h-full" onSnap={onSnap} type="four-grid-top-left" />
-                    <SnapZone className="h-full" onSnap={onSnap} type="four-grid-top-right" />
-                    <SnapZone className="h-full" onSnap={onSnap} type="four-grid-bottom-left" />
-                    <SnapZone className="h-full" onSnap={onSnap} type="four-grid-bottom-right" />
-                </div>
-
-                {/* 5. Left Half / Right Quarters */}
-                <div className="flex gap-1 h-16 w-full group">
-                    <SnapZone className="w-1/2 h-full" onSnap={onSnap} type="left" />
-                    <div className="flex flex-col gap-1 w-1/2 h-full">
-                        <SnapZone className="h-1/2 w-full" onSnap={onSnap} type="left-half-right-top" />
-                        <SnapZone className="h-1/2 w-full" onSnap={onSnap} type="left-half-right-bottom" />
+                {/* 4. 2×2 grid — single flex child that's a grid */}
+                <SnapCell label="GRID">
+                    <div className="flex-1 grid grid-cols-2 gap-px h-full min-w-0">
+                        <SnapZone className="h-full" onSnap={onSnap} type="four-grid-top-left" />
+                        <SnapZone className="h-full" onSnap={onSnap} type="four-grid-top-right" />
+                        <SnapZone className="h-full" onSnap={onSnap} type="four-grid-bottom-left" />
+                        <SnapZone className="h-full" onSnap={onSnap} type="four-grid-bottom-right" />
                     </div>
-                </div>
+                </SnapCell>
 
-                {/* 6. Center Wide */}
-                <div className="flex gap-1 h-16 w-full group">
-                    <SnapZone className="w-1/4 h-full" onSnap={onSnap} type="center-wide-left" />
-                    <SnapZone className="w-1/2 h-full" onSnap={onSnap} type="center-wide-center" />
-                    <SnapZone className="w-1/4 h-full" onSnap={onSnap} type="center-wide-right" />
-                </div>
+                {/* 5. Left half / right stacked quarters */}
+                <SnapCell label="L+2R">
+                    <SnapZone className="flex-1 h-full" onSnap={onSnap} type="left" />
+                    <div className="flex-1 flex flex-col gap-px h-full min-w-0">
+                        <SnapZone className="flex-1 w-full" onSnap={onSnap} type="left-half-right-top" />
+                        <SnapZone className="flex-1 w-full" onSnap={onSnap} type="left-half-right-bottom" />
+                    </div>
+                </SnapCell>
+
+                {/* 6. Center wide — 1:2:1 ratio */}
+                <SnapCell label="C-WIDE">
+                    <SnapZone className="flex-1 h-full" onSnap={onSnap} type="center-wide-left" />
+                    <SnapZone className="flex-[2] h-full min-w-0" onSnap={onSnap} type="center-wide-center" />
+                    <SnapZone className="flex-1 h-full" onSnap={onSnap} type="center-wide-right" />
+                </SnapCell>
             </div>
         </div>
     );

@@ -15,6 +15,7 @@ import { AchievementsForm } from "./forms/achievements-form"
 import { DEFAULT_CONTENT_BY_TYPE } from "@/lib/portfolio-extras"
 import { uploadFile } from "@/lib/services/uploadService"
 import { useWindowsContext } from "@/contexts/windowsContext"
+import { assetUrl } from "@/lib/asset-url"
 
 // Template definitions metadata
 const CONTENT_TEMPLATES: Record<WindowContentType, {
@@ -167,7 +168,7 @@ export function WindowContentEditor({ windowId, portfolioId, onSave, onCancel }:
             for (const [path, file] of filesToUpload.entries()) {
                 const asset = await uploadFile(file, portfolioId)
                 if (asset) {
-                    uploadedUrls.set(path, `https://drive.google.com/uc?id=${asset.fileId}`)
+                    uploadedUrls.set(path, assetUrl(asset))
                 }
             }
 

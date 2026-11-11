@@ -17,6 +17,7 @@ export interface Theme {
     colors: ThemeColors
     font: string
     taskbarStyleId: string
+    lockScreenStyleId?: string
     menubarStyleId: string
     windowStyleId: string
     musicPlayerStyleId: string

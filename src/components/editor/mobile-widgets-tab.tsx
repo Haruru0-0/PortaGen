@@ -12,6 +12,8 @@ import { AssetPicker } from "@/components/common/asset-picker"
 import { Library } from "lucide-react"
 import { Asset } from "@/lib/types"
 import Image from "next/image"
+import { assetUrl } from "@/lib/asset-url"
+import { useAssetCleanup } from "@/hooks/use-asset-cleanup"
 
 export function MobileWidgetsTab() {
     const params = useParams<{ id: string }>()
@@ -19,6 +21,7 @@ export function MobileWidgetsTab() {
     const { data, getDesktopData, updateWidget } = useDesktopContext()
     const { setMobileWidget1, setMobileWidget2, pendingWidget1File, setPendingWidget1File, pendingWidget2File, setPendingWidget2File } = useDesktopStore()
     const { uploadFile, uploading } = useFileUpload()
+    const { cleanupAsset, cleanupDialog } = useAssetCleanup()
 
     const [renameOpen1, setRenameOpen1] = useState(false)
     const [renameOpen2, setRenameOpen2] = useState(false)
@@ -143,15 +146,35 @@ export function MobileWidgetsTab() {
         await updateWidget(currentPortfolioId, 2, null, urlInput2)
     }
 
+    const handleRemoveWidget = async (index: 1 | 2) => {
+        if (!currentPortfolioId) return
+        // Back to the default picture. The uploaded file stays in the library.
+        const asset = index === 1 ? data?.widget1Asset : data?.widget2Asset
+        const saved = asset || (index === 1 ? data?.widget1Url : data?.widget2Url)
+        if (saved) await updateWidget(currentPortfolioId, index, null)
+        await cleanupAsset(asset)
+        if (index === 1) {
+            setMobileWidget1("")
+            setPendingWidget1File(null)
+            setPreviewUrl1(null)
+            setUrlInput1("")
+        } else {
+            setMobileWidget2("")
+            setPendingWidget2File(null)
+            setPreviewUrl2(null)
+            setUrlInput2("")
+        }
+    }
+
     const handleAssetSelect = async (asset: Asset) => {
         if (!currentPortfolioId) return
         await updateWidget(currentPortfolioId, assetPickerWidget, asset.id)
         if (assetPickerWidget === 1) {
-            setMobileWidget1(`https://drive.google.com/thumbnail?id=${asset.fileId}` || `https://drive.google.com/uc?id=${asset.fileId}`)
+            setMobileWidget1(assetUrl(asset, "thumbnail"))
             setPendingWidget1File(null)
             setPreviewUrl1(null)
         } else {
-            setMobileWidget2(`https://drive.google.com/thumbnail?id=${asset.fileId}` || `https://drive.google.com/uc?id=${asset.fileId}`)
+            setMobileWidget2(assetUrl(asset, "thumbnail"))
             setPendingWidget2File(null)
             setPreviewUrl2(null)
         }
@@ -168,7 +191,8 @@ export function MobileWidgetsTab() {
                 <h3 className="text-sm workspace-editor-title">MOBILE WIDGETS</h3>
                 <div className="space-y-2">
                     <FileUpload accept="image/*" onFileSelect={onUploadWidget1} label="WIDGET 1"
-                        preview={previewUrl1 || (data?.widget1Asset?.fileId ? `https://drive.google.com/uc?id=${data.widget1Asset.fileId}` : '')} maxSize={5} />
+                        preview={previewUrl1 || assetUrl(data?.widget1Asset) || data?.widget1Url || ''} maxSize={5}
+                        onRemove={() => handleRemoveWidget(1)} removeLabel="REMOVE WIDGET" />
                     <PixelButton
                         variant="secondary"
                         className="w-full text-xs flex items-center justify-center gap-2"
@@ -210,7 +234,8 @@ export function MobileWidgetsTab() {
                 </div>
                 <div className="space-y-2">
                     <FileUpload accept="image/*" onFileSelect={onUploadWidget2} label="WIDGET 2"
-                        preview={previewUrl2 || (data?.widget2Asset?.fileId ? `https://drive.google.com/uc?id=${data.widget2Asset.fileId}` : '')} maxSize={5} />
+                        preview={previewUrl2 || assetUrl(data?.widget2Asset) || data?.widget2Url || ''} maxSize={5}
+                        onRemove={() => handleRemoveWidget(2)} removeLabel="REMOVE WIDGET" />
                     <PixelButton
                         variant="secondary"
                         className="w-full text-xs flex items-center justify-center gap-2"
@@ -307,6 +332,7 @@ export function MobileWidgetsTab() {
                     </div>
                 </div>
             </PixelModal>
+            {cleanupDialog}
             <AssetPicker
                 isOpen={assetPickerOpen}
                 onClose={() => setAssetPickerOpen(false)}

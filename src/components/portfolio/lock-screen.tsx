@@ -4,30 +4,39 @@ import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { ArrowRight, X } from "lucide-react"
-import { cn } from "@/lib/utils"
 import { useAppSound } from "../../contexts/sound-context"
 import { gsap } from "gsap"
 import { useGSAP } from "@gsap/react"
 import { useLockScreenContext } from "@/contexts/lockScreenContext"
 import { useLockScreenStore } from "@/lib/stores/lock-screen-store"
 import { useParams } from "next/navigation"
+import { useThemeStore } from "@/lib/stores/theme-store"
+import { useTheme } from "@/contexts/theme-context"
+import { LiquidGlassLockScreen } from "./lock-screen-styles/LiquidGlassLockScreen"
+import { Windows98LockScreen } from "./lock-screen-styles/Windows98LockScreen"
+import { WindowsXPLockScreen } from "./lock-screen-styles/WindowsXPLockScreen"
+import { Windows7LockScreen } from "./lock-screen-styles/Windows7LockScreen"
+import { PixelLockScreen } from "./lock-screen-styles/PixelLockScreen"
+import { ModernWindowLockScreen } from "./lock-screen-styles/ModernWindowLockScreen"
+import { useMediaQuery } from "@/hooks/use-media-query"
+import { assetUrl } from "@/lib/asset-url"
 
 interface LockScreenProps {
   onUnlock: () => void
   preview?: boolean
+  previewMode?: "desktop" | "mobile"
 }
 
-export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
+export function LockScreen({ onUnlock, preview = false, previewMode }: LockScreenProps) {
+  const mqDesktop = useMediaQuery("(min-width: 650px)")
+  const isDesktop = previewMode ? previewMode === "desktop" : mqDesktop
   const [currentTime, setCurrentTime] = useState(new Date())
   const { playClickSound, playErrorSound, playSuccessSound } = useAppSound()
   const {
     enabled,
     password,
     wallpaper,
+    mobileWallpaper,
     showLogin,
     setShowLogin,
     inputPassword,
@@ -57,13 +66,28 @@ export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
         enabled: data.enabled,
         password: data.password || '1234',
         hint: data.hint || '',
-        wallpaper: data.wallpaperUrl || (data.wallpaperAsset?.fileId ? `https://drive.google.com/uc?id=${data.wallpaperAsset.fileId}` : ''),
+        mobileWallpaper: data.mobileWallpaperUrl || assetUrl(data.mobileWallpaperAsset),
+        wallpaper: data.wallpaperUrl || assetUrl(data.wallpaperAsset),
       })
     }
   }, [data, setLockScreenState])
 
+  const { displayThemeData } = useTheme()
+  const lockScreenStyleId = useThemeStore((state) => state.lockScreenStyleId)
+  const themeColors = useThemeStore((state) => state.colors)
+
+  // The published page shows the lock screen before the desktop, so it loads the theme itself.
+  // The editor preview keeps the theme already in the store, including unsaved style choices.
+  useEffect(() => {
+    if (preview || !currentPortfolioId || !params?.username) return
+    void displayThemeData(params.username, currentPortfolioId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preview, currentPortfolioId, params?.username])
+
   const effectivePassword = password
   const effectiveWallpaper = wallpaper || "/placeholder.svg?height=1080&width=1920"
+  // The mobile layout has its own wallpaper; fall back to the desktop one when none is set
+  const hasMobileWallpaper = !!mobileWallpaper && mobileWallpaper !== effectiveWallpaper
 
   const timeRef = useRef<HTMLHeadingElement>(null)
   const dateRef = useRef<HTMLParagraphElement>(null)
@@ -71,6 +95,8 @@ export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const loginCardRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const xButtonRef = useRef<HTMLButtonElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -115,7 +141,17 @@ export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
     e.preventDefault()
     if (inputPassword === effectivePassword) {
       playSuccessSound()
-      onUnlock()
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      if (containerRef.current && !prefersReducedMotion && !preview) {
+        gsap.to(containerRef.current, {
+          opacity: 0,
+          duration: 0.5,
+          ease: "power2.inOut",
+          onComplete: onUnlock,
+        })
+      } else {
+        onUnlock()
+      }
     } else {
       playErrorSound()
       setIsWrongPassword(true)
@@ -208,23 +244,69 @@ export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
       }
     }
 
-    if (isWrongPassword && inputRef.current && !prefersReducedMotion) {
-      gsap.fromTo(
-        inputRef.current,
-        { x: 0 },
-        {
-          x: 8,
-          duration: 0.1,
-          ease: "power2.out",
-          yoyo: true,
-          repeat: 5,
-        },
-      )
+    if (showLogin && xButtonRef.current) {
+      if (prefersReducedMotion) {
+        gsap.fromTo(xButtonRef.current, { opacity: 0 }, { opacity: 1, duration: 0.3, delay: 0.35 })
+      } else {
+        gsap.fromTo(
+          xButtonRef.current,
+          { opacity: 0, scale: 0, rotate: -90 },
+          { opacity: 1, scale: 1, rotate: 0, duration: 0.45, delay: 0.35, ease: "back.out(2)" },
+        )
+      }
     }
-  }, [showLogin, isWrongPassword])
+  }, [showLogin])
+
+  // Isolated shake: its own effect so a wrong password never replays the entrance animations
+  useEffect(() => {
+    if (!isWrongPassword || !inputRef.current) return
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    if (prefersReducedMotion) return
+    gsap.killTweensOf(inputRef.current, "x")
+    gsap.fromTo(inputRef.current, { x: 0 }, { x: 8, duration: 0.08, ease: "power2.out", yoyo: true, repeat: 5 })
+  }, [isWrongPassword])
+
+  const styleProps = {
+    time: formatTime(currentTime),
+    date: formatDate(currentTime),
+    preview,
+    showLogin,
+    inputPassword,
+    onInputChange: setInputPassword,
+    onSubmit: handleSubmit,
+    onCancel: handleCancel,
+    onClickSound: playClickSound,
+    hint: effectivePassword ? `Hint: The password is '${effectivePassword}'` : "",
+    colors: themeColors,
+    timeRef,
+    dateRef,
+    hintRef,
+    overlayRef,
+    cardRef: loginCardRef,
+    xButtonRef,
+    inputRef,
+  }
+
+  const renderStyle = () => {
+    switch (lockScreenStyleId || "liquid-glass") {
+      case "windows-98":
+        return <Windows98LockScreen {...styleProps} />
+      case "windows-xp":
+        return <WindowsXPLockScreen {...styleProps} />
+      case "windows-7":
+        return <Windows7LockScreen {...styleProps} />
+      case "pixel":
+        return <PixelLockScreen {...styleProps} />
+      case "window":
+        return <ModernWindowLockScreen {...styleProps} />
+      default:
+        return <LiquidGlassLockScreen {...styleProps} />
+    }
+  }
 
   return (
     <div
+      ref={containerRef}
       className={`${preview ? 'w-full h-full' : 'w-screen h-screen'} relative flex flex-col items-center justify-center overflow-hidden`}
       onClick={handleScreenClick}
     >
@@ -232,119 +314,21 @@ export function LockScreen({ onUnlock, preview = false }: LockScreenProps) {
         src={effectiveWallpaper}
         alt="Lock Screen Wallpaper"
         fill
-        className="object-cover object-center"
+        className="object-cover object-center transition-opacity duration-700"
+        style={{ opacity: hasMobileWallpaper && !isDesktop ? 0 : 1 }}
         priority
       />
-      {!showLogin && (
-        <div className="flex flex-col items-center justify-center relative z-10 w-full px-4 text-center">
-          <h1
-            ref={timeRef}
-            className={cn(
-              "font-bold mb-2 tracking-tight transition-all duration-300",
-              preview
-                ? "text-3xl sm:text-4xl md:text-5xl"
-                : "text-4xl sm:text-5xl md:text-6xl lg:text-7xl"
-            )}
-            style={{ color: 'var(--theme-text)' }}
-          >
-            {formatTime(currentTime)}
-          </h1>
-          <p
-            ref={dateRef}
-            className={cn(
-              "font-medium transition-all duration-300 opacity-90",
-              preview
-                ? "text-xs mb-4"
-                : "text-sm sm:text-lg md:text-xl mb-8 sm:mb-12"
-            )}
-            style={{ color: 'var(--theme-text)' }}
-          >
-            {formatDate(currentTime)}
-          </p>
-          <p
-            ref={hintRef}
-            className={cn(
-              "uppercase tracking-widest animate-pulse font-bold opacity-80",
-              preview ? "text-[8px]" : "text-[10px] sm:text-xs"
-            )}
-            style={{ color: 'var(--theme-primary)' }}
-          >
-            CLICK ANYWHERE TO UNLOCK
-          </p>
-        </div>
+      {hasMobileWallpaper && (
+        <Image
+          src={mobileWallpaper}
+          alt="Mobile Lock Screen Wallpaper"
+          fill
+          className="object-cover object-center transition-opacity duration-700"
+          style={{ opacity: isDesktop ? 0 : 1 }}
+          priority
+        />
       )}
-
-      {showLogin && (
-        <div
-          ref={overlayRef}
-          className="absolute inset-0 flex flex-col items-center justify-center backdrop-blur-md"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div
-            ref={loginCardRef}
-            className="w-64 p-6 bg-white/20 backdrop-blur-lg rounded-3xl shadow-lg border border-white/30 flex flex-col items-center"
-          >
-            <Avatar className="w-20 h-20 mb-4 border-4" style={{ borderColor: 'var(--theme-primary)', opacity: 0.5 }}>
-              <AvatarImage src="/placeholder.svg?height=80&width=80" alt="User" />
-              <AvatarFallback
-                className="text-xl"
-                style={{ backgroundColor: 'var(--theme-secondary)', color: 'var(--theme-text)' }}
-              >
-                ME
-              </AvatarFallback>
-            </Avatar>
-
-            <form onSubmit={handleSubmit} className="w-full flex flex-col justify-center space-y-4">
-              <div className="flex items-center gap-2">
-                <Input
-                  ref={inputRef}
-                  type="password"
-                  placeholder="Enter password"
-                  value={inputPassword}
-                  onChange={(e) => setInputPassword(e.target.value)}
-                  className={cn(
-                    "pr-12 bg-white/30 rounded-xl",
-                  )}
-                  style={{
-                    borderColor: 'var(--theme-primary)',
-                    color: 'var(--theme-text)'
-                  }}
-                  autoFocus
-                />
-                <Button
-                  type="submit"
-                  size="icon"
-                  className="h-8 w-8 cursor-pointer text-white rounded-lg transition-colors"
-                  style={{ backgroundColor: 'var(--theme-primary)' }}
-                  onClick={playClickSound}
-                >
-                  <ArrowRight className="h-4 w-4" />
-                  <span className="sr-only">Unlock</span>
-                </Button>
-              </div>
-              {effectivePassword && (
-                <p
-                  className="text-xs text-center opacity-80"
-                  style={{ color: 'var(--theme-text)' }}
-                >
-                  Hint: The password is &apos;{effectivePassword}&apos;
-                </p>
-              )}
-            </form>
-          </div>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            className="mt-4 cursor-pointer text-white backdrop-blur-sm rounded-full transition-all"
-            style={{ backgroundColor: 'var(--theme-primary)', opacity: 0.3 }}
-            onClick={handleCancel}
-          >
-            <X className="h-5 w-5" />
-            <span className="sr-only">Cancel</span>
-          </Button>
-        </div>
-      )}
+      {renderStyle()}
     </div>
   )
 }

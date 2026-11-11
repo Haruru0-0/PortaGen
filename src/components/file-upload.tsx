@@ -15,9 +15,13 @@ interface FileUploadProps {
   label?: string
   maxSize?: number // in MB
   className?: string
+  /** When set, a remove button appears inside the box while a file or image is shown. */
+  onRemove?: () => void | Promise<void>
+  removeLabel?: string
 }
 
-export function FileUpload({ accept, onFileSelect, preview, label, maxSize = 5, className }: FileUploadProps) {
+export function FileUpload({ accept, onFileSelect, preview, label, maxSize = 5, className, onRemove, removeLabel = "REMOVE" }: FileUploadProps) {
+  const [removing, setRemoving] = useState(false)
   const [dragActive, setDragActive] = useState(false)
   const [error, setError] = useState<string>("")
   const inputRef = useRef<HTMLInputElement>(null)
@@ -129,18 +133,40 @@ export function FileUpload({ accept, onFileSelect, preview, label, maxSize = 5, 
             ) : (
               <FileText className="size-8 mx-auto" aria-hidden="true" />
             )}
-            <PixelButton
-              type="button"
-              variant="secondary"
-              className="text-xs"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                handleClick()
-              }}
-            >
-              CHANGE FILE
-            </PixelButton>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <PixelButton
+                type="button"
+                variant="secondary"
+                className="text-xs"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleClick()
+                }}
+              >
+                CHANGE FILE
+              </PixelButton>
+              {onRemove && (
+                <PixelButton
+                  type="button"
+                  variant="secondary"
+                  className="text-xs text-[#bc174c]"
+                  disabled={removing}
+                  onClick={async (e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setRemoving(true)
+                    try {
+                      await onRemove()
+                    } finally {
+                      setRemoving(false)
+                    }
+                  }}
+                >
+                  {removing ? "REMOVING…" : removeLabel}
+                </PixelButton>
+              )}
+            </div>
           </div>
         ) : (
           <>

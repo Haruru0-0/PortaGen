@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { SongInfoProps } from "./types";
+import { SoundCloudCredit } from "./SoundCloudCredit";
 
 export const SongInfo: React.FC<SongInfoProps> = ({
     track,
@@ -53,6 +54,7 @@ export const SongInfo: React.FC<SongInfoProps> = ({
                         spotifyTrack?.artists?.map((a: any) => a.name).join(", ")) ||
                         track.artist}
                 </p>
+                <SoundCloudCredit track={track} className="text-gray-600 dark:text-gray-300" />
             </div>
         </div>
     );

@@ -12,13 +12,18 @@ import { useFileUpload } from "@/hooks/use-file-upload"
 import { AssetPicker } from "@/components/common/asset-picker"
 import { Asset } from "@/lib/types"
 import Image from "next/image"
+import { MobileWallpaperSection } from "@/components/editor/mobile-wallpaper-section"
+import { assetUrl } from "@/lib/asset-url"
+import { useAssetCleanup } from "@/hooks/use-asset-cleanup"
 
 export function LockScreenWallpaperTab() {
   const { data, updateWallpaper, getLockScreenData } = useLockScreenContext()
   const { setWallpaper, pendingWallpaperFile, setPendingWallpaperFile } = useLockScreenStore()
+  const setMobileWallpaper = useLockScreenStore((s) => s.setLockScreenState)
   const params = useParams<{ id: string }>()
   const currentPortfolioId = Number(params?.id)
   const { uploadFile, uploading } = useFileUpload()
+  const { cleanupAsset, cleanupDialog } = useAssetCleanup()
 
   const [renameOpen, setRenameOpen] = useState(false)
   const [customName, setCustomName] = useState("")
@@ -52,6 +57,18 @@ export function LockScreenWallpaperTab() {
     const url = URL.createObjectURL(file)
     setPreviewUrl(url)
     setWallpaper(url) // Update store for immediate preview
+  }
+
+  const handleRemoveWallpaper = async () => {
+    if (!currentPortfolioId) return
+    // Clears this portfolio's wallpaper (file or link). The uploaded file stays in the library.
+    const asset = data?.wallpaperAsset
+    if (asset || data?.wallpaperUrl) await updateWallpaper(currentPortfolioId, null)
+    await cleanupAsset(asset)
+    setWallpaper("")
+    setUrlInput("")
+    setPendingWallpaperFile(null)
+    setPreviewUrl(null)
   }
 
   const handleUrlInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,7 +110,7 @@ export function LockScreenWallpaperTab() {
   const handleAssetSelect = async (asset: Asset) => {
     if (!currentPortfolioId) return
     await updateWallpaper(currentPortfolioId, asset.id)
-    setWallpaper(`https://drive.google.com/uc?id=${asset.fileId}`)
+    setWallpaper(assetUrl(asset))
     setPendingWallpaperFile(null)
     setPreviewUrl(null)
   }
@@ -107,7 +124,9 @@ export function LockScreenWallpaperTab() {
           <FileUpload
             accept="image/*"
             onFileSelect={onUpload}
-            preview={previewUrl || (data?.wallpaperAsset?.fileId ? `https://drive.google.com/uc?id=${data.wallpaperAsset.fileId}` : '')}
+            preview={previewUrl || assetUrl(data?.wallpaperAsset) || data?.wallpaperUrl || ''}
+            onRemove={handleRemoveWallpaper}
+            removeLabel="REMOVE WALLPAPER"
             label="LOCK SCREEN IMAGE"
             maxSize={5}
           />
@@ -152,6 +171,17 @@ export function LockScreenWallpaperTab() {
             SAVE WALLPAPER
           </PixelButton>
         )}
+
+        <div className="h-[1px] bg-border w-full" />
+
+        <MobileWallpaperSection
+          title="MOBILE LOCK SCREEN WALLPAPER"
+          savedUrl={data?.mobileWallpaperUrl}
+          savedImageUrl={assetUrl(data?.mobileWallpaperAsset)}
+          savedAsset={data?.mobileWallpaperAsset}
+          onSave={(assetId, url) => updateWallpaper(currentPortfolioId, assetId, url, "mobile")}
+          onPreview={(url) => setMobileWallpaper({ mobileWallpaper: url })}
+        />
       </div>
       <PixelModal isOpen={renameOpen} onClose={() => !uploading && setRenameOpen(false)} title="RENAME WALLPAPER">
         <div className="space-y-4">
@@ -180,6 +210,7 @@ export function LockScreenWallpaperTab() {
           </div>
         </div>
       </PixelModal>
+      {cleanupDialog}
       <AssetPicker
         isOpen={assetPickerOpen}
         onClose={() => setAssetPickerOpen(false)}

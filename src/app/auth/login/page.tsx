@@ -43,22 +43,26 @@ export default function LoginPage() {
     setError("")
 
     try {
-      let email = data.identifier
+      const email = data.identifier
 
       // Check if identifier is an email. If not, treat as username and find email.
       const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.identifier)
 
       if (!isEmail) {
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('email')
-          .eq('username', data.identifier)
-          .single()
-
-        if (userError || !userData) {
-          throw new Error("PLAYER NOT FOUND. CHECK YOUR USERNAME.")
+        // The username lookup and sign-in happen on the server, so the browser never reads the users table.
+        const response = await fetch("/api/auth/username-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: data.identifier, password: data.password }),
+        })
+        if (!response.ok) {
+          const detail = await response.json().catch(() => null)
+          throw new Error(detail?.error || "INVALID CREDENTIALS")
         }
-        email = userData.email
+        cancelPendingTransition()
+        router.push("/dashboard")
+        router.refresh()
+        return
       }
 
       const { error } = await supabase.auth.signInWithPassword({

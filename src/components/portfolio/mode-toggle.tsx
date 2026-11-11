@@ -20,10 +20,10 @@ const STYLE_CONFIGS = {
   "liquid-glass": {
     wrapper: "liquidGlass-wrapper dropdown",
     content: "liquidGlass-content p-2 w-full",
-    item: "w-full cursor-pointer hover:bg-sky-400/30 focus:bg-sky-400/30 text-slate-900 focus:text-slate-900",
-    icon: "text-gray-600",
+    item: "w-full cursor-pointer hover:bg-sky-400/30 focus:bg-sky-400/30 text-slate-200 focus:text-slate-200",
+    icon: "text-slate-200",
     hasGlassLayers: true,
-    trigger: "relative flex items-center justify-center w-10 h-10 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 transition-colors"
+    trigger: "relative flex items-center justify-center w-8 h-8 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-slate-200 transition-colors"
   },
   "windows-98": {
     wrapper: "bg-[#c0c0c0] border-2 border-l-white border-t-white border-r-black border-b-black shadow-md",

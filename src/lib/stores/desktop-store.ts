@@ -2,6 +2,7 @@ import { create } from 'zustand'
 
 export interface DesktopState {
     wallpaper: string
+    mobileWallpaper: string
     wallpaperUrl?: string // Saved URL from DB or Input
     wallpaperFileId: string | null
     desktopGif: string
@@ -53,6 +54,7 @@ interface DesktopStore extends DesktopState {
 
 export const useDesktopStore = create<DesktopStore>((set) => ({
     wallpaper: '',
+    mobileWallpaper: '',
     wallpaperUrl: '',
     wallpaperFileId: null,
     desktopGif: '',

@@ -63,6 +63,20 @@ export const TASKBAR_TEMPLATES: TaskbarTemplate[] = [
     },
 ]
 
+export interface LockScreenTemplate {
+    id: string
+    name: string
+}
+
+export const LOCK_SCREEN_TEMPLATES: LockScreenTemplate[] = [
+    { id: "liquid-glass", name: "Liquid Glass" },
+    { id: "windows-98", name: "Windows 98" },
+    { id: "windows-xp", name: "Windows XP" },
+    { id: "windows-7", name: "Windows 7" },
+    { id: "pixel", name: "Pixel Art" },
+    { id: "window", name: "Modern Window" },
+]
+
 export const MENUBAR_TEMPLATES: MenubarTemplate[] = [
     {
         id: "liquid-glass",
@@ -189,6 +203,7 @@ export const DEFAULT_THEME = {
     },
     font: 'Inter, sans-serif',
     taskbarStyleId: 'liquid-glass',
+    lockScreenStyleId: 'liquid-glass',
     menubarStyleId: 'liquid-glass',
     windowStyleId: 'liquid-glass',
     musicPlayerStyleId: 'default',

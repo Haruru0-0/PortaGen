@@ -9,6 +9,10 @@ import { useAppSound } from "../../../contexts/sound-context";
 import { CuteSuspenseFallback } from "../suspense-fallback";
 import { SnapMenu, type SnapType } from "../SnapMenu";
 import ReactDOM from "react-dom";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollContainerProvider } from "../animated-section";
+
+gsap.registerPlugin(ScrollTrigger);
 
 let globalZ = 100;
 const getOptimalWindowSize = (title: string) => {
@@ -25,6 +29,8 @@ const getOptimalWindowSize = (title: string) => {
             return { width: 750, height: 600 };
         case "Contact me":
             return { width: 800, height: 600 };
+        case "Terminal":
+            return { width: 720, height: 480 };
         default:
             return { width: 800, height: 600 };
     }
@@ -107,23 +113,29 @@ export function LiquidGlassWindow({
 
     const handleClose = () => {
         playWindowCloseSound();
-        if (windowRef.current) {
-            const prefersReducedMotion = window.matchMedia(
-                "(prefers-reduced-motion: reduce)"
-            ).matches;
+        // windowRef is set for maximized/snapped windows; a floating Rnd exposes its element instead
+        const el = windowRef.current ?? rndRef.current?.getSelfElement();
+        const prefersReducedMotion = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches;
+        if (el) {
             if (prefersReducedMotion) {
-                gsap.to(windowRef.current, {
+                gsap.to(el, { opacity: 0, duration: 0.2, onComplete: () => onClose?.() });
+            } else if (isMobile) {
+                gsap.to(el, {
                     opacity: 0,
-                    duration: 0.2,
+                    y: 24,
+                    duration: 0.25,
+                    ease: "power2.in",
                     onComplete: () => onClose?.(),
                 });
             } else {
-                gsap.to(windowRef.current, {
+                gsap.to(el, {
                     opacity: 0,
-                    scale: 0.9,
-                    y: isMobile ? 20 : 0,
-                    duration: 0.2,
-                    ease: "power2.out",
+                    scale: 0.88,
+                    y: 8,
+                    duration: 0.25,
+                    ease: "back.in(1.4)",
                     onComplete: () => onClose?.(),
                 });
             }
@@ -168,40 +180,45 @@ export function LiquidGlassWindow({
         }
     }, [isMaximized, isMobile]);
 
-    const contentRef = useRef<HTMLDivElement>(null);
-    const { width: contentWidth } = useResizeObserver(contentRef);
+    const contentRef = useRef<HTMLDivElement | null>(null);
+    const [contentEl, setContentEl] = useState<HTMLDivElement | null>(null);
+    // The callback ref keeps contentRef.current (used by ScrollContainerProvider) and the
+    // contentEl state (used by useResizeObserver) in sync when the window switches branches.
+    const contentRefCallback = React.useCallback((el: HTMLDivElement | null) => {
+        contentRef.current = el;
+        setContentEl(el);
+    }, []);
+    const { width: contentWidth } = useResizeObserver(contentEl);
 
     useGSAP(() => {
-        if (!isVisible || !windowRef.current) return;
+        if (!isVisible) return;
+        const el = windowRef.current ?? rndRef.current?.getSelfElement();
+        if (!el) return;
         const prefersReducedMotion = window.matchMedia(
             "(prefers-reduced-motion: reduce)"
         ).matches;
 
         if (isMobile) {
-            gsap.fromTo(
-                windowRef.current,
-                { opacity: 0 },
-                { opacity: 1, duration: 0.25 }
-            );
+            gsap.fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.25 });
             return;
         }
         if (prefersReducedMotion) {
-            gsap.fromTo(
-                windowRef.current,
-                { opacity: 0 },
-                { opacity: 1, duration: 0.3 }
-            );
+            gsap.fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.3 });
         } else {
             gsap.fromTo(
-                windowRef.current,
-                { opacity: 0, scale: 0.9 },
-                {
-                    opacity: 1,
-                    ease: "power2.out",
-                }
+                el,
+                { opacity: 0, scale: 0.92, y: 10 },
+                { opacity: 1, scale: 1, y: 0, duration: 0.35, ease: "back.out(1.4)" }
             );
         }
     }, [isVisible, isMobile]);
+
+    // Refresh ScrollTrigger whenever content may have remounted (open, maximize toggle, drag end)
+    useEffect(() => {
+        if (!isVisible || isDragging) return;
+        const id = setTimeout(() => ScrollTrigger.refresh(), 400);
+        return () => clearTimeout(id);
+    }, [isVisible, isMaximized, isDragging]);
 
     const handleButtonAnimation = (
         e: React.MouseEvent<HTMLButtonElement>,
@@ -305,7 +322,7 @@ export function LiquidGlassWindow({
         if (isMobile) return;
         snapMenuTimeoutRef.current = setTimeout(() => {
             setShowSnapMenu(false);
-        }, 500);
+        }, 50);
     };
 
     const handleDrag = (e: any, d: any) => {
@@ -461,7 +478,7 @@ export function LiquidGlassWindow({
                                         {!isMobile && (
                                             <div className="relative" onMouseLeave={handleMaximizeLeave}>
                                                 <button
-                                                    onClick={() => handleButtonClick(toggleMaximize)}
+                                                    onClick={() => { setShowSnapMenu(false); handleButtonClick(toggleMaximize); }}
                                                     className="window-button"
                                                     onMouseEnter={(e) => {
                                                         handleButtonAnimation(e, "enter");
@@ -499,11 +516,12 @@ export function LiquidGlassWindow({
                                     </div>
                                 </div>
                                 <div
-                                    ref={contentRef}
+                                    ref={contentRefCallback}
                                     className="window-content"
                                     data-width={contentWidth}
                                 >
-                                    <React.Suspense fallback={<CuteSuspenseFallback />}>
+                                    <ScrollContainerProvider container={contentRef}>
+<React.Suspense fallback={<CuteSuspenseFallback />}>
                                         {React.Children.map(children, (child) =>
                                             React.isValidElement(child)
                                                 ? React.cloneElement(child, {
@@ -512,6 +530,7 @@ export function LiquidGlassWindow({
                                                 : child
                                         )}
                                     </React.Suspense>
+</ScrollContainerProvider>
                                 </div>
                             </div>
                         </div>
@@ -565,7 +584,7 @@ export function LiquidGlassWindow({
                                     {!isMobile && (
                                         <div className="relative" onMouseLeave={handleMaximizeLeave}>
                                             <button
-                                                onClick={() => handleButtonClick(toggleMaximize)}
+                                                onClick={() => { setShowSnapMenu(false); handleButtonClick(toggleMaximize); }}
                                                 className="window-button"
                                                 onMouseEnter={(e) => {
                                                     handleButtonAnimation(e, "enter");
@@ -603,11 +622,12 @@ export function LiquidGlassWindow({
                                 </div>
                             </div>
                             <div
-                                ref={contentRef}
+                                ref={contentRefCallback}
                                 className="window-content"
                                 data-width={contentWidth}
                             >
-                                <React.Suspense fallback={<CuteSuspenseFallback />}>
+                                <ScrollContainerProvider container={contentRef}>
+<React.Suspense fallback={<CuteSuspenseFallback />}>
                                     {isDragging
                                         ? null
                                         : React.Children.map(children, (child) =>
@@ -618,6 +638,7 @@ export function LiquidGlassWindow({
                                                 : child
                                         )}
                                 </React.Suspense>
+</ScrollContainerProvider>
                             </div>
                         </Rnd>
                     )}

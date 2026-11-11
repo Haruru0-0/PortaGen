@@ -6,6 +6,7 @@ import { PixelModal } from "./pixel-modal"
 import { PixelButton } from "./pixel-button"
 import { Play, Pause, Cloud, Image as ImageIcon, Music, Zap } from "lucide-react"
 import Image from "next/image"
+import { assetUrl } from "@/lib/asset-url"
 
 interface Asset {
   id: string
@@ -43,17 +44,16 @@ export function AssetLibraryModal({
   const [portfolioFilter, setPortfolioFilter] = useState<"all" | "current">("current")
   const [loading, setLoading] = useState(false)
 
-  // Function to optimize Google Drive URLs for display
+  // Function to pick the right address for display
   const getOptimizedImageUrl = (asset: Asset): string => {
     // If it's a default asset, use the provided URL
     if (asset.type === "default") {
       return asset.thumbnail || asset.url
     }
 
-    // If it's a user uploaded asset with Google Drive fileId
-    if (asset.fileId) {
-      // For thumbnails in grid view
-      return `https://drive.google.com/thumbnail?id=${asset.fileId}&sz=w200-h200`
+    // If it's a user uploaded asset (UploadThing url, or a Google Drive file id from before the move)
+    if (asset.fileId || asset.url) {
+      return assetUrl(asset, "thumbnail")
     }
 
     // If we have a thumbnail URL, use it
@@ -72,7 +72,7 @@ export function AssetLibraryModal({
     }
 
     if (asset.fileId) {
-      return `https://drive.google.com/uc?id=${asset.fileId}`
+      return assetUrl(asset)
     }
 
     return asset.url

@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
 
         const row = await db.query.lockScreenSettings.findFirst({
             where: eq(lockScreenSettings.portfolioId, portfolioId),
-            with: { wallpaperAsset: true },
+            with: { wallpaperAsset: true, mobileWallpaperAsset: true },
         })
         if (!row) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
@@ -31,6 +31,8 @@ export async function GET(req: NextRequest) {
             password: row.password,
             wallpaperAsset: row.wallpaperAsset ?? undefined,
             wallpaperUrl: row.wallpaperUrl || '',
+            mobileWallpaperAsset: row.mobileWallpaperAsset ?? undefined,
+            mobileWallpaperUrl: row.mobileWallpaperUrl || '',
         })
     } catch (e) {
         console.error('Lock screen fetch error:', e)

@@ -11,11 +11,13 @@ export function MobileIcon({
   label,
   icon,
   onClick,
+  glass = false,
 }: {
   id: string;
   label: string;
   icon: string | StaticImageData;
   onClick: () => void;
+  glass?: boolean;
 }) {
   const isMobile = useMediaQuery("(max-width: 650px)");
   const { playClickSound, playHoverSound } = useAppSound();
@@ -142,30 +144,43 @@ export function MobileIcon({
           ? `translate(${transform.x}px, ${transform.y}px)`
           : undefined,
       }}
-      className="desktop-icon flex flex-col items-center justify-center w-14 sm:w-18 md:w-20 cursor-pointer select-none transition-transform hover:scale-105"
+      className={
+        glass
+          ? "liquidGlass-icon desktop-icon w-20 cursor-pointer select-none p-1.5"
+          : "desktop-icon flex flex-col items-center justify-center w-14 sm:w-18 md:w-20 cursor-pointer select-none transition-transform hover:scale-105"
+      }
     >
-      <div
-        ref={iconRef}
-        className="w-10 h-10 flex items-center justify-center"
-      >
-        <Image
-          src={icon || "/placeholder.svg"}
-          alt={label}
-          width={40}
-          height={40}
-          className="max-w-full max-h-full object-contain drop-shadow-md"
-          style={{
-            willChange: "transform",
-            backfaceVisibility: "hidden",
-          }}
-        />
+      {glass && (
+        <>
+          <div className="liquidGlass-effect" />
+          <div className="liquidGlass-tint" />
+          <div className="liquidGlass-shine" />
+        </>
+      )}
+      <div className={glass ? "liquidGlass-content" : "contents"}>
+        <div
+          ref={iconRef}
+          className="w-10 h-10 flex items-center justify-center"
+        >
+          <Image
+            src={icon || "/placeholder.svg"}
+            alt={label}
+            width={40}
+            height={40}
+            className="max-w-full max-h-full object-contain drop-shadow-md"
+            style={{
+              willChange: "transform",
+              backfaceVisibility: "hidden",
+            }}
+          />
+        </div>
+        <span
+          ref={textRef}
+          className="desktop-icon-text text-xs md:text-sm"
+        >
+          {label}
+        </span>
       </div>
-      <span
-        ref={textRef}
-        className="desktop-icon-text text-xs md:text-sm"
-      >
-        {label}
-      </span>
     </div>
   );
 }

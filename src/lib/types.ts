@@ -16,6 +16,14 @@ export interface Track {
     duration: string;
     cover: string | StaticImageData;
     src: string | VideoAsset;
+    /** Set for YouTube Music tracks; used by the embedded-player engine. */
+    videoId?: string;
+    /** Set for SoundCloud tracks: the set or track link the hidden widget loads. */
+    soundcloudUrl?: string;
+    /** Position of this track inside the SoundCloud widget's list. */
+    scIndex?: number;
+    /** Link to the track on SoundCloud, shown as attribution. */
+    permalinkUrl?: string;
 }
 
 export const playlist: Track[] = [
@@ -273,6 +281,7 @@ export type AssetType = "all" | "wallpaper" | "icon" | "music" | "sound"
 export interface Asset {
     id: number
     fileId: string
+    url?: string | null
     name: string
     type: AssetType
     size: string

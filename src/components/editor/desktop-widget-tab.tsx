@@ -12,6 +12,8 @@ import { useParams } from "next/navigation";
 import { AssetPicker } from "@/components/common/asset-picker"
 import { Asset } from "@/lib/types"
 import Image from "next/image"
+import { assetUrl } from "@/lib/asset-url"
+import { useAssetCleanup } from "@/hooks/use-asset-cleanup"
 
 export function DesktopWidgetTab() {
   const params = useParams<{ id: string }>()
@@ -19,6 +21,7 @@ export function DesktopWidgetTab() {
   const { data, getDesktopData, updateGif } = useDesktopContext()
   const { setDesktopGif, pendingGifFile, setPendingGifFile } = useDesktopStore()
   const { uploadFile, uploading } = useFileUpload()
+  const { cleanupAsset, cleanupDialog } = useAssetCleanup()
   const [renameOpen, setRenameOpen] = useState(false)
   const [customName, setCustomName] = useState("")
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -95,10 +98,22 @@ export function DesktopWidgetTab() {
     }
   }
 
+  const handleRemoveGif = async () => {
+    if (!currentPortfolioId) return
+    // Back to the default greeting animation. The uploaded file stays in the library.
+    const asset = data?.desktopGifAsset
+    if (asset || data?.desktopGifUrl) await updateGif(currentPortfolioId, null)
+    await cleanupAsset(asset)
+    setDesktopGif("")
+    setUrlInput("")
+    setPendingGifFile(null)
+    setPreviewUrl(null)
+  }
+
   const handleAssetSelect = async (asset: Asset) => {
     if (!currentPortfolioId) return
     await updateGif(currentPortfolioId, asset.id)
-    setDesktopGif(`https://drive.google.com/thumbnail?id=${asset.fileId}` || `https://drive.google.com/uc?id=${asset.fileId}`)
+    setDesktopGif(assetUrl(asset, "thumbnail"))
     setPendingGifFile(null)
     setPreviewUrl(null)
   }
@@ -112,7 +127,9 @@ export function DesktopWidgetTab() {
           <FileUpload
             accept="image/gif,image/*"
             onFileSelect={onUploadGif}
-            preview={previewUrl || (data?.desktopGifAsset?.fileId ? `https://drive.google.com/uc?id=${data.desktopGifAsset.fileId}` : '')}
+            preview={previewUrl || assetUrl(data?.desktopGifAsset) || data?.desktopGifUrl || ''}
+            onRemove={handleRemoveGif}
+            removeLabel="REMOVE GIF"
             label=""
             maxSize={10}
           />
@@ -168,6 +185,7 @@ export function DesktopWidgetTab() {
           </div>
         </div>
       </PixelModal>
+      {cleanupDialog}
       <AssetPicker
         isOpen={assetPickerOpen}
         onClose={() => setAssetPickerOpen(false)}

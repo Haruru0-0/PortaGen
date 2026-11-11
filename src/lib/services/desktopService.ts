@@ -5,6 +5,8 @@ export interface DesktopData {
   spotifyPlaylistUrl: string
   wallpaperAsset?: Asset
   wallpaperUrl?: string
+  mobileWallpaperAsset?: Asset
+  mobileWallpaperUrl?: string
   desktopGifAsset?: Asset
   widget1Asset?: Asset
   widget2Asset?: Asset
@@ -27,11 +29,11 @@ export async function getDesktop(portfolioId: number): Promise<DesktopData | und
   }
 }
 
-export async function updateDesktopWallpaper(portfolioId: number, wallpaperAssetId: number | null, wallpaperUrl?: string) {
+export async function updateDesktopWallpaper(portfolioId: number, wallpaperAssetId: number | null, wallpaperUrl?: string, variant?: 'mobile') {
   const res = await fetch('/api/desktop/wallpaper', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ portfolioId, wallpaperAssetId, wallpaperUrl }),
+    body: JSON.stringify({ portfolioId, wallpaperAssetId, wallpaperUrl, variant }),
   })
   if (!res.ok) throw new Error('Failed to update desktop wallpaper')
   return res.json()

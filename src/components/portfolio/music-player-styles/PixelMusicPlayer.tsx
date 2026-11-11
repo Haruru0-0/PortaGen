@@ -4,6 +4,7 @@ import { MusicPlayerStyleProps, SpotifyTrack } from "./types"
 import { Track } from "@/lib/types"
 import { Loader2, Pause, Play, SkipBack, SkipForward, List, X } from "lucide-react"
 import { Slider } from "@/components/ui/slider"
+import { SoundCloudCredit } from "../music-player/SoundCloudCredit"
 
 export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
     const { playerType, embedded, playerRef, buttonsRef, handleExpandClick, handleButtonClick,
@@ -168,6 +169,7 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
                                             <p className="text-[10px] truncate max-w-full text-[#00ffff] font-pixel">
                                                 {(useSpotify && spotifyCurrentTrack?.artists?.map((a) => a.name).join(", ")) || currentTrack.artist}
                                             </p>
+                                            <SoundCloudCredit track={currentTrack} />
                                         </div>
                                     </div>
                                 )}
@@ -312,6 +314,7 @@ export function PixelMusicPlayer(props: MusicPlayerStyleProps) {
                                             <p className="text-[10px] truncate w-full text-[#00ffff] font-pixel">
                                                 {(useSpotify && spotifyCurrentTrack?.artists?.map((a) => a.name).join(", ")) || currentTrack.artist}
                                             </p>
+                                            <SoundCloudCredit track={currentTrack} />
                                         </div>
 
                                         <div className="flex items-center justify-between w-full">

@@ -12,17 +12,22 @@ import { useParams } from "next/navigation";
 import { AssetPicker } from "@/components/common/asset-picker"
 import { Asset } from "@/lib/types"
 import Image from "next/image"
+import { MobileWallpaperSection } from "@/components/editor/mobile-wallpaper-section"
+import { assetUrl } from "@/lib/asset-url"
+import { useAssetCleanup } from "@/hooks/use-asset-cleanup"
 
 export function DesktopWallpaperTab() {
   const params = useParams<{ id: string }>()
   const currentPortfolioId = Number(params?.id)
   const { data, getDesktopData, updateWallpaper } = useDesktopContext()
+  const setDesktopState = useDesktopStore((s) => s.setDesktopState)
   const {
     setWallpaper, pendingWallpaperFile, setPendingWallpaperFile,
     setMenubarIcon, pendingMenubarIconFile, setPendingMenubarIconFile,
     menubarText, setMenubarText
   } = useDesktopStore()
   const { uploadFile, uploading } = useFileUpload()
+  const { cleanupAsset, cleanupDialog } = useAssetCleanup()
   const [renameOpen, setRenameOpen] = useState(false)
   const [customName, setCustomName] = useState("")
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -126,14 +131,14 @@ export function DesktopWallpaperTab() {
     if (assetPickerType === "wallpaper") {
       // For wallpaper, we update directly
       await updateWallpaper(currentPortfolioId, asset.id)
-      setWallpaper(`https://drive.google.com/thumbnail?id=${asset.fileId}` || `https://drive.google.com/uc?id=${asset.fileId}`)
+      setWallpaper(assetUrl(asset, "thumbnail"))
       setPendingWallpaperFile(null)
       setPreviewUrl(null)
     } else {
       // For menu bar, we update directly too for consistency with "library selection" flow
       // But we need the current menu text to not overwrite it
       await updateMenubar(currentPortfolioId, asset.id, menubarText)
-      setMenubarIcon(`https://drive.google.com/thumbnail?id=${asset.fileId}` || `https://drive.google.com/uc?id=${asset.fileId}`)
+      setMenubarIcon(assetUrl(asset, "thumbnail"))
       setPendingMenubarIconFile(null)
       setMenubarIconPreview(null)
     }
@@ -142,6 +147,18 @@ export function DesktopWallpaperTab() {
   const openAssetPicker = (type: "wallpaper" | "icon") => {
     setAssetPickerType(type)
     setAssetPickerOpen(true)
+  }
+
+  const handleRemoveWallpaper = async () => {
+    if (!currentPortfolioId) return
+    // Clears this portfolio's wallpaper (file or link). The uploaded file stays in the library.
+    const asset = data?.wallpaperAsset
+    if (asset || data?.wallpaperUrl) await updateWallpaper(currentPortfolioId, null)
+    await cleanupAsset(asset)
+    setWallpaper("")
+    setUrlInput("")
+    setPendingWallpaperFile(null)
+    setPreviewUrl(null)
   }
 
   const handleSaveWallpaper = () => {
@@ -166,6 +183,18 @@ export function DesktopWallpaperTab() {
     }
 
     await updateMenubar(currentPortfolioId, assetId, menubarText)
+    setPendingMenubarIconFile(null)
+    setMenubarIconPreview(null)
+  }
+
+  const handleRemoveMenubarIcon = async () => {
+    if (!currentPortfolioId) return
+    // Back to the default logo. The uploaded file stays in the library.
+    const asset = data?.menubarIconAsset
+    await updateMenubar(currentPortfolioId, null, menubarText, "")
+    await cleanupAsset(asset)
+    setMenubarIcon("")
+    setMenubarUrlInput("")
     setPendingMenubarIconFile(null)
     setMenubarIconPreview(null)
   }
@@ -195,7 +224,9 @@ export function DesktopWallpaperTab() {
             <FileUpload
               accept="image/*"
               onFileSelect={onUploadWallpaper}
-              preview={previewUrl || (data?.wallpaperAsset?.fileId ? `https://drive.google.com/uc?id=${data.wallpaperAsset.fileId}` : '')}
+              preview={previewUrl || assetUrl(data?.wallpaperAsset) || data?.wallpaperUrl || ''}
+              onRemove={handleRemoveWallpaper}
+              removeLabel="REMOVE WALLPAPER"
               label=""
               maxSize={10}
             />
@@ -243,6 +274,18 @@ export function DesktopWallpaperTab() {
 
         <div className="h-[1px] bg-border w-full" />
 
+        {/* MOBILE WALLPAPER SECTION */}
+        <MobileWallpaperSection
+          title="MOBILE WALLPAPER"
+          savedUrl={data?.mobileWallpaperUrl}
+          savedImageUrl={assetUrl(data?.mobileWallpaperAsset)}
+          savedAsset={data?.mobileWallpaperAsset}
+          onSave={(assetId, url) => updateWallpaper(currentPortfolioId, assetId, url, "mobile")}
+          onPreview={(url) => setDesktopState({ mobileWallpaper: url })}
+        />
+
+        <div className="h-[1px] bg-border w-full" />
+
         {/* MENU BAR SECTION */}
         <div className="space-y-4">
           <h3 className="text-sm workspace-editor-title">MENU BAR SETTINGS</h3>
@@ -253,7 +296,9 @@ export function DesktopWallpaperTab() {
               <FileUpload
                 accept="image/*"
                 onFileSelect={onUploadMenubarIcon}
-                preview={menubarIconPreview || (data?.menubarIconAsset?.fileId ? `https://drive.google.com/uc?id=${data.menubarIconAsset.fileId}` : '')}
+                preview={menubarIconPreview || assetUrl(data?.menubarIconAsset) || data?.menubarIconUrl || ''}
+                onRemove={handleRemoveMenubarIcon}
+                removeLabel="REMOVE ICON"
                 label=""
                 maxSize={2}
               />
@@ -321,6 +366,8 @@ export function DesktopWallpaperTab() {
           </div>
         </div>
       </PixelModal>
+
+      {cleanupDialog}
 
       <AssetPicker
         isOpen={assetPickerOpen}

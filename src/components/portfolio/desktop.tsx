@@ -1,7 +1,17 @@
 import React from "react";
 import Image from "next/image";
-import { DndContext } from "@dnd-kit/core";
-import { useEffect, useState, useRef } from "react";
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
+import { SortableContext, arrayMove, rectSortingStrategy } from "@dnd-kit/sortable";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { Window } from "./window";
 import { DesktopIcon } from "./icon";
 import { MobileIcon } from "./MobileIcon";
@@ -13,6 +23,7 @@ import GreetingGif from "@/assets/greeting.gif";
 import WaterCd from "@/assets/water-cd.jpg";
 import CutePuppy from "@/assets/cute-puppy.jpg";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { useResizeObserver } from "@/hooks/use-resize-observer";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { MobileSettingsBar } from "./MobileSettingsBar";
@@ -35,6 +46,7 @@ const Achievements = React.lazy(() => import("./achievements"));
 import { useWindowsContext } from "@/contexts/windowsContext";
 import { useThemeStore } from "@/lib/stores/theme-store";
 import { useTheme } from "@/contexts/theme-context";
+import { assetUrl } from "@/lib/asset-url"
 
 type DesktopProps = { preview?: boolean; previewMode?: "desktop" | "mobile" };
 
@@ -58,7 +70,7 @@ function DesktopInner({ preview = false, previewMode }: DesktopProps) {
   const params = useParams<{ username: string, id: string }>()
   const currentPortfolioId = Number(params?.id)
   const { data, getDesktopData, displayDesktopData } = useDesktopContext();
-  const { wallpaper, desktopGif, mobileWidget1, mobileWidget2, setDesktopState } = useDesktopStore();
+  const { wallpaper, mobileWallpaper, desktopGif, mobileWidget1, mobileWidget2, setDesktopState } = useDesktopStore();
   const { icons, getAllIcons, displayIcons } = useIconContext();
   const { windows: fetchedWindows, fetchWindows, displayWindows } = useWindowsContext();
   const musicPlayerStyleId = useThemeStore((state) => state.musicPlayerStyleId);
@@ -78,11 +90,12 @@ function DesktopInner({ preview = false, previewMode }: DesktopProps) {
   useEffect(() => {
     if (data) {
       setDesktopState({
-        wallpaper: data.wallpaperUrl || (data.wallpaperAsset?.fileId ? `https://drive.google.com/uc?id=${data.wallpaperAsset.fileId}` : ''),
-        desktopGif: data.desktopGifUrl || (data.desktopGifAsset?.fileId ? `https://drive.google.com/uc?id=${data.desktopGifAsset.fileId}` : ''),
-        mobileWidget1: data.widget1Url || (data.widget1Asset?.fileId ? `https://drive.google.com/uc?id=${data.widget1Asset.fileId}` : ''),
-        mobileWidget2: data.widget2Url || (data.widget2Asset?.fileId ? `https://drive.google.com/uc?id=${data.widget2Asset.fileId}` : ''),
-        menubarIcon: data.menubarIconUrl || (data.menubarIconAsset?.fileId ? `https://drive.google.com/uc?id=${data.menubarIconAsset.fileId}` : ''),
+        wallpaper: data.wallpaperUrl || assetUrl(data.wallpaperAsset),
+        mobileWallpaper: data.mobileWallpaperUrl || assetUrl(data.mobileWallpaperAsset),
+        desktopGif: data.desktopGifUrl || assetUrl(data.desktopGifAsset),
+        mobileWidget1: data.widget1Url || assetUrl(data.widget1Asset),
+        mobileWidget2: data.widget2Url || assetUrl(data.widget2Asset),
+        menubarIcon: data.menubarIconUrl || assetUrl(data.menubarIconAsset),
         menubarText: data.menubarText || ''
       })
     }
@@ -103,6 +116,8 @@ function DesktopInner({ preview = false, previewMode }: DesktopProps) {
   }, [])
 
   const effectiveWallpaper = wallpaper || Wallpaper.src;
+  // The mobile layout has its own wallpaper; fall back to the desktop one when none is set
+  const effectiveMobileWallpaper = mobileWallpaper || effectiveWallpaper;
   const effectiveGif = desktopGif || GreetingGif.src;
   const effectiveWidget1 = mobileWidget1 || WaterCd.src;
   const effectiveWidget2 = mobileWidget2 || CutePuppy.src;
@@ -123,6 +138,85 @@ function DesktopInner({ preview = false, previewMode }: DesktopProps) {
   const floatingAnims = useRef<gsap.core.Tween[]>([]);
 
   const [openWindows, setOpenWindows] = useState<WindowData[]>([]);
+  const [activeAppId, setActiveAppId] = useState<string | null>(null);
+  const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
+  const [folderPage, setFolderPage] = useState(0);
+  const [folderDragOffset, setFolderDragOffset] = useState(0);
+  const touchStartX = useRef(0);
+  const pageOverlayRef = useRef<HTMLDivElement>(null);
+  const [rootEl, setRootEl] = useState<HTMLDivElement | null>(null);
+  const { width: rootWidth } = useResizeObserver(rootEl);
+
+  const windowStyleId = useThemeStore((state) => state.windowStyleId);
+  const isGlass = (windowStyleId || "liquid-glass") === "liquid-glass";
+
+  // Desktop icon order: reorderable by dragging, remembered per portfolio in this browser
+  const orderKey = `portagen-icon-order-${currentPortfolioId}`;
+  // Icons load after mount, so reading storage in the initializer cannot cause a hydration mismatch
+  const [iconOrder, setIconOrder] = useState<string[]>(() => {
+    if (preview || typeof window === "undefined") return [];
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(orderKey) || "[]");
+      return Array.isArray(saved) ? saved.map(String) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const orderedIcons = useMemo(() => {
+    if (iconOrder.length === 0) return icons;
+    const rank = (id: string) => {
+      const i = iconOrder.indexOf(id);
+      return i === -1 ? Number.MAX_SAFE_INTEGER : i;
+    };
+    return [...icons].sort((a, b) => rank(String(a.id)) - rank(String(b.id)));
+  }, [icons, iconOrder]);
+
+  const iconSrc = (icon: (typeof icons)[number]) =>
+    icon.iconImageUrl || assetUrl(icon.icon);
+
+  // 50px icon + 8px gap = 58px/slot; ~28px dock padding and safe margin. Only the liquid glass dock has an overflow menu.
+  const taskbarApps = orderedIcons.map((icon) => ({ id: String(icon.id), label: icon.name, icon: iconSrc(icon) }));
+  const maxFit = rootWidth > 0 ? Math.floor((rootWidth - 28) / 58) : taskbarApps.length;
+  const splitAt = !isGlass || maxFit >= taskbarApps.length ? taskbarApps.length : Math.max(1, maxFit - 1);
+  const taskbarVisible = taskbarApps.slice(0, splitAt);
+  const taskbarOverflow = taskbarApps.slice(splitAt);
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }));
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveAppId(String(event.active.id));
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setActiveAppId(null);
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const ids = orderedIcons.map((i) => String(i.id));
+    const next = arrayMove(ids, ids.indexOf(String(active.id)), ids.indexOf(String(over.id)));
+    setIconOrder(next);
+    if (preview) return;
+    try {
+      window.localStorage.setItem(orderKey, JSON.stringify(next));
+    } catch {
+      // storage unavailable: the order lasts for this visit only
+    }
+  };
+
+  // Fade out the entry overlay once the desktop has mounted
+  useEffect(() => {
+    const el = pageOverlayRef.current;
+    if (!el) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    gsap.to(el, {
+      opacity: 0,
+      duration: reduce ? 0.2 : 0.55,
+      ease: "power2.out",
+      onComplete: () => {
+        el.style.display = "none";
+      },
+    });
+  }, []);
 
   useEffect(() => {
     if (!isDesktop) {
@@ -372,17 +466,38 @@ function DesktopInner({ preview = false, previewMode }: DesktopProps) {
   );
 
   return (
-    <DndContext>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
       <div
+        ref={setRootEl}
         className={`${preview ? 'w-full h-full' : 'w-screen h-screen'} relative overflow-hidden`}
+        onClick={() => setSelectedAppId(null)}
       >
+        {!preview && (
+          <div ref={pageOverlayRef} className="fixed inset-0 bg-black z-[99999] pointer-events-none" />
+        )}
         <Image
           src={effectiveWallpaper}
           alt="Desktop Wallpaper"
           fill
-          className="object-cover object-center"
+          className="object-cover object-center transition-opacity duration-700"
+          style={{ opacity: effectiveMobileWallpaper !== effectiveWallpaper && !isDesktop ? 0 : 1 }}
           priority
         />
+        {effectiveMobileWallpaper !== effectiveWallpaper && (
+          <Image
+            src={effectiveMobileWallpaper}
+            alt="Mobile Wallpaper"
+            fill
+            className="object-cover object-center transition-opacity duration-700"
+            style={{ opacity: isDesktop ? 0 : 1 }}
+            priority
+          />
+        )}
         {isDesktop && <MenuBar embedded={preview} previewMode={previewMode} />}
 
         {isDesktop && (
@@ -411,27 +526,37 @@ function DesktopInner({ preview = false, previewMode }: DesktopProps) {
         )}
 
         {isDesktop ? (
-          <div className="absolute inset-0 flex flex-col gap-4 p-4 pt-12">
-            <div className="flex flex-col flex-wrap gap-4 content-start flex-1 overflow-auto pointer-events-none">
-              {icons.map((app, index) => (
-                <div
-                  key={app.id}
-                  ref={(el) => {
-                    if (el) desktopIconsRef.current[index] = el;
-                  }}
-                >
-                  <DesktopIcon
-                    id={String(app.id)}
-                    label={app.name}
-                    icon={app.iconImageUrl || (app.icon?.fileId ? `https://drive.google.com/uc?id=${app.icon.fileId}` : '')}
-                    onDoubleClick={() => openWindow(String(app.id))}
-                  />
+          <div className="absolute inset-0 flex flex-col gap-2 p-4 pt-12">
+            {/* flex-1 + min-h-0 lets this shrink and defines the icon column height */}
+            <div className="flex-1 min-h-0 overflow-hidden">
+              <SortableContext items={orderedIcons.map((i) => String(i.id))} strategy={rectSortingStrategy}>
+                <div className="flex flex-col flex-wrap gap-4 h-full w-fit content-start pointer-events-none">
+                  {orderedIcons.map((app, index) => (
+                    <div
+                      key={app.id}
+                      className="min-h-28"
+                      ref={(el) => {
+                        if (el) desktopIconsRef.current[index] = el;
+                      }}
+                    >
+                      <DesktopIcon
+                        id={String(app.id)}
+                        label={app.name}
+                        icon={iconSrc(app)}
+                        onDoubleClick={() => openWindow(String(app.id))}
+                        onSelect={() => setSelectedAppId(String(app.id))}
+                        isSelected={selectedAppId === String(app.id)}
+                        isBeingDragged={activeAppId === String(app.id)}
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </SortableContext>
             </div>
             <MusicPlayerWidget isDesktop={true} embedded={preview} spotifyPlaylistUrl={data?.spotifyPlaylistUrl} musicPlayerStyleId={musicPlayerStyleId} />
             <Taskbar
-              apps={icons.map(icon => ({ id: String(icon.id), label: icon.name, icon: icon.iconImageUrl || (icon.icon?.fileId ? `https://drive.google.com/uc?id=${icon.icon.fileId}` : '') }))}
+              apps={taskbarVisible}
+              overflowApps={taskbarOverflow}
               openWindows={openWindows}
               onAppClick={handleAppClick}
               className="mt-auto"
@@ -439,57 +564,155 @@ function DesktopInner({ preview = false, previewMode }: DesktopProps) {
             />
           </div>
         ) : (
-          <div className="absolute inset-0 flex flex-col justify-between overflow-hidden gap-8 p-4 pb-24">
-            <div className="flex flex-col gap-4 justify-between h-full">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid grid-cols-2 gap-4 auto-rows-min justify-items-center">
-                  {icons.slice(0, 4).map((app, index) => (
-                    <div
-                      key={app.id}
-                      ref={(el) => {
-                        if (el) mobileIconsRef.current[index] = el;
-                      }}
-                    >
-                      <MobileIcon
-                        id={String(app.id)}
-                        label={app.name}
-                        icon={app.iconImageUrl || (app.icon?.fileId ? `https://drive.google.com/uc?id=${app.icon.fileId}` : '')}
-                        onClick={() => openWindow(String(app.id))}
-                      />
+          <div className={`absolute inset-0 flex flex-col justify-between overflow-hidden ${isGlass ? "gap-3 p-3 pb-[82px]" : "gap-8 p-4 pb-24"}`}>
+            <div className={`flex flex-col ${isGlass ? "gap-3" : "gap-4 justify-between h-full"}`}>
+              <div className={`grid grid-cols-2 ${isGlass ? "gap-3" : "gap-4"}`}>
+                {isGlass ? (
+                  <div className="liquidGlass-wrapper mobile-folder rounded-2xl">
+                    <div className="liquidGlass-effect"></div>
+                    <div className="liquidGlass-tint"></div>
+                    <div className="liquidGlass-shine"></div>
+                    <div className="liquidGlass-content flex flex-col overflow-hidden flex-1">
+                      <div
+                        className="flex flex-1 overflow-hidden"
+                        onTouchStart={(e) => {
+                          touchStartX.current = e.touches[0].clientX;
+                        }}
+                        onTouchMove={(e) => {
+                          const diff = e.touches[0].clientX - touchStartX.current;
+                          // Rubber-band resistance at the edges
+                          if ((folderPage === 0 && diff > 0) || (folderPage === 1 && diff < 0)) {
+                            setFolderDragOffset(diff * 0.25);
+                          } else {
+                            setFolderDragOffset(diff);
+                          }
+                        }}
+                        onTouchEnd={(e) => {
+                          const diff = touchStartX.current - e.changedTouches[0].clientX;
+                          if (diff > 40 && orderedIcons.length > 6) setFolderPage(1);
+                          else if (diff < -40) setFolderPage(0);
+                          setFolderDragOffset(0);
+                        }}
+                      >
+                        <div
+                          className="flex w-full"
+                          style={{
+                            transform: `translateX(calc(-${folderPage * 100}% + ${folderDragOffset}px))`,
+                            transition: folderDragOffset !== 0 ? "none" : "transform 300ms ease-out",
+                          }}
+                        >
+                          {/* Page 1: icons 0-3 */}
+                          <div className="grid grid-cols-2 gap-1 auto-rows-min justify-items-center p-2 flex-shrink-0 w-full content-start">
+                            {orderedIcons.slice(0, 4).map((app, index) => (
+                              <div
+                                key={app.id}
+                                ref={(el) => {
+                                  if (el) mobileIconsRef.current[index] = el;
+                                }}
+                              >
+                                <MobileIcon
+                                  glass
+                                  id={String(app.id)}
+                                  label={app.name}
+                                  icon={iconSrc(app)}
+                                  onClick={() => openWindow(String(app.id))}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                          {/* Page 2: icons 6 and beyond */}
+                          <div className="grid grid-cols-2 gap-1 auto-rows-min justify-items-center p-2 flex-shrink-0 w-full content-start">
+                            {orderedIcons.slice(6).map((app, index) => (
+                              <div
+                                key={app.id}
+                                ref={(el) => {
+                                  if (el) mobileIconsRef.current[index + 6] = el;
+                                }}
+                              >
+                                <MobileIcon
+                                  glass
+                                  id={String(app.id)}
+                                  label={app.name}
+                                  icon={iconSrc(app)}
+                                  onClick={() => openWindow(String(app.id))}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      {orderedIcons.length > 6 && (
+                        <div className="flex justify-center gap-1.5 pb-2">
+                          {[0, 1].map((i) => (
+                            <button
+                              key={i}
+                              aria-label={`Folder page ${i + 1}`}
+                              onClick={() => setFolderPage(i)}
+                              className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
+                                folderPage === i ? "bg-white" : "bg-white/35"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4 auto-rows-min justify-items-center">
+                    {orderedIcons.slice(0, 4).map((app, index) => (
+                      <div
+                        key={app.id}
+                        ref={(el) => {
+                          if (el) mobileIconsRef.current[index] = el;
+                        }}
+                      >
+                        <MobileIcon
+                          id={String(app.id)}
+                          label={app.name}
+                          icon={iconSrc(app)}
+                          onClick={() => openWindow(String(app.id))}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <div className="flex justify-center">
-                  <Image
-                    src={effectiveWidget1}
-                    alt="Water CD"
-                    width={160}
-                    height={160}
-                    className="rounded-2xl h-40 w-auto animate-float-smooth"
-                    style={{
-                      willChange: "transform",
-                      backfaceVisibility: "hidden",
-                    }}
-                  />
+                  <div className={isGlass ? "relative overflow-hidden rounded-2xl h-[180px]" : "contents"}>
+                    <Image
+                      src={effectiveWidget1}
+                      alt="Water CD"
+                      width={160}
+                      height={160}
+                      className={`rounded-2xl w-auto animate-float-smooth ${isGlass ? "h-full" : "h-40"}`}
+                      style={{
+                        willChange: "transform",
+                        backfaceVisibility: "hidden",
+                      }}
+                    />
+                    {isGlass && <div className="widget-glass-overlay rounded-2xl" />}
+                  </div>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className={`grid grid-cols-2 ${isGlass ? "gap-3" : "gap-4"}`}>
                 <div className="flex justify-center">
-                  <Image
-                    src={effectiveWidget2}
-                    alt="Cute Puppy"
-                    width={160}
-                    height={160}
-                    className="rounded-2xl h-40 w-auto animate-float-smooth"
-                    style={{
-                      willChange: "transform",
-                      backfaceVisibility: "hidden",
-                    }}
-                  />
+                  <div className={isGlass ? "relative overflow-hidden rounded-2xl h-[160px]" : "contents"}>
+                    <Image
+                      src={effectiveWidget2}
+                      alt="Cute Puppy"
+                      width={160}
+                      height={160}
+                      className={`rounded-2xl w-auto animate-float-smooth ${isGlass ? "h-full" : "h-40"}`}
+                      style={{
+                        willChange: "transform",
+                        backfaceVisibility: "hidden",
+                      }}
+                    />
+                    {isGlass && <div className="widget-glass-overlay rounded-2xl" />}
+                  </div>
                 </div>
-                <div className="flex flex-col justify-center">
-                  <div className="grid grid-cols-2 gap-4 auto-rows-min justify-items-center">
-                    {icons.slice(4, 6).map((app, index) => (
+                <div className={`flex flex-col justify-center ${isGlass ? "gap-3" : ""}`}>
+                  <div className={`grid grid-cols-2 auto-rows-min justify-items-center ${isGlass ? "gap-2" : "gap-4"}`}>
+                    {orderedIcons.slice(4, 6).map((app, index) => (
                       <div
                         key={app.id}
                         ref={(el) => {
@@ -497,9 +720,10 @@ function DesktopInner({ preview = false, previewMode }: DesktopProps) {
                         }}
                       >
                         <MobileIcon
+                          glass={isGlass}
                           id={String(app.id)}
                           label={app.name}
-                          icon={app.iconImageUrl || (app.icon?.fileId ? `https://drive.google.com/uc?id=${app.icon.fileId}` : '')}
+                          icon={iconSrc(app)}
                           onClick={() => openWindow(String(app.id))}
                         />
                       </div>
@@ -511,7 +735,8 @@ function DesktopInner({ preview = false, previewMode }: DesktopProps) {
               <MusicPlayerWidget isDesktop={false} embedded={preview} musicPlayerStyleId={musicPlayerStyleId} spotifyPlaylistUrl={data?.spotifyPlaylistUrl} />
             </div>
             <Taskbar
-              apps={icons.map(icon => ({ id: String(icon.id), label: icon.name, icon: icon.iconImageUrl || (icon.icon?.fileId ? `https://drive.google.com/uc?id=${icon.icon.fileId}` : '') }))}
+              apps={taskbarVisible}
+              overflowApps={taskbarOverflow}
               openWindows={openWindows}
               onAppClick={handleAppClick}
               className="mt-auto"
@@ -533,6 +758,34 @@ function DesktopInner({ preview = false, previewMode }: DesktopProps) {
           </Window>
         ))}
       </div>
+
+      <DragOverlay dropAnimation={{ duration: 180, easing: "ease" }}>
+        {activeAppId
+          ? (() => {
+              const app = orderedIcons.find((a) => String(a.id) === activeAppId);
+              if (!app) return null;
+              return (
+                <div className="liquidGlass-icon desktop-icon w-20 sm:w-24 md:w-28 p-2 mb-2 select-none cursor-grabbing scale-110 opacity-90 drop-shadow-2xl">
+                  <div className="liquidGlass-effect" />
+                  <div className="liquidGlass-tint" />
+                  <div className="liquidGlass-shine" />
+                  <div className="liquidGlass-content">
+                    <div className="w-12 h-12 flex items-center justify-center">
+                      <Image
+                        src={iconSrc(app) || "/placeholder.svg"}
+                        alt={app.name}
+                        width={48}
+                        height={48}
+                        className="max-w-full max-h-full object-contain drop-shadow-md"
+                      />
+                    </div>
+                    <span className="desktop-icon-text">{app.name}</span>
+                  </div>
+                </div>
+              );
+            })()
+          : null}
+      </DragOverlay>
     </DndContext>
   );
 }
