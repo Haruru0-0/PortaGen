@@ -8,53 +8,17 @@ import { TabsNavigation } from "@/components/editor/TabsNavigation"
 import { TabContent } from "@/components/editor/TabContent"
 
 import { PortfolioSettings } from "@/components/editor/portfolio-settings"
-import { useGoogleDrive } from "@/hooks/use-google-drive"
-import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
-import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
 import { WorkspaceLink } from "@/components/workspace/workspace-link"
-import { ArrowLeft, ArrowUp, ArrowDown, Cloud, XCircle } from "lucide-react"
+import { ArrowLeft, ArrowUp, ArrowDown } from "lucide-react"
 
 export default function EditorPage() {
     const tabsId = useId();
-    const { connected, loading: driveLoading, connectDrive } = useGoogleDrive();
 
     return (
         <div>
             <div className="workspace-controls">
                 <WorkspaceLink href="/dashboard/portfolios" transition="back" className="workspace-editor-return ws-action ws-action--secondary"><ArrowLeft size={18} aria-hidden="true"/>Portfolios</WorkspaceLink>
                 <PortfolioUrlShare />
-
-            {driveLoading && (
-                <PixelCard className="mt-4">
-                    <div className="min-h-24 bg-muted workspace-editor-loading" role="status" aria-label="Checking Google Drive" />
-                </PixelCard>
-            )}
-            {!driveLoading && !connected && (
-                <PixelCard className="border-yellow-500 mt-4">
-                    <div className="flex flex-col md:flex-row items-center justify-between p-4 gap-4 md:gap-2">
-                        <div className="flex items-center gap-3">
-                            <XCircle className="w-6 h-6 text-yellow-500" />
-                            <div>
-                                <p className="text-xs font-bold">
-                                    GOOGLE DRIVE NOT CONNECTED
-                                </p>
-                                <p className="font-dialogue text-sm text-muted-foreground">
-                                    Connect your Google Drive to upload and manage assets
-                                </p>
-                            </div>
-                        </div>
-                        <PixelButton
-                            variant="primary"
-                            className="text-xs flex items-center gap-2"
-                            onClick={connectDrive}
-                            disabled={driveLoading}
-                        >
-                            <Cloud className="w-4 h-4" />
-                            {driveLoading ? "CONNECTING..." : "CONNECT NOW"}
-                        </PixelButton>
-                    </div>
-                </PixelCard>
-            )}
 
             </div>
             <div id="editor-top" className="min-h-[calc(100vh-180px)] flex flex-col mt-4">

@@ -16,6 +16,11 @@ interface TaskbarProps {
     label: string
     icon: string
   }[]
+  overflowApps?: {
+    id: string
+    label: string
+    icon: string
+  }[]
   openWindows: {
     name: string
     minimized: boolean

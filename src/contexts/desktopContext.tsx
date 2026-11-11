@@ -10,7 +10,7 @@ interface DesktopContextType {
   fetching: boolean
   getDesktopData: (portfolioId: number) => Promise<void>
   displayDesktopData: (username: string, portfolioId: number) => Promise<void>
-  updateWallpaper: (portfolioId: number, assetId: number | null, url?: string) => Promise<void>
+  updateWallpaper: (portfolioId: number, assetId: number | null, url?: string, variant?: 'mobile') => Promise<void>
   updateGif: (portfolioId: number, assetId: number | null, url?: string) => Promise<void>
   updateWidget: (portfolioId: number, index: 1 | 2, assetId: number | null, url?: string) => Promise<void>
   updateSpotify: (portfolioId: number, url: string) => Promise<void>
@@ -35,12 +35,12 @@ export function DesktopProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const updateWallpaper = async (portfolioId: number, assetId: number | null, url?: string) => {
+  const updateWallpaper = async (portfolioId: number, assetId: number | null, url?: string, variant?: 'mobile') => {
     setLoading(true)
     try {
-      await updateDesktopWallpaper(portfolioId, assetId, url)
+      await updateDesktopWallpaper(portfolioId, assetId, url, variant)
       await getDesktopData(portfolioId)
-      toast.success("Wallpaper updated successfully!")
+      toast.success(variant === 'mobile' ? "Mobile wallpaper updated!" : "Wallpaper updated successfully!")
     } catch (error) {
       console.error("Failed to update wallpaper:", error)
       toast.error("Failed to update wallpaper")

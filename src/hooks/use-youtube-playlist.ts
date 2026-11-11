@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { isSpotifyMusicUrl, parseYouTubePlaylistUrl, type YouTubePlaylist } from "@/lib/music/youtube-playlist";
+import { isSoundCloudUrl } from "@/lib/music/soundcloud";
 
 // Keep successful playlist objects stable across responsive widget remounts.
 const playlistCache = new Map<string, YouTubePlaylist>();
 
 export function useYouTubePlaylist(url?: string) {
-  const configured = !!url?.trim() && !isSpotifyMusicUrl(url);
+  const configured = !!url?.trim() && !isSpotifyMusicUrl(url) && !isSoundCloudUrl(url);
   const parsedUrl = url ? parseYouTubePlaylistUrl(url)?.url ?? null : null;
   const [result, setResult] = useState<{ url: string; playlist: YouTubePlaylist | null; error: boolean } | null>(null);
   useEffect(() => {

@@ -4,6 +4,7 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { isSpotifyMusicUrl } from "@/lib/music/youtube-playlist";
 import { useYouTubePlaylist } from "@/hooks/use-youtube-playlist";
+import { useSoundCloudPlaylist } from "@/hooks/use-soundcloud-playlist";
 import { AudioContext } from "../../contexts/audio-context";
 import { useAppSound } from "../../contexts/sound-context";
 import { playlist, Track } from "@/lib/types";
@@ -87,10 +88,11 @@ interface ThemedMusicPlayerProps extends Partial<MusicPlayerStyleProps> {
   onRetry?: () => void;
   onSkipUnavailable?: () => void;
   youtubeMusicUrl?: string;
+  externalLabel?: string;
 }
 
 function ThemedMusicPlayer(props: ThemedMusicPlayerProps) {
-  const { musicPlayerStyleId, playerType, playbackError, onRetry, onSkipUnavailable, youtubeMusicUrl, ...restProps } = props;
+  const { musicPlayerStyleId, playerType, playbackError, onRetry, onSkipUnavailable, youtubeMusicUrl, externalLabel, ...restProps } = props;
 
   // Provide default values for required props
   // We use useMemo here to avoid creating a new object on every render if possible
@@ -153,7 +155,7 @@ function ThemedMusicPlayer(props: ThemedMusicPlayerProps) {
         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2">
           <button type="button" className="cursor-pointer underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-4" onClick={onRetry}>Retry</button>
           <button type="button" className="cursor-pointer underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-4" onClick={onSkipUnavailable}>Next track</button>
-          {youtubeMusicUrl ? <a className="underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-4" href={youtubeMusicUrl} target="_blank" rel="noopener noreferrer">Open on YouTube Music</a> : null}
+          {youtubeMusicUrl ? <a className="underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-4" href={youtubeMusicUrl} target="_blank" rel="noopener noreferrer">{externalLabel ?? "Open on YouTube Music"}</a> : null}
         </div>
       </div>
     ) : null}
@@ -169,7 +171,7 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
   musicPlayerStyleId = "default",
 }: MusicPlayerProps) {
   const {
-    audioRef,
+    seek: seekTrack,
     currentTrack: audioTrack,
     isPlaying,
     progress,
@@ -193,19 +195,21 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
   }, [isPlaying, emitAchievement]);
 
   const youtube = useYouTubePlaylist(spotifyPlaylistUrl);
+  const soundcloud = useSoundCloudPlaylist(spotifyPlaylistUrl);
+  const ext = soundcloud.configured ? soundcloud : youtube;
   const useSpotify = !!spotifyPlaylistUrl && isSpotifyMusicUrl(spotifyPlaylistUrl);
-  const queue = youtube.configured ? youtube.playlist?.tracks ?? EMPTY_QUEUE : useSpotify ? EMPTY_QUEUE : playlist;
-  const unavailable = youtube.configured && !youtube.playlist;
+  const queue = ext.configured ? ext.playlist?.tracks ?? EMPTY_QUEUE : useSpotify ? EMPTY_QUEUE : playlist;
+  const unavailable = ext.configured && !ext.playlist;
   const currentTrack = unavailable ? {
     id: 0,
-    title: youtube.loading ? "Loading playlist..." : "Playlist unavailable",
-    artist: youtube.loading ? "YouTube Music" : "Check that the playlist is public and try again.",
+    title: ext.loading ? "Loading playlist..." : "Playlist unavailable",
+    artist: ext.loading ? (soundcloud.configured ? "SoundCloud" : "YouTube Music") : "Check that the playlist is public and try again.",
     cover: playlist[0].cover,
     duration: "0:00",
     src: "",
   } : audioTrack;
-  const playerLoading = isLoading || youtube.loading;
-  const sourceKey = useSpotify ? `spotify:${spotifyPlaylistUrl}` : youtube.sourceKey;
+  const playerLoading = isLoading || ext.loading;
+  const sourceKey = useSpotify ? `spotify:${spotifyPlaylistUrl}` : ext.sourceKey;
   useEffect(() => { setQueue(queue, sourceKey); }, [queue, sourceKey, setQueue]);
 
   const [showPlaylist, setShowPlaylist] = useState(false);
@@ -770,11 +774,9 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
       playClickSound();
       return;
     }
-    if (useSpotify || !audioRef.current || !Number.isFinite(audioRef.current.duration)) return;
-    audioRef.current.currentTime = (audioRef.current.duration * pct) / 100;
-    setProgress(pct);
+    if (useSpotify || !seekTrack(pct)) return;
     playClickSound();
-  }, [useSpotify, spDurationMs, audioRef, setProgress, playClickSound]);
+  }, [useSpotify, spDurationMs, seekTrack, setProgress, playClickSound]);
 
   const handleSeekWrapped = useCallback((value: number[]) => {
     isDraggingSlider.current = true;
@@ -799,13 +801,14 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
   };
 
   const errorFeedbackProps = {
-    playbackError: youtube.configured && !unavailable && playbackError,
+    playbackError: ext.configured && !unavailable && playbackError,
     onRetry: retryPlayback,
     onSkipUnavailable: () => {
       if (queue.length === 1) retryPlayback();
       else { handleNext(); setIsPlaying(true); }
     },
-    youtubeMusicUrl: youtube.playlist?.url,
+    youtubeMusicUrl: ext.playlist?.url,
+    externalLabel: soundcloud.configured ? "Open on SoundCloud" : undefined,
   };
 
   if (isDesktop && !isExpanded) {

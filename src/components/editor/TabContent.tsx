@@ -1,4 +1,5 @@
 import { LockScreenSettingsTab } from "@/components/editor/lock-screen-settings-tab";
+import { LockScreenThemeTab } from "@/components/editor/lock-screen-theme-tab";
 import { LockScreenWallpaperTab } from "@/components/editor/lock-screen-wallpaper-tab";
 import { MobileWidgetsTab } from "@/components/editor/mobile-widgets-tab";
 import { DesktopWallpaperTab } from "@/components/editor/desktop-wallpaper-tab";
@@ -52,6 +53,7 @@ export const TabContent = ({ idPrefix }: { idPrefix: string }) => {
                     <>
                         {activeLockScreenTab === "settings" && <LockScreenSettingsTab />}
                         {activeLockScreenTab === "wallpaper" && <LockScreenWallpaperTab />}
+                        {activeLockScreenTab === "theme" && <LockScreenThemeTab />}
                     </>
                 )}
 

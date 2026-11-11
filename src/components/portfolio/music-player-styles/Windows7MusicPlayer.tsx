@@ -4,6 +4,7 @@ import { MusicPlayerStyleProps, SpotifyTrack } from "./types"
 import { Track } from "@/lib/types"
 import { Loader2, Pause, Play, SkipBack, SkipForward, List, X, Minimize2 } from "lucide-react"
 import { Slider } from "@/components/ui/slider"
+import { SoundCloudCredit } from "../music-player/SoundCloudCredit"
 
 export function Windows7MusicPlayer(props: MusicPlayerStyleProps) {
     const { playerType, embedded, playerRef, buttonsRef, handleExpandClick, handleButtonClick,
@@ -159,6 +160,7 @@ export function Windows7MusicPlayer(props: MusicPlayerStyleProps) {
                                         <p className="text-blue-200/60 text-xs font-medium uppercase tracking-wide">
                                             {(useSpotify && spotifyCurrentTrack?.artists?.map((a) => a.name).join(", ")) || currentTrack.artist}
                                         </p>
+                                        <SoundCloudCredit track={currentTrack} />
                                     </div>
                                 </div>
                             )
@@ -312,6 +314,7 @@ export function Windows7MusicPlayer(props: MusicPlayerStyleProps) {
                                         <p className="text-[10px] font-bold text-blue-200/40 truncate tracking-wider uppercase mb-3">
                                             {(useSpotify && spotifyCurrentTrack?.artists?.map((a) => a.name).join(", ")) || currentTrack.artist}
                                         </p>
+                                        <SoundCloudCredit track={currentTrack} />
 
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-1.5">

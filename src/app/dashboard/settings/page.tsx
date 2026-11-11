@@ -12,10 +12,9 @@ import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-p
 import { UserRound } from "lucide-react"
 import { MotionPreferenceControl } from "@/components/workspace/motion-preference-control"
 import { FileUpload } from "@/components/file-upload"
-import { Trash2, Cloud, CheckCircle, XCircle } from "lucide-react"
+import { Trash2 } from "lucide-react"
 import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal"
 import { useSearchParams } from "next/navigation";
-import { useGoogleDrive } from "@/hooks/use-google-drive";
 
 // Password validation schema
 const passwordSchema = z.object({
@@ -74,17 +73,12 @@ function SettingsContent() {
   const [passwordSuccess, setPasswordSuccess] = useState(false)
   const [passwordLoading, setPasswordLoading] = useState(false)
   const searchParams = useSearchParams()
-  const { connected, loading, connecting, connectDrive, disconnectDrive } = useGoogleDrive()
   const [message, setMessage] = useState('')
 
   useEffect(() => {
-    const success = searchParams.get('success')
     const error = searchParams.get('error')
 
-    if (success === 'google_connected') {
-      setMessage('Google Drive connected successfully!')
-      setTimeout(() => setMessage(''), 5000)
-    } else if (error) {
+    if (error) {
       setMessage(`Error: ${error}`)
       setTimeout(() => setMessage(''), 5000)
     }
@@ -305,77 +299,6 @@ function SettingsContent() {
                 SAVE CHANGES
               </PixelButton>
             </div>
-          </div>
-        </PixelCard>
-
-        <PixelCard>
-          <div className="space-y-6">
-            <h3 className="text-sm ">GOOGLE DRIVE INTEGRATION</h3>
-
-            <PixelCard className="ws-drive-status flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <Cloud className="w-6 h-6" />
-                <div>
-                  <p className="text-sm font-bold">GOOGLE DRIVE STATUS</p>
-                  <p className="font-[family-name:var(--font-workspace-body)] text-sm text-muted-foreground">
-                    {loading ? 'Checking...' : connected ? 'Connected' : 'Not connected'}
-                  </p>
-                </div>
-              </div>
-
-              {!loading && (
-                <div className="flex items-center gap-2">
-                  {connected ? (
-                    <>
-                      <CheckCircle className="w-5 h-5 text-[#83efbd]" />
-                      <PixelButton
-                        variant="secondary"
-                        className="text-sm"
-                        onClick={disconnectDrive}
-                      >
-                        DISCONNECT
-                      </PixelButton>
-                    </>
-                  ) : (
-                    <>
-                      <XCircle className="w-5 h-5 text-[#ffb2c5]" />
-                      <PixelButton
-                        variant="primary"
-                        className="text-sm"
-                        onClick={connectDrive}
-                        disabled={connecting}
-                      >
-                        {connecting ? 'CONNECTING...' : 'CONNECT DRIVE'}
-                      </PixelButton>
-                    </>
-                  )}
-                </div>
-              )}
-            </PixelCard>
-
-            <PixelCard className="ws-drive-explainer">
-              <p className="font-[family-name:var(--font-workspace-body)] text-sm leading-relaxed">
-                <strong>WHY CONNECT GOOGLE DRIVE?</strong>
-                <br />
-                • Your files are stored in YOUR Google Drive
-                <br />
-                • You have full control over your assets
-                <br />
-                • No file storage limits from us
-                <br />
-                • Files are automatically backed up
-                <br />
-                • Easy to manage and organize
-              </p>
-            </PixelCard>
-
-            {connected && (
-              <div className="p-3 bg-green-500/10 border border-green-500">
-                <p className="font-[family-name:var(--font-workspace-body)] text-sm text-[#83efbd]">
-                  ✓ Your portfolio files will be saved to a &#34;Portfolio Assets&#34; folder in your Google Drive
-                </p>
-              </div>
-            )}
           </div>
         </PixelCard>
 

@@ -10,7 +10,7 @@ interface LockScreenContextType {
   fetching: boolean
   getLockScreenData: (portfolioId: number) => Promise<void>
   displayLockScreenData: (username: string, portfolioId: number) => Promise<void>
-  updateWallpaper: (portfolioId: number, wallpaperAssetId: number | null, url?: string) => Promise<void>
+  updateWallpaper: (portfolioId: number, wallpaperAssetId: number | null, url?: string, variant?: 'mobile') => Promise<void>
   updatePass: (portfolioId: number, payload: { enabled?: boolean; password?: string; hint?: string }) => Promise<void>
 }
 
@@ -31,12 +31,12 @@ export function LockScreenProvider({ children }: { children: React.ReactNode }) 
     }
   }, [])
 
-  const updateWallpaper = async (portfolioId: number, wallpaperAssetId: number | null, url?: string) => {
+  const updateWallpaper = async (portfolioId: number, wallpaperAssetId: number | null, url?: string, variant?: 'mobile') => {
     setLoading(true)
     try {
-      await updateLockScreenWallpaper(portfolioId, wallpaperAssetId, url)
+      await updateLockScreenWallpaper(portfolioId, wallpaperAssetId, url, variant)
       await getLockScreenData(portfolioId)
-      toast.success("Lock screen wallpaper updated!")
+      toast.success(variant === 'mobile' ? "Mobile lock screen wallpaper updated!" : "Lock screen wallpaper updated!")
     } catch (error) {
       console.error("Failed to update lock screen wallpaper:", error)
       toast.error("Failed to update lock screen wallpaper")

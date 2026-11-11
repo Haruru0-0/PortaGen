@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
     const body = await req.json().catch(() => ({}))
-    const { id, portfolioId, name, url, fileId, linkType, iconImageUrl } = body || {}
+    const { id, portfolioId, name, url, fileId, linkType, iconImageUrl, clearImage } = body || {}
 
     if (!id) return NextResponse.json({ error: 'Icon ID required' }, { status: 400 })
     if (!portfolioId) return NextResponse.json({ error: 'Portfolio ID required' }, { status: 400 })
@@ -47,8 +47,9 @@ export async function POST(req: NextRequest) {
       name,
       linkType: (linkType === 'url' || linkType === 'window') ? linkType : undefined,
       linkUrl: linkType === 'url' ? url : (linkType === 'window' ? '' : undefined),
-      iconAssetId: fileId != null && fileId !== '' ? Number(fileId) : undefined,
-      iconImageUrl: iconImageUrl || null,
+      // `clearImage` removes the icon's picture (file and link) so the placeholder shows again.
+      iconAssetId: clearImage ? null : fileId != null && fileId !== '' ? Number(fileId) : undefined,
+      iconImageUrl: clearImage ? null : iconImageUrl || null,
       updatedAt: new Date(),
     }
 

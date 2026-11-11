@@ -4,6 +4,7 @@ import { MusicPlayerStyleProps, SpotifyTrack } from "./types"
 import { Track } from "@/lib/types"
 import { Loader2, Pause, Play, SkipBack, SkipForward, List, X } from "lucide-react"
 import { Slider } from "@/components/ui/slider"
+import { SoundCloudCredit } from "../music-player/SoundCloudCredit"
 
 export function LiquidGlassMusicPlayer(props: MusicPlayerStyleProps) {
     const { playerType, embedded, playerRef, buttonsRef, handleExpandClick, handleButtonClick,
@@ -149,6 +150,7 @@ export function LiquidGlassMusicPlayer(props: MusicPlayerStyleProps) {
                                         <p className="text-white/50 text-xs tracking-wide uppercase font-medium">
                                             {(useSpotify && spotifyCurrentTrack?.artists?.map((a) => a.name).join(", ")) || currentTrack.artist}
                                         </p>
+                                        <SoundCloudCredit track={currentTrack} />
                                     </div>
                                 </div>
                             )
@@ -290,6 +292,7 @@ export function LiquidGlassMusicPlayer(props: MusicPlayerStyleProps) {
                                         <p className="text-[10px] font-medium text-white/40 truncate tracking-wide uppercase mb-4">
                                             {(useSpotify && spotifyCurrentTrack?.artists?.map((a) => a.name).join(", ")) || currentTrack.artist}
                                         </p>
+                                        <SoundCloudCredit track={currentTrack} />
 
                                         <div className="flex items-center justify-between gap-4">
                                             <div className="flex items-center gap-3">

@@ -1,11 +1,12 @@
 export type CategoryType = 'lockScreen' | 'homeScreen'
-export type LockScreenTab = 'settings' | 'wallpaper'
+export type LockScreenTab = 'settings' | 'wallpaper' | 'theme'
 export type HomeScreenTab = 'wallpaper' | 'icons' | 'music' | 'windows' | 'theme' | 'sounds' | 'mobile widgets' | 'desktop widget'
 
 
 export const lockScreenTabs: { id: LockScreenTab; label: string }[] = [
     { id: "settings", label: "SETTINGS" },
     { id: "wallpaper", label: "WALLPAPER" },
+    { id: "theme", label: "THEME" },
 ]
 
 export const homeScreenTabs: { id: HomeScreenTab; label: string }[] = [

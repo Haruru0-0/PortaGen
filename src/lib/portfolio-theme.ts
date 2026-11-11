@@ -9,6 +9,7 @@ export interface PortfolioTheme {
   }
   font: string
   taskbarStyleId: string
+  lockScreenStyleId?: string
   menubarStyleId: string
   windowStyleId: string
   musicPlayerStyleId: string
@@ -26,6 +27,7 @@ export const THEME_PRESETS: PortfolioTheme[] = [
     },
     font: "Press Start 2P",
     taskbarStyleId: "pixel",
+    lockScreenStyleId: "pixel",
     menubarStyleId: "pixel",
     windowStyleId: "pixel",
     musicPlayerStyleId: "pixel",
@@ -41,6 +43,7 @@ export const THEME_PRESETS: PortfolioTheme[] = [
     },
     font: "Orbitron",
     taskbarStyleId: "liquid-glass",
+    lockScreenStyleId: "liquid-glass",
     menubarStyleId: "liquid-glass",
     windowStyleId: "liquid-glass",
     musicPlayerStyleId: "liquid-glass",
@@ -56,6 +59,7 @@ export const THEME_PRESETS: PortfolioTheme[] = [
     },
     font: "Inter",
     taskbarStyleId: "liquid-glass",
+    lockScreenStyleId: "liquid-glass",
     menubarStyleId: "liquid-glass",
     windowStyleId: "liquid-glass",
     musicPlayerStyleId: "liquid-glass",
@@ -71,6 +75,7 @@ export const THEME_PRESETS: PortfolioTheme[] = [
     },
     font: "Poppins",
     taskbarStyleId: "liquid-glass",
+    lockScreenStyleId: "liquid-glass",
     menubarStyleId: "liquid-glass",
     windowStyleId: "liquid-glass",
     musicPlayerStyleId: "liquid-glass",
@@ -86,6 +91,7 @@ export const THEME_PRESETS: PortfolioTheme[] = [
     },
     font: "Space Grotesk",
     taskbarStyleId: "pixel",
+    lockScreenStyleId: "pixel",
     menubarStyleId: "pixel",
     windowStyleId: "pixel",
     musicPlayerStyleId: "pixel",

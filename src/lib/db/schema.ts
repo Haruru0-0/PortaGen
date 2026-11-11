@@ -12,12 +12,6 @@ export const users = pgTable('users', {
     email: varchar('email', { length: 255 }).notNull(),
     username: varchar('username', { length: 100 }).unique(),
 
-    // Google Drive OAuth tokens (encrypted)
-    googleAccessToken: text('google_access_token'),
-    googleRefreshToken: text('google_refresh_token'),
-    googleTokenExpiry: timestamp('google_token_expiry'),
-    googleDriveConnected: boolean('google_drive_connected').default(false),
-
     // Spotify OAuth tokens (encrypted)
     spotifyAccessToken: text('spotify_access_token'),
     spotifyRefreshToken: text('spotify_refresh_token'),
@@ -29,7 +23,7 @@ export const users = pgTable('users', {
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => ({
     supabaseUserIdIdx: index('supabase_user_id_idx').on(table.supabaseUserId),
-}))
+})).enableRLS()
 
 // Portfolios table - main portfolio data
 export const portfolios = pgTable('portfolios', {
@@ -45,7 +39,7 @@ export const portfolios = pgTable('portfolios', {
     views: integer('views').default(0).notNull(),
 }, (table) => ({
     userIdIdx: index('portfolio_user_id_idx').on(table.userId),
-}))
+})).enableRLS()
 
 // ============================================
 // CONTENT TABLES
@@ -74,7 +68,7 @@ export const windows = pgTable('windows', {
 }, (table) => ({
     portfolioIdIdx: index('windows_portfolio_id_idx').on(table.portfolioId),
     iconIdIdx: index('windows_icon_id_idx').on(table.iconId),
-}))
+})).enableRLS()
 
 // Icons table
 export const icons = pgTable('icons', {
@@ -92,7 +86,7 @@ export const icons = pgTable('icons', {
 
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
-})
+}).enableRLS()
 
 // ============================================
 // MEDIA & ASSETS TABLES
@@ -104,8 +98,10 @@ export const uploadedAssets = pgTable('uploaded_assets', {
 
     assetType: varchar('asset_type', { length: 50 }).notNull(), // 'image', 'audio', 'icon', 'wallpaper'
 
-    // Google Drive file info
+    // Storage key: the UploadThing file key (older rows hold a Google Drive file id and have no url)
     fileId: varchar('file_id', { length: 255 }).notNull().unique(),
+    // Public address of the file on UploadThing
+    url: text('url'),
     fileName: text('file_name').notNull(),
 
     mimeType: varchar('mime_type', { length: 100 }),
@@ -115,7 +111,7 @@ export const uploadedAssets = pgTable('uploaded_assets', {
 }, (table) => ({
     userIdIdx: index('assets_user_id_idx').on(table.userId),
     fileIdIdx: index('assets_file_id_idx').on(table.fileId),
-}))
+})).enableRLS()
 
 export const portfolioAssets = pgTable('portfolio_assets', {
     id: serial('id').primaryKey(),
@@ -129,7 +125,7 @@ export const portfolioAssets = pgTable('portfolio_assets', {
     uniquePortfolioAsset: unique('unique_portfolio_asset').on(table.portfolioId, table.assetId),
     portfolioIdIdx: index('portfolio_assets_portfolio_id_idx').on(table.portfolioId),
     assetIdIdx: index('portfolio_assets_asset_id_idx').on(table.assetId),
-}))
+})).enableRLS()
 
 // Sound effects table - simplified to store only preset ID with portfolio ID
 export const soundEffects = pgTable('sound_effects', {
@@ -141,7 +137,7 @@ export const soundEffects = pgTable('sound_effects', {
 
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
-})
+}).enableRLS()
 
 // ============================================
 // SETTINGS TABLES
@@ -164,12 +160,13 @@ export const themeSettings = pgTable('theme_settings', {
         }
         font: string
         taskbarStyleId?: string
+        lockScreenStyleId?: string
         menubarStyleId?: string
     }>(),
 
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
-})
+}).enableRLS()
 
 // Lock screen settings table
 export const lockScreenSettings = pgTable('lock_screen_settings', {
@@ -181,10 +178,12 @@ export const lockScreenSettings = pgTable('lock_screen_settings', {
 
     wallpaperAssetId: integer('wallpaper_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
     wallpaperUrl: text('wallpaper_url'),
+    mobileWallpaperAssetId: integer('mobile_wallpaper_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
+    mobileWallpaperUrl: text('mobile_wallpaper_url'),
 
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
-})
+}).enableRLS()
 
 // Desktop settings table
 export const desktopSettings = pgTable('desktop_settings', {
@@ -193,6 +192,8 @@ export const desktopSettings = pgTable('desktop_settings', {
 
     wallpaperAssetId: integer('wallpaper_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
     wallpaperUrl: text('wallpaper_url'),
+    mobileWallpaperAssetId: integer('mobile_wallpaper_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
+    mobileWallpaperUrl: text('mobile_wallpaper_url'),
     desktopGifAssetId: integer('desktop_gif_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
     desktopGifUrl: text('desktop_gif_url'),
     widget1AssetId: integer('widget1_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
@@ -212,7 +213,7 @@ export const desktopSettings = pgTable('desktop_settings', {
 
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
-})
+}).enableRLS()
 
 // ============================================
 // ANALYTICS & ACTIVITY TABLES
@@ -228,7 +229,7 @@ export const userActivities = pgTable('user_activities', {
     createdAt: timestamp('created_at').defaultNow().notNull(),
 }, (table) => ({
     userIdIdx: index('activities_user_id_idx').on(table.userId),
-}))
+})).enableRLS()
 
 export const userChecklistItems = pgTable('user_checklist_items', {
     id: serial('id').primaryKey(),
@@ -242,7 +243,7 @@ export const userChecklistItems = pgTable('user_checklist_items', {
 }, (table) => ({
     uniqueUserTask: unique('unique_user_task').on(table.userId, table.taskId),
     userIdIdx: index('checklist_user_id_idx').on(table.userId),
-}))
+})).enableRLS()
 
 // ============================================
 // RELATIONS
@@ -321,6 +322,10 @@ export const lockScreenSettingsRelations = relations(lockScreenSettings, ({ one 
         fields: [lockScreenSettings.wallpaperAssetId],
         references: [uploadedAssets.id],
     }),
+    mobileWallpaperAsset: one(uploadedAssets, {
+        fields: [lockScreenSettings.mobileWallpaperAssetId],
+        references: [uploadedAssets.id],
+    }),
 }))
 
 export const desktopSettingsRelations = relations(desktopSettings, ({ one }) => ({
@@ -330,6 +335,10 @@ export const desktopSettingsRelations = relations(desktopSettings, ({ one }) => 
     }),
     wallpaperAsset: one(uploadedAssets, {
         fields: [desktopSettings.wallpaperAssetId],
+        references: [uploadedAssets.id],
+    }),
+    mobileWallpaperAsset: one(uploadedAssets, {
+        fields: [desktopSettings.mobileWallpaperAssetId],
         references: [uploadedAssets.id],
     }),
     desktopGifAsset: one(uploadedAssets, {

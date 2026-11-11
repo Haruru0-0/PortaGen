@@ -4,6 +4,7 @@ import { MusicPlayerStyleProps, SpotifyTrack } from "./types"
 import { Track } from "@/lib/types"
 import { Loader2, Pause, Play, SkipBack, SkipForward, List, X, Minus } from "lucide-react"
 import { Slider } from "@/components/ui/slider"
+import { SoundCloudCredit } from "../music-player/SoundCloudCredit"
 
 export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
     const { playerType, embedded, playerRef, buttonsRef, handleExpandClick, handleButtonClick,
@@ -153,6 +154,7 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
                                             <p className="text-[#00ff00] text-[10px] font-mono leading-none truncate opacity-80">
                                                 {(useSpotify && spotifyCurrentTrack?.artists?.map((a) => a.name).join(", ")) || currentTrack.artist}
                                             </p>
+                                            <SoundCloudCredit track={currentTrack} />
                                         </div>
                                     </div>
                                 )}
@@ -311,6 +313,7 @@ export function Windows98MusicPlayer(props: MusicPlayerStyleProps) {
                                         <p className="text-[9px] text-[#424242] truncate mb-3">
                                             {(useSpotify && spotifyCurrentTrack?.artists?.map((a) => a.name).join(", ")) || currentTrack.artist}
                                         </p>
+                                        <SoundCloudCredit track={currentTrack} />
 
                                         <div className="flex items-center gap-1.5">
                                             <button

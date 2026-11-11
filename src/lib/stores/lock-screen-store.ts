@@ -5,6 +5,7 @@ export interface LockScreenState {
     password: string
     hint: string
     wallpaper: string
+    mobileWallpaper: string
     wallpaperFileId: string | null
     isPreview: boolean
     isLocked: boolean
@@ -36,6 +37,7 @@ export const useLockScreenStore = create<LockScreenStore>((set) => ({
     password: '1234',
     hint: "It's 1234",
     wallpaper: '',
+    mobileWallpaper: '',
     wallpaperFileId: null,
     isPreview: false,
     isLocked: false,

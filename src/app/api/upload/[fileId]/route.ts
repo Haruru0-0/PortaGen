@@ -1,73 +1,33 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/api/upload/[fileId]/route.ts
 import { NextRequest, NextResponse } from 'next/server'
+import { UTApi } from 'uploadthing/server'
+import { and, eq } from 'drizzle-orm'
 import { createClient } from '@/utils/supabase/server'
-import { deleteFromUserDrive, decryptToken } from '@/lib/services/google-drive'
+import { getUserBySupabaseId } from '@/lib/db/helpers'
 import { db } from '@/lib/db'
-import { users, uploadedAssets } from '@/lib/db/schema'
-import { eq, and } from 'drizzle-orm'
+import { uploadedAssets } from '@/lib/db/schema'
 
-export async function DELETE(
-    req: NextRequest,
-    { params }: { params: Promise<{ fileId: string }> }
-) {
-    try {
-        const supabase = await createClient()
-        const { data: { user: supabaseUser } } = await supabase.auth.getUser()
+export const runtime = 'nodejs'
 
-        if (!supabaseUser) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-        }
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ fileId: string }> }) {
+  try {
+    const { data: { user: account } } = await (await createClient()).auth.getUser()
+    if (!account) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const user = await getUserBySupabaseId(account.id)
+    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
-        const { fileId } = await params
+    const { fileId } = await params
+    const asset = await db.query.uploadedAssets.findFirst({
+      where: and(eq(uploadedAssets.fileId, fileId), eq(uploadedAssets.userId, user.id)),
+    })
+    if (!asset) return NextResponse.json({ error: 'Asset not found' }, { status: 404 })
 
-        // Get user
-        const user = await db.query.users.findFirst({
-            where: eq(users.supabaseUserId, supabaseUser.id),
-        })
-
-        if (!user || !user.googleAccessToken || !user.googleRefreshToken) {
-            return NextResponse.json(
-                { error: 'Google Drive not connected' },
-                { status: 400 }
-            )
-        }
-
-        // Find asset in database
-        const asset = await db.query.uploadedAssets.findFirst({
-            where: and(
-                eq(uploadedAssets.fileId, fileId),
-                eq(uploadedAssets.userId, user.id)
-            ),
-        })
-
-        if (!asset) {
-            return NextResponse.json({ error: 'Asset not found' }, { status: 404 })
-        }
-
-        // Decrypt tokens
-        const accessToken = decryptToken(user.googleAccessToken)
-        const refreshToken = decryptToken(user.googleRefreshToken)
-
-        // Delete from Google Drive
-        await deleteFromUserDrive(accessToken, refreshToken, fileId)
-
-        // Delete from database
-        await db
-            .delete(uploadedAssets)
-            .where(eq(uploadedAssets.id, asset.id))
-
-        return NextResponse.json({ success: true })
-    } catch (error: any) {
-        console.error('Delete error:', error)
-
-        if (error.message === 'REFRESH_TOKEN_NEEDED') {
-            return NextResponse.json(
-                { error: 'Please reconnect your Google Drive' },
-                { status: 401 }
-            )
-        }
-
-        return NextResponse.json({ error: 'Delete failed' }, { status: 500 })
-    }
+    // Files uploaded before the move to UploadThing live in the owner's Google Drive and are not removed from there.
+    if (asset.url) await new UTApi().deleteFiles(asset.fileId)
+    await db.delete(uploadedAssets).where(eq(uploadedAssets.id, asset.id))
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Delete error:', error)
+    return NextResponse.json({ error: 'Delete failed' }, { status: 500 })
+  }
 }

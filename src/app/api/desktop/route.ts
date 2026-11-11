@@ -28,6 +28,7 @@ export async function GET(req: NextRequest) {
       where: eq(desktopSettings.portfolioId, portfolioId),
       with: {
         wallpaperAsset: true,
+        mobileWallpaperAsset: true,
         desktopGifAsset: true,
         widget1Asset: true,
         widget2Asset: true,
@@ -42,6 +43,8 @@ export async function GET(req: NextRequest) {
       spotifyPlaylistUrl: row.spotifyPlaylistUrl || '',
       wallpaperAsset: row.wallpaperAsset ?? undefined,
       wallpaperUrl: row.wallpaperUrl || '',
+      mobileWallpaperAsset: row.mobileWallpaperAsset ?? undefined,
+      mobileWallpaperUrl: row.mobileWallpaperUrl || '',
       desktopGifAsset: row.desktopGifAsset ?? undefined,
       desktopGifUrl: row.desktopGifUrl || '',
       widget1Asset: row.widget1Asset ?? undefined,

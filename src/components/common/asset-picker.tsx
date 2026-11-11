@@ -4,9 +4,12 @@ import { useEffect, useState } from "react"
 import { WorkspaceModal as PixelModal } from "@/components/workspace/workspace-modal"
 import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
 import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
-import { Loader2, Music, Zap, FileImage, FolderOpen } from "lucide-react"
+import { Loader2, Music, Zap, FileImage, FolderOpen, Trash2 } from "lucide-react"
 import Image from "next/image"
 import { Asset } from "@/lib/types"
+import { assetUrl } from "@/lib/asset-url"
+import { DeleteConfirmationModal } from "@/components/delete-confirmation-modal"
+import { useFileUpload } from "@/hooks/use-file-upload"
 
 interface AssetPickerProps {
     isOpen: boolean
@@ -20,6 +23,8 @@ export function AssetPicker({ isOpen, onClose, onSelect, type = "all" }: AssetPi
     const [loading, setLoading] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
     const [selectedAssetId, setSelectedAssetId] = useState<number | null>(null)
+    const [assetToDelete, setAssetToDelete] = useState<(Asset & { usedIn?: string[] }) | null>(null)
+    const { deleteFile } = useFileUpload()
 
     useEffect(() => {
         if (isOpen) {
@@ -29,18 +34,6 @@ export function AssetPicker({ isOpen, onClose, onSelect, type = "all" }: AssetPi
         }
     }, [isOpen])
 
-    const getOptimizedDriveUrl = (fileId: string, type: 'display' | 'download' | 'thumbnail' = 'display') => {
-        switch (type) {
-            case 'thumbnail':
-                return `https://drive.google.com/thumbnail?id=${fileId}&sz=w300-h300`
-            case 'download':
-                return `https://drive.google.com/uc?export=download&id=${fileId}`
-            case 'display':
-            default:
-                return `https://drive.google.com/uc?id=${fileId}`
-        }
-    }
-
     const fetchAssets = async () => {
         setLoading(true)
         try {
@@ -49,8 +42,8 @@ export function AssetPicker({ isOpen, onClose, onSelect, type = "all" }: AssetPi
                 const data = await response.json()
                 const assetsWithFixedUrls = data.assets.map((asset: any) => ({
                     ...asset,
-                    url: asset.url || getOptimizedDriveUrl(asset.fileId, 'display'),
-                    thumbnailUrl: asset.thumbnailUrl || getOptimizedDriveUrl(asset.fileId, 'thumbnail'),
+                    url: assetUrl(asset),
+                    thumbnailUrl: asset.thumbnailUrl || assetUrl(asset, 'thumbnail'),
                     mimeType: asset.mimeType
                 }))
                 setAssets(assetsWithFixedUrls || [])
@@ -79,6 +72,24 @@ export function AssetPicker({ isOpen, onClose, onSelect, type = "all" }: AssetPi
 
         return matchesType && matchesSearch
     })
+
+    const confirmDelete = async () => {
+        if (!assetToDelete) return
+        const result = await deleteFile(assetToDelete.fileId)
+        if (!result.success) throw new Error(result.error || "Delete failed")
+        setAssets((current) => current.filter((a) => a.id !== assetToDelete.id))
+        if (selectedAssetId === assetToDelete.id) setSelectedAssetId(null)
+        setAssetToDelete(null)
+    }
+
+    const deleteMessage = (() => {
+        if (!assetToDelete) return ""
+        const used = assetToDelete.usedIn ?? []
+        const base = `"${assetToDelete.name}" will be deleted for good. This cannot be undone.`
+        return used.length
+            ? `${base} It is used in ${used.join(", ")}; those will go back to their default until you choose another file.`
+            : base
+    })()
 
     const handleSelect = () => {
         const asset = assets.find(a => a.id === selectedAssetId)
@@ -123,11 +134,11 @@ export function AssetPicker({ isOpen, onClose, onSelect, type = "all" }: AssetPi
                                 const isImage = asset.type === "wallpaper" || asset.type === "icon"
 
                                 return (
+                                    <div key={asset.id} className="relative">
                                     <button
-                                        key={asset.id}
                                         aria-pressed={selectedAssetId === asset.id}
                                         onClick={() => setSelectedAssetId(asset.id)}
-                                        className={`relative group border-2 text-left p-2 transition-all cursor-pointer flex flex-col gap-2 ${isSelected
+                                        className={`relative group w-full border-2 text-left p-2 transition-all cursor-pointer flex flex-col gap-2 ${isSelected
                                             ? "border-primary bg-primary/10 ring-2 ring-primary ring-offset-2 ring-offset-background"
                                             : "border-border bg-card hover:border-primary/50"
                                             }`}
@@ -135,7 +146,7 @@ export function AssetPicker({ isOpen, onClose, onSelect, type = "all" }: AssetPi
                                         <div className="aspect-square relative bg-muted border border-border overflow-hidden">
                                             {isImage ? (
                                                 <Image
-                                                    src={`https://drive.google.com/thumbnail?id=${asset.fileId}` || `https://drive.google.com/uc?id=${asset.fileId}`}
+                                                    src={assetUrl(asset, "thumbnail")}
                                                     alt={asset.name}
                                                     fill
                                                     className="object-cover"
@@ -160,6 +171,16 @@ export function AssetPicker({ isOpen, onClose, onSelect, type = "all" }: AssetPi
                                             </div>
                                         </div>
                                     </button>
+                                    <button
+                                        type="button"
+                                        aria-label={`Delete ${asset.name}`}
+                                        title="Delete"
+                                        onClick={() => setAssetToDelete(asset as Asset & { usedIn?: string[] })}
+                                        className="absolute top-3 left-3 flex size-8 items-center justify-center border-2 border-border bg-background/90 text-[#bc174c] hover:bg-[#bc174c] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2"
+                                    >
+                                        <Trash2 className="size-4" aria-hidden="true" />
+                                    </button>
+                                    </div>
                                 )
                             })}
                         </div>
@@ -184,6 +205,13 @@ export function AssetPicker({ isOpen, onClose, onSelect, type = "all" }: AssetPi
                     </PixelButton>
                 </div>
             </div>
+            <DeleteConfirmationModal
+                isOpen={!!assetToDelete}
+                onClose={() => setAssetToDelete(null)}
+                onConfirm={confirmDelete}
+                title="DELETE FILE?"
+                message={deleteMessage}
+            />
         </PixelModal>
     )
 }

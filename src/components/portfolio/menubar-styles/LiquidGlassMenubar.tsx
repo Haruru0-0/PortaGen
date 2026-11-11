@@ -8,7 +8,7 @@ import { MenubarStyleProps } from "./types"
 export function LiquidGlassMenubar({ embedded, previewMode, currentTime, menubarIcon, menubarText }: MenubarStyleProps) {
     return (
         <div className={embedded ? "absolute top-0 left-0 right-0 z-50" : "fixed top-0 left-0 right-0 z-50"}>
-            <div className="liquidGlass-wrapper menubar h-12 flex items-center justify-between px-4 text-lg font-medium transition-none">
+            <div className="liquidGlass-wrapper menubar flex items-center justify-between text-lg font-medium">
                 <div className="liquidGlass-effect"></div>
                 <div className="liquidGlass-tint"></div>
                 <div className="liquidGlass-shine"></div>
@@ -23,13 +23,13 @@ export function LiquidGlassMenubar({ embedded, previewMode, currentTime, menubar
                                     className="object-contain" // Use object-contain to preserve aspect ratio
                                 />
                             </div>
-                            <p>{menubarText || "Ahmad kanaan"}</p>
+                            <p className="text-slate-200">{menubarText || "Ahmad kanaan"}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
                         <SoundSettings previewMode={previewMode} embedded={embedded} />
                         <ModeToggle previewMode={previewMode} embedded={embedded} />
-                        <span>{format(currentTime, "EEE d MMM h:mm a")}</span>
+                        <span className="text-slate-200">{format(currentTime, "EEE d MMM h:mm a")}</span>
                     </div>
                 </div>
             </div>

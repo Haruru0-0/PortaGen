@@ -8,6 +8,8 @@ import { getUserBySupabaseId } from '@/lib/db/helpers';
 import { completeChecklistTask } from '@/lib/activity';
 import { parseYouTubePlaylistUrl } from '@/lib/music/youtube-playlist';
 import { getYouTubePlaylist, YouTubeMusicError } from '@/lib/services/youtube-music';
+import { isSoundCloudUrl, parseSoundCloudUrl } from '@/lib/music/soundcloud';
+import { getSoundCloudInfo, SoundCloudError } from '@/lib/services/soundcloud';
 const input = z.object({ portfolioId: z.number().int().positive(), playlistUrl: z.string().max(2048) });
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -22,9 +24,14 @@ export async function POST(request: NextRequest) {
     const { portfolioId, playlistUrl } = parsed.data;
     const owned = await db.query.portfolios.findFirst({ where: and(eq(portfolios.id, portfolioId), eq(portfolios.userId, user.id)) });
     if (!owned) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    const link = playlistUrl.trim() ? parseYouTubePlaylistUrl(playlistUrl) : null;
-    if (playlistUrl.trim() && !link) return NextResponse.json({ error: 'Enter a valid YouTube playlist link.' }, { status: 400 });
-    if (link) await getYouTubePlaylist(link.url);
+    const soundcloud = playlistUrl.trim() && isSoundCloudUrl(playlistUrl);
+    const link = !playlistUrl.trim() ? null : soundcloud ? parseSoundCloudUrl(playlistUrl) : parseYouTubePlaylistUrl(playlistUrl);
+    if (playlistUrl.trim() && !link) return NextResponse.json({ error: soundcloud ? 'Enter a valid SoundCloud track or playlist link.' : 'Enter a valid YouTube or SoundCloud playlist link.' }, { status: 400 });
+    if (link) {
+      // SoundCloud links are checked with its public oEmbed lookup; the tracks are read in the browser.
+      if (soundcloud) await getSoundCloudInfo(link.url);
+      else await getYouTubePlaylist(link.url);
+    }
     // Reuse the legacy URL column; existing Spotify portfolios remain compatible.
     const [updated] = await db.insert(desktopSettings).values({ portfolioId, spotifyPlaylistUrl: link?.url ?? null })
       .onConflictDoUpdate({ target: desktopSettings.portfolioId, set: { spotifyPlaylistUrl: link?.url ?? null, updatedAt: new Date() } }).returning();
@@ -33,7 +40,7 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json(updated);
   } catch (error) {
-    return NextResponse.json({ error: error instanceof YouTubeMusicError ? error.message : 'Could not save the music playlist.' },
-      { status: error instanceof YouTubeMusicError ? error.status : 500 });
+    const known = error instanceof YouTubeMusicError || error instanceof SoundCloudError;
+    return NextResponse.json({ error: known ? error.message : 'Could not save the music playlist.' }, { status: known ? error.status : 500 });
   }
 }

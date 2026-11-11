@@ -29,7 +29,7 @@ interface IconContextType {
     getAllIcons: (portfolioId: number) => Promise<void>
     displayIcons: (username: string, portfolioId: number) => Promise<void>
     addIcon: (portfolioId: number, payload: Partial<Icon> & { fileId?: number | string }) => Promise<Icon | undefined>
-    updateIcon: (portfolioId: number, payload: Partial<Icon> & { id: number; fileId?: number | string }) => Promise<Icon | undefined>
+    updateIcon: (portfolioId: number, payload: Partial<Icon> & { id: number; fileId?: number | string; clearImage?: boolean }) => Promise<Icon | undefined>
     deleteIcon: (portfolioId: number, id: number) => Promise<boolean>
     getIconById: (id: number) => Promise<Icon | undefined>
 }

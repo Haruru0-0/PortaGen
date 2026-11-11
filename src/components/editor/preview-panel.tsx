@@ -129,6 +129,7 @@ export function PreviewPanel() {
                                     {isLocked ? (
                                         <LockScreen
                                             preview={true}
+                                            previewMode={previewMode}
                                             onUnlock={() => setIsLocked(false)}
                                         />
                                     ) : (
@@ -152,6 +153,7 @@ export function PreviewPanel() {
                                             {isLocked ? (
                                                 <LockScreen
                                                     preview={true}
+                                                    previewMode={previewMode}
                                                     onUnlock={() => setIsLocked(false)}
                                                 />
                                             ) : (
