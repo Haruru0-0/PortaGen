@@ -2,33 +2,35 @@
 
 import { useState, useEffect } from "react"
 import { Copy, Check, ExternalLink } from "lucide-react"
-import { WorkspaceAction as PixelButton } from "./workspace/workspace-primitives"
+import { WorkspaceAction as PixelButton, WorkspacePanel, WorkspaceInput } from "./workspace/workspace-primitives"
 import { createClient } from "@/utils/supabase/client"
 import { useParams } from "next/navigation"
 
 export function PortfolioUrlShare() {
   const [copied, setCopied] = useState(false)
-  const [portfolioUrl, setPortfolioUrl] = useState("/portfolio/preview")
-  const supabase = createClient()
-  const [user, setUser] = useState<any>(null)
+  const [identity, setIdentity] = useState<{ username: string; origin: string } | null>(null)
   const params = useParams<{ id: string }>()
   const currentPortfolioId = Number(params?.id)
+  const portfolioUrl = identity && Number.isFinite(currentPortfolioId)
+    ? `${identity.origin}/portfolio/${encodeURIComponent(identity.username)}/${currentPortfolioId}`
+    : ""
 
   useEffect(() => {
+    let active = true
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
+      const { data: { user } } = await createClient().auth.getUser()
+      const username = user?.user_metadata?.username || user?.email?.split('@')[0]
+      if (active && typeof username === "string" && username) {
+        setIdentity({ username, origin: window.location.origin })
+      }
     }
-    getUser()
-  }, [supabase])
-
-  useEffect(() => {
-    const username = user?.user_metadata?.username || user?.email?.split('@')[0]
-    setPortfolioUrl(`${window.location.origin}/portfolio/${username}/${currentPortfolioId}`)
-  }, [user, currentPortfolioId])
+    void getUser()
+    return () => { active = false }
+  }, [])
 
   const handleCopy = async () => {
     try {
+      if (!portfolioUrl) return
       await navigator.clipboard.writeText(portfolioUrl)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
@@ -38,27 +40,23 @@ export function PortfolioUrlShare() {
   }
 
   const handleOpen = () => {
-    window.open(portfolioUrl, "_blank")
+    if (portfolioUrl) window.open(portfolioUrl, "_blank", "noopener,noreferrer")
   }
 
   return (
-    <div
-      className="ws-panel"
-    >
+    <WorkspacePanel>
       <div className="flex items-center gap-2 mb-4">
         <div className="w-3 h-3 rounded-full bg-primary" />
         <h2 className="font-bold text-lg">Share Your Portfolio</h2>
       </div>
 
       <p className="font-dialogue text-base text-muted-foreground mb-4">
-        Your portfolio is live! Share this link with others to showcase your work.
+        Share your portfolio link so others can explore your work.
       </p>
 
-      <div className="flex gap-2 mb-4">
-        <div className="flex-1 bg-background border-2 border-foreground rounded px-4 py-2 font-[family-name:var(--font-workspace-body)] text-sm truncate w-20">
-          {portfolioUrl}
-        </div>
-        <PixelButton onClick={handleCopy} variant="secondary" className="shrink-0 flex items-center justify-center">
+      <div className="ws-share-row flex gap-3 mb-4">
+        <WorkspaceInput aria-label="Portfolio share link" value={portfolioUrl} placeholder="Your link will appear when your account is ready" readOnly onFocus={event => event.currentTarget.select()} />
+        <PixelButton type="button" disabled={!portfolioUrl} onClick={handleCopy} variant="secondary" className="shrink-0 flex items-center justify-center">
           {copied ? (
             <>
               <Check className="w-4 h-4 mr-2" />
@@ -73,10 +71,10 @@ export function PortfolioUrlShare() {
         </PixelButton>
       </div>
 
-      <PixelButton onClick={handleOpen} variant="primary" className="w-full flex items-center justify-center">
+      <PixelButton type="button" disabled={!portfolioUrl} onClick={handleOpen} variant="primary" className="w-full flex items-center justify-center">
         <ExternalLink className="w-4 h-4 mr-2" />
         Open Portfolio in New Tab
       </PixelButton>
-    </div>
+    </WorkspacePanel>
   )
 }

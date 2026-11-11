@@ -428,7 +428,7 @@ export default function AssetsPage() {
                   key={filter.id}
                   aria-pressed={activeFilter === filter.id}
                   onClick={() => setActiveFilter(filter.id)}
-                  className={`persona-filter min-h-10 px-4 py-2 text-sm border border-border ${activeFilter === filter.id
+                  className={`persona-filter ws-action ws-action--secondary min-h-10 px-4 py-2 text-sm border border-border ${activeFilter === filter.id
                       ? "bg-primary text-primary-foreground"
                       : "bg-card hover:bg-muted"
                     }`}

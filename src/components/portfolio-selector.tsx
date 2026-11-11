@@ -1,5 +1,6 @@
 "use client"
 
+import { WorkspaceNativeSelect } from "@/components/workspace/workspace-native-select"
 import { useState } from "react"
 import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
 import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
@@ -79,7 +80,7 @@ export function PortfolioSelector({
                             NEW
                         </PixelButton>
                     </div>
-                    <select aria-label="Portfolio"
+                    <WorkspaceNativeSelect aria-label="Portfolio"
                         value={currentPortfolioId || ''}
                         onChange={(e) => { if (e.target.value) onPortfolioChange(Number(e.target.value)) }}
                         className="ws-input w-full"
@@ -90,7 +91,7 @@ export function PortfolioSelector({
                                 {portfolio.name}
                             </option>
                         ))}
-                    </select>
+                    </WorkspaceNativeSelect>
                     {portfolios.length === 0 && (
                         <p className="font-[family-name:var(--font-workspace-body)] text-sm text-muted-foreground mt-2">
                             No portfolios found. Create your first portfolio to get started.

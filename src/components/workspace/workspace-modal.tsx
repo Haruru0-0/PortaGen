@@ -1,5 +1,6 @@
 "use client";
 import { useRef, type ReactNode } from "react";
+import { WorkspaceFrameLayers } from "./workspace-frame";
 import { X } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
@@ -41,8 +42,8 @@ export function WorkspaceModal(props: WorkspaceModalProps) {
       <DrawerContent onOpenAutoFocus={rememberFocus} onCloseAutoFocus={restoreFocus} className={cn("p-6", props.className)} aria-describedby={undefined}>
         <DrawerHeader className="relative px-0 pb-6 pr-12 text-left">
           <DrawerTitle>{props.title}</DrawerTitle>
-          <DrawerClose className="ws-dialog-close absolute right-0 top-0 flex min-h-11 min-w-11 items-center justify-center" aria-label="Close">
-            <X className="size-5" aria-hidden="true"/>
+          <DrawerClose className="ws-dialog-close ws-cut-frame ws-icon-frame absolute right-0 top-0 flex min-h-11 min-w-11 items-center justify-center" aria-label="Close">
+            <WorkspaceFrameLayers /><X className="size-5" aria-hidden="true"/>
           </DrawerClose>
         </DrawerHeader>
         {props.children}

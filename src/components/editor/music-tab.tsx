@@ -1,124 +1,155 @@
-import { useEffect, useState } from "react"
-import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
-import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
-import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
+"use client"
+
+import { useEffect, useRef, useState } from "react"
+import { useParams } from "next/navigation"
+import { WorkspacePanel, WorkspaceAction, WorkspaceInput } from "@/components/workspace/workspace-primitives"
 import { useDesktopContext } from "@/contexts/desktopContext"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { useParams } from "next/navigation";
+import { isSpotifyMusicUrl, parseYouTubePlaylistUrl, type YouTubePlaylist } from "@/lib/music/youtube-playlist"
 
 export function MusicTab() {
-  const [connected, setConnected] = useState<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(false)
-
   const params = useParams<{ id: string }>()
-  const currentPortfolioId = Number(params?.id)
-  const { data, getDesktopData, updateSpotify, loading: desktopLoading } = useDesktopContext()
-
-  const schema = z.object({
-    spotifyPlaylistUrl: z
-      .string()
-      .min(1, "Playlist URL is required")
-      .refine(
-        (val) => /^(https?:\/\/)?open\.spotify\.com\/(playlist|album|track)\//i.test(val.trim()),
-        { message: "Enter a valid Spotify playlist/album/track URL" },
-      ),
-  })
-  const form = useForm<z.input<typeof schema>>({
-    resolver: zodResolver(schema),
-    defaultValues: { spotifyPlaylistUrl: "" },
-  })
+  const portfolioId = Number(params?.id)
+  const { data, getDesktopData, updateMusic, loading, fetching } = useDesktopContext()
+  const savedUrl = data?.portfolioId === portfolioId ? data.spotifyPlaylistUrl || "" : ""
+  const [url, setUrl] = useState("")
+  const [preview, setPreview] = useState<YouTubePlaylist | null>(null)
+  const [previewing, setPreviewing] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState("")
+  const [status, setStatus] = useState("")
+  const request = useRef<AbortController | null>(null)
+  const parsed = parseYouTubePlaylistUrl(url)
+  const busy = loading || fetching || saving
+  const canSave = !!preview && preview.url === parsed?.url && preview.tracks.length > 0
 
   useEffect(() => {
-    const check = async () => {
-      try {
-        const res = await fetch('/api/auth/spotify/status')
-        if (res.ok) {
-          const data = await res.json()
-          setConnected(!!data.connected)
-        }
-      } catch { }
+    if (portfolioId) {
+      void getDesktopData(portfolioId).catch(() => setError("Could not load your saved music. Please try again."))
     }
-    check()
-  }, [])
+  }, [portfolioId, getDesktopData])
 
   useEffect(() => {
-    if (currentPortfolioId) {
-      void getDesktopData(currentPortfolioId)
-    }
-  }, [currentPortfolioId, getDesktopData])
+    request.current?.abort()
+    setUrl(parseYouTubePlaylistUrl(savedUrl)?.url || "")
+    setPreview(null)
+    setPreviewing(false)
+  }, [savedUrl, portfolioId])
 
-  useEffect(() => {
-    if (data?.spotifyPlaylistUrl !== undefined) {
-      form.reset({ spotifyPlaylistUrl: data.spotifyPlaylistUrl || "" })
-    }
-  }, [data, form])
+  useEffect(() => () => request.current?.abort(), [])
 
-  const connectSpotify = async () => {
-    setLoading(true)
+  const previewPlaylist = async () => {
+    if (busy || previewing) return
+    request.current?.abort()
+    setError("")
+    setStatus("")
+    setPreview(null)
+    if (!parsed) {
+      setError("Enter a YouTube Music or YouTube playlist link containing a playlist ID.")
+      return
+    }
+    const controller = new AbortController()
+    request.current = controller
+    setPreviewing(true)
     try {
-      const res = await fetch('/api/auth/spotify/connect')
-      const data = await res.json()
-      if (data.authUrl) window.location.href = data.authUrl
+      const response = await fetch(`/api/music/youtube/playlist?url=${encodeURIComponent(parsed.url)}`, { signal: controller.signal })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || "Could not load this playlist. Check that it is public or unlisted.")
+      if (controller.signal.aborted) return
+      const playlist = result as YouTubePlaylist
+      if (playlist.url !== parsed.url || !Array.isArray(playlist.tracks) || !playlist.tracks.length) {
+        throw new Error("This playlist has no available tracks. Try another public or unlisted playlist.")
+      }
+      setPreview(playlist)
+    } catch (cause) {
+      if (!controller.signal.aborted) setError(cause instanceof Error ? cause.message : "Could not load this playlist. Try again.")
     } finally {
-      setLoading(false)
+      if (!controller.signal.aborted) setPreviewing(false)
+    }
+  }
+
+  const savePlaylist = async (nextUrl: string) => {
+    if (!portfolioId || busy || previewing) return
+    setSaving(true)
+    setError("")
+    setStatus("")
+    try {
+      await updateMusic(portfolioId, nextUrl)
+      setStatus(nextUrl ? "Playlist saved. Visitors can play it from your music player." : "Playlist removed.")
+      if (!nextUrl) {
+        setUrl("")
+        setPreview(null)
+      }
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Could not save your playlist. Try again.")
+    } finally {
+      setSaving(false)
     }
   }
 
   return (
-    <PixelCard>
+    <WorkspacePanel>
       <div className="space-y-4">
-        <h3 className="text-sm workspace-editor-title">MUSIC (SPOTIFY)</h3>
-
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(async (values) => {
-              if (!currentPortfolioId) return
-              await updateSpotify(currentPortfolioId, values.spotifyPlaylistUrl.trim())
-            })}
-            className="space-y-3"
-          >
-            <FormField
-              control={form.control}
-              name="spotifyPlaylistUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>SPOTIFY PLAYLIST URL</FormLabel>
-                  <FormControl>
-                    <PixelInput placeholder="https://open.spotify.com/playlist/..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <p className="font-dialogue text-sm text-muted-foreground">Private playlists require Spotify connect. Full playback requires Premium.</p>
-
-            <div className="mt-4">
-              <PixelButton
-                type="submit"
-                className="w-full text-xs"
-                disabled={desktopLoading || form.formState.isSubmitting}
-              >
-                {desktopLoading || form.formState.isSubmitting ? 'SAVING…' : 'SAVE'}
-              </PixelButton>
-            </div>
-          </form>
-        </Form>
-
-        {!connected && (
-          <PixelButton
-            variant="secondary"
-            className="w-full text-xs"
-            onClick={connectSpotify}
-            disabled={loading}
-          >
-            {loading ? 'CONNECTING…' : 'CONNECT SPOTIFY'}
-          </PixelButton>
+        <h3 className="text-sm workspace-editor-title">MUSIC (YOUTUBE MUSIC)</h3>
+        <p id="music-playlist-help" className="font-dialogue text-sm text-muted-foreground">
+          Paste a public or unlisted playlist link, preview its tracks, then save. No Google sign-in needed.
+        </p>
+        {savedUrl && (
+          <p className="font-dialogue text-sm text-muted-foreground">
+            {isSpotifyMusicUrl(savedUrl)
+              ? "Your saved Spotify source stays in place until you save a YouTube Music playlist or remove it."
+              : "A playlist is saved. Preview a link to review or replace it."}
+          </p>
         )}
+        <form className="space-y-3" onSubmit={(event) => { event.preventDefault(); void previewPlaylist() }} aria-busy={previewing || saving}>
+          <WorkspaceInput
+            id="music-playlist-url"
+            label="YOUTUBE MUSIC PLAYLIST LINK"
+            placeholder="https://music.youtube.com/playlist?list=…"
+            value={url}
+            disabled={busy}
+            aria-describedby={`music-playlist-help${error ? " music-playlist-error" : ""}`}
+            aria-invalid={!!error}
+            onChange={(event) => {
+              request.current?.abort()
+              setUrl(event.target.value)
+              setPreview(null)
+              setPreviewing(false)
+              setError("")
+              setStatus("")
+            }}
+          />
+          <WorkspaceAction type="submit" variant="secondary" className="w-full text-xs" disabled={busy || previewing || !url.trim()}>
+            {previewing ? "LOADING PLAYLIST…" : "PREVIEW PLAYLIST"}
+          </WorkspaceAction>
+          {error && <p id="music-playlist-error" role="alert" className="font-dialogue text-sm text-destructive">{error}</p>}
+          <p role="status" className="font-dialogue text-sm text-muted-foreground">{previewing ? "Fetching playlist details…" : status}</p>
+          {preview && (
+            <div className="space-y-3" aria-label="Playlist preview">
+              <div className="flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {preview.cover && <img src={preview.cover} alt="" className="size-16 shrink-0 object-cover" />}
+                <div className="min-w-0">
+                  <h4 className="font-dialogue break-words">{preview.title}</h4>
+                  <p className="font-dialogue text-sm text-muted-foreground">{preview.tracks.length}{preview.truncated ? "+" : ""} tracks{preview.truncated ? " · Includes the first 500 available tracks" : ""}</p>
+                </div>
+              </div>
+              <ol className="space-y-1 font-dialogue text-sm" aria-label="Sample tracks">
+                {preview.tracks.slice(0, 5).map((track, index) => (
+                  <li key={`${track.videoId}-${index}`} className="break-words">{index + 1}. {track.title}{track.artist ? ` — ${track.artist}` : ""}</li>
+                ))}
+              </ol>
+            </div>
+          )}
+          <div className="flex flex-wrap gap-3">
+            <WorkspaceAction type="button" className="flex-1 text-xs" disabled={busy || previewing || !canSave || !portfolioId} onClick={() => { if (canSave && preview) void savePlaylist(preview.url) }}>
+              {saving ? "SAVING…" : "SAVE PLAYLIST"}
+            </WorkspaceAction>
+            <WorkspaceAction type="button" variant="secondary" className="text-xs" disabled={busy || previewing || !savedUrl || !portfolioId} onClick={() => void savePlaylist("")}>
+              REMOVE
+            </WorkspaceAction>
+          </div>
+        </form>
       </div>
-
-    </PixelCard>
+    </WorkspacePanel>
   )
 }

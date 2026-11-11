@@ -1,3 +1,4 @@
+import { WorkspaceNativeSelect } from "@/components/workspace/workspace-native-select"
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/editor/editor-form-controls"
@@ -162,7 +163,7 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
                                             </div>
                                             <div className="grid grid-cols-4 items-center gap-4">
                                                 <Label htmlFor={`icon-${index}`} className="text-right">Icon</Label>
-                                                <select
+                                                <WorkspaceNativeSelect
                                                     id={`icon-${index}`}
                                                     value={link.icon || "Globe"}
                                                     onChange={(e) => updateSocial(index, "icon", e.target.value)}
@@ -171,7 +172,7 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
                                                     {AVAILABLE_ICONS.map(icon => (
                                                         <option key={icon} value={icon}>{icon}</option>
                                                     ))}
-                                                </select>
+                                                </WorkspaceNativeSelect>
                                             </div>
                                             <div className="grid grid-cols-4 items-center gap-4">
                                                 <Label htmlFor={`color-${index}`} className="text-right">Color</Label>
@@ -244,7 +245,7 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
                                             </div>
                                             <div className="grid grid-cols-4 items-center gap-4">
                                                 <Label htmlFor={`icon-${index}`} className="text-right">Icon</Label>
-                                                <select
+                                                <WorkspaceNativeSelect
                                                     id={`icon-${index}`}
                                                     value={link.icon || "Globe"}
                                                     onChange={(e) => updateSocial(index, "icon", e.target.value)}
@@ -253,7 +254,7 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
                                                     {AVAILABLE_ICONS.map(icon => (
                                                         <option key={icon} value={icon}>{icon}</option>
                                                     ))}
-                                                </select>
+                                                </WorkspaceNativeSelect>
                                             </div>
                                             <div className="grid grid-cols-4 items-center gap-4">
                                                 <Label htmlFor={`color-${index}`} className="text-right">Color</Label>
@@ -328,7 +329,7 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
                                                         </div>
                                                         <div className="grid grid-cols-4 items-center gap-4">
                                                             <Label className="text-right">Icon</Label>
-                                                            <select
+                                                            <WorkspaceNativeSelect
                                                                 value={link.icon || "Globe"}
                                                                 onChange={(e) => updateProject(index, "icon", e.target.value)}
                                                                 className="col-span-3 h-10 w-full border-2 border-[var(--workspace-white,#fffef5)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
@@ -336,7 +337,7 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
                                                                 {AVAILABLE_ICONS.map(icon => (
                                                                     <option key={icon} value={icon}>{icon}</option>
                                                                 ))}
-                                                            </select>
+                                                            </WorkspaceNativeSelect>
                                                         </div>
                                                     </div>
                                                     <DialogFooter className="sm:justify-between bg-card ">
@@ -381,7 +382,7 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
                                                         </div>
                                                         <div className="grid grid-cols-4 items-center gap-4">
                                                             <Label className="text-right">Icon</Label>
-                                                            <select
+                                                            <WorkspaceNativeSelect
                                                                 value={link.icon || "Globe"}
                                                                 onChange={(e) => updateProject(index, "icon", e.target.value)}
                                                                 className="col-span-3 h-10 w-full border-2 border-[var(--workspace-white,#fffef5)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
@@ -389,7 +390,7 @@ export function LinksForm({ initialData, onChange }: LinksFormProps) {
                                                                 {AVAILABLE_ICONS.map(icon => (
                                                                     <option key={icon} value={icon}>{icon}</option>
                                                                 ))}
-                                                            </select>
+                                                            </WorkspaceNativeSelect>
                                                         </div>
                                                     </div>
                                                     <DrawerFooter className="flex-col gap-2 bg-card ">

@@ -1,3 +1,4 @@
+import '@/components/landing/landing-persona.css';
 import type {Metadata} from 'next';
 import {HERO_MEDIA} from '@/lib/blue-hour/media';
 import {LandingMotionProvider} from '@/components/landing/landing-motion-provider';

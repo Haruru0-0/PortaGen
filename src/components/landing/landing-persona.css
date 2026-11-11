@@ -1,0 +1,295 @@
+/* Lower landing only: the title-screen media and portfolio skins keep their own rules. */
+.blue-hour-landing .landing-section {
+  --landing-paper:#fffef5;
+  --landing-ink:#071b57;
+  --landing-blue:#0953cc;
+  isolation:isolate;
+  padding-block:clamp(5rem,9vw,8rem);
+}
+.blue-hour-landing .landing-section::before {
+  content:"";
+  position:absolute;
+  inset:-1px calc((min(100vw,1280px) - 100vw)/2) -2.8rem;
+  z-index:-1;
+  pointer-events:none;
+  clip-path:polygon(0 2.8rem,100% 0,100% 100%,0 100%);
+}
+.blue-hour-landing .persona-section-blue::before {background:var(--landing-blue)}
+.blue-hour-landing .persona-section-paper::before {background:var(--landing-paper)}
+.blue-hour-landing .persona-section-paper {color:var(--landing-ink)}
+.blue-hour-landing .landing-section h2 {
+  font-size:clamp(3rem,6.4vw,6rem);
+  font-weight:800;
+  font-style:italic;
+  line-height:.92;
+  letter-spacing:-.025em;
+  text-transform:uppercase;
+  transform:rotate(-3deg);
+  transform-origin:left center;
+}
+.blue-hour-landing .landing-section h2 em {font-style:inherit}
+.blue-hour-landing .persona-section-blue p {color:#e2efff}
+.blue-hour-landing .persona-section-paper p {color:#294375}
+.blue-hour-landing .persona-section-paper h2 em {color:#0953cc}
+.blue-hour-landing .section-intro {grid-template-columns:1.35fr 1fr;margin-bottom:3.5rem}
+.blue-hour-landing .section-intro p {max-width:37ch}
+.blue-hour-landing .demo-desktop {
+  --ws-frame-fill:#082b72;
+  padding:0;
+  overflow:visible;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  color:#fffef5;
+  box-shadow:none;
+}
+.blue-hour-landing .demo-menubar,
+.blue-hour-landing .demo-taskbar {
+  position:relative;
+  background:#44e4ff;
+  color:#071b57;
+  border:0;
+  min-height:48px;
+  padding:.8rem 1.7rem;
+  font-size:.8rem;
+}
+.blue-hour-landing .demo-menubar {padding-right:clamp(2rem,5vw,4rem)}
+.blue-hour-landing .demo-body {background:none;min-height:400px;padding:2rem;gap:2rem;isolation:isolate}
+.blue-hour-landing .demo-wallpaper-art {
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:linear-gradient(90deg,#07275bdf 5%,#082b7280 60%,#082b7220),url('/artwork/eighty-six/reference-set/02-shin-smiling.webp') center 43%/cover no-repeat;
+}
+.blue-hour-landing .demo-icons {gap:1rem}
+.blue-hour-landing .demo-icons button {
+  position:relative;
+  isolation:isolate;
+  width:88px;
+  min-height:80px;
+  color:#fffef5;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  font-weight:600;
+}
+.blue-hour-landing .demo-icons button::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  background:#071b57bb;
+  clip-path:polygon(0 7%,100% 0,92% 100%,0 94%);
+}
+.blue-hour-landing .demo-icons button[aria-pressed=true] {color:#ad1545;background:transparent}
+.blue-hour-landing .demo-icons button[aria-pressed=true]::before {background:#fffef5}
+.blue-hour-landing .demo-icons button:hover::before {background:#44e4ff}
+.blue-hour-landing .demo-icons button:hover {color:#071b57}
+.blue-hour-landing .demo-window {
+  --ws-frame-fill:#071b57;
+  width:min(420px,100%);
+  padding:0;
+  color:#fffef5;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  overflow:visible;
+  box-shadow:none;
+}
+.blue-hour-landing .demo-windowbar {
+  min-height:44px;
+  padding:.7rem 1.25rem;
+  padding-right:2rem;
+  color:#071b57;
+  background:#44e4ff;
+  border:0;
+  font-weight:700;
+}
+.blue-hour-landing .demo-windowbody {padding:1.5rem 2rem 2rem 1.5rem;min-height:270px}
+.blue-hour-landing .demo-windowbody p {color:#e2efff}
+.blue-hour-landing .demo-avatar {background:#44e4ff;color:#071b57;border-radius:0;font-style:italic}
+.blue-hour-landing .demo-detail {color:#a7deff;line-height:1.6}
+.blue-hour-landing .demo-project {background:#44e4ff;color:#071b57}
+.blue-hour-landing .demo-wallpaper-type {color:#fffef5b3;right:4%;bottom:8%;font-size:clamp(3rem,7vw,6rem);line-height:.85;z-index:0}
+.blue-hour-landing .demo-caption {margin-top:1.5rem}
+.blue-hour-landing .workflow-section {border:0}
+.blue-hour-landing .workflow-steps {margin-block:3.5rem 2.5rem;gap:2rem}
+.blue-hour-landing .workflow-steps li {border-top:2px solid #0953cc;padding-top:1rem}
+.blue-hour-landing .workflow-steps li::before {color:#0953cc;font-size:2.5rem;font-weight:800;font-style:italic;line-height:1}
+.blue-hour-landing .workflow-steps li>span {font-weight:700}
+.blue-hour-landing .persona-pointed-action {
+  position:relative;
+  isolation:isolate;
+  clip-path:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:1.25rem;
+  padding:1rem 2.25rem 1rem 1.5rem;
+  min-height:52px;
+  max-width:100%;
+  background:transparent;
+  color:#ad1545;
+  text-decoration:none;
+  text-align:center;
+  font:800 italic 1.7rem/1.05 var(--font-workspace-display),sans-serif;
+  text-transform:uppercase;
+}
+.blue-hour-landing .persona-pointed-action::before,
+.blue-hour-landing .persona-pointed-action::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  background:#fffef5;
+  clip-path:polygon(0 6%,100% 0,94% 100%,0 94%);
+}
+.blue-hour-landing .persona-pointed-action::after {inset:5px -3px -5px 3px;background:#ff6baf;z-index:-2}
+.blue-hour-landing .persona-section-paper .persona-pointed-action {color:#fffef5}
+.blue-hour-landing .persona-section-paper .persona-pointed-action::before {background:#071b57}
+.blue-hour-landing .persona-pointed-action:hover {color:#071b57}
+.blue-hour-landing .persona-pointed-action:hover::before {background:#44e4ff}
+.blue-hour-landing .window-section {gap:4.5rem}
+.blue-hour-landing .window-library {min-height:365px}
+.blue-hour-landing .library-back,
+.blue-hour-landing .library-front {
+  --ws-frame-fill:#071b57;
+  color:#fffef5;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  padding:0;
+  overflow:visible;
+  box-shadow:none;
+}
+.blue-hour-landing .library-back {width:89%}
+.blue-hour-landing .library-front {top:135px;left:12%}
+.blue-hour-landing .library-front h3 {font:800 italic 1.8rem/1 var(--font-workspace-display),sans-serif;text-transform:uppercase;padding:1.3rem 1.5rem 0}
+.blue-hour-landing .library-front p {padding:.8rem 2rem 1.75rem 1.5rem;color:#e2efff}
+.blue-hour-landing .library-project {padding:2rem 2.5rem 2rem 1.5rem}
+.blue-hour-landing .library-project span {font-size:2.5rem;font-style:italic}
+.blue-hour-landing .library-floating {border:0;border-radius:0;background:#44e4ff;color:#071b57;font-weight:700;transform:rotate(-3deg);bottom:-.5rem}
+.blue-hour-landing .window-types {column-gap:1.5rem;row-gap:1rem}
+.blue-hour-landing .customization-section {overflow:visible;gap:4rem}
+.blue-hour-landing .customization-art {
+  --ws-frame-fill:#0953cc;
+  padding:0;
+  min-height:450px;
+  border:0;
+  border-radius:0;
+  overflow:visible;
+  background:transparent;
+}
+
+.blue-hour-landing .customization-art-fill {position:absolute;inset:0;pointer-events:none}
+.blue-hour-landing .customization-art img {object-position:60% center}
+.blue-hour-landing .theme-swatches {gap:.75rem}
+.blue-hour-landing .theme-swatches>span {border-radius:0;box-shadow:none;border:0;clip-path:polygon(0 7%,100% 0,93% 100%,0 93%);font-weight:700}
+.blue-hour-landing .theme-pixel {color:#071b57;background:#44e4ff}
+.blue-hour-landing .theme-xp {background:#0953cc}
+.blue-hour-landing .theme-glass {background:#071b57}
+.blue-hour-landing .sharing-section {border:0;grid-template-columns:1fr 1.15fr;gap:3.5rem}
+.blue-hour-landing .sharing-comparison {gap:.9rem;align-items:center}
+.blue-hour-landing .editor-example,
+.blue-hour-landing .visitor-example {
+  --ws-frame-fill:#071b57;
+  padding:0;
+  gap:0;
+  border-radius:0;
+  background:transparent;
+}
+.blue-hour-landing .editor-example>strong,
+.blue-hour-landing .visitor-example>strong {display:block;color:#071b57;background:#44e4ff;padding:.8rem 1rem;min-height:46px;font-size:.8rem}
+.blue-hour-landing .editor-example>div {padding:1rem 1.5rem 1.5rem 1rem;min-height:235px;border:0;border-radius:0;background:transparent;font-size:.7rem;color:#e2efff}
+.blue-hour-landing .example-input {border-radius:0;border-color:#598bcb;color:#e2efff;overflow-wrap:anywhere}
+.blue-hour-landing .example-save {border-radius:0;padding:.5rem .8rem;clip-path:polygon(0 5%,100% 0,92% 100%,0 95%)}
+.blue-hour-landing .mini-desktop {border-radius:0;min-height:235px;background:#0d4baa;color:#fffef5;padding:1rem 1.5rem 1.5rem 1rem}
+.blue-hour-landing .mini-window {border-radius:0;background:#fffef5;color:#071b57;clip-path:polygon(0 5%,100% 0,94% 100%,0 95%);padding:1rem 1.3rem 1rem 1rem}
+.blue-hour-landing .faq-section {gap:4rem}
+.blue-hour-landing .faq-items details {border-color:#8ba8d0;padding-block:.75rem}
+.blue-hour-landing .faq-items summary {font-weight:700;padding-block:.4rem;line-height:1.5}
+.blue-hour-landing .faq-items details[open] summary {color:#0953cc}
+.blue-hour-landing .faq-items summary:hover {color:#ad1545}
+.blue-hour-landing .faq-items summary:focus-visible {outline:3px solid #0953cc;outline-offset:4px}
+.blue-hour-landing .faq-items p {padding-bottom:.75rem}
+.blue-hour-landing .final-menu {padding-block:6rem 7rem}
+.blue-hour-landing .final-menu h2 {font-size:clamp(3.5rem,8vw,6rem);transform-origin:center}
+.blue-hour-landing .final-menu .ws-final-cta {margin-block:2.5rem 1.5rem}
+.blue-hour-landing .landing-bottom {background:#071b57;border:0;padding-block:2rem;color:#c6e5ff}
+@media(min-width:1280px) {
+  .blue-hour-landing .demo-body {padding:2.5rem}
+  .blue-hour-landing .demo-window {margin-left:1rem}
+}
+@media(max-width:1023px) {
+  .blue-hour-landing .window-section,
+  .blue-hour-landing .customization-section,
+  .blue-hour-landing .sharing-section {gap:2.5rem}
+  .blue-hour-landing .sharing-section {grid-template-columns:1fr}
+  .blue-hour-landing .sharing-comparison {max-width:42rem;width:100%}
+  .blue-hour-landing .workflow-steps {grid-template-columns:1fr 1fr}
+}
+@media(max-width:767px) {
+  .blue-hour-landing .landing-section {padding:4.5rem 1.25rem}
+  .blue-hour-landing .landing-section::before {bottom:-1.3rem;clip-path:polygon(0 1.3rem,100% 0,100% 100%,0 100%)}
+  .blue-hour-landing .landing-section h2 {font-size:clamp(2.6rem,9.5vw,4.5rem)}
+  .blue-hour-landing .section-intro,
+  .blue-hour-landing .window-section,
+  .blue-hour-landing .customization-section,
+  .blue-hour-landing .faq-section {grid-template-columns:1fr;gap:2.5rem}
+  .blue-hour-landing .section-intro {margin-bottom:2rem}
+  .blue-hour-landing .demo-body {padding:1.1rem;gap:1.1rem;min-height:435px;flex-direction:column}
+  .blue-hour-landing .demo-icons {flex-direction:row;gap:.5rem;width:100%}
+  .blue-hour-landing .demo-icons button {width:76px;min-height:70px;font-size:.75rem}
+  .blue-hour-landing .demo-window {width:min(420px,100%)}
+  .blue-hour-landing .demo-windowbody {min-height:235px;padding:1.25rem 1.5rem 1.75rem 1.25rem}
+  .blue-hour-landing .demo-window h3 {font-size:1.4rem}
+  .blue-hour-landing .demo-menubar {flex-wrap:wrap;gap:.15rem .75rem;padding:.8rem 2rem .8rem 1rem;font-size:.7rem}
+  .blue-hour-landing .demo-taskbar {flex-wrap:wrap;gap:.3rem .75rem;padding:.8rem 1rem;font-size:.65rem}
+  .blue-hour-landing .demo-wallpaper-type {display:none}
+  .blue-hour-landing .workflow-steps {gap:1.75rem 1.25rem;margin-block:2.5rem}
+  .blue-hour-landing .workflow-steps li>span {font-size:1rem}
+  .blue-hour-landing .window-library {min-height:365px;margin-inline:.75rem}
+  .blue-hour-landing .window-copy {order:-1}
+  .blue-hour-landing .customization-art {min-height:340px;aspect-ratio:1.1;order:2;margin-inline:.75rem}
+  .blue-hour-landing .sharing-comparison {gap:.65rem;grid-template-columns:minmax(0,1fr) 22px minmax(0,1fr)}
+  .blue-hour-landing .editor-example>strong,
+  .blue-hour-landing .visitor-example>strong {padding:.7rem .75rem;font-size:.7rem}
+  .blue-hour-landing .editor-example>div,
+  .blue-hour-landing .mini-desktop {padding:1rem 1.2rem 1.3rem .75rem}
+  .blue-hour-landing .mini-window {font-size:.8rem}
+  .blue-hour-landing .final-menu {padding-block:4.5rem 5rem}
+  .blue-hour-landing .persona-pointed-action {font-size:1.45rem;gap:.75rem;padding-inline:1rem 1.75rem}
+}
+@media(max-width:389px) {
+  .blue-hour-landing .sharing-comparison {grid-template-columns:1fr}
+  .blue-hour-landing .comparison-arrow {transform:rotate(45deg);margin:.5rem auto}
+  .blue-hour-landing .editor-example>div,
+  .blue-hour-landing .mini-desktop {min-height:190px}
+  .blue-hour-landing .library-project {padding:1.5rem;gap:.75rem}
+  .blue-hour-landing .library-project span {font-size:2rem}
+  .blue-hour-landing .library-front {left:7%}
+  .blue-hour-landing .library-front h3 {font-size:1.5rem}
+  .blue-hour-landing .workflow-steps {grid-template-columns:1fr}
+}
+/* Focus follows the existing pointed silhouette; content stays unclipped. */
+.blue-hour-landing .demo-icons button:focus-visible,
+.blue-hour-landing .persona-pointed-action:focus-visible {outline:none}
+.blue-hour-landing .demo-icons button:focus-visible::after {
+  content:"";
+  position:absolute;
+  inset:-4px;
+  z-index:-2;
+  background:#44e4ff;
+  clip-path:polygon(0 7%,100% 0,92% 100%,0 94%);
+}
+.blue-hour-landing .persona-pointed-action:focus-visible::after {inset:-5px;background:#44e4ff}
+.blue-hour-landing .persona-section-paper .persona-pointed-action:focus-visible::after {background:#ad1545}
+
+/* Aspect ratio must not derive a width from the taller copy column. */
+.blue-hour-landing .customization-art { width:100%; max-width:100%; min-width:0; align-self:center; }
+.blue-hour-landing .library-back,.blue-hour-landing .library-front { transform:none; }
+
+/* Keep the final section backing out of the footer content plane. */
+.blue-hour-landing .final-menu::before { bottom:0; }
+.blue-hour-landing .landing-bottom { position:relative; z-index:1; min-height:96px; background:#071b57; padding-block:2rem; line-height:1.5; }

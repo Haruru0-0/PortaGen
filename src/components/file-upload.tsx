@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useRef, useState } from "react"
 import { Upload, Music, FileText } from "lucide-react"
+import { WorkspaceFrameLayers } from "./workspace/workspace-frame"
 import { WorkspaceAction as PixelButton } from "./workspace/workspace-primitives"
 import Image from "next/image"
 
@@ -93,8 +94,10 @@ export function FileUpload({ accept, onFileSelect, preview, label, maxSize = 5, 
     <div className={`space-y-3 ${className || ""}`}>
       {label && <p className="font-dialogue text-sm">{label}</p>}
 
-      <div
-        className={`persona-upload border border-dashed p-6 text-center space-y-3 cursor-pointer transition-colors ${dragActive
+      <label
+        data-invalid={error ? true : undefined}
+        data-drag-active={dragActive || undefined}
+        className={`persona-upload ws-cut-frame relative block border border-dashed p-6 text-center space-y-3 cursor-pointer transition-colors ${dragActive
           ? "border-primary bg-primary/10"
           : error
             ? "border-destructive bg-destructive/10"
@@ -104,9 +107,9 @@ export function FileUpload({ accept, onFileSelect, preview, label, maxSize = 5, 
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
-        onClick={handleClick}
       >
-        <input ref={inputRef} type="file" className="hidden" accept={accept} onChange={handleChange} />
+        <WorkspaceFrameLayers />
+        <input ref={inputRef} type="file" aria-label={label || "Choose file to upload"} className="sr-only" accept={accept} onChange={handleChange} />
 
         {preview ? (
           <div className="space-y-3">
@@ -127,9 +130,11 @@ export function FileUpload({ accept, onFileSelect, preview, label, maxSize = 5, 
               <FileText className="size-8 mx-auto" aria-hidden="true" />
             )}
             <PixelButton
+              type="button"
               variant="secondary"
               className="text-xs"
               onClick={(e) => {
+                e.preventDefault()
                 e.stopPropagation()
                 handleClick()
               }}
@@ -144,7 +149,7 @@ export function FileUpload({ accept, onFileSelect, preview, label, maxSize = 5, 
             {!error && <p className="font-dialogue text-sm text-muted-foreground">MAX SIZE: {maxSize}MB</p>}
           </>
         )}
-      </div>
+      </label>
     </div>
   )
 }

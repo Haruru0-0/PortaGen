@@ -2,7 +2,7 @@
 
 import React, { createContext, useCallback, useContext, useState } from 'react'
 import { toast } from 'sonner'
-import { DesktopData, displayDesktop, getDesktop, updateDesktopGif, updateDesktopSpotify, updateDesktopWallpaper, updateDesktopWidget } from '@/lib/services/desktopService'
+import { DesktopData, displayDesktop, getDesktop, updateDesktopGif, updateDesktopMusic, updateDesktopSpotify, updateDesktopWallpaper, updateDesktopWidget } from '@/lib/services/desktopService'
 
 interface DesktopContextType {
   data?: DesktopData
@@ -14,6 +14,7 @@ interface DesktopContextType {
   updateGif: (portfolioId: number, assetId: number | null, url?: string) => Promise<void>
   updateWidget: (portfolioId: number, index: 1 | 2, assetId: number | null, url?: string) => Promise<void>
   updateSpotify: (portfolioId: number, url: string) => Promise<void>
+  updateMusic: (portfolioId: number, url: string) => Promise<void>
   updateMenubar: (portfolioId: number, assetId: number | null, text: string, url?: string) => Promise<void>
 }
 
@@ -87,6 +88,22 @@ export function DesktopProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const updateMusic = async (portfolioId: number, url: string) => {
+    setLoading(true)
+    try {
+      await updateDesktopMusic(portfolioId, url)
+      setData((current) => current?.portfolioId === portfolioId
+        ? { ...current, spotifyPlaylistUrl: url }
+        : { portfolioId, spotifyPlaylistUrl: url })
+      toast.success(url ? "Music playlist updated successfully!" : "Music playlist removed")
+    } catch (error) {
+      toast.error("Failed to update music playlist")
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const updateMenubar = async (portfolioId: number, assetId: number | null, text: string, url?: string) => {
     setLoading(true)
     try {
@@ -125,6 +142,7 @@ export function DesktopProvider({ children }: { children: React.ReactNode }) {
     updateGif,
     updateWidget,
     updateSpotify,
+    updateMusic,
     updateMenubar
   }
   return (

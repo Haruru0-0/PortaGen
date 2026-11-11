@@ -1,3 +1,4 @@
+import { WorkspaceNativeSelect } from "@/components/workspace/workspace-native-select"
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/editor/editor-form-controls"
@@ -155,7 +156,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                                 <div className="grid gap-4 py-4">
                                                     <div className="grid grid-cols-4 items-center gap-4">
                                                         <Label className="text-right">Type</Label>
-                                                        <select
+                                                        <WorkspaceNativeSelect
                                                             value={info.type}
                                                             onChange={(e) => updateContactInfo(index, "type", e.target.value)}
                                                             className="col-span-3 h-10 w-full border-2 border-[var(--workspace-white,#fffef5)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
@@ -163,7 +164,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                                             {INFO_TYPES.map(type => (
                                                                 <option key={type.value} value={type.value}>{type.label}</option>
                                                             ))}
-                                                        </select>
+                                                        </WorkspaceNativeSelect>
                                                     </div>
                                                     <div className="grid grid-cols-4 items-center gap-4">
                                                         <Label className="text-right">Link</Label>
@@ -208,7 +209,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                                 <div className="grid gap-4 p-4">
                                                     <div className="grid grid-cols-4 items-center gap-4">
                                                         <Label className="text-right">Type</Label>
-                                                        <select
+                                                        <WorkspaceNativeSelect
                                                             value={info.type}
                                                             onChange={(e) => updateContactInfo(index, "type", e.target.value)}
                                                             className="col-span-3 h-10 w-full border-2 border-[var(--workspace-white,#fffef5)] rounded-none px-2 text-sm bg-background focus:outline-none focus:ring-0"
@@ -216,7 +217,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                                             {INFO_TYPES.map(type => (
                                                                 <option key={type.value} value={type.value}>{type.label}</option>
                                                             ))}
-                                                        </select>
+                                                        </WorkspaceNativeSelect>
                                                     </div>
                                                     <div className="grid grid-cols-4 items-center gap-4">
                                                         <Label className="text-right">Link</Label>
@@ -289,7 +290,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                             <div className="grid gap-4 py-4">
                                                 <div className="grid grid-cols-4 items-center gap-4">
                                                     <Label className="text-right">Platform</Label>
-                                                    <select
+                                                    <WorkspaceNativeSelect
                                                         value={social.platform}
                                                         onChange={(e) => {
                                                             updateSocialLink(index, "platform", e.target.value)
@@ -300,7 +301,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                                         {SOCIAL_PLATFORMS.map(platform => (
                                                             <option key={platform.value} value={platform.value}>{platform.label}</option>
                                                         ))}
-                                                    </select>
+                                                    </WorkspaceNativeSelect>
                                                 </div>
                                                 <div className="grid grid-cols-4 items-center gap-4">
                                                     <Label className="text-right">URL</Label>
@@ -347,7 +348,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                             <div className="grid gap-4 p-4">
                                                 <div className="grid grid-cols-4 items-center gap-4">
                                                     <Label className="text-right">Platform</Label>
-                                                    <select
+                                                    <WorkspaceNativeSelect
                                                         value={social.platform}
                                                         onChange={(e) => {
                                                             updateSocialLink(index, "platform", e.target.value)
@@ -358,7 +359,7 @@ export function ContactForm({ initialData, onChange }: ContactFormProps) {
                                                         {SOCIAL_PLATFORMS.map(platform => (
                                                             <option key={platform.value} value={platform.value}>{platform.label}</option>
                                                         ))}
-                                                    </select>
+                                                    </WorkspaceNativeSelect>
                                                 </div>
                                                 <div className="grid grid-cols-4 items-center gap-4">
                                                     <Label className="text-right">URL</Label>

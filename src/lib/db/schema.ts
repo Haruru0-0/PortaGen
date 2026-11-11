@@ -201,7 +201,7 @@ export const desktopSettings = pgTable('desktop_settings', {
     widget2Url: text('widget2_url'),
     musicPlayerIconAssetId: integer('music_player_icon_asset_id').references(() => uploadedAssets.id, { onDelete: 'set null' }),
 
-    // Spotify playlist URL to drive the music player via Web Playback SDK
+    // Legacy column: selected playlist URL (Spotify or YouTube Music).
     spotifyPlaylistUrl: text('spotify_playlist_url'),
 
     // Menu Bar Customization 

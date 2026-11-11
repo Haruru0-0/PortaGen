@@ -312,7 +312,7 @@ function SettingsContent() {
           <div className="space-y-6">
             <h3 className="text-sm ">GOOGLE DRIVE INTEGRATION</h3>
 
-            <div className="flex flex-col md:flex-row items-center justify-between p-4 border border-border bg-muted gap-4 md:gap-2">
+            <PixelCard className="ws-drive-status flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <Cloud className="w-6 h-6" />
                 <div>
@@ -351,9 +351,9 @@ function SettingsContent() {
                   )}
                 </div>
               )}
-            </div>
+            </PixelCard>
 
-            <div className="p-3 bg-accent/20 border border-border">
+            <PixelCard className="ws-drive-explainer">
               <p className="font-[family-name:var(--font-workspace-body)] text-sm leading-relaxed">
                 <strong>WHY CONNECT GOOGLE DRIVE?</strong>
                 <br />
@@ -367,7 +367,7 @@ function SettingsContent() {
                 <br />
                 • Easy to manage and organize
               </p>
-            </div>
+            </PixelCard>
 
             {connected && (
               <div className="p-3 bg-green-500/10 border border-green-500">

@@ -1,5 +1,6 @@
 "use client"
 
+import { WorkspaceNativeSelect } from "@/components/workspace/workspace-native-select"
 import { useMemo } from "react"
 import { Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/editor/editor-form-controls"
@@ -113,7 +114,7 @@ export function TerminalForm({ initialData, onChange }: TerminalFormProps) {
                     <div key={i} className="space-y-2 border-2 border-border p-3">
                         <div className="flex gap-2">
                             <Input value={cmd.command} onChange={(e) => updateCommand(i, { command: e.target.value })} placeholder="command text" />
-                            <select
+                            <WorkspaceNativeSelect
                                 value={cmd.style ?? "output"}
                                 onChange={(e) => updateCommand(i, { style: e.target.value as TerminalCustomCommand["style"] })}
                                 className="border-2 border-border bg-card px-2 text-xs"
@@ -122,7 +123,7 @@ export function TerminalForm({ initialData, onChange }: TerminalFormProps) {
                                 <option value="output">Normal</option>
                                 <option value="success">Success</option>
                                 <option value="error">Error</option>
-                            </select>
+                            </WorkspaceNativeSelect>
                             <Button type="button" size="icon" variant="outline" onClick={() => update({ commands: commands.filter((_, idx) => idx !== i) })} aria-label="Remove command">
                                 <Trash2 className="h-4 w-4" />
                             </Button>

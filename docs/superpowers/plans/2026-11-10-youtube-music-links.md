@@ -1,0 +1,13 @@
+# YouTube Music public playlist links
+
+Implemented and verified 2026-11-11. See [QA and known upstream restrictions](../../qa/2026-11-11-youtube-music-links.md). Production build and local production metadata/audio requests pass; real database mutation and deployment were not performed. Some tracks reject complete audio with upstream 403 even though anonymous playlist metadata loads; error/retry/next/external-link feedback is implemented, with no iframe fallback.
+
+User requests the link-only flow now, with no Google login. Anonymous real playlist metadata and a real 65KB audio range were verified using youtubei.js 18.3.0 YTMUSIC. URL decoding runs in QuickJS WASM with memory/time limits; do not use Node Function/eval for remote player code.
+
+Ruling: retain existing Spotify data/playback for backward compatibility, replace the editor Music UI with YouTube playlist link + preview + save/remove. Store the general music URL in the existing legacy spotifyPlaylistUrl column, exposed via existing reads/prop; validate provider before initializing Spotify. No DB migration or credentials required.
+
+1. Shared pure module src/lib/music/youtube-playlist.ts: strict URL parser/canonicalizer and YouTubePlaylist/YouTubePlaylistTrack types. Native node tests for supported hosts, watch+list, malicious hosts/credentials, malformed IDs.
+2. Parent: server service + GET /api/music/youtube/playlist?url, GET /api/music/youtube/audio/[videoId] with Range streaming, bounded metadata/audio URL caches, timeout/size limits and upstream host validation. Authenticated ownership-checked POST /api/desktop/music saves canonical URL or clears it and completes checklist. Playlist preview validates availability; no keys/cookies/login. Externalize youtubei.js/quickjs packages and trace WASM for production.
+3. Editor agent: DesktopContext/DesktopService updateMusic contract and MusicTab link input/preview/loading/errors/save/remove, shared frames, abort stale requests. Existing Spotify URLs stay saved until replaced.
+4. Playback agent: use shared playlist JSON and local audio endpoint in existing themes; title/artwork/queue/next/previous/ended/seek/volume. Consolidate duplicate audio effects and prevent unsolicited autoplay; handle changed/failed playlists without playing bundled fallback tracks for a configured YouTube playlist. Preserve Spotify legacy and default local queue.
+5. Fresh reviews, types/lint/policy+URL tests, real backend metadata/range playback + browser audio play/seek/queue checks, editor fixture states/mobile checks; remove fixtures; production webpack build and trace audit. Report hosted deployment and live DB mutation limits honestly.

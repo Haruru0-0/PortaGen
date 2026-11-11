@@ -19,7 +19,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
 }) => {
     return (
         <div className="flex items-center justify-center gap-4 mb-4">
-            <button
+            <button type="button" aria-label="Previous track"
                 ref={(el) => {
                     if (el) buttonsRef.current[3] = el;
                 }}
@@ -38,7 +38,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                 </div>
             </button>
 
-            <button
+            <button type="button" aria-label={isPlaying ? "Pause music" : "Play music"}
                 ref={(el) => {
                     if (el) buttonsRef.current[4] = el;
                 }}
@@ -63,7 +63,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                 </div>
             </button>
 
-            <button
+            <button type="button" aria-label="Next track"
                 ref={(el) => {
                     if (el) buttonsRef.current[5] = el;
                 }}

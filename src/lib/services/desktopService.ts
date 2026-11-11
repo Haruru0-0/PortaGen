@@ -67,6 +67,19 @@ export async function updateDesktopSpotify(portfolioId: number, spotifyPlaylistU
   return res.json()
 }
 
+export async function updateDesktopMusic(portfolioId: number, playlistUrl: string) {
+  const res = await fetch('/api/desktop/music', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ portfolioId, playlistUrl }),
+  })
+  if (!res.ok) {
+    const detail = await res.json().catch(() => null)
+    throw new Error(detail?.error || 'Failed to update music playlist')
+  }
+  return res.json()
+}
+
 export async function updateDesktopMenubar(portfolioId: number, menubarIconAssetId: number | null, menubarText: string, menubarIconUrl?: string) {
   const res = await fetch('/api/desktop/menubar', {
     method: 'POST',

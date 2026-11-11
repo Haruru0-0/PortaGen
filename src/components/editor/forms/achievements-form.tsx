@@ -1,5 +1,6 @@
 "use client"
 
+import { WorkspaceNativeSelect } from "@/components/workspace/workspace-native-select"
 import { useMemo } from "react"
 import { Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/editor/editor-form-controls"
@@ -85,7 +86,7 @@ export function AchievementsForm({ initialData, onChange }: AchievementsFormProp
                         <div className="grid grid-cols-2 gap-2">
                             <div className="space-y-1">
                                 <Label className="text-[10px]">Unlocked when the visitor…</Label>
-                                <select
+                                <WorkspaceNativeSelect
                                     value={a.trigger.type}
                                     onChange={(e) => updateTrigger(i, { type: e.target.value as AchievementTriggerType })}
                                     className="w-full border-2 border-border bg-card px-2 py-2 text-xs"
@@ -95,7 +96,7 @@ export function AchievementsForm({ initialData, onChange }: AchievementsFormProp
                                             {TRIGGER_LABELS[t]}
                                         </option>
                                     ))}
-                                </select>
+                                </WorkspaceNativeSelect>
                             </div>
 
                             {a.trigger.type === "window_opened" && (

@@ -2,13 +2,11 @@
 import { useCallback, useContext, useEffect, useRef, useState, memo } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
-import MusicWallpaper from "@/assets/MusicWallPaper.gif";
+import { isSpotifyMusicUrl } from "@/lib/music/youtube-playlist";
+import { useYouTubePlaylist } from "@/hooks/use-youtube-playlist";
 import { AudioContext } from "../../contexts/audio-context";
 import { useAppSound } from "../../contexts/sound-context";
 import { playlist, Track } from "@/lib/types";
-import { CollapsedPlayer } from "./music-player/CollapsedPlayer";
-import { ExpandedPlayer } from "./music-player/ExpandedPlayer";
-import { MobilePlayer } from "./music-player/MobilePlayer";
 import { getMusicPlayerJSX } from "./music-player-styles";
 import { MusicPlayerStyleProps } from "./music-player-styles/types";
 import { useAchievements } from "./achievement-context";
@@ -23,6 +21,7 @@ interface SpotifyPlayer {
   addListener: (event: string, callback: (state: unknown) => void) => void;
   getOAuthToken: (cb: (token: string) => void) => void;
   volume: number;
+  disconnect: () => void;
 }
 
 // Type for Spotify track information
@@ -36,11 +35,6 @@ interface SpotifyTrack {
     name: string;
   }[];
   duration_ms?: number;
-}
-
-// Type for Spotify error
-interface SpotifyError {
-  message: string;
 }
 
 // Type for Spotify player state
@@ -89,10 +83,14 @@ interface MusicPlayerProps {
 interface ThemedMusicPlayerProps extends Partial<MusicPlayerStyleProps> {
   musicPlayerStyleId: string;
   playerType: "collapsed" | "expanded" | "mobile";
+  playbackError?: boolean;
+  onRetry?: () => void;
+  onSkipUnavailable?: () => void;
+  youtubeMusicUrl?: string;
 }
 
 function ThemedMusicPlayer(props: ThemedMusicPlayerProps) {
-  const { musicPlayerStyleId, playerType, ...restProps } = props;
+  const { musicPlayerStyleId, playerType, playbackError, onRetry, onSkipUnavailable, youtubeMusicUrl, ...restProps } = props;
 
   // Provide default values for required props
   // We use useMemo here to avoid creating a new object on every render if possible
@@ -117,13 +115,13 @@ function ThemedMusicPlayer(props: ThemedMusicPlayerProps) {
     handleDesktopClose: restProps.handleDesktopClose || (() => { }),
     progress: restProps.progress || 0,
     handleSeek: restProps.handleSeek || (() => { }),
-    formatTime: restProps.formatTime || ((progress: number) => "0:00"),
+    formatTime: restProps.formatTime || (() => "0:00"),
     spDurationMs: restProps.spDurationMs || 0,
     isPlaying: restProps.isPlaying || false,
     onPlayPause: restProps.onPlayPause || (() => { }),
     onNext: restProps.onNext || (() => { }),
     onPrevious: restProps.onPrevious || (() => { }),
-    volume: restProps.volume || 50,
+    volume: restProps.volume ?? 50,
     setVolume: restProps.setVolume || (() => { }),
     spotifyPlayerRef: restProps.spotifyPlayerRef || { current: null },
     playClickSound: restProps.playClickSound || (() => { }),
@@ -131,7 +129,7 @@ function ThemedMusicPlayer(props: ThemedMusicPlayerProps) {
     spotifyPlaylistTracks: restProps.spotifyPlaylistTracks || [],
     playlist: restProps.playlist || [],
     changeTrack: restProps.changeTrack || (() => { }),
-    formatDuration: restProps.formatDuration || ((ms: number) => "0:00"),
+    formatDuration: restProps.formatDuration || (() => "0:00"),
     handlePlayPause: restProps.onPlayPause || (() => { }),
     handleNext: restProps.onNext || (() => { }),
     handlePrevious: restProps.onPrevious || (() => { }),
@@ -140,8 +138,29 @@ function ThemedMusicPlayer(props: ThemedMusicPlayerProps) {
     spotifyEmbedUrl: restProps.spotifyEmbedUrl || "",
   };
 
-  return getMusicPlayerJSX(musicPlayerStyleId, musicPlayerProps);
+  return <>
+    {getMusicPlayerJSX(musicPlayerStyleId, musicPlayerProps)}
+    {playbackError ? (
+      <div
+        role="alert"
+        className={`${playerType === "mobile" ? "relative mt-2 w-full" : restProps.embedded ? "absolute" : "fixed"} z-[100] rounded-lg border border-white/20 bg-zinc-950/95 p-3 text-sm text-white shadow-lg`}
+        style={playerType === "mobile" ? undefined : {
+          bottom: playerType === "collapsed" ? "8rem" : "calc(min(300px, 60vh) + 2rem)",
+          right: "1.5rem", width: "min(380px, calc(100% - 3rem))",
+        }}
+      >
+        <p>This track could not be played. Try again or choose another track.</p>
+        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2">
+          <button type="button" className="cursor-pointer underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-4" onClick={onRetry}>Retry</button>
+          <button type="button" className="cursor-pointer underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-4" onClick={onSkipUnavailable}>Next track</button>
+          {youtubeMusicUrl ? <a className="underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-4" href={youtubeMusicUrl} target="_blank" rel="noopener noreferrer">Open on YouTube Music</a> : null}
+        </div>
+      </div>
+    ) : null}
+  </>;
 }
+
+const EMPTY_QUEUE: Track[] = [];
 
 const MusicPlayerWidget = memo(function MusicPlayerWidget({
   isDesktop = false,
@@ -151,17 +170,19 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
 }: MusicPlayerProps) {
   const {
     audioRef,
-    currentTrack,
+    currentTrack: audioTrack,
     isPlaying,
     progress,
     volume,
     duration,
     isLoading,
+    playbackError,
+    retryPlayback,
     setCurrentTrack,
     setIsPlaying,
     setProgress,
     setVolume,
-    setIsLoading,
+    setQueue,
   } = useContext(AudioContext);
 
   const { playClickSound, playMenuSound, playPowerUpSound } = useAppSound();
@@ -171,17 +192,27 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
     if (isPlaying) emitAchievement({ type: "music_play" });
   }, [isPlaying, emitAchievement]);
 
-  // Resolve track source (string | next-video Asset) to URL string
-  const resolveTrackSrc = (src: Track["src"]): string => {
-    if (typeof src === "string") return src;
-    return src?.sources?.[0]?.src ?? "";
-  };
+  const youtube = useYouTubePlaylist(spotifyPlaylistUrl);
+  const useSpotify = !!spotifyPlaylistUrl && isSpotifyMusicUrl(spotifyPlaylistUrl);
+  const queue = youtube.configured ? youtube.playlist?.tracks ?? EMPTY_QUEUE : useSpotify ? EMPTY_QUEUE : playlist;
+  const unavailable = youtube.configured && !youtube.playlist;
+  const currentTrack = unavailable ? {
+    id: 0,
+    title: youtube.loading ? "Loading playlist..." : "Playlist unavailable",
+    artist: youtube.loading ? "YouTube Music" : "Check that the playlist is public and try again.",
+    cover: playlist[0].cover,
+    duration: "0:00",
+    src: "",
+  } : audioTrack;
+  const playerLoading = isLoading || youtube.loading;
+  const sourceKey = useSpotify ? `spotify:${spotifyPlaylistUrl}` : youtube.sourceKey;
+  useEffect(() => { setQueue(queue, sourceKey); }, [queue, sourceKey, setQueue]);
 
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const spotifyEmbedUrl = (() => {
-    if (!spotifyPlaylistUrl) return "";
+    if (!useSpotify || !spotifyPlaylistUrl) return "";
     try {
       return spotifyPlaylistUrl.replace(
         "open.spotify.com/playlist",
@@ -193,14 +224,13 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
   })();
 
   // Spotify Web Playback SDK integration (Premium required)
-  const useSpotify = !!spotifyPlaylistUrl;
   const spotifyPlayerRef = useRef<SpotifyPlayer | null>(null);
   const spotifyAccessTokenRef = useRef<string>("");
   const spotifyDeviceIdRef = useRef<string>("");
+  const spotifyTrackIdRef = useRef<string | undefined>(undefined);
   const [spotifyReady, setSpotifyReady] = useState(false);
   const [spotifyFailed, setSpotifyFailed] = useState(false);
-  const [spIsPlaying, setSpIsPlaying] = useState(false);
-  const [spPositionMs, setSpPositionMs] = useState(0);
+  const [, setSpPositionMs] = useState(0);
   const [spDurationMs, setSpDurationMs] = useState(0);
   const [spotifyCurrentTrack, setSpotifyCurrentTrack] = useState<SpotifyTrack | null>(null);
   const [spotifyPlaylistTracks, setSpotifyPlaylistTracks] = useState<SpotifyTrack[]>([]);
@@ -224,7 +254,7 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const fetchSpotifyCurrentTrack = async () => {
+  const fetchSpotifyCurrentTrack = useCallback(async () => {
     if (!spotifyAccessTokenRef.current) return;
     try {
       const res = await fetch(
@@ -256,9 +286,9 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
     } catch (e) {
       console.error("Failed to fetch current track:", e);
     }
-  };
+  }, []);
 
-  const fetchSpotifyPlaylistTracks = async () => {
+  const fetchSpotifyPlaylistTracks = useCallback(async () => {
     if (!spotifyAccessTokenRef.current || !spotifyPlaylistUrl) return;
     const playlistId = parsePlaylistId(spotifyPlaylistUrl);
     if (!playlistId) return;
@@ -285,12 +315,15 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
     } catch (e) {
       console.error("Failed to fetch playlist tracks:", e);
     }
-  };
+  }, [spotifyPlaylistUrl]);
 
   useEffect(() => {
     if (!useSpotify) return;
 
     let cancelled = false;
+    let sdkReady: (() => void) | undefined;
+    setSpotifyFailed(false);
+    setSpotifyReady(false);
     const init = async () => {
       try {
         // Get access token
@@ -324,7 +357,7 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
           console.error("Failed to fetch Spotify profile:", e);
         }
 
-        (window as Window & { onSpotifyWebPlaybackSDKReady?: () => void }).onSpotifyWebPlaybackSDKReady = () => {
+        sdkReady = () => {
           if (cancelled) return;
           const player = new (window as Window & { Spotify?: { Player: new (config: SpotifyPlayerConfig) => SpotifyPlayer } }).Spotify!.Player({
             name: "PortaGen Player",
@@ -369,38 +402,13 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
               console.warn("No playlist ID found in URL:", spotifyPlaylistUrl);
               return;
             }
-            try {
-              // Transfer playback to SDK device and start playlist
-              await fetch("https://api.spotify.com/v1/me/player", {
-                method: "PUT",
-                headers: {
-                  Authorization: `Bearer ${spotifyAccessTokenRef.current}`,
-                },
-                body: JSON.stringify({ device_ids: [device_id], play: true }),
-              });
-              await fetch(
-                `https://api.spotify.com/v1/me/player/play?device_id=${device_id}`,
-                {
-                  method: "PUT",
-                  headers: {
-                    Authorization: `Bearer ${spotifyAccessTokenRef.current}`,
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    context_uri: `spotify:playlist:${playlistId}`,
-                  }),
-                }
-              );
-            } catch (e) {
-              console.error("Failed to start playlist:", e);
-              setSpotifyFailed(true);
-            }
+
           });
 
           player.addListener("player_state_changed", async (state: unknown) => {
+            if (cancelled) return;
             if (!state) return;
             const playerState = state as SpotifyPlayerState;
-            setSpIsPlaying(!playerState.paused);
             setSpPositionMs(playerState.position || 0);
             setSpDurationMs(playerState.duration || 0);
             const pct = playerState.duration
@@ -414,8 +422,9 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
 
             // Fetch current track info when track changes
             if (
-              playerState.track_window?.current_track?.id !== spotifyCurrentTrack?.id
+              playerState.track_window?.current_track?.id !== spotifyTrackIdRef.current
             ) {
+              spotifyTrackIdRef.current = playerState.track_window?.current_track?.id;
               await fetchSpotifyCurrentTrack();
             }
           });
@@ -440,6 +449,7 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
             });
           spotifyPlayerRef.current = player;
         };
+        (window as Window & { onSpotifyWebPlaybackSDKReady?: () => void }).onSpotifyWebPlaybackSDKReady = sdkReady;
 
         // Load SDK if not present
         if (!(window as Window & { Spotify?: { Player: new (config: SpotifyPlayerConfig) => SpotifyPlayer } }).Spotify) {
@@ -470,8 +480,12 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
     init();
     return () => {
       cancelled = true;
+      spotifyPlayerRef.current?.disconnect();
+      spotifyPlayerRef.current = null;
+      const sdkWindow = window as Window & { onSpotifyWebPlaybackSDKReady?: () => void };
+      if (sdkWindow.onSpotifyWebPlaybackSDKReady === sdkReady) delete sdkWindow.onSpotifyWebPlaybackSDKReady;
     };
-  }, [useSpotify, spotifyPlaylistUrl]);
+  }, [useSpotify, spotifyPlaylistUrl, fetchSpotifyCurrentTrack, fetchSpotifyPlaylistTracks, setIsPlaying, setProgress]);
 
   const playerRef = useRef<HTMLDivElement>(null);
   const playlistRef = useRef<HTMLDivElement>(null);
@@ -519,7 +533,7 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
-    if (isPlaying && !isLoading && !isDraggingSlider.current) {
+    if (useSpotify && isPlaying && !isLoading && !isDraggingSlider.current) {
       interval = setInterval(() => {
         const now = Date.now();
         const elapsed = now - lastUpdateRef.current;
@@ -544,7 +558,7 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
     }
 
     return () => clearInterval(interval);
-  }, [isPlaying, isLoading, spDurationMs]);
+  }, [useSpotify, isPlaying, isLoading, spDurationMs, setProgress]);
 
   // Update rotation whenever playing state changes
   useEffect(() => {
@@ -657,65 +671,32 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
     };
   }, { dependencies: [musicPlayerStyleId, isDesktop, isExpanded], revertOnUpdate: true });
 
-  useEffect(() => {
-    const playAudio = async () => {
-      if (!audioRef.current) return;
-
-      try {
-        setIsLoading(true);
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-        audioRef.current.src = resolveTrackSrc(currentTrack.src);
-
-        await audioRef.current.load();
-
-        const playPromise = audioRef.current.play();
-
-        if (playPromise !== undefined) {
-          await playPromise;
-          setIsPlaying(true);
-        }
-      } catch (error) {
-        console.error("Autoplay failed:", error);
-        setIsPlaying(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    playAudio();
-  }, [currentTrack]);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume / 100;
-    }
-  }, [volume]);
-
   const handlePlayPause = async () => {
-    if (useSpotify && spotifyPlayerRef.current) {
+    if (useSpotify) {
+      if (!spotifyReady || !spotifyPlayerRef.current) return;
       try {
-        await spotifyPlayerRef.current.togglePlay();
-      } catch { }
+        if (!spotifyCurrentTrack) {
+          const response = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${spotifyDeviceIdRef.current}`, {
+            method: "PUT",
+            headers: { Authorization: `Bearer ${spotifyAccessTokenRef.current}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ context_uri: `spotify:playlist:${parsePlaylistId(spotifyPlaylistUrl)}` }),
+          });
+          if (!response.ok) throw new Error("Spotify playback unavailable");
+        } else {
+          await spotifyPlayerRef.current.togglePlay();
+        }
+      } catch { setSpotifyFailed(true); }
       return;
     }
-    if (!audioRef.current) return;
-    try {
-      if (isPlaying) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-        playClickSound();
-      } else {
-        await audioRef.current.play();
-        setIsPlaying(true);
-        playPowerUpSound();
-      }
-    } catch (error) {
-      console.error("Playback error:", error);
-    }
+    if (!queue.length || unavailable) return;
+    if (playbackError) retryPlayback();
+    else setIsPlaying(!isPlaying);
+    if (isPlaying) playClickSound();
+    else playPowerUpSound();
   };
 
   const changeTrack = (track: Track) => {
+    if (!queue.some(item => item.id === track.id)) return;
     setCurrentTrack(track);
     setProgress(0);
     playMenuSound();
@@ -726,11 +707,12 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
       spotifyPlayerRef.current.nextTrack();
       return;
     }
-    const currentIndex = playlist.findIndex(
+    if (useSpotify || !queue.length) return;
+    const currentIndex = queue.findIndex(
       (track) => track.id === currentTrack.id
     );
-    const nextIndex = (currentIndex + 1) % playlist.length;
-    changeTrack(playlist[nextIndex]);
+    const nextIndex = (currentIndex + 1) % queue.length;
+    changeTrack(queue[nextIndex]);
   };
 
   const handlePrevious = () => {
@@ -738,11 +720,12 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
       spotifyPlayerRef.current.previousTrack();
       return;
     }
-    const currentIndex = playlist.findIndex(
+    if (useSpotify || !queue.length) return;
+    const currentIndex = queue.findIndex(
       (track) => track.id === currentTrack.id
     );
-    const prevIndex = (currentIndex - 1 + playlist.length) % playlist.length;
-    changeTrack(playlist[prevIndex]);
+    const prevIndex = (currentIndex - 1 + queue.length) % queue.length;
+    changeTrack(queue[prevIndex]);
   };
 
   const formatTime = (progress: number) => {
@@ -764,7 +747,7 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const handleSeek = async (value: number[]) => {
+  const handleSeek = useCallback(async (value: number[]) => {
     const pct = value[0];
     if (useSpotify && spotifyPlayerRef.current) {
       try {
@@ -787,11 +770,11 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
       playClickSound();
       return;
     }
-    if (!audioRef.current) return;
+    if (useSpotify || !audioRef.current || !Number.isFinite(audioRef.current.duration)) return;
     audioRef.current.currentTime = (audioRef.current.duration * pct) / 100;
     setProgress(pct);
     playClickSound();
-  };
+  }, [useSpotify, spDurationMs, audioRef, setProgress, playClickSound]);
 
   const handleSeekWrapped = useCallback((value: number[]) => {
     isDraggingSlider.current = true;
@@ -815,31 +798,20 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
     playMenuSound();
   };
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const handleEnded = () => {
-      handleNext();
-    };
-
-    const handleError = () => {
-      setIsLoading(false);
-      setIsPlaying(false);
-    };
-
-    audio.addEventListener("ended", handleEnded);
-    audio.addEventListener("error", handleError);
-
-    return () => {
-      audio.removeEventListener("ended", handleEnded);
-      audio.removeEventListener("error", handleError);
-    };
-  }, []);
+  const errorFeedbackProps = {
+    playbackError: youtube.configured && !unavailable && playbackError,
+    onRetry: retryPlayback,
+    onSkipUnavailable: () => {
+      if (queue.length === 1) retryPlayback();
+      else { handleNext(); setIsPlaying(true); }
+    },
+    youtubeMusicUrl: youtube.playlist?.url,
+  };
 
   if (isDesktop && !isExpanded) {
     return (
       <ThemedMusicPlayer
+        {...errorFeedbackProps}
         playerType="collapsed"
         embedded={embedded}
         playerRef={playerRef}
@@ -848,7 +820,7 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
         handleButtonClick={handleButtonClick}
         handleButtonHover={handleButtonHover}
         handleButtonLeave={handleButtonLeave}
-        isLoading={isLoading}
+        isLoading={playerLoading}
         albumCoverRef={albumCoverRef}
         useSpotify={useSpotify}
         spotifyCurrentTrack={spotifyCurrentTrack}
@@ -862,6 +834,7 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
   if (isDesktop && isExpanded) {
     return (
       <ThemedMusicPlayer
+        {...errorFeedbackProps}
         playerType="expanded"
         embedded={embedded}
         playerRef={playerRef}
@@ -879,7 +852,7 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
         currentTrack={currentTrack}
         progress={progress}
         handleSeek={handleSeekWrapped}
-        isLoading={isLoading}
+        isLoading={playerLoading}
         formatTime={formatTime}
         spDurationMs={spDurationMs}
         isPlaying={isPlaying}
@@ -892,7 +865,7 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
         playClickSound={playClickSound}
         playlistRef={playlistRef}
         spotifyPlaylistTracks={spotifyPlaylistTracks}
-        playlist={playlist}
+        playlist={queue}
         changeTrack={changeTrack}
         formatDuration={formatDuration}
         musicPlayerStyleId={musicPlayerStyleId}
@@ -905,12 +878,20 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
   // Mobile/Widget version with horizontal scrolling playlist
   return (
     <ThemedMusicPlayer
+      {...errorFeedbackProps}
       playerType="mobile"
+      embedded={embedded}
+      volume={volume}
+      setVolume={setVolume}
+      spDurationMs={spDurationMs}
+      spotifyPlayerRef={spotifyPlayerRef}
+      isSpotifyFallback={useSpotify && spotifyFailed}
+      spotifyEmbedUrl={spotifyEmbedUrl}
       playerRef={playerRef}
       showPlaylist={showPlaylist}
       setShowPlaylist={setShowPlaylist}
       albumCoverRef={albumCoverRef}
-      isLoading={isLoading}
+      isLoading={playerLoading}
       useSpotify={useSpotify}
       spotifyCurrentTrack={spotifyCurrentTrack}
       currentTrack={currentTrack}
@@ -928,7 +909,7 @@ const MusicPlayerWidget = memo(function MusicPlayerWidget({
       handleSeek={handleSeekWrapped}
       formatTime={formatTime}
       spotifyPlaylistTracks={spotifyPlaylistTracks}
-      playlist={playlist}
+      playlist={queue}
       changeTrack={changeTrack}
       formatDuration={formatDuration}
       musicPlayerStyleId={musicPlayerStyleId}

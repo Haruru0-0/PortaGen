@@ -1,11 +1,12 @@
 "use client"
 import { PersonaPageHeader } from "@/components/workspace/persona-page-header"
+import { WorkspaceFrameLayers } from "@/components/workspace/workspace-frame"
 import React, { useEffect, useState } from "react"
 import Link from "@/components/workspace/workspace-link"
 import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
 import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
 import { WorkspaceModal as PixelModal } from "@/components/workspace/workspace-modal"
-import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
+import { WorkspaceInput as PixelInput, WorkspaceTextarea } from "@/components/workspace/workspace-primitives"
 import { usePortfolioContext } from "@/contexts/portfolioContext"
 
 export default function PortfoliosPage() {
@@ -89,8 +90,8 @@ export default function PortfoliosPage() {
             {portfolios.map((portfolio, index) => (
               <button key={portfolio.id} type="button" aria-pressed={selected?.id === portfolio.id} data-persona-slot
                 onClick={() => setSelectedId(portfolio.id)}
-                className={`w-full text-left p-5 border min-h-24 flex gap-4 items-center focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#44e4ff] ${selected?.id === portfolio.id ? "bg-[#fffef5] text-[#bc174c] border-[#fffef5]" : "bg-[#071657] text-[#fffef5] border-[#3864a6] hover:border-[#44e4ff]"}`}>
-                <span className="text-2xl tabular-nums opacity-70" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                className={`ws-cut-frame ws-slot-selector relative w-full text-left p-5 border min-h-24 flex gap-4 items-center focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#44e4ff] ${selected?.id === portfolio.id ? "bg-[#fffef5] text-[#bc174c] border-[#fffef5]" : "bg-[#071657] text-[#fffef5] border-[#3864a6] hover:border-[#44e4ff]"}`}>
+                <WorkspaceFrameLayers/><span className="text-2xl tabular-nums opacity-70" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
                 <span className="min-w-0"><span className="block font-semibold break-words">{portfolio.portfolioName}</span><span className="block mt-1 text-sm">{selected?.id === portfolio.id ? "Selected portfolio" : "Select portfolio"}</span></span>
               </button>
             ))}
@@ -116,7 +117,7 @@ export default function PortfoliosPage() {
           </div>
           <div>
             <label htmlFor="new-portfolio-bio" className="block text-sm mb-2">Bio</label>
-            <textarea id="new-portfolio-bio"
+            <WorkspaceTextarea id="new-portfolio-bio"
               value={newBio}
               onChange={(e) => setNewBio(e.target.value)}
               placeholder="A short description of your portfolio..."

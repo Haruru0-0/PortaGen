@@ -2,7 +2,7 @@
 
 Structure: [[architecture]].
 
-- Dashboard with a portfolio editor, asset manager, settings and AI chat (commit "add AI chat functionality to dashboard"); image-URL support for wallpapers, icons and widgets.
+- Dashboard with a portfolio editor, asset manager and settings (PortaGen AI removed at the author's request on 2026-11-10); image-URL support for wallpapers, icons and widgets.
 - Published portfolios at `/portfolio/[username]` as a themed desktop with draggable windows, a lock screen, sound effects and widgets (including a music player).
 - Window types: about me, blog, contact, links, projects, resume.
 - GitHub Actions mirrors the repo to GitLab on every push.
@@ -26,3 +26,5 @@ Structure: [[architecture]].
 - Editor: from 1400px (`min-[1400px]:`) the preview is a sticky 440px pane beside the controls; the jump button and back link are hidden there. A pane under 738px starts in the mobile view and the DESKTOP button opens the full-screen desktop. Tab strip scrolls the selected tab into view with a right-edge fade. Still open: one global SAVE and a saved indicator.
 - Targets: `PixelButton` has `min-h-10`; filters, preview toggles and standalone links are at least 40px high.
 - Titles and labels: each route has its own tab title through a `layout.tsx` with `metadata` (client layouts cannot export metadata, and setting `document.title` in an effect gets reset); landing h1 is "BUILD A DESKTOP. PUBLISH A LINK."; editor name and bio fields and the asset search boxes are labelled.
+
+- **2026-11-11 Music playlist links:** editor preview/save/remove for public or unlisted YouTube Music/YouTube playlists, without Google login. Existing portfolio player skins support the retrieved queue, seek, next/previous, volume and error/retry actions. URL stored in the existing legacy Spotify field; owner-checked save API; no DB migration. Real supported-track audio/seek and mobile editor checks passed; persistence UI was mocked, not a live DB write. Full playback of some tracks is blocked upstream. See `docs/qa/2026-11-11-youtube-music-links.md`.

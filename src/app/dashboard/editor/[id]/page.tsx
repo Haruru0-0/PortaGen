@@ -12,7 +12,7 @@ import { useGoogleDrive } from "@/hooks/use-google-drive"
 import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
 import { WorkspaceAction as PixelButton } from "@/components/workspace/workspace-primitives"
 import { WorkspaceLink } from "@/components/workspace/workspace-link"
-import { Cloud, XCircle } from "lucide-react"
+import { ArrowLeft, ArrowUp, ArrowDown, Cloud, XCircle } from "lucide-react"
 
 export default function EditorPage() {
     const tabsId = useId();
@@ -21,7 +21,7 @@ export default function EditorPage() {
     return (
         <div>
             <div className="workspace-controls">
-                <WorkspaceLink href="/dashboard/portfolios" transition="back" className="workspace-editor-return">← Portfolios</WorkspaceLink>
+                <WorkspaceLink href="/dashboard/portfolios" transition="back" className="workspace-editor-return ws-action ws-action--secondary"><ArrowLeft size={18} aria-hidden="true"/>Portfolios</WorkspaceLink>
                 <PortfolioUrlShare />
 
             {driveLoading && (
@@ -74,9 +74,9 @@ export default function EditorPage() {
                     <div id="live-preview" className="workspace-editor-preview-shell flex-1 scroll-mt-4 min-[1400px]:sticky min-[1400px]:top-4 min-[1400px]:max-h-[calc(100vh-2rem)] min-[1400px]:overflow-y-auto">
                         <a
                             href="#editor-top"
-                            className="workspace-editor-preview-link inline-flex items-center min-h-11 py-2 mb-2 text-sm hover:underline min-[1400px]:hidden"
+                            className="workspace-editor-preview-link ws-action ws-action--secondary inline-flex items-center min-h-11 py-2 mb-2 text-sm hover:underline min-[1400px]:hidden"
                         >
-                            ↑ Back to the controls
+                            <ArrowUp size={18} aria-hidden="true"/> Back to the controls
                         </a>
                         <PreviewPanel />
                     </div>
@@ -103,10 +103,10 @@ function JumpToPreviewButton() {
     return (
         <a
             href="#live-preview"
-            className="workspace-editor-preview-link min-[1400px]:hidden fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] md:bottom-4 right-20 z-50 min-h-11 px-4 flex items-center"
+            className="workspace-editor-preview-link ws-action ws-action--secondary min-[1400px]:hidden fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] md:bottom-4 right-20 z-50 min-h-11 px-4 flex items-center"
             aria-label="Jump to the live preview"
         >
-            Preview ↓
+            Preview <ArrowDown size={18} aria-hidden="true"/>
         </a>
     )
 }

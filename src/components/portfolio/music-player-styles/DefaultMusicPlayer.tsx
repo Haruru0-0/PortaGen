@@ -57,7 +57,7 @@ export function DefaultMusicPlayer(props: MusicPlayerStyleProps) {
             onPlayPause: restProps.onPlayPause || (() => {}),
             onNext: restProps.onNext || (() => {}),
             onPrevious: restProps.onPrevious || (() => {}),
-            volume: restProps.volume || 50,
+            volume: restProps.volume ?? 50,
             setVolume: restProps.setVolume || (() => {}),
             spotifyPlayerRef: (restProps.spotifyPlayerRef as React.MutableRefObject<any>) || { current: null },
             playClickSound: restProps.playClickSound || (() => {}),

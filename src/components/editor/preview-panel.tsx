@@ -41,7 +41,7 @@ export function PreviewPanel() {
     return (
         <PixelCard className={`workspace-editor-preview-shell ${isFullScreen ? "fixed inset-0 z-50 m-0 rounded-none w-screen h-screen border-0" : ""}`}>
             <div className="space-y-4 h-full flex flex-col">
-                <div className="workspace-controls flex flex-col md:flex-row md:items-center justify-between flex-wrap gap-4">
+                <div className="workspace-controls workspace-preview-toolbar flex flex-col md:flex-row md:items-center justify-between flex-wrap gap-4">
                     <h3 className="text-sm workspace-editor-title">LIVE PREVIEW</h3>
                     <div className="flex gap-3 flex-col md:flex-row flex-wrap md:items-center">
                         {/* Screen Size Toggle */}
@@ -54,7 +54,7 @@ export function PreviewPanel() {
                                         if (isNarrow) setIsFullScreen(true)
                                     }}
                                     aria-pressed={previewMode === "desktop"}
-                                    className={`min-h-11 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 ${previewMode === "desktop"
+                                    className={`ws-action ws-preview-action min-h-11 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 ${previewMode === "desktop"
                                         ? "bg-primary text-primary-foreground"
                                         : "bg-card hover:bg-muted"
                                         }`}
@@ -66,7 +66,7 @@ export function PreviewPanel() {
                                 <button
                                     onClick={() => setPreviewMode("mobile")}
                                     aria-pressed={previewMode === "mobile"}
-                                    className={`min-h-11 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 ${previewMode === "mobile"
+                                    className={`ws-action ws-preview-action min-h-11 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 ${previewMode === "mobile"
                                         ? "bg-primary text-primary-foreground"
                                         : "bg-card hover:bg-muted"
                                         }`}
@@ -82,8 +82,9 @@ export function PreviewPanel() {
                             <span className="text-xs text-muted-foreground font-bold uppercase">Page:</span>
                             <div className="flex items-center gap-1">
                                 <button
+                                    aria-pressed={isLocked}
                                     onClick={() => setIsLocked(true)}
-                                    className={`min-h-11 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 ${isLocked
+                                    className={`ws-action ws-preview-action min-h-11 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 ${isLocked
                                         ? "bg-primary text-primary-foreground"
                                         : "bg-card hover:bg-muted"
                                         }`}
@@ -92,8 +93,9 @@ export function PreviewPanel() {
                                     LOCK
                                 </button>
                                 <button
+                                    aria-pressed={!isLocked}
                                     onClick={() => setIsLocked(false)}
-                                    className={`min-h-11 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 ${!isLocked
+                                    className={`ws-action ws-preview-action min-h-11 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 ${!isLocked
                                         ? "bg-primary text-primary-foreground"
                                         : "bg-card hover:bg-muted"
                                         }`}
@@ -107,8 +109,9 @@ export function PreviewPanel() {
                         {/* Full Screen Toggle */}
                         <div className="flex items-center gap-1">
                             <button
+                                aria-pressed={isFullScreen}
                                 onClick={() => setIsFullScreen(!isFullScreen)}
-                                className={`min-h-11 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 bg-card hover:bg-muted`}
+                                className={`ws-action ws-preview-action min-h-11 px-3 py-2 text-xs border-2 border-border flex items-center gap-1 bg-card hover:bg-muted`}
                                 title={isFullScreen ? "Exit Full Screen" : "Full Screen"}
                             >
                                 {isFullScreen ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}

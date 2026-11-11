@@ -2,6 +2,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { isWorkspacePath } from '@/lib/blue-hour/navigation-policy';
+import { WorkspaceReveals } from "./workspace-reveals";
 import { WorkspaceScene } from "./workspace-scene";
 import { useWorkspaceMotion } from './workspace-motion-provider';
 type Experience = {
@@ -78,6 +79,6 @@ export function WorkspaceExperienceProvider({ children }: {
         if (href)
             router.push(href);
     } }, [reducedMotion, clear, router]);
-    return <Context.Provider value={{ navigate, cancelPendingTransition }}>{isWorkspacePath(pathname) ? <div className="workspace-theme persona-app" data-workspace-surface={surface} data-workspace-motion={reducedMotion ? 'reduced' : 'full'}><WorkspaceScene surface={surface}/>{children}{cover && <div className={`ws-route-wipe ws-route-wipe-${cover}`} aria-hidden="true"/>}</div> : children}</Context.Provider>;
+    return <Context.Provider value={{ navigate, cancelPendingTransition }}>{isWorkspacePath(pathname) ? <div className="workspace-theme persona-app" data-workspace-surface={surface} data-workspace-motion={reducedMotion ? 'reduced' : 'full'}><WorkspaceScene surface={surface}/><WorkspaceReveals/>{children}{cover && <div className={`ws-route-wipe ws-route-wipe-${cover}`} aria-hidden="true"/>}</div> : children}</Context.Provider>;
 }
 export const useWorkspaceExperience = () => useContext(Context);

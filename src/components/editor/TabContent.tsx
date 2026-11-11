@@ -9,6 +9,7 @@ import { SoundEffectsTab } from "@/components/editor/sound-effects-tab";
 import { ThemeEditor } from "@/components/theme-editor";
 import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives";
 import { DesktopWidgetTab } from "@/components/editor/desktop-widget-tab";
+import { animate } from "motion";
 import { useEffect, useRef } from "react";
 import { useWorkspaceMotion } from "@/components/workspace/workspace-motion-provider";
 import { homeScreenTabs, lockScreenTabs } from "@/lib/constants/tabs";
@@ -28,11 +29,13 @@ export const TabContent = ({ idPrefix }: { idPrefix: string }) => {
     const tabs = activeCategory === "lockScreen" ? lockScreenTabs : homeScreenTabs;
     useEffect(() => {
         if (!ready || reducedMotion || !panelRef.current) return;
-        const animation = panelRef.current.animate(
-            [{ opacity: 0.65, transform: "translateY(4px)" }, { opacity: 1, transform: "translateY(0)" }],
-            { duration: 160, easing: "cubic-bezier(0.16,1,0.3,1)" }
-        );
-        return () => animation.cancel();
+        const panel = panelRef.current;
+        const original = { opacity: panel.style.opacity, translate: panel.style.translate };
+        const restore = () => { panel.style.opacity = original.opacity; panel.style.translate = original.translate; };
+        const animation = animate(panel, { opacity: [0, 1], translate: ["0 24px", "0 0px"] }, {
+            duration: .42, ease: [.22, 1, .36, 1], onComplete: restore,
+        });
+        return () => { animation.stop(); restore(); };
     }, [activeCategory, activeTab, ready, reducedMotion]);
 
     return (

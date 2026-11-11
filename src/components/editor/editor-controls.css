@@ -39,7 +39,7 @@
 .workspace-controls [data-workspace-control] { min-width: 44px; min-height: 44px; }
 .workspace-controls .font-dialogue { font-family: inherit; }
 .workspace-controls :where(.text-xs, .text-\[10px\]) { font-size: .9375rem; }
-.workspace-editor-preview-shell { background: #071657; color: #fffef5; }
+.workspace-editor-preview-shell.ws-panel { background: #071657; color: #fffef5; }
 .workspace-controls :where(button, input, textarea):disabled { cursor: not-allowed; }
 .workspace-controls :where(button, input, textarea) { scroll-margin-block: 6rem; }
 @media (min-width: 1024px) {

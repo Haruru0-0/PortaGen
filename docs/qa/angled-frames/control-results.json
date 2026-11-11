@@ -1,0 +1,16 @@
+{
+  "layouts": [
+    {
+      "width": 1440,
+      "controls": "focus, native value/onChange/FormData, ref, account menu, nested dialog",
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "controls": "focus, native value/onChange/FormData, ref, account menu, nested dialog",
+      "overflow": false
+    }
+  ],
+  "errors": [],
+  "fixture": true
+}

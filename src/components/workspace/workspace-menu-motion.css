@@ -1,0 +1,22 @@
+/* Animate the portal surface, preserving Popper's positioning wrapper. */
+.workspace-theme:is(.ws-select,.ws-dropdown) {
+  --ws-menu-enter-x:0px; --ws-menu-enter-y:-12px;
+  --ws-menu-exit-x:0px; --ws-menu-exit-y:-8px;
+  transform-origin:var(--radix-select-content-transform-origin,var(--radix-dropdown-menu-content-transform-origin,center top));
+}
+.workspace-theme:is(.ws-select,.ws-dropdown)[data-side="top"] { --ws-menu-enter-y:12px; --ws-menu-exit-y:8px; }
+.workspace-theme.ws-dropdown[data-side="left"] { --ws-menu-enter-x:12px; --ws-menu-enter-y:0px; --ws-menu-exit-x:8px; --ws-menu-exit-y:0px; }
+.workspace-theme.ws-dropdown[data-side="right"] { --ws-menu-enter-x:-12px; --ws-menu-enter-y:0px; --ws-menu-exit-x:-8px; --ws-menu-exit-y:0px; }
+.workspace-theme:is(.ws-select,.ws-dropdown)[data-workspace-motion="full"][data-state="open"] { animation:ws-menu-in 280ms cubic-bezier(.22,1,.36,1) both; }
+.workspace-theme:is(.ws-select,.ws-dropdown)[data-workspace-motion="full"][data-state="closed"] { animation:ws-menu-out 160ms cubic-bezier(.4,0,1,1) both; }
+.workspace-theme[data-menu-exit-snapshot] { pointer-events:none!important; }
+@keyframes ws-menu-in {
+  from { opacity:0; transform:translate(var(--ws-menu-enter-x),var(--ws-menu-enter-y)); }
+  to { opacity:1; transform:translate(0,0); }
+}
+@keyframes ws-menu-out {
+  from { opacity:var(--ws-menu-exit-opacity,1); transform:translate(0,0); }
+  to { opacity:0; transform:translate(var(--ws-menu-exit-x),var(--ws-menu-exit-y)); }
+}
+
+.workspace-theme.ws-dropdown[data-state="closed"] { pointer-events:none; }

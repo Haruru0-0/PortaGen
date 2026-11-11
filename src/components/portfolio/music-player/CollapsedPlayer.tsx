@@ -37,7 +37,7 @@ export const CollapsedPlayer: React.FC<CollapsedPlayerProps> = ({
             ref={playerRef}
             className={`${embedded ? "absolute" : "fixed"} bottom-6 right-6 z-99`}
         >
-            <button
+            <button type="button" aria-label="Open music player"
                 ref={(el) => {
                     if (el) buttonsRef.current[0] = el;
                 }}

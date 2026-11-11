@@ -1,4 +1,5 @@
 import { WorkspacePanel as PixelCard } from "@/components/workspace/workspace-primitives"
+import { WorkspaceTextarea } from "@/components/workspace/workspace-primitives"
 import { WorkspaceInput as PixelInput } from "@/components/workspace/workspace-primitives"
 import { usePortfolioContext } from "@/contexts/portfolioContext"
 import { useParams } from "next/navigation"
@@ -39,7 +40,7 @@ export function PortfolioSettings() {
                     </div>
                     <div>
                         <label htmlFor="portfolio-bio" className="block text-xs uppercase tracking-wider mb-2">Bio</label>
-                        <textarea
+                        <WorkspaceTextarea
                             id="portfolio-bio"
                             value={portfolioInfo?.bio || ""}
                             onChange={(e) => setBio(e.target.value)}

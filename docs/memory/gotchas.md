@@ -14,3 +14,7 @@ See [[architecture]].
 
 - After editing `globals.css`, restart `yarn dev`; the old CSS is served otherwise.
 - Do not use `Math.random()` in render (skylines, etc.); it breaks hydration. Use a deterministic formula.
+
+- **YouTube metadata success is insufficient evidence of playback:** a track can allow its first audio bytes and still reject complete/later requests with HTTP 403. Test complete playback or near-end seeking. Google sign-in is not a confirmed fix. See [[youtube-music]].
+- **Music field naming is legacy:** `spotifyPlaylistUrl` can now contain a YouTube Music URL. Validate the provider before loading the Spotify SDK; no column migration was needed.
+- **Current build evidence (2026-11-11):** `yarn build --webpack` passed with the current port/redesign/music changes. Production traces include QuickJS WASM, and local production metadata/audio requests passed. Existing next-video experimental tracing, middleware and browser-mapping warnings remain. This does not verify live DB writes or deployment.

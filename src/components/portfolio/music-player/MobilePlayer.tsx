@@ -135,7 +135,7 @@ export const MobilePlayer: React.FC<MobilePlayerProps> = ({
 
                             <div className="flex items-center justify-between w-full">
                                 <div className="flex items-center space-x-2">
-                                    <button
+                                    <button type="button" aria-label="Previous track"
                                         ref={(el) => {
                                             if (el) buttonsRef.current[6] = el;
                                         }}
@@ -155,7 +155,7 @@ export const MobilePlayer: React.FC<MobilePlayerProps> = ({
                                         </div>
                                     </button>
 
-                                    <button
+                                    <button type="button" aria-label={isPlaying ? "Pause music" : "Play music"}
                                         ref={(el) => {
                                             if (el) buttonsRef.current[7] = el;
                                         }}
@@ -180,7 +180,7 @@ export const MobilePlayer: React.FC<MobilePlayerProps> = ({
                                         </div>
                                     </button>
 
-                                    <button
+                                    <button type="button" aria-label="Next track"
                                         ref={(el) => {
                                             if (el) buttonsRef.current[8] = el;
                                         }}

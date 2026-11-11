@@ -190,7 +190,7 @@ export default function SignUpPage() {
   // OTP Verification View
   if (verifying) {
     return (
-      <AuthScene artwork="/artwork/eighty-six/reference-set/09-lena-bouquet.webp" title="Verify your email" description="Check your inbox to activate your account.">
+      <AuthScene artwork="/artwork/eighty-six/reference-set/03-lena-wind.webp" artworkLayout="left-panel" title="Verify your email" description="Check your inbox to activate your account.">
             <div className="space-y-6">
 
 
@@ -223,7 +223,7 @@ export default function SignUpPage() {
 
   // Signup Form View
   return (
-    <AuthScene artwork="/artwork/eighty-six/reference-set/09-lena-bouquet.webp" title="Create an account" description="Make a portfolio people can explore.">
+    <AuthScene artwork="/artwork/eighty-six/reference-set/03-lena-wind.webp" artworkLayout="left-panel" title="Create an account" description="Make a portfolio people can explore.">
           <div className="space-y-6">
 
 
@@ -234,7 +234,7 @@ export default function SignUpPage() {
             )}
 
             <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div>
                   <PixelInput
                     label="FIRST NAME"
@@ -292,7 +292,7 @@ export default function SignUpPage() {
                 )}
               </div>
 
-              <div className={"grid grid-cols-1 sm:grid-cols-2 gap-4"}>
+              <div className={"grid grid-cols-1 lg:grid-cols-2 gap-4"}>
                 <div>
                   <PixelPasswordInput
                     label="PASSWORD"

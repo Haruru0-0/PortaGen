@@ -58,6 +58,7 @@ export function LockScreenSettingsTab() {
                                     <span className="font-dialogue text-sm">ENABLE LOCK SCREEN</span>
                                     <FormControl>
                                         <Switch
+                                            aria-label="Enable lock screen"
                                             checked={!!field.value}
                                             onCheckedChange={(checked) => {
                                                 field.onChange(checked)
