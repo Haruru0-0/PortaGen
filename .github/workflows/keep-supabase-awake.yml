@@ -1,0 +1,35 @@
+name: Keep Supabase awake
+
+# Free Supabase projects pause after about a week without activity. This runs one tiny database query every three days
+# so the project never counts as idle. Run it by hand from the Actions tab to check the setup.
+on:
+  schedule:
+    - cron: '23 6 */3 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: keep-supabase-awake
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # SUPABASE_DB_URL must be the Supavisor SESSION POOLER string (Project Settings > Database > Connection string),
+      # not the direct db.<ref>.supabase.co host: GitHub runners have no IPv6 and the direct host is IPv6-only.
+      - name: Run one query on the database
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PGCONNECT_TIMEOUT: '30'
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "Add the SUPABASE_DB_URL repository secret (the session pooler connection string)."
+            exit 1
+          fi
+          # A paused project refuses the connection, which fails this run and emails you.
+          psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 --no-psqlrc -tAc 'select 1' > /dev/null
+          echo "Database answered the query"
