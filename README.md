@@ -59,7 +59,7 @@ Add screenshots or an animated GIF here showing the editor and generated portfol
 Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/AhmadKanaan0/PortaGen.git
+git clone https://github.com/Haruru0-0/PortaGen.git
 cd PortaGen
 yarn install
 ```
@@ -188,7 +188,7 @@ For other hosts (Docker, custom server), follow Next.js deployment docs: https:/
 
 Add a LICENSE file to specify the license for this project (MIT is common). For now, this repo does not include a license file — add one if you’d like to allow reuse.
 
-Maintainer: AhmadKanaan0 — https://github.com/AhmadKanaan0
+Maintainer: Haruru0-0 — https://github.com/Haruru0-0
 
 ---
 
